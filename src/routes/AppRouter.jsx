@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 // Import components
@@ -9,65 +9,71 @@ import Register from '../features/auth/Register';
 import CustomerDashboard from '../features/Customer/CustomerDashboard';
 import DoctorDashboard from '../features/Doctor/DoctorDashboard';
 import AdminDashboard from '../features/Admin/AdminDashboard';
-
+import Settings from '../features/Settings/Settings';
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const { isAuthenticated, user, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '1.2rem',
+        color: '#666'
+      }}>
+        Loading...
+      </div>
+    );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-    return <Navigate to="/unauthorized" replace />;
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
 };
 
-// Public Route Component (redirect if authenticated)
+// Public Route Component (redirect if already logged in)
 const PublicRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '1.2rem',
+        color: '#666'
+      }}>
+        Loading...
+      </div>
+    );
   }
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+  if (user) {
+    // Redirect based on user role
+    switch (user.role) {
+      case 'Admin':
+        return <Navigate to="/admin" replace />;
+      case 'Doctor':
+        return <Navigate to="/doctor" replace />;
+      case 'Patient':
+        return <Navigate to="/customer" replace />;
+      default:
+        return <Navigate to="/" replace />;
+    }
   }
 
   return children;
-};
-
-// Dashboard Route Component (role-based routing)
-const DashboardRoute = () => {
-  const { user } = useAuth();
-
-  console.log('DashboardRoute - User:', user);
-  console.log('DashboardRoute - User Role:', user?.role);
-
-  // Handle role-based routing with case-insensitive comparison
-  const userRole = user?.role?.toLowerCase();
-  
-  switch (userRole) {
-    case 'patient':
-      console.log('Routing to CustomerDashboard');
-      return <CustomerDashboard />;
-    case 'doctor':
-      console.log('Routing to DoctorDashboard');
-      return <DoctorDashboard />;
-    case 'admin':
-      console.log('Routing to AdminDashboard');
-      return <AdminDashboard />;
-    default:
-      console.log('Unknown role, redirecting to unauthorized:', userRole);
-      return <Navigate to="/unauthorized" replace />;
-  }
 };
 
 const AppRouter = () => {
@@ -75,6 +81,8 @@ const AppRouter = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
+      
+      {/* Auth Routes */}
       <Route 
         path="/login" 
         element={
@@ -94,33 +102,25 @@ const AppRouter = () => {
 
       {/* Protected Routes */}
       <Route 
-        path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <DashboardRoute />
-          </ProtectedRoute>
-        } 
-      />
-
-      {/* Role-specific Routes */}
-      <Route 
-        path="/patient/*" 
+        path="/customer" 
         element={
           <ProtectedRoute allowedRoles={['Patient']}>
             <CustomerDashboard />
           </ProtectedRoute>
         } 
       />
+      
       <Route 
-        path="/doctor/*" 
+        path="/doctor" 
         element={
           <ProtectedRoute allowedRoles={['Doctor']}>
             <DoctorDashboard />
           </ProtectedRoute>
         } 
       />
+      
       <Route 
-        path="/admin/*" 
+        path="/admin" 
         element={
           <ProtectedRoute allowedRoles={['Admin']}>
             <AdminDashboard />
@@ -128,25 +128,18 @@ const AppRouter = () => {
         } 
       />
 
-      {/* Error Routes */}
+      {/* Settings Route - Available to all authenticated users */}
       <Route 
-        path="/unauthorized" 
+        path="/settings" 
         element={
-          <div className="error-page">
-            <h1>Unauthorized</h1>
-            <p>You don't have permission to access this page.</p>
-          </div>
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
         } 
       />
-      <Route 
-        path="*" 
-        element={
-          <div className="error-page">
-            <h1>Page Not Found</h1>
-            <p>The page you're looking for doesn't exist.</p>
-          </div>
-        } 
-      />
+
+      {/* Catch all route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

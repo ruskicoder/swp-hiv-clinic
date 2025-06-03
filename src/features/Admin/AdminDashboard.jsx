@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
+import ErrorBoundary from '../../components/ErrorBoundary';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
+import { SafeText } from '../../utils/SafeComponents';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -14,15 +19,12 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
-  const [appointments, setAppointments] = useState([]);
+const [appointments, setAppointments] = useState([]);
   const [specialties, setSpecialties] = useState([]);
 
-  // Error states for individual sections
+  // Error states
   const [usersError, setUsersError] = useState('');
-  const [patientsError, setPatientsError] = useState('');
-  const [doctorsError, setDoctorsError] = useState('');
   const [appointmentsError, setAppointmentsError] = useState('');
-  const [specialtiesError, setSpecialtiesError] = useState('');
 
   useEffect(() => {
     loadDashboardData();
@@ -31,59 +33,42 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     setError('');
-    setUsersError('');
-    setPatientsError('');
-    setDoctorsError('');
-    setAppointmentsError('');
-    setSpecialtiesError('');
 
     try {
       console.log('Loading admin dashboard data...');
       
-      // Load users
-      try {
-        const usersRes = await apiClient.get('/admin/users');
-        setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
-      } catch (err) {
-        setUsers([]);
+      // Load all data concurrently
+      const [usersResult, patientsResult, doctorsResult, appointmentsResult, specialtiesResult] = await Promise.allSettled([
+        apiClient.get('/admin/users'),
+        apiClient.get('/admin/patients'),
+        apiClient.get('/admin/doctors'),
+        apiClient.get('/admin/appointments'),
+        apiClient.get('/admin/specialties')
+      ]);
+
+      // Handle results
+      if (usersResult.status === 'fulfilled' && usersResult.value?.data) {
+        setUsers(Array.isArray(usersResult.value.data) ? usersResult.value.data : []);
+      } else {
         setUsersError('Failed to load users');
-        console.error('Failed to load users:', err);
       }
-      // Load patients
-      try {
-        const patientsRes = await apiClient.get('/admin/patients');
-        setPatients(Array.isArray(patientsRes.data) ? patientsRes.data : []);
-      } catch (err) {
-        setPatients([]);
-        setPatientsError('Failed to load patients');
-        console.error('Failed to load patients:', err);
+
+      if (patientsResult.status === 'fulfilled' && patientsResult.value?.data) {
+        setPatients(Array.isArray(patientsResult.value.data) ? patientsResult.value.data : []);
       }
-      // Load doctors
-      try {
-        const doctorsRes = await apiClient.get('/admin/doctors');
-        setDoctors(Array.isArray(doctorsRes.data) ? doctorsRes.data : []);
-      } catch (err) {
-        setDoctors([]);
-        setDoctorsError('Failed to load doctors');
-        console.error('Failed to load doctors:', err);
+
+      if (doctorsResult.status === 'fulfilled' && doctorsResult.value?.data) {
+        setDoctors(Array.isArray(doctorsResult.value.data) ? doctorsResult.value.data : []);
       }
-      // Load appointments
-      try {
-        const appointmentsRes = await apiClient.get('/admin/appointments');
-        setAppointments(Array.isArray(appointmentsRes.data) ? appointmentsRes.data : []);
-      } catch (err) {
-        setAppointments([]);
+
+      if (appointmentsResult.status === 'fulfilled' && appointmentsResult.value?.data) {
+        setAppointments(Array.isArray(appointmentsResult.value.data) ? appointmentsResult.value.data : []);
+      } else {
         setAppointmentsError('Failed to load appointments');
-        console.error('Failed to load appointments:', err);
       }
-      // Load specialties
-      try {
-        const specialtiesRes = await apiClient.get('/admin/specialties');
-        setSpecialties(Array.isArray(specialtiesRes.data) ? specialtiesRes.data : []);
-      } catch (err) {
-        setSpecialties([]);
-        setSpecialtiesError('Failed to load specialties');
-        console.error('Failed to load specialties:', err);
+
+      if (specialtiesResult.status === 'fulfilled' && specialtiesResult.value?.data) {
+        setSpecialties(Array.isArray(specialtiesResult.value.data) ? specialtiesResult.value.data : []);
       }
 
     } catch (error) {
@@ -98,250 +83,267 @@ const AdminDashboard = () => {
     try {
       const response = await apiClient.put(`/admin/users/${userId}/toggle-status`);
       if (response.data.success) {
-        loadDashboardData();
+        loadDashboardData(); // Reload data
       }
-      } catch (error) {
+    } catch (error) {
       console.error('Toggle user status error:', error);
-      setError('Failed to update user status');
-      }
+      setError('Failed to toggle user status');
+    }
   };
 
   const handleResetPassword = async (userId) => {
-    const newPassword = prompt('Enter new password:');
-    if (newPassword) {
+    const newPassword = prompt('Enter new password for user:');
+    if (!newPassword) return;
+
     try {
-        const response = await apiClient.put(`/admin/users/${userId}/reset-password`, null, {
-          params: { newPassword }
-        });
-        if (response.data.success) {
-          alert('Password reset successfully');
-        }
+      const response = await apiClient.put(`/admin/users/${userId}/reset-password`, null, {
+        params: { newPassword }
+      });
+      if (response.data.success) {
+        alert('Password reset successfully');
+      }
     } catch (error) {
-        console.error('Reset password error:', error);
-        setError('Failed to reset password');
+      console.error('Reset password error:', error);
+      setError('Failed to reset password');
     }
-    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const navigationItems = [
     { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'users', label: 'Users', icon: '👥' },
-    { id: 'doctors', label: 'Doctors', icon: '👨‍⚕️' },
-    { id: 'appointments', label: 'Appointments', icon: '📅' },
-    { id: 'create-doctor', label: 'Add Doctor', icon: '➕' }
+    { id: 'users', label: 'Manage Users', icon: '👥' },
+    { id: 'doctors', label: 'Manage Doctors', icon: '👨‍⚕️' },
+    { id: 'appointments', label: 'All Appointments', icon: '📅' },
+    { id: 'create-doctor', label: 'Create Doctor', icon: '➕' }
   ];
+
   const renderOverview = () => (
-    <div className="overview-section">
-      <div className="content-header">
-        <h2>System Overview</h2>
-        <p>Monitor and manage your HIV medical treatment system</p>
+    <ErrorBoundary>
+      <div className="overview-section">
+        <div className="content-header">
+          <h2>Admin Dashboard</h2>
+          <p>Welcome back, <SafeText>{safeRender(user?.username)}</SafeText>! Manage the HIV Medical Treatment System.</p>
         </div>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>Total Users</h3>
-          <p className="stat-number">{users.length}</p>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total Users</h3>
+            <p className="stat-number">{users?.length || 0}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Total Patients</h3>
+            <p className="stat-number">{patients?.length || 0}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Total Doctors</h3>
+            <p className="stat-number">{doctors?.length || 0}</p>
+          </div>
+          <div className="stat-card">
+            <h3>Total Appointments</h3>
+            <p className="stat-number">{appointments?.length || 0}</p>
+          </div>
         </div>
-        <div className="stat-card">
-          <h3>Active Patients</h3>
-          <p className="stat-number">{patients.filter(p => p.isActive).length}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Active Doctors</h3>
-          <p className="stat-number">{doctors.filter(d => d.isActive).length}</p>
-      </div>
-        <div className="stat-card">
-          <h3>Total Appointments</h3>
-          <p className="stat-number">{appointments.length}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Scheduled Appointments</h3>
-          <p className="stat-number">
-            {appointments.filter(apt => apt.status === 'Scheduled').length}
-          </p>
-      </div>
-        <div className="stat-card">
-          <h3>Medical Specialties</h3>
-          <p className="stat-number">{specialties.length}</p>
-        </div>
-      </div>
 
-      {error && (
-        <div className="error-message">
-          {error}
-          <button onClick={loadDashboardData} className="action-btn" style={{marginLeft: '1rem'}}>
-            Retry
-      </button>
-        </div>
-      )}
-    </div>
+        {error && (
+          <div className="error-message">
+            <SafeText>{error}</SafeText>
+            <button onClick={loadDashboardData} className="retry-btn">
+              Retry
+            </button>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
 
   const renderUsers = () => (
-    <div className="users-section">
-      <div className="content-header">
-        <h2>User Management</h2>
-        <p>Manage all system users and their permissions</p>
-      </div>
-
-      <div className="section-header">
-        <h3>All Users ({users.length})</h3>
-      </div>
-
-      {usersError && <div className="error-message">{usersError}</div>}
-      
-      {users.length === 0 && !usersError ? (
-        <p>No users found.</p>
-      ) : (
-        <div className="users-table">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user.userId || Math.random()}>
-                  <td>{safeRender(user.userId)}</td>
-                  <td>{safeRender(user.username)}</td>
-                  <td>{safeRender(user.email)}</td>
-                  <td>
-                    <span className={`role-badge ${safeRender(user.role?.roleName, 'unknown').toLowerCase()}`}>
-                      {safeRender(user.role?.roleName, 'Unknown')}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}>
-                      {user.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>{safeDate(user.createdAt)}</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button 
-                        className={`toggle-btn ${user.isActive ? 'deactivate' : 'activate'}`}
-                        onClick={() => handleToggleUserStatus(user.userId)}
-                      >
-                        {user.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
-                      <button 
-                        className="reset-btn"
-                        onClick={() => handleResetPassword(user.userId)}
-                      >
-                        Reset Password
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <ErrorBoundary>
+      <div className="users-section">
+        <div className="content-header">
+          <h2>User Management</h2>
+          <p>Manage all system users and their permissions</p>
         </div>
-      )}
-    </div>
+
+        {usersError && (
+          <div className="error-message">
+            <SafeText>{usersError}</SafeText>
+          </div>
+        )}
+
+        {!users || users.length === 0 ? (
+          <div className="no-data">
+            <p>No users found.</p>
+            <button className="refresh-btn" onClick={loadDashboardData}>
+              Refresh
+            </button>
+          </div>
+        ) : (
+          <div className="users-table-container">
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user, index) => (
+                  <tr key={user?.userId || index}>
+                    <td><SafeText>{safeRender(user?.username)}</SafeText></td>
+                    <td><SafeText>{safeRender(user?.email)}</SafeText></td>
+                    <td>
+                      <span className={`role-badge ${safeRender(user?.role, '').toLowerCase()}`}>
+                        <SafeText>{safeRender(user?.role)}</SafeText>
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`status-badge ${user?.isActive ? 'active' : 'inactive'}`}>
+                        <SafeText>{user?.isActive ? 'Active' : 'Inactive'}</SafeText>
+                      </span>
+                    </td>
+                    <td><SafeText>{safeDate(user?.createdAt)}</SafeText></td>
+                    <td>
+                      <div className="action-buttons">
+                        <button 
+                          className={`action-btn ${user?.isActive ? 'deactivate' : 'activate'}`}
+                          onClick={() => handleToggleUserStatus(user?.userId)}
+                        >
+                          {user?.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button 
+                          className="action-btn reset"
+                          onClick={() => handleResetPassword(user?.userId)}
+                        >
+                          Reset Password
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
 
   const renderDoctors = () => (
-    <div className="doctors-section">
-      <div className="content-header">
-        <h2>Doctor Management</h2>
-        <p>Manage doctor accounts and their specializations</p>
-      </div>
-
-      <div className="section-header">
-        <h3>Doctors ({doctors.length})</h3>
-        <button 
-          className="add-btn"
-          onClick={() => setActiveTab('create-doctor')}
-        >
-          Add New Doctor
-        </button>
-      </div>
-
-      {doctorsError && <div className="error-message">{doctorsError}</div>}
-      
-      {doctors.length === 0 && !doctorsError ? (
-        <p>No doctors found.</p>
-      ) : (
-        <div className="doctors-grid">
-          {doctors.map(doctor => (
-            <div key={doctor.userId || Math.random()} className="doctor-card">
-              <h4>Dr. {safeRender(doctor.username)}</h4>
-              <p><strong>Email:</strong> {safeRender(doctor.email)}</p>
-              <p><strong>Status:</strong> {doctor.isActive ? 'Active' : 'Inactive'}</p>
-              <p><strong>Created:</strong> {safeDate(doctor.createdAt)}</p>
-              <div className="action-buttons">
-                <button 
-                  className={`toggle-btn ${doctor.isActive ? 'deactivate' : 'activate'}`}
-                  onClick={() => handleToggleUserStatus(doctor.userId)}
-                >
-                  {doctor.isActive ? 'Deactivate' : 'Activate'}
-                </button>
-              </div>
-            </div>
-          ))}
+    <ErrorBoundary>
+      <div className="doctors-section">
+        <div className="content-header">
+          <h2>Doctor Management</h2>
+          <p>Manage doctor accounts and their specialties</p>
         </div>
-      )}
-    </div>
+
+        {!doctors || doctors.length === 0 ? (
+          <div className="no-data">
+            <p>No doctors found.</p>
+            <button className="refresh-btn" onClick={loadDashboardData}>
+              Refresh
+            </button>
+          </div>
+        ) : (
+          <div className="doctors-grid">
+            {doctors.map((doctor, index) => (
+              <ErrorBoundary key={doctor?.userId || index}>
+                <div className="doctor-card">
+                  <div className="doctor-info">
+                    <h4><SafeText>Dr. {safeRender(doctor?.username)}</SafeText></h4>
+                    <p><strong>Email:</strong> <SafeText>{safeRender(doctor?.email)}</SafeText></p>
+                    <p><strong>Status:</strong> 
+                      <span className={`status-badge ${doctor?.isActive ? 'active' : 'inactive'}`}>
+                        <SafeText>{doctor?.isActive ? 'Active' : 'Inactive'}</SafeText>
+                      </span>
+                    </p>
+                    <p><strong>Created:</strong> <SafeText>{safeDate(doctor?.createdAt)}</SafeText></p>
+                  </div>
+                  <div className="doctor-actions">
+                    <button 
+                      className={`action-btn ${doctor?.isActive ? 'deactivate' : 'activate'}`}
+                      onClick={() => handleToggleUserStatus(doctor?.userId)}
+                    >
+                      {doctor?.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button 
+                      className="action-btn reset"
+                      onClick={() => handleResetPassword(doctor?.userId)}
+                    >
+                      Reset Password
+                    </button>
+                  </div>
+                </div>
+              </ErrorBoundary>
+            ))}
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
 
   const renderAppointments = () => (
-    <div className="appointments-section">
-      <div className="content-header">
-        <h2>Appointment Management</h2>
-        <p>Monitor and oversee all system appointments</p>
-      </div>
-
-      <div className="section-header">
-        <h3>All Appointments ({appointments.length})</h3>
-      </div>
-
-      {appointmentsError && <div className="error-message">{appointmentsError}</div>}
-      
-      {appointments.length === 0 && !appointmentsError ? (
-        <p>No appointments found.</p>
-      ) : (
-        <div className="appointments-table">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Patient</th>
-                <th>Doctor</th>
-                <th>Date & Time</th>
-                <th>Duration</th>
-                <th>Status</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointments.map(appointment => (
-                <tr key={appointment.appointmentId || Math.random()}>
-                  <td>{safeRender(appointment.appointmentId)}</td>
-                  <td>{safeRender(appointment.patientUser?.username, 'Unknown Patient')}</td>
-                  <td>Dr. {safeRender(appointment.doctorUser?.username, 'Unknown Doctor')}</td>
-                  <td>{safeDateTime(appointment.appointmentDateTime)}</td>
-                  <td>{safeRender(appointment.durationMinutes, '30')} min</td>
-                  <td>
-                    <span className={`status ${safeRender(appointment.status, 'unknown').toLowerCase()}`}>
-                      {safeRender(appointment.status, 'Unknown')}
-                    </span>
-                  </td>
-                  <td>{safeDate(appointment.createdAt)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <ErrorBoundary>
+      <div className="appointments-section">
+        <div className="content-header">
+          <h2>Appointment Management</h2>
+          <p>Overview of all appointments in the system</p>
         </div>
-      )}
-    </div>
+
+        {appointmentsError && (
+          <div className="error-message">
+            <SafeText>{appointmentsError}</SafeText>
+          </div>
+        )}
+
+        {!appointments || appointments.length === 0 ? (
+          <div className="no-data">
+            <p>No appointments found.</p>
+            <button className="refresh-btn" onClick={loadDashboardData}>
+              Refresh
+            </button>
+          </div>
+        ) : (
+          <div className="appointments-table-container">
+            <table className="appointments-table">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Doctor</th>
+                  <th>Date & Time</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.map((appointment, index) => (
+                  <tr key={appointment?.appointmentId || index}>
+                    <td><SafeText>{safeRender(appointment?.patientUser?.username)}</SafeText></td>
+                    <td><SafeText>Dr. {safeRender(appointment?.doctorUser?.username)}</SafeText></td>
+                    <td><SafeText>{safeDateTime(appointment?.appointmentDateTime)}</SafeText></td>
+                    <td><SafeText>{safeRender(appointment?.durationMinutes)} min</SafeText></td>
+                    <td>
+                      <span className={`status-badge ${safeRender(appointment?.status, '').toLowerCase()}`}>
+                        <SafeText>{safeRender(appointment?.status)}</SafeText>
+                      </span>
+                    </td>
+                    <td><SafeText>{safeDate(appointment?.createdAt)}</SafeText></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
 
   const CreateDoctorForm = () => {
@@ -364,21 +366,9 @@ const AdminDashboard = () => {
       setFormError('');
 
       try {
-        const formDataToSend = new URLSearchParams();
-        Object.keys(formData).forEach(key => {
-          if (formData[key]) {
-            formDataToSend.append(key, formData[key]);
-          }
-        });
-
-        const response = await apiClient.post('/admin/doctors', formDataToSend, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        });
-
+        const response = await apiClient.post('/admin/doctors', formData);
         if (response.data.success) {
-          alert('Doctor created successfully!');
+          alert('Doctor account created successfully!');
           setFormData({
             username: '',
             email: '',
@@ -390,14 +380,15 @@ const AdminDashboard = () => {
             bio: ''
           });
           loadDashboardData();
+          setActiveTab('doctors');
         }
       } catch (error) {
         console.error('Create doctor error:', error);
-        setFormError(error.response?.data?.message || 'Failed to create doctor');
+        setFormError(error.response?.data?.message || 'Failed to create doctor account');
       } finally {
         setFormLoading(false);
       }
-};
+    };
 
     const handleChange = (e) => {
       setFormData({
@@ -407,79 +398,84 @@ const AdminDashboard = () => {
     };
 
     return (
-      <div className="create-doctor-section">
-        <div className="content-header">
-          <h2>Add New Doctor</h2>
-          <p>Create a new doctor account with profile information</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="create-doctor-form">
-          {formError && <div className="error-message">{formError}</div>}
-          
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="username">Username *</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email *</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
+      <ErrorBoundary>
+        <div className="create-doctor-section">
+          <div className="content-header">
+            <h2>Create Doctor Account</h2>
+            <p>Add a new doctor to the system</p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password *</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength="6"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="create-doctor-form">
+            {formError && (
+              <div className="error-message">
+                <SafeText>{formError}</SafeText>
+              </div>
+            )}
 
-          <div className="form-row">
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
             <div className="form-group">
-              <label htmlFor="firstName">First Name *</label>
+              <label htmlFor="password">Password</label>
               <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
                 required
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="lastName">Last Name *</label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
 
-          <div className="form-row">
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="firstName">First Name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
             <div className="form-group">
               <label htmlFor="phoneNumber">Phone Number</label>
               <input
@@ -490,6 +486,7 @@ const AdminDashboard = () => {
                 onChange={handleChange}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="specialtyId">Specialty</label>
               <select
@@ -498,33 +495,33 @@ const AdminDashboard = () => {
                 value={formData.specialtyId}
                 onChange={handleChange}
               >
-                <option value="">Select Specialty</option>
-                {specialties.map(specialty => (
-                  <option key={specialty.specialtyId} value={specialty.specialtyId}>
-                    {specialty.specialtyName}
+                <option value="">Select a specialty...</option>
+                {specialties.map((specialty, index) => (
+                  <option key={specialty?.specialtyId || index} value={specialty?.specialtyId}>
+                    {safeRender(specialty?.specialtyName)}
                   </option>
                 ))}
               </select>
             </div>
-          </div>
 
-          <div className="form-group">
-            <label htmlFor="bio">Biography</label>
-            <textarea
-              id="bio"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              rows="4"
-              placeholder="Brief professional biography..."
-            />
-          </div>
+            <div className="form-group">
+              <label htmlFor="bio">Biography</label>
+              <textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                rows="4"
+                placeholder="Brief professional biography..."
+              />
+            </div>
 
-          <button type="submit" className="submit-btn" disabled={formLoading}>
-            {formLoading ? 'Creating Doctor...' : 'Create Doctor Account'}
-          </button>
-        </form>
-      </div>
+            <button type="submit" className="submit-btn" disabled={formLoading}>
+              {formLoading ? 'Creating...' : 'Create Doctor Account'}
+            </button>
+          </form>
+        </div>
+      </ErrorBoundary>
     );
   };
 
@@ -555,12 +552,16 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+      <DashboardHeader 
+        title="Admin Portal" 
+        subtitle={`Welcome back, ${safeRender(user?.username)}!`}
+      />
+      
       <div className="dashboard-layout">
         {/* Vertical Sidebar */}
         <div className="dashboard-sidebar">
           <div className="sidebar-header">
-            <h1>Admin Panel</h1>
-            <p>Welcome, {user?.username}</p>
+            <h1>Navigation</h1>
           </div>
           
           <nav className="dashboard-nav">
@@ -575,6 +576,17 @@ const AdminDashboard = () => {
                 </button>
               </div>
             ))}
+            
+            {/* Logout Button */}
+            <div className="nav-item nav-logout">
+              <button
+                className="nav-button logout-button"
+                onClick={handleLogout}
+              >
+                <span className="nav-icon">🚪</span>
+                Logout
+              </button>
+            </div>
           </nav>
         </div>
 

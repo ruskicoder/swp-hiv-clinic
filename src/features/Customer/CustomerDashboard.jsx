@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import ErrorBoundary from '../../components/ErrorBoundary';
-import { safeRender, safeDate, safeDateTime, SafeText } from '../../utils/renderUtils';
+import DashboardHeader from '../../components/layout/DashboardHeader';
+import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
+import { SafeText } from '../../utils/SafeComponents';
 import './CustomerDashboard.css';
 
 const CustomerDashboard = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -33,8 +37,8 @@ const CustomerDashboard = () => {
       console.log('Loading customer dashboard data...');
       
       // Initialize with empty arrays to prevent undefined errors
-        setAppointments([]);
-          setDoctors([]);
+      setAppointments([]);
+      setDoctors([]);
       
       // Load appointments
       try {
@@ -45,15 +49,15 @@ const CustomerDashboard = () => {
           const appointmentsData = Array.isArray(appointmentsRes.data) ? appointmentsRes.data : [];
           console.log('Processed appointments:', appointmentsData);
           setAppointments(appointmentsData);
-      }
+        }
       } catch (err) {
         console.error('Failed to load appointments:', err);
         setAppointments([]);
         setAppointmentsError('Failed to load appointments: ' + (err.message || 'Unknown error'));
-    }
+      }
 
       // Load doctors
-    try {
+      try {
         const doctorsRes = await apiClient.get('/doctors');
         console.log('Raw doctors response:', doctorsRes);
         
@@ -66,7 +70,7 @@ const CustomerDashboard = () => {
         console.error('Failed to load doctors:', err);
         setDoctors([]);
         setDoctorsError('Failed to load doctors: ' + (err.message || 'Unknown error'));
-    }
+      }
 
     } catch (error) {
       console.error('Dashboard error:', error);
@@ -78,18 +82,23 @@ const CustomerDashboard = () => {
 
   const handleCancelAppointment = async (appointmentId, reason) => {
     try {
-        const response = await apiClient.put(`/appointments/${appointmentId}/cancel`, null, {
+      const response = await apiClient.put(`/appointments/${appointmentId}/cancel`, null, {
         params: { reason }
       });
-        if (response.data.success) {
-          alert('Appointment cancelled successfully');
-      loadDashboardData();
-    }
+      if (response.data.success) {
+        alert('Appointment cancelled successfully');
+        loadDashboardData();
+      }
     } catch (error) {
-        console.error('Cancel appointment error:', error);
-        setError('Failed to cancel appointment');
+      console.error('Cancel appointment error:', error);
+      setError('Failed to cancel appointment');
     }
   };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    };
 
   const navigationItems = [
     { id: 'overview', label: 'Overview', icon: '📊' },
@@ -97,27 +106,26 @@ const CustomerDashboard = () => {
     { id: 'doctors', label: 'Find Doctors', icon: '👨‍⚕️' },
     { id: 'book-appointment', label: 'Book Appointment', icon: '➕' }
   ];
-
   const renderOverview = () => (
-    <ErrorBoundary>
+      <ErrorBoundary>
       <div className="overview-section">
-        <div className="content-header">
+          <div className="content-header">
           <h2>Patient Dashboard</h2>
           <p>Welcome back, <SafeText>{safeRender(user?.username)}</SafeText>! Manage your healthcare appointments and find doctors.</p>
-        </div>
+          </div>
 
         {(appointmentsError || doctorsError) && (
-          <div className="error-message">
+              <div className="error-message">
             {appointmentsError && <div><SafeText>{appointmentsError}</SafeText></div>}
             {doctorsError && <div><SafeText>{doctorsError}</SafeText></div>}
-          </div>
-        )}
+              </div>
+            )}
 
         <div className="stats-grid">
           <div className="stat-card">
             <h3>Total Appointments</h3>
             <p className="stat-number">{appointments?.length || 0}</p>
-        </div>
+            </div>
           <div className="stat-card">
             <h3>Upcoming Appointments</h3>
             <p className="stat-number">
@@ -129,11 +137,11 @@ const CustomerDashboard = () => {
                 }
               }).length || 0}
             </p>
-        </div>
+            </div>
           <div className="stat-card">
             <h3>Available Doctors</h3>
             <p className="stat-number">{doctors?.length || 0}</p>
-          </div>
+            </div>
         </div>
 
         {error && (
@@ -141,8 +149,8 @@ const CustomerDashboard = () => {
             <SafeText>{error}</SafeText>
             <button onClick={loadDashboardData} className="retry-btn">
               Retry
-        </button>
-          </div>
+                </button>
+              </div>
         )}
       </div>
     </ErrorBoundary>
@@ -161,7 +169,7 @@ const CustomerDashboard = () => {
             <SafeText>{appointmentsError}</SafeText>
           </div>
         )}
-        
+
         {!appointments || appointments.length === 0 && !appointmentsError ? (
           <div className="no-data">
             <p>No appointments found.</p>
@@ -178,9 +186,9 @@ const CustomerDashboard = () => {
               <ErrorBoundary key={appointment?.appointmentId || index}>
                 <div className="appointment-card">
                   <div className="appointment-details">
-                  <h4>
+                    <h4>
                       <SafeText>Dr. {safeRender(appointment?.doctorUser?.username, 'Unknown Doctor')}</SafeText>
-                  </h4>
+                    </h4>
                     <p><strong>Date:</strong> <SafeText>{safeDate(appointment?.appointmentDateTime)}</SafeText></p>
                     <p><strong>Time:</strong> <SafeText>{safeDateTime(appointment?.appointmentDateTime)}</SafeText></p>
                     <p><strong>Duration:</strong> <SafeText>{safeRender(appointment?.durationMinutes, '30')} minutes</SafeText></p>
@@ -200,17 +208,17 @@ const CustomerDashboard = () => {
                             handleCancelAppointment(appointment.appointmentId, reason);
                           }
                         }}
-            >
+                      >
                         Cancel
-          </button>
+                      </button>
                     )}
-      </div>
-      </div>
+                  </div>
+                </div>
               </ErrorBoundary>
             ))}
           </div>
         )}
-          </div>
+      </div>
     </ErrorBoundary>
   );
 
@@ -227,7 +235,7 @@ const CustomerDashboard = () => {
             <SafeText>{doctorsError}</SafeText>
           </div>
         )}
-        
+
         {!doctors || doctors.length === 0 && !doctorsError ? (
           <div className="no-data">
             <p>No doctors available.</p>
@@ -325,7 +333,7 @@ const CustomerDashboard = () => {
                 <SafeText>{formError}</SafeText>
               </div>
             )}
-            
+
             <div className="form-group">
               <label htmlFor="doctorUserId">Select Doctor</label>
               <select
@@ -405,12 +413,16 @@ const CustomerDashboard = () => {
 
   return (
     <div className="customer-dashboard">
+      <DashboardHeader 
+        title="Patient Portal" 
+        subtitle={`Welcome back, ${safeRender(user?.username)}!`}
+      />
+      
       <div className="dashboard-layout">
         {/* Vertical Sidebar */}
         <div className="dashboard-sidebar">
           <div className="sidebar-header">
-            <h1>Patient Portal</h1>
-            <p>Welcome, <SafeText>{safeRender(user?.username)}</SafeText></p>
+            <h1>Navigation</h1>
           </div>
           
           <nav className="dashboard-nav">
@@ -425,6 +437,17 @@ const CustomerDashboard = () => {
                 </button>
               </div>
             ))}
+            
+            {/* Logout Button */}
+            <div className="nav-item nav-logout">
+              <button
+                className="nav-button logout-button"
+                onClick={handleLogout}
+              >
+                <span className="nav-icon">🚪</span>
+                Logout
+              </button>
+            </div>
           </nav>
         </div>
 

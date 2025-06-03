@@ -1,45 +1,51 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Navbar from '../../components/layout/Navbar';
 import './Home.css';
 
 const Home = () => {
   return (
     <div className="home-container">
+      <Navbar />
+      
       {/* Hero Section */}
       <section className="hero-section">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">
-              HIV Medical Treatment System
-            </h1>
-            <p className="hero-subtitle">
-              Comprehensive healthcare management for HIV patients and medical professionals
-            </p>
-            <p className="hero-description">
-              Our platform provides secure, efficient, and compassionate care coordination 
-              between patients and healthcare providers, ensuring the best possible outcomes 
-              for HIV treatment and management.
-            </p>
-            <div className="hero-actions">
-              <Link to="/register" className="btn btn-primary">
-                Get Started
-              </Link>
-              <Link to="/login" className="btn btn-secondary">
-                Sign In
-              </Link>
+        <div className="container">
+          <div className="hero-content">
+            <div className="hero-text">
+              <h1 className="hero-title">
+                HIV Medical Treatment System
+              </h1>
+              <h2 className="hero-subtitle">
+                Comprehensive Healthcare Management
+              </h2>
+              <p className="hero-description">
+                Streamline your HIV healthcare journey with our integrated platform. 
+                Connect with specialized doctors, manage appointments, and access 
+                personalized treatment plans all in one secure environment.
+              </p>
+              <div className="hero-actions">
+                <Link to="/register" className="btn btn-primary btn-large">
+                  Get Started
+                </Link>
+                <Link to="/login" className="btn btn-secondary btn-large">
+                  Sign In
+                </Link>
+              </div>
             </div>
-          </div>
-          <div className="hero-image">
-            <div className="hero-placeholder">
-              <div className="medical-icon">
+            <div className="hero-image">
+              <div className="hero-placeholder">
+                <div className="medical-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    <path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/>
                 </svg>
               </div>
-              <h3>Secure Healthcare Platform</h3>
+                <h3>Advanced Healthcare Platform</h3>
+                <p>Secure, reliable, and user-friendly medical management system</p>
             </div>
-          </div>
-        </div>
+              </div>
+            </div>
+              </div>
       </section>
 
       {/* Features Section */}
@@ -54,59 +60,60 @@ const Home = () => {
                 </svg>
               </div>
               <h3>Appointment Management</h3>
-              <p>Easy scheduling and management of medical appointments with healthcare providers.</p>
+              <p>Schedule, reschedule, and manage your medical appointments with ease. Real-time availability and automated reminders.</p>
             </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <h3>Secure Medical Records</h3>
+              <p>Access your complete medical history, treatment plans, and test results in a secure, encrypted environment.</p>
+            </div>
+
             <div className="feature-card">
               <div className="feature-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
-              <h3>Expert Care</h3>
-              <p>Access to specialized HIV/AIDS healthcare professionals and treatment experts.</p>
+              <h3>Specialist Network</h3>
+              <p>Connect with HIV specialists and healthcare professionals who understand your unique medical needs.</p>
             </div>
 
             <div className="feature-card">
               <div className="feature-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
                 </svg>
-              </div>
-              <h3>Secure & Private</h3>
-              <p>HIPAA-compliant platform ensuring complete privacy and security of medical data.</p>
             </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                </svg>
-              </div>
-              <h3>24/7 Access</h3>
-              <p>Round-the-clock access to your medical information and healthcare services.</p>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 16H9V7h9v14z"/>
-                </svg>
-              </div>
-              <h3>Treatment Tracking</h3>
-              <p>Comprehensive tracking of treatment plans, medications, and health progress.</p>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/>
-                </svg>
-              </div>
-              <h3>Dashboard Analytics</h3>
-              <p>Intuitive dashboards for patients, doctors, and administrators with key insights.</p>
-            </div>
+              <h3>Treatment Monitoring</h3>
+              <p>Track your treatment progress, medication schedules, and health metrics with comprehensive monitoring tools.</p>
           </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
         </div>
+              <h3>Communication Hub</h3>
+              <p>Stay connected with your healthcare team through secure messaging and notification systems.</p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+        </div>
+              <h3>Privacy & Security</h3>
+              <p>Your medical information is protected with enterprise-grade security and HIPAA-compliant data handling.</p>
+            </div>
+            </div>
+            </div>
       </section>
 
       {/* User Types Section */}
@@ -119,7 +126,7 @@ const Home = () => {
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
-              </div>
+        </div>
               <h3>Patients</h3>
               <p>Manage your appointments, view treatment plans, and stay connected with your healthcare team.</p>
               <ul>
@@ -128,7 +135,7 @@ const Home = () => {
                 <li>Access treatment plans</li>
                 <li>Secure messaging</li>
               </ul>
-            </div>
+    </div>
 
             <div className="user-type-card">
               <div className="user-type-icon">
@@ -136,13 +143,13 @@ const Home = () => {
                   <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
                 </svg>
               </div>
-              <h3>Doctors</h3>
-              <p>Efficiently manage patient care, appointments, and treatment protocols with advanced tools.</p>
+              <h3>Healthcare Providers</h3>
+              <p>Streamline patient care with comprehensive tools for appointment and treatment management.</p>
               <ul>
-                <li>Manage availability slots</li>
-                <li>View patient appointments</li>
-                <li>Update medical records</li>
-                <li>Treatment selection tools</li>
+                <li>Patient appointment scheduling</li>
+                <li>Medical record management</li>
+                <li>Treatment plan creation</li>
+                <li>Progress monitoring</li>
               </ul>
             </div>
 

@@ -1,75 +1,68 @@
 .home-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  width: 100%;
+  background: #ffffff;
   overflow-x: hidden;
 }
 
 /* Hero Section */
   .hero-section {
-  padding: 80px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 120px 20px 100px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
-  min-height: 100vh;
+  min-height: 90vh;
   display: flex;
   align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  }
+  position: relative;
+}
 
-.hero-content {
+  .hero-content {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
+    align-items: center;
+    width: 100%;
   }
-
+  
 .hero-text {
   max-width: 600px;
   }
-
-.hero-title {
+  .hero-title {
   font-size: 3.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
   line-height: 1.2;
-  background: linear-gradient(45deg, #fff, #e0e7ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
   }
 
 .hero-subtitle {
   font-size: 1.5rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
-  color: #e0e7ff;
-}
+  color: #e0f2fe;
+  }
 
 .hero-description {
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 2.5rem;
-  color: #cbd5e1;
-}
-
+  color: #f0f9ff;
+  }
+  
 .hero-actions {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-}
-
+  }
+  
 .hero-image {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.hero-placeholder {
+  }
+  
+  .hero-placeholder {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -79,6 +72,18 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
+  }
+
+.hero-placeholder h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.hero-placeholder p {
+  color: #e0f2fe;
+  font-size: 1rem;
 }
 
 .medical-icon {
@@ -94,7 +99,7 @@
 }
 
 /* Button Styles */
-.btn {
+  .btn {
   display: inline-block;
   padding: 14px 28px;
   border-radius: 12px;
@@ -107,19 +112,19 @@
   text-align: center;
   box-sizing: border-box;
   min-width: 140px;
-}
+  }
 
 .btn-primary {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
+  background: #ffffff;
+  color: #10b981;
+  border-color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: #f0f9ff;
+  color: #059669;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary {
@@ -130,19 +135,19 @@
 
 .btn-secondary:hover {
   background: white;
-  color: #667eea;
+  color: #10b981;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
 }
 
 .btn-outline {
   background: transparent;
-  color: #3b82f6;
-  border-color: #3b82f6;
+  color: #10b981;
+  border-color: #10b981;
 }
 
 .btn-outline:hover {
-  background: #3b82f6;
+  background: #10b981;
   color: white;
 }
 
@@ -154,7 +159,7 @@
 /* Features Section */
 .features-section {
   padding: 100px 20px;
-  background: white;
+  background: #f8fafc;
 }
 
 .container {
@@ -172,30 +177,31 @@
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
 }
 
 .feature-card {
-  background: #f8fafc;
-  padding: 2rem;
+  background: white;
+  padding: 2.5rem;
   border-radius: 16px;
   text-align: center;
   transition: all 0.3s ease;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border-color: #3b82f6;
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
 }
 
 .feature-icon {
   width: 60px;
   height: 60px;
   margin: 0 auto 1.5rem;
-  color: #3b82f6;
+  color: #10b981;
 }
 
 .feature-card h3 {
@@ -208,12 +214,13 @@
 .feature-card p {
   color: #6b7280;
   line-height: 1.6;
+  font-size: 1rem;
 }
 
 /* User Types Section */
 .user-types-section {
   padding: 100px 20px;
-  background: #f8fafc;
+  background: white;
 }
 
 .user-types-grid {
@@ -223,16 +230,18 @@
 }
 
 .user-type-card {
-  background: white;
+  background: #f8fafc;
   padding: 2.5rem;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
 }
 
 .user-type-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  border-color: #10b981;
 }
 
 .user-type-icon {
@@ -278,7 +287,7 @@
 /* CTA Section */
 .cta-section {
   padding: 100px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   text-align: center;
 }
@@ -292,7 +301,7 @@
 .cta-content p {
   font-size: 1.2rem;
   margin-bottom: 2rem;
-  color: #e0e7ff;
+  color: #e0f2fe;
 }
 
 .cta-actions {
@@ -304,7 +313,7 @@
 
 /* Footer */
 .home-footer {
-  background: #0f172a;
+  background: #1f2937;
   color: white;
   padding: 60px 20px 20px;
 }
@@ -344,11 +353,11 @@
 }
 
 .footer-section a:hover {
-  color: #3b82f6;
+  color: #10b981;
 }
 
 .footer-bottom {
-  border-top: 1px solid #334155;
+  border-top: 1px solid #374151;
   padding-top: 2rem;
   text-align: center;
   color: #64748b;
@@ -365,7 +374,7 @@
   }
   
   .features-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
   
   .user-types-grid {
@@ -375,7 +384,7 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 80px 15px 60px;
+    padding: 100px 15px 80px;
   }
   
   .hero-content {
@@ -423,7 +432,7 @@
 
 @media (max-width: 480px) {
   .hero-section {
-    padding: 60px 15px;
+    padding: 80px 15px 60px;
   }
 
   .hero-title {
@@ -442,7 +451,7 @@
   
   .feature-card,
   .user-type-card {
-    padding: 1.5rem;
+    padding: 2rem;
   }
   
   .btn {
@@ -453,13 +462,6 @@
   .btn-large {
     padding: 14px 24px;
     font-size: 1rem;
-  }
-}
-
-/* High DPI Displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .hero-placeholder {
-    backdrop-filter: blur(20px);
   }
 }
 
@@ -480,7 +482,7 @@
 
 /* Focus Management */
 .btn:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #10b981;
   outline-offset: 2px;
 }
 
