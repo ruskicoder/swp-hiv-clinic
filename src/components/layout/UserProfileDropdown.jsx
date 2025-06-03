@@ -29,7 +29,12 @@ const UserProfileDropdown = () => {
 
   const handleDashboard = () => {
     setIsOpen(false);
-    const role = user?.role?.toLowerCase();
+    // Ensure role is always a string
+    let role = user?.role;
+    if (typeof role === 'object' && role !== null) {
+      role = role.roleName || role.name || '';
+    }
+    role = (role || '').toLowerCase();
     switch (role) {
       case 'admin':
         navigate('/admin');
@@ -57,8 +62,11 @@ const UserProfileDropdown = () => {
   };
 
   const getInitials = (firstName, lastName) => {
-    if (firstName && lastName) {
-      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    // Handle empty string or missing names
+    const f = (firstName || '').trim();
+    const l = (lastName || '').trim();
+    if (f && l) {
+      return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
     }
     if (user?.username) {
       return user.username.charAt(0).toUpperCase();
@@ -67,13 +75,19 @@ const UserProfileDropdown = () => {
   };
 
   const getUserDisplayName = () => {
-    if (user?.firstName && user?.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+    const f = (user?.firstName || '').trim();
+    const l = (user?.lastName || '').trim();
+    if (f && l) {
+      return `${f} ${l}`;
     }
     return user?.username || 'User';
   };
 
   const getUserRole = () => {
+    // Always return a string for role
+    if (typeof user?.role === 'object' && user?.role !== null) {
+      return user.role.roleName || user.role.name || 'User';
+    }
     return user?.role || 'User';
   };
 

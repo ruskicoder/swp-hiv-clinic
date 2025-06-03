@@ -99,7 +99,12 @@ const DoctorDashboard = () => {
     <ErrorBoundary>
       <div className="overview-section">
         <div className="content-header">
-          <h2>Doctor Dashboard</h2>
+          <h2>
+            Doctor Dashboard
+          </h2>
+          <p>
+            Welcome back, Dr. {user?.firstName || ''} {user?.lastName || ''}
+          </p>
         </div>
 
         {(appointmentsError || slotsError) && (
@@ -173,7 +178,7 @@ const DoctorDashboard = () => {
                 <div className="appointment-card">
                   <div className="appointment-details">
                     <h4>
-                      Patient: {safeRender(appointment?.patientUser?.username, 'Unknown Patient')}
+                      Patient: {appointment?.patientUser?.firstName || ''} {appointment?.patientUser?.lastName || ''}
                     </h4>
                     <p><strong>Date:</strong> {safeDate(appointment?.appointmentDateTime)}</p>
                     <p><strong>Time:</strong> {safeDateTime(appointment?.appointmentDateTime)}</p>
@@ -393,6 +398,7 @@ const DoctorDashboard = () => {
     <div className="doctor-dashboard">
       <DashboardHeader 
         title="Doctor Portal"
+        subtitle={`Welcome back, Dr. ${user?.firstName || ''} ${user?.lastName || ''}!`}
       />
       
       <div className="dashboard-layout">

@@ -242,4 +242,49 @@ public class AuthService {
             null  // profileImageBase64
         );
     }
+
+    /**
+     * Update user profile (firstName, lastName, phoneNumber, etc.)
+     */
+    @Transactional
+    public MessageResponse updateUserProfile(Integer userId, String firstName, String lastName, String phoneNumber, String dateOfBirth, String address, String bio) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return MessageResponse.error("User not found");
+        }
+        User user = userOpt.get();
+        String role = user.getRole().getRoleName();
+
+        try {
+            if ("Patient".equalsIgnoreCase(role)) {
+                var profileOpt = patientProfileRepository.findByUser(user);
+                if (profileOpt.isEmpty()) return MessageResponse.error("Patient profile not found");
+                var profile = profileOpt.get();
+                if (firstName != null) profile.setFirstName(firstName);
+                if (lastName != null) profile.setLastName(lastName);
+                if (phoneNumber != null) profile.setPhoneNumber(phoneNumber);
+                if (dateOfBirth != null) {
+                    try {
+                        profile.setDateOfBirth(java.time.LocalDate.parse(dateOfBirth));
+                    } catch (Exception ignored) {}
+                }
+                if (address != null) profile.setAddress(address);
+                patientProfileRepository.save(profile);
+            } else if ("Doctor".equalsIgnoreCase(role)) {
+                var profileOpt = doctorProfileRepository.findByUser(user);
+                if (profileOpt.isEmpty()) return MessageResponse.error("Doctor profile not found");
+                var profile = profileOpt.get();
+                if (firstName != null) profile.setFirstName(firstName);
+                if (lastName != null) profile.setLastName(lastName);
+                if (phoneNumber != null) profile.setPhoneNumber(phoneNumber);
+                if (bio != null) profile.setBio(bio);
+                doctorProfileRepository.save(profile);
+            }
+            // Optionally update email on user entity if needed
+            return MessageResponse.success("Profile updated successfully!");
+        } catch (Exception e) {
+            logger.error("Error updating profile: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to update profile: " + e.getMessage());
+        }
+    }
 }

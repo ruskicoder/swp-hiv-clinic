@@ -23,7 +23,7 @@ CREATE TABLE Users (
     PasswordHash VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL UNIQUE,
     RoleID INT NOT NULL,
-    IsActive BIT DEFAULT 1, -- Admin can activate/deactivate
+    IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (RoleID) REFERENCES Roles(RoleID) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -42,29 +42,29 @@ CREATE TABLE Specialties (
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorProfiles' AND xtype='U')
 CREATE TABLE DoctorProfiles (
     DoctorProfileID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL UNIQUE, -- Foreign Key to Users table, ensuring one profile per doctor user
+    UserID INT NOT NULL UNIQUE,
     FirstName NVARCHAR(100) NOT NULL,
     LastName NVARCHAR(100) NOT NULL,
-    SpecialtyID INT NULL, -- Link to their specialty
-    PhoneNumber VARCHAR(20) NULL,
-    Bio NVARCHAR(MAX) NULL, -- A brief biography or description for display
-    ProfileImageBase64 NVARCHAR(MAX) NULL, -- For storing Base64 encoded profile picture
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE, -- If User is deleted, DoctorProfile is also deleted
-    FOREIGN KEY (SpecialtyID) REFERENCES Specialties(SpecialtyID) ON DELETE SET NULL ON UPDATE NO ACTION -- If Specialty is deleted, set to NULL here
+    SpecialtyID INT NULL,
+    PhoneNumber NVARCHAR(20) NULL,
+    Bio NVARCHAR(MAX) NULL,
+    ProfileImageBase64 NVARCHAR(MAX) NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (SpecialtyID) REFERENCES Specialties(SpecialtyID) ON DELETE SET NULL ON UPDATE NO ACTION
 );
 
 -- PatientProfiles Table: Stores additional information specific to Patients
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientProfiles' AND xtype='U')
 CREATE TABLE PatientProfiles (
     PatientProfileID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL UNIQUE, -- Foreign Key to Users table, ensuring one profile per patient user
+    UserID INT NOT NULL UNIQUE,
     FirstName NVARCHAR(100) NOT NULL,
     LastName NVARCHAR(100) NOT NULL,
     DateOfBirth DATE NULL,
-    PhoneNumber VARCHAR(20) NULL,
+    PhoneNumber NVARCHAR(20) NULL,
     Address NVARCHAR(MAX) NULL,
-    ProfileImageBase64 NVARCHAR(MAX) NULL, -- For storing Base64 encoded profile picture
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE -- If User is deleted, PatientProfile is also deleted
+    ProfileImageBase64 NVARCHAR(MAX) NULL,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
 -- DoctorAvailabilitySlots Table: Doctors define their work slots

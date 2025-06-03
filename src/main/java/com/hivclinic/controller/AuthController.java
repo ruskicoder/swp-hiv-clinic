@@ -144,4 +144,36 @@ public class AuthController {
     public ResponseEntity<?> healthCheck() {
         return ResponseEntity.ok(MessageResponse.success("Auth service is running"));
     }
+
+    /**
+     * Update current user profile (firstName, lastName, etc.)
+     */
+    @PutMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateProfile(
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
+            @RequestBody(required = true) java.util.Map<String, Object> payload
+    ) {
+        try {
+            String firstName = (String) payload.getOrDefault("firstName", null);
+            String lastName = (String) payload.getOrDefault("lastName", null);
+            String phoneNumber = (String) payload.getOrDefault("phoneNumber", null);
+            String dateOfBirth = (String) payload.getOrDefault("dateOfBirth", null);
+            String address = (String) payload.getOrDefault("address", null);
+            String bio = (String) payload.getOrDefault("bio", null);
+
+            MessageResponse response = authService.updateUserProfile(
+                userPrincipal.getId(), firstName, lastName, phoneNumber, dateOfBirth, address, bio
+            );
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            logger.error("Error updating profile for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to update profile: " + e.getMessage()));
+        }
+    }
 }
