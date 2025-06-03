@@ -19,6 +19,28 @@
 .dashboard-header-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center; /* changed from flex-start to center */
+  gap: 1rem;
+}
+
+.dashboard-header-info .nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: #059669;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.dashboard-header-titles {
+  display: flex;
+  flex-direction: row; /* changed from column to row */
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
 }
 
 .dashboard-title {
@@ -27,6 +49,8 @@
   color: #059669;
   margin: 0;
   line-height: 1.2;
+  text-align: left;
+  display: inline-block;
 }
 
 .dashboard-subtitle {
@@ -34,6 +58,7 @@
   color: #374151;
   margin: 0.25rem 0 0;
   line-height: 1.4;
+  text-align: left;
 }
 
 .dashboard-header-actions {

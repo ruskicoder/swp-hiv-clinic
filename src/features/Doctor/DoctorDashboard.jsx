@@ -100,7 +100,6 @@ const DoctorDashboard = () => {
       <div className="overview-section">
         <div className="content-header">
           <h2>Doctor Dashboard</h2>
-          <p>Welcome back, Dr. {safeRender(user?.username)}! Manage your appointments and availability.</p>
         </div>
 
         {(appointmentsError || slotsError) && (
@@ -393,8 +392,7 @@ const DoctorDashboard = () => {
   return (
     <div className="doctor-dashboard">
       <DashboardHeader 
-        title="Doctor Portal" 
-        subtitle={`Welcome back, Dr. ${safeRender(user?.username)}!`}
+        title="Doctor Portal"
       />
       
       <div className="dashboard-layout">
@@ -403,7 +401,6 @@ const DoctorDashboard = () => {
           <div className="sidebar-header">
             <h1>Navigation</h1>
           </div>
-          
           <nav className="dashboard-nav">
             {navigationItems.map(item => (
               <div key={item.id} className="nav-item">
@@ -416,20 +413,9 @@ const DoctorDashboard = () => {
                 </button>
               </div>
             ))}
-            
-            {/* Logout Button */}
-            <div className="nav-item nav-logout">
-              <button
-                className="nav-button logout-button"
-                onClick={handleLogout}
-              >
-                <span className="nav-icon">🚪</span>
-                Logout
-              </button>
-            </div>
+            {/* Remove logout button here */}
           </nav>
         </div>
-
         {/* Main Content */}
         <div className="dashboard-main">
           <div className="dashboard-content">

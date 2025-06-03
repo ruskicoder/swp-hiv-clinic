@@ -13,6 +13,7 @@ A comprehensive web application for managing HIV medical treatment with appointm
 ## Technology Stack
 
 ### Backend
+
 - Spring Boot 3.2.0
 - Spring Security with JWT authentication
 - Spring Data JPA
@@ -20,6 +21,7 @@ A comprehensive web application for managing HIV medical treatment with appointm
 - Maven
 
 ### Frontend
+
 - React 18
 - Vite
 - Axios for API communication

@@ -47,23 +47,17 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/" className="nav-link" onClick={closeMenu}>
-                Home
-              </Link>
-              
-              {/* Role-based navigation */}
-              {user.role === 'Admin' && (
-                <Link to="/admin" className="nav-link" onClick={closeMenu}>
-                  Admin Panel
+              {/* Remove Home and Admin Panel for admin */}
+              {user.role !== 'Admin' && (
+                <Link to="/" className="nav-link" onClick={closeMenu}>
+                  Home
                 </Link>
               )}
-              
               {user.role === 'Doctor' && (
                 <Link to="/doctor" className="nav-link" onClick={closeMenu}>
                   Doctor Dashboard
                 </Link>
               )}
-              
               {user.role === 'Patient' && (
                 <Link to="/customer" className="nav-link" onClick={closeMenu}>
                   My Dashboard

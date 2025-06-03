@@ -121,7 +121,6 @@ const [appointments, setAppointments] = useState([]);
       <div className="overview-section">
           <div className="content-header">
           <h2>Admin Dashboard</h2>
-          <p>Welcome back, {safeRender(user?.username)}! Manage the HIV Medical Treatment System.</p>
           </div>
 
         <div className="stats-grid">
@@ -546,8 +545,7 @@ const [appointments, setAppointments] = useState([]);
   return (
     <div className="admin-dashboard">
       <DashboardHeader 
-        title="Admin Portal" 
-        subtitle={`Welcome back, ${safeRender(user?.username)}!`}
+        title="Admin Portal"
       />
       
       <div className="dashboard-layout">
@@ -556,7 +554,6 @@ const [appointments, setAppointments] = useState([]);
           <div className="sidebar-header">
             <h1>Navigation</h1>
           </div>
-          
           <nav className="dashboard-nav">
             {navigationItems.map(item => (
               <div key={item.id} className="nav-item">
@@ -569,20 +566,9 @@ const [appointments, setAppointments] = useState([]);
                 </button>
               </div>
             ))}
-            
-            {/* Logout Button */}
-            <div className="nav-item nav-logout">
-              <button
-                className="nav-button logout-button"
-                onClick={handleLogout}
-              >
-                <span className="nav-icon">🚪</span>
-                Logout
-              </button>
-            </div>
+            {/* Remove logout button here */}
           </nav>
         </div>
-
         {/* Main Content */}
         <div className="dashboard-main">
           <div className="dashboard-content">

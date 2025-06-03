@@ -111,7 +111,6 @@ const CustomerDashboard = () => {
       <div className="overview-section">
           <div className="content-header">
           <h2>Patient Dashboard</h2>
-          <p>Welcome back, {safeRender(user?.username)}! Manage your healthcare appointments and find doctors.</p>
           </div>
 
         {(appointmentsError || doctorsError) && (
@@ -513,13 +512,12 @@ const CustomerDashboard = () => {
   return (
     <div className="customer-dashboard">
       <DashboardHeader 
-        title="Patient Portal" 
-        subtitle={`Welcome back, ${safeRender(user?.username)}!`}
+        title="Patient Portal"
       />
       
       <div className="dashboard-layout">
         {/* Logo in top left */}
-        <div className="dashboard-logo">
+        <div className="dashboard-logo" style={{ display: 'none' }}>
           <Link to="/" className="nav-logo">
             <div className="logo-icon">
               <svg viewBox="0 0 24 24" fill="currentColor">
