@@ -1,7 +1,7 @@
 /* Dashboard Header Styles */
 .dashboard-header {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #e6f9f0 0%, #f3fdf7 100%);
+  border-bottom: 1px solid #e5e7eb;
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
@@ -24,14 +24,14 @@
 .dashboard-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #059669;
   margin: 0;
   line-height: 1.2;
 }
 
 .dashboard-subtitle {
   font-size: 0.9rem;
-  color: #F0FDF4; /* Updated for better contrast and theme alignment */
+  color: #374151;
   margin: 0.25rem 0 0;
   line-height: 1.4;
 }
@@ -48,22 +48,22 @@
   .dashboard-header {
     padding: 1rem;
   }
-  
+
   .dashboard-header-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .dashboard-header-actions {
     width: 100%;
     justify-content: flex-end;
   }
-  
+
   .dashboard-title {
     font-size: 1.25rem;
   }
-  
+
   .dashboard-subtitle {
     font-size: 0.85rem;
   }
@@ -73,76 +73,8 @@
   .dashboard-header {
     padding: 0.75rem;
   }
-  
+
   .dashboard-title {
     font-size: 1.125rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .dashboard-header {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    border-color: #374151; /* Adjusted for a slightly darker, more fitting border */
-  }
-  
-  .dashboard-title {
-    color: #ffffff; 
-  }
-  
-  .dashboard-subtitle {
-    color: #D1D5DB; 
-}
-
-/* Text Input Styles for Modern Green (Medical Clinic) Theme */
-.dashboard-text-input {
-  padding: 0.625rem 1rem;
-  font-size: 0.9rem;
-  border: 1px solid #A3BFB7; /* Softer green-grey border */
-  border-radius: 0.375rem;
-  background-color: #F0FDF4; /* Very light minty background */
-  color: #064E3B; /* Dark green text for good contrast */
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  width: 100%; /* Or specific width as needed */
-  box-sizing: border-box;
-}
-
-.dashboard-text-input::placeholder {
-  color: #52A388; /* Muted green placeholder text */
-  opacity: 0.7;
-}
-
-.dashboard-text-input:hover {
-  border-color: #059669; /* Main theme green on hover */
-}
-
-.dashboard-text-input:focus,
-.dashboard-text-input:focus-visible {
-  border-color: #047857; /* Darker theme green for focus */
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25); /* Subtle green glow */
-  outline: none;
-}
-
-/* Dark mode support for text input */
-@media (prefers-color-scheme: dark) {
-  .dashboard-text-input {
-    background-color: #065F46; /* Dark green background */
-    border-color: #069564; /* A slightly more visible green border in dark mode */
-    color: #E0F2FE; /* Light cyan/almost white text */
-  }
-
-  .dashboard-text-input::placeholder {
-    color: #A7F3D0; /* Lighter mint placeholder for dark mode */
-    opacity: 0.6;
-  }
-
-  .dashboard-text-input:hover {
-    border-color: #10B981; /* Brighter green for hover in dark mode */
-  }
-
-  .dashboard-text-input:focus,
-  .dashboard-text-input:focus-visible {
-    border-color: #34D399; /* Even brighter/accent green for focus */
-    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.3); /* Lighter green glow */
   }
 }

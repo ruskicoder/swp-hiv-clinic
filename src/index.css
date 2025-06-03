@@ -124,26 +124,32 @@ input, textarea, select {
   padding: 0.75rem 1rem;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-background);
-  color: var(--color-text);
+  background-color: #fff !important;
+  color: #1f2937 !important;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
 }
 
 input:disabled, textarea:disabled, select:disabled {
-  background-color: var(--color-background-light);
-  color: var(--color-text-light);
+  background-color: #f3f4f6;
+  color: #9ca3af;
   cursor: not-allowed;
 }
 
 input::placeholder, textarea::placeholder {
-  color: var(--color-text-light);
+  color: #9ca3af;
+}
+
+/* Add green theme for labels */
+label {
+  color: #10b981 !important;
+  font-weight: 600;
 }
 
 /* Buttons */
@@ -154,8 +160,8 @@ input::placeholder, textarea::placeholder {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: var(--radius-md);
-  background-color: var(--color-primary);
-  color: white;
+  background-color: #10b981;
+  color: #fff;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -165,7 +171,7 @@ input::placeholder, textarea::placeholder {
   }
 
 button:hover:not(:disabled) {
-  background-color: var(--color-primary-dark);
+  background-color: #059669;
   transform: translateY(-1px);
 }
 
@@ -178,6 +184,8 @@ button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  background-color: #e5e7eb;
+  color: #9ca3af;
 }
 
 /* Lists */

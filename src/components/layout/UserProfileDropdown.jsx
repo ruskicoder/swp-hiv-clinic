@@ -125,7 +125,13 @@ const UserProfileDropdown = () => {
 
       {isOpen && (
         <div className="dropdown-menu">
-          <div className="dropdown-header">
+          <div
+            className="dropdown-header"
+            onClick={handleDashboard}
+            style={{ cursor: 'pointer' }}
+            tabIndex={0}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleDashboard(); }}
+          >
             <div className="dropdown-avatar">
               {user?.profileImageBase64 ? (
                 <img 
@@ -148,23 +154,6 @@ const UserProfileDropdown = () => {
           <div className="dropdown-divider"></div>
 
           <div className="dropdown-items">
-            <button 
-              className="dropdown-item"
-              onClick={handleDashboard}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path 
-                  d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                />
-                <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Dashboard
-            </button>
-
             <button 
               className="dropdown-item"
               onClick={handleSettings}

@@ -139,20 +139,22 @@
 
 .form-group label {
   font-weight: 600;
-  color: #374151;
+  color: #10b981 !important;
   font-size: 0.9rem;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
-    padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s ease;
   font-family: inherit;
-  }
+  background: #fff !important;
+  color: #1f2937 !important;
+}
   
 .form-group input:focus,
 .form-group textarea:focus,
@@ -411,51 +413,5 @@
   
   .setting-description {
     margin-left: 1.5rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .settings-container {
-    background: #111827;
-  }
-  
-  .settings-content {
-    background: #1f2937;
-  }
-  
-  .settings-sidebar {
-    background: #374151;
-    border-color: #4b5563;
-  }
-  
-  .settings-section h3,
-  .settings-section h4 {
-    color: white;
-  }
-  
-  .form-group label {
-    color: #d1d5db;
-  }
-  
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    background: #374151;
-    border-color: #4b5563;
-    color: white;
-  }
-  
-  .security-info {
-    background: #374151;
-    border-color: #4b5563;
-  }
-  
-  .setting-label {
-    color: #d1d5db;
-  }
-  
-  .setting-description {
-    color: #9ca3af;
   }
 }

@@ -21,6 +21,13 @@
 .profile-button:hover {
   border-color: #d1d5db;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.profile-button:hover .profile-name,
+.profile-button:hover .profile-role,
+.profile-button:hover .profile-initials {
+  color: #fff;
 }
 
 .profile-button:focus {
@@ -77,6 +84,10 @@
   text-transform: capitalize;
 }
 
+.profile-button:hover .profile-role {
+  color: #fff;
+}
+
 .dropdown-arrow {
   color: #6b7280;
   transition: transform 0.2s ease;
@@ -120,6 +131,25 @@
   padding: 1rem;
   background: #f9fafb;
   border-bottom: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-header:hover,
+.dropdown-header:focus {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.dropdown-header:hover .dropdown-name,
+.dropdown-header:hover .dropdown-email,
+.dropdown-header:hover .dropdown-profile-initials {
+  color: #fff;
+}
+
+.dropdown-header:focus .dropdown-name,
+.dropdown-header:focus .dropdown-email,
+.dropdown-header:focus .dropdown-profile-initials {
+  color: #fff;
 }
 
 .dropdown-avatar {
@@ -221,6 +251,26 @@
   color: #dc2626;
 }
 
+/* Make all dropdown-item text white on hover */
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+}
+.dropdown-item:hover svg,
+.dropdown-item:focus svg {
+  color: #fff;
+}
+.logout-item:hover,
+.logout-item:focus {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #fff;
+}
+.logout-item:hover svg,
+.logout-item:focus svg {
+  color: #fff;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .profile-button {
@@ -251,48 +301,5 @@
     bottom: 1rem;
     width: auto;
     min-width: auto;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .profile-button {
-    background: #374151;
-    border-color: #4b5563;
-    color: white;
-  }
-  
-  .profile-button:hover {
-    border-color: #6b7280;
-  }
-  
-  .profile-name {
-    color: white;
-  }
-  
-  .dropdown-menu {
-    background: #374151;
-    border-color: #4b5563;
-  }
-  
-  .dropdown-header {
-    background: #4b5563;
-    border-color: #6b7280;
-  }
-  
-  .dropdown-name {
-    color: white;
-  }
-  
-  .dropdown-item {
-    color: #d1d5db;
-  }
-  
-  .dropdown-item:hover {
-    background: #4b5563;
-  }
-  
-  .dropdown-divider {
-    background: #6b7280;
   }
 }

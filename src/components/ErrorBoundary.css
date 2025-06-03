@@ -1,10 +1,11 @@
 .error-boundary {
   padding: 2rem;
   margin: 1rem 0;
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  background: #fee2e2;
   border: 1px solid #f87171;
   border-radius: 12px;
   text-align: center;
+  color: #dc2626;
 }
 
 .error-content h3 {
@@ -19,8 +20,8 @@
 }
 
 .retry-button {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  color: white;
+  background: #dc2626;
+  color: #fff;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -30,6 +31,8 @@
 }
 
 .retry-button:hover {
+  background: #b91c1c;
+  color: #fff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
@@ -37,15 +40,16 @@
 .error-details {
   margin-top: 1rem;
   text-align: left;
-  background: rgba(255, 255, 255, 0.5);
+  background: #fff;
   padding: 1rem;
   border-radius: 8px;
+  color: #374151;
 }
 
 .error-details summary {
   cursor: pointer;
   font-weight: 600;
-  color: #7f1d1d;
+  color: #dc2626;
 }
 
 .error-details pre {

@@ -3,7 +3,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 0;
-  background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e8 100%);
+  background: linear-gradient(135deg, #e6f9f0 0%, #f3fdf7 100%);
+  color: #1f2937;
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -16,8 +17,8 @@
   
 .dashboard-sidebar {
   width: 280px;
-  background: linear-gradient(180deg, #059669 0%, #047857 100%);
-  color: white;
+  background: #10b981;
+  color: #fff;
   padding: 2rem 0;
   box-shadow: 4px 0 20px rgba(5, 150, 105, 0.15);
   position: fixed;
@@ -103,7 +104,8 @@
 
 /* Main Content Area */
 .dashboard-content {
-  background: white;
+  background: #fff;
+  color: #1f2937;
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -121,12 +123,12 @@
 .content-header h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #059669;
   margin: 0 0 0.5rem;
 }
   
 .content-header p {
-  color: #64748b;
+  color: #374151;
   font-size: 1rem;
   margin: 0;
 }
@@ -140,7 +142,8 @@
   }
   
 .stat-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: #fff;
+  color: #059669;
   padding: 2rem;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
@@ -190,7 +193,8 @@
 }
 
 .appointment-card {
-  background: white;
+  background: #fff;
+  color: #1f2937;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -209,7 +213,7 @@
 .appointment-details h4 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #059669;
   margin: 0 0 0.5rem;
 }
 
@@ -235,17 +239,17 @@
 }
 
 .status.scheduled {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  background: #dbeafe;
   color: #1e40af;
 }
 
 .status.completed {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  background: #d1fae5;
   color: #065f46;
 }
 
 .status.cancelled {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  background: #fee2e2;
   color: #dc2626;
 }
 
@@ -261,23 +265,21 @@
 }
 
 .cancel-btn {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
+  background: #ef4444;
+  color: #fff;
 }
 
 .cancel-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  background: #dc2626;
 }
 
 .book-btn {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  background: #10b981;
+  color: #fff;
 }
 
 .book-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background: #059669;
 }
 
 .book-btn:disabled {
@@ -287,13 +289,12 @@
 }
 
 .refresh-btn, .retry-btn {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  color: white;
+  background: #6366f1;
+  color: #fff;
 }
 
 .refresh-btn:hover, .retry-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: #4f46e5;
 }
 
 /* Doctors Grid */
@@ -304,7 +305,8 @@
 }
 
 .doctor-card {
-  background: white;
+  background: #fff;
+  color: #1f2937;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -320,7 +322,7 @@
 .doctor-card h4 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #059669;
   margin: 0 0 1rem;
 }
 
@@ -333,6 +335,7 @@
 /* Forms */
 .book-appointment-form {
   background: #f8fafc;
+  color: #1f2937;
   padding: 2rem;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
@@ -346,7 +349,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #374151;
+  color: #10b981 !important;
   font-size: 0.9rem;
 }
 
@@ -358,19 +361,19 @@
   border-radius: 8px;
   font-size: 0.9rem;
   transition: all 0.3s ease;
-  background: white;
+  background: #fff !important;
+  color: #1f2937 !important;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-  outline: none;
   border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background: #f0fdf4;
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  background: #10b981;
+  color: #fff;
   border: none;
   padding: 1rem 2rem;
   border-radius: 8px;
@@ -382,8 +385,7 @@
 }
 
 .submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  background: #059669;
 }
 
 .submit-btn:disabled {
@@ -406,7 +408,7 @@
 
 /* Error Messages */
 .error-message {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  background: #fee2e2;
   color: #dc2626;
   padding: 1rem 1.5rem;
   border-radius: 8px;
@@ -528,5 +530,14 @@
   
   .stat-number {
     font-size: 2rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .form-group input,
+  .form-group select {
+    background: #fff !important;
+    color: #1f2937 !important;
+    border-color: #e2e8f0 !important;
   }
 }
