@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch HIV Clinic Backend",
+            "request": "launch",
+            "mainClass": "com.hivclinic.HivClinicBackendApplication",
+            "projectName": "hiv-clinic-backend",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
