@@ -5,7 +5,6 @@ import apiClient from '../../services/apiClient';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
-import { SafeText } from '../../utils/SafeComponents';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -79,39 +78,35 @@ const [appointments, setAppointments] = useState([]);
     }
   };
 
-  const handleToggleUserStatus = async (userId) => {
-    try {
-      const response = await apiClient.put(`/admin/users/${userId}/toggle-status`);
-      if (response.data.success) {
-        loadDashboardData(); // Reload data
-      }
-    } catch (error) {
-      console.error('Toggle user status error:', error);
-      setError('Failed to toggle user status');
-    }
-  };
-
-  const handleResetPassword = async (userId) => {
-    const newPassword = prompt('Enter new password for user:');
-    if (!newPassword) return;
-
-    try {
-      const response = await apiClient.put(`/admin/users/${userId}/reset-password`, null, {
-        params: { newPassword }
-      });
-      if (response.data.success) {
-        alert('Password reset successfully');
-      }
-    } catch (error) {
-      console.error('Reset password error:', error);
-      setError('Failed to reset password');
-    }
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  const handleToggleUserStatus = async (userId) => {
+      try {
+      await apiClient.put(`/admin/users/${userId}/toggle-status`);
+          loadDashboardData();
+      } catch (error) {
+      console.error('Toggle user status error:', error);
+      setError('Failed to toggle user status');
+      }
+    };
+
+  const handleResetPassword = async (userId) => {
+    const newPassword = prompt('Enter new password:');
+    if (!newPassword) return;
+
+    try {
+      await apiClient.put(`/admin/users/${userId}/reset-password`, null, {
+        params: { newPassword }
+      });
+      alert('Password reset successfully');
+    } catch (error) {
+      console.error('Reset password error:', error);
+      setError('Failed to reset password');
+    }
+    };
 
   const navigationItems = [
     { id: 'overview', label: 'Overview', icon: '📊' },
@@ -122,35 +117,35 @@ const [appointments, setAppointments] = useState([]);
   ];
 
   const renderOverview = () => (
-    <ErrorBoundary>
+      <ErrorBoundary>
       <div className="overview-section">
-        <div className="content-header">
+          <div className="content-header">
           <h2>Admin Dashboard</h2>
-          <p>Welcome back, <SafeText>{safeRender(user?.username)}</SafeText>! Manage the HIV Medical Treatment System.</p>
-        </div>
+          <p>Welcome back, {safeRender(user?.username)}! Manage the HIV Medical Treatment System.</p>
+          </div>
 
         <div className="stats-grid">
           <div className="stat-card">
             <h3>Total Users</h3>
             <p className="stat-number">{users?.length || 0}</p>
-          </div>
+              </div>
           <div className="stat-card">
             <h3>Total Patients</h3>
             <p className="stat-number">{patients?.length || 0}</p>
-          </div>
+              </div>
           <div className="stat-card">
             <h3>Total Doctors</h3>
             <p className="stat-number">{doctors?.length || 0}</p>
-          </div>
+              </div>
           <div className="stat-card">
             <h3>Total Appointments</h3>
             <p className="stat-number">{appointments?.length || 0}</p>
-          </div>
-        </div>
+            </div>
+              </div>
 
         {error && (
           <div className="error-message">
-            <SafeText>{error}</SafeText>
+            {error}
             <button onClick={loadDashboardData} className="retry-btn">
               Retry
             </button>
@@ -158,29 +153,29 @@ const [appointments, setAppointments] = useState([]);
         )}
       </div>
     </ErrorBoundary>
-  );
+    );
 
   const renderUsers = () => (
     <ErrorBoundary>
       <div className="users-section">
         <div className="content-header">
-          <h2>User Management</h2>
-          <p>Manage all system users and their permissions</p>
-        </div>
-
+          <h2>Manage Users</h2>
+          <p>View and manage all system users</p>
+          </div>
+          
         {usersError && (
           <div className="error-message">
-            <SafeText>{usersError}</SafeText>
-          </div>
+            {usersError}
+              </div>
         )}
-
+            
         {!users || users.length === 0 ? (
           <div className="no-data">
             <p>No users found.</p>
             <button className="refresh-btn" onClick={loadDashboardData}>
               Refresh
-            </button>
-          </div>
+              </button>
+            </div>
         ) : (
           <div className="users-table-container">
             <table className="users-table">
@@ -195,36 +190,32 @@ const [appointments, setAppointments] = useState([]);
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, index) => (
-                  <tr key={user?.userId || index}>
-                    <td><SafeText>{safeRender(user?.username)}</SafeText></td>
-                    <td><SafeText>{safeRender(user?.email)}</SafeText></td>
+                {users.map((userItem, index) => (
+                  <tr key={userItem?.userId || index}>
+                    <td>{safeRender(userItem?.username)}</td>
+                    <td>{safeRender(userItem?.email)}</td>
+                    <td>{safeRender(userItem?.role?.roleName || userItem?.role)}</td>
                     <td>
-                      <span className={`role-badge ${safeRender(user?.role, '').toLowerCase()}`}>
-                        <SafeText>{safeRender(user?.role)}</SafeText>
+                      <span className={`status-badge ${userItem?.isActive ? 'active' : 'inactive'}`}>
+                        {userItem?.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td>
-                      <span className={`status-badge ${user?.isActive ? 'active' : 'inactive'}`}>
-                        <SafeText>{user?.isActive ? 'Active' : 'Inactive'}</SafeText>
-                      </span>
-                    </td>
-                    <td><SafeText>{safeDate(user?.createdAt)}</SafeText></td>
+                    <td>{safeDate(userItem?.createdAt)}</td>
                     <td>
                       <div className="action-buttons">
                         <button 
-                          className={`action-btn ${user?.isActive ? 'deactivate' : 'activate'}`}
-                          onClick={() => handleToggleUserStatus(user?.userId)}
+                          className="btn-toggle"
+                          onClick={() => handleToggleUserStatus(userItem?.userId)}
                         >
-                          {user?.isActive ? 'Deactivate' : 'Activate'}
+                          {userItem?.isActive ? 'Deactivate' : 'Activate'}
                         </button>
                         <button 
-                          className="action-btn reset"
-                          onClick={() => handleResetPassword(user?.userId)}
+                          className="btn-reset"
+                          onClick={() => handleResetPassword(userItem?.userId)}
                         >
                           Reset Password
                         </button>
-                      </div>
+        </div>
                     </td>
                   </tr>
                 ))}
@@ -240,8 +231,8 @@ const [appointments, setAppointments] = useState([]);
     <ErrorBoundary>
       <div className="doctors-section">
         <div className="content-header">
-          <h2>Doctor Management</h2>
-          <p>Manage doctor accounts and their specialties</p>
+          <h2>Manage Doctors</h2>
+          <p>View and manage doctor accounts</p>
         </div>
 
         {!doctors || doctors.length === 0 ? (
@@ -256,28 +247,20 @@ const [appointments, setAppointments] = useState([]);
             {doctors.map((doctor, index) => (
               <ErrorBoundary key={doctor?.userId || index}>
                 <div className="doctor-card">
-                  <div className="doctor-info">
-                    <h4><SafeText>Dr. {safeRender(doctor?.username)}</SafeText></h4>
-                    <p><strong>Email:</strong> <SafeText>{safeRender(doctor?.email)}</SafeText></p>
-                    <p><strong>Status:</strong> 
-                      <span className={`status-badge ${doctor?.isActive ? 'active' : 'inactive'}`}>
-                        <SafeText>{doctor?.isActive ? 'Active' : 'Inactive'}</SafeText>
-                      </span>
-                    </p>
-                    <p><strong>Created:</strong> <SafeText>{safeDate(doctor?.createdAt)}</SafeText></p>
-                  </div>
+                  <h4>Dr. {safeRender(doctor?.username)}</h4>
+                  <p><strong>Email:</strong> {safeRender(doctor?.email)}</p>
+                  <p><strong>Status:</strong> 
+                    <span className={`status-badge ${doctor?.isActive ? 'active' : 'inactive'}`}>
+                      {doctor?.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </p>
+                  <p><strong>Created:</strong> {safeDate(doctor?.createdAt)}</p>
                   <div className="doctor-actions">
                     <button 
-                      className={`action-btn ${doctor?.isActive ? 'deactivate' : 'activate'}`}
+                      className="btn-toggle"
                       onClick={() => handleToggleUserStatus(doctor?.userId)}
                     >
                       {doctor?.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <button 
-                      className="action-btn reset"
-                      onClick={() => handleResetPassword(doctor?.userId)}
-                    >
-                      Reset Password
                     </button>
                   </div>
                 </div>
@@ -293,13 +276,13 @@ const [appointments, setAppointments] = useState([]);
     <ErrorBoundary>
       <div className="appointments-section">
         <div className="content-header">
-          <h2>Appointment Management</h2>
-          <p>Overview of all appointments in the system</p>
+          <h2>All Appointments</h2>
+          <p>View all system appointments</p>
         </div>
 
         {appointmentsError && (
           <div className="error-message">
-            <SafeText>{appointmentsError}</SafeText>
+            {appointmentsError}
           </div>
         )}
 
@@ -320,22 +303,20 @@ const [appointments, setAppointments] = useState([]);
                   <th>Date & Time</th>
                   <th>Duration</th>
                   <th>Status</th>
-                  <th>Created</th>
                 </tr>
               </thead>
               <tbody>
                 {appointments.map((appointment, index) => (
                   <tr key={appointment?.appointmentId || index}>
-                    <td><SafeText>{safeRender(appointment?.patientUser?.username)}</SafeText></td>
-                    <td><SafeText>Dr. {safeRender(appointment?.doctorUser?.username)}</SafeText></td>
-                    <td><SafeText>{safeDateTime(appointment?.appointmentDateTime)}</SafeText></td>
-                    <td><SafeText>{safeRender(appointment?.durationMinutes)} min</SafeText></td>
+                    <td>{safeRender(appointment?.patientUser?.username, 'Unknown Patient')}</td>
+                    <td>Dr. {safeRender(appointment?.doctorUser?.username, 'Unknown Doctor')}</td>
+                    <td>{safeDateTime(appointment?.appointmentDateTime)}</td>
+                    <td>{safeRender(appointment?.durationMinutes, '30')} min</td>
                     <td>
-                      <span className={`status-badge ${safeRender(appointment?.status, '').toLowerCase()}`}>
-                        <SafeText>{safeRender(appointment?.status)}</SafeText>
+                      <span className={`status ${safeRender(appointment?.status, 'unknown').toLowerCase()}`}>
+                        {safeRender(appointment?.status, 'Unknown')}
                       </span>
                     </td>
-                    <td><SafeText>{safeDate(appointment?.createdAt)}</SafeText></td>
                   </tr>
                 ))}
               </tbody>
@@ -366,9 +347,21 @@ const [appointments, setAppointments] = useState([]);
       setFormError('');
 
       try {
-        const response = await apiClient.post('/admin/doctors', formData);
+        const formDataToSend = new FormData();
+        Object.keys(formData).forEach(key => {
+          if (formData[key]) {
+            formDataToSend.append(key, formData[key]);
+          }
+        });
+
+        const response = await apiClient.post('/admin/doctors', formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
         if (response.data.success) {
-          alert('Doctor account created successfully!');
+          alert('Doctor created successfully!');
           setFormData({
             username: '',
             email: '',
@@ -384,11 +377,11 @@ const [appointments, setAppointments] = useState([]);
         }
       } catch (error) {
         console.error('Create doctor error:', error);
-        setFormError(error.response?.data?.message || 'Failed to create doctor account');
+        setFormError(error.response?.data?.message || 'Failed to create doctor');
       } finally {
         setFormLoading(false);
       }
-    };
+};
 
     const handleChange = (e) => {
       setFormData({
@@ -408,7 +401,7 @@ const [appointments, setAppointments] = useState([]);
           <form onSubmit={handleSubmit} className="create-doctor-form">
             {formError && (
               <div className="error-message">
-                <SafeText>{formError}</SafeText>
+                {formError}
               </div>
             )}
 
@@ -511,13 +504,13 @@ const [appointments, setAppointments] = useState([]);
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
+                placeholder="Enter doctor's biography..."
                 rows="4"
-                placeholder="Brief professional biography..."
               />
             </div>
 
             <button type="submit" className="submit-btn" disabled={formLoading}>
-              {formLoading ? 'Creating...' : 'Create Doctor Account'}
+              {formLoading ? 'Creating...' : 'Create Doctor'}
             </button>
           </form>
         </div>

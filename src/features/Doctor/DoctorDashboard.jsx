@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
-import { SafeText } from '../../utils/SafeComponents';
 import './DoctorDashboard.css';
 
 const DoctorDashboard = () => {
@@ -37,8 +36,8 @@ const DoctorDashboard = () => {
       console.log('Loading doctor dashboard data...');
       
       // Initialize with empty arrays
-        setAppointments([]);
-        setAvailabilitySlots([]);
+      setAppointments([]);
+      setAvailabilitySlots([]);
       
       // Load appointments and availability slots concurrently
       const [appointmentsResult, slotsResult] = await Promise.allSettled([
@@ -101,13 +100,13 @@ const DoctorDashboard = () => {
       <div className="overview-section">
         <div className="content-header">
           <h2>Doctor Dashboard</h2>
-          <p>Welcome back, Dr. <SafeText>{safeRender(user?.username)}</SafeText>! Manage your appointments and availability.</p>
-      </div>
+          <p>Welcome back, Dr. {safeRender(user?.username)}! Manage your appointments and availability.</p>
+        </div>
 
         {(appointmentsError || slotsError) && (
           <div className="error-message">
-            {appointmentsError && <div><SafeText>{appointmentsError}</SafeText></div>}
-            {slotsError && <div><SafeText>{slotsError}</SafeText></div>}
+            {appointmentsError && <div>{appointmentsError}</div>}
+            {slotsError && <div>{slotsError}</div>}
           </div>
         )}
 
@@ -115,7 +114,7 @@ const DoctorDashboard = () => {
           <div className="stat-card">
             <h3>Total Appointments</h3>
             <p className="stat-number">{appointments?.length || 0}</p>
-        </div>
+          </div>
           <div className="stat-card">
             <h3>Today's Appointments</h3>
             <p className="stat-number">
@@ -128,19 +127,19 @@ const DoctorDashboard = () => {
                 }
               }).length || 0}
             </p>
-        </div>
+          </div>
           <div className="stat-card">
             <h3>Available Slots</h3>
             <p className="stat-number">{availabilitySlots?.filter(slot => !slot?.isBooked).length || 0}</p>
-      </div>
+          </div>
         </div>
 
         {error && (
           <div className="error-message">
-            <SafeText>{error}</SafeText>
+            {error}
             <button onClick={loadDashboardData} className="retry-btn">
               Retry
-      </button>
+            </button>
           </div>
         )}
       </div>
@@ -157,7 +156,7 @@ const DoctorDashboard = () => {
 
         {appointmentsError && (
           <div className="error-message">
-            <SafeText>{appointmentsError}</SafeText>
+            {appointmentsError}
           </div>
         )}
 
@@ -175,14 +174,14 @@ const DoctorDashboard = () => {
                 <div className="appointment-card">
                   <div className="appointment-details">
                     <h4>
-                      <SafeText>Patient: {safeRender(appointment?.patientUser?.username, 'Unknown Patient')}</SafeText>
+                      Patient: {safeRender(appointment?.patientUser?.username, 'Unknown Patient')}
                     </h4>
-                    <p><strong>Date:</strong> <SafeText>{safeDate(appointment?.appointmentDateTime)}</SafeText></p>
-                    <p><strong>Time:</strong> <SafeText>{safeDateTime(appointment?.appointmentDateTime)}</SafeText></p>
-                    <p><strong>Duration:</strong> <SafeText>{safeRender(appointment?.durationMinutes, '30')} minutes</SafeText></p>
+                    <p><strong>Date:</strong> {safeDate(appointment?.appointmentDateTime)}</p>
+                    <p><strong>Time:</strong> {safeDateTime(appointment?.appointmentDateTime)}</p>
+                    <p><strong>Duration:</strong> {safeRender(appointment?.durationMinutes, '30')} minutes</p>
                     <p><strong>Status:</strong> 
                       <span className={`status ${safeRender(appointment?.status, 'unknown').toLowerCase()}`}>
-                        <SafeText>{safeRender(appointment?.status, 'Unknown')}</SafeText>
+                        {safeRender(appointment?.status, 'Unknown')}
                       </span>
                     </p>
                   </div>
@@ -205,7 +204,7 @@ const DoctorDashboard = () => {
 
         {slotsError && (
           <div className="error-message">
-            <SafeText>{slotsError}</SafeText>
+            {slotsError}
           </div>
         )}
 
@@ -222,14 +221,14 @@ const DoctorDashboard = () => {
               <ErrorBoundary key={slot?.availabilitySlotId || index}>
                 <div className="slot-card">
                   <div className="slot-details">
-                    <h4><SafeText>{safeDate(slot?.slotDate)}</SafeText></h4>
-                    <p><strong>Time:</strong> <SafeText>{safeRender(slot?.startTime)} - {safeRender(slot?.endTime)}</SafeText></p>
+                    <h4>{safeDate(slot?.slotDate)}</h4>
+                    <p><strong>Time:</strong> {safeRender(slot?.startTime)} - {safeRender(slot?.endTime)}</p>
                     <p><strong>Status:</strong> 
                       <span className={`status ${slot?.isBooked ? 'booked' : 'available'}`}>
-                        <SafeText>{slot?.isBooked ? 'Booked' : 'Available'}</SafeText>
+                        {slot?.isBooked ? 'Booked' : 'Available'}
                       </span>
                     </p>
-                    {slot?.notes && <p><strong>Notes:</strong> <SafeText>{safeRender(slot?.notes)}</SafeText></p>}
+                    {slot?.notes && <p><strong>Notes:</strong> {safeRender(slot?.notes)}</p>}
                   </div>
                   <div className="slot-actions">
                     {!slot?.isBooked && (
@@ -284,7 +283,7 @@ const DoctorDashboard = () => {
       } finally {
         setFormLoading(false);
       }
-};
+    };
 
     const handleChange = (e) => {
       setFormData({
@@ -304,7 +303,7 @@ const DoctorDashboard = () => {
           <form onSubmit={handleSubmit} className="availability-form">
             {formError && (
               <div className="error-message">
-                <SafeText>{formError}</SafeText>
+                {formError}
               </div>
             )}
 
@@ -314,7 +313,7 @@ const DoctorDashboard = () => {
                 type="date"
                 id="slotDate"
                 name="slotDate"
-                value={formData.slotDate}
+                                value={formData.slotDate}
                 onChange={handleChange}
                 min={new Date().toISOString().split('T')[0]}
                 required
@@ -443,3 +442,4 @@ const DoctorDashboard = () => {
 };
 
 export default DoctorDashboard;
+
