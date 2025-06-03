@@ -82,14 +82,38 @@ const Settings = () => {
     setError('');
     setMessage('');
 
+    // Only send updatable fields
+    const updatableFields = [
+      'firstName',
+      'lastName',
+      'phoneNumber',
+      'dateOfBirth',
+      'address',
+      'bio'
+    ];
+    const payload = {};
+    updatableFields.forEach((key) => {
+      if (profileData[key] !== undefined) {
+        payload[key] = profileData[key];
+      }
+    });
+
     try {
-      const response = await apiClient.put('/auth/profile', profileData);
+      const response = await apiClient.put('/auth/profile', payload);
       if (response.data.success) {
         setMessage('Profile updated successfully!');
         setIsEditing(false);
-        // Update user context
-        if (updateUser) {
-          updateUser({ ...user, ...profileData });
+        // Fetch updated user profile and update context
+        try {
+          const meRes = await apiClient.get('/auth/me');
+          if (updateUser && meRes.data) {
+            updateUser(meRes.data);
+          }
+        } catch (fetchError) {
+          // fallback: update context with local profileData if fetch fails
+          if (updateUser) {
+            updateUser({ ...user, ...profileData });
+          }
         }
       }
     } catch (error) {
