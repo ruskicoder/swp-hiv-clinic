@@ -1,14 +1,15 @@
-# HIV Medical Treatment System
+# HIV Medical Treatment System - Backend
 
-A comprehensive web application for managing HIV medical treatment with appointment booking functionality.
+A comprehensive Spring Boot backend API for managing HIV medical treatment with appointment booking functionality.
 
 ## Features
 
-- User authentication and role-based access control
-- Appointment booking and management
+- User authentication and role-based access control with JWT
+- RESTful API for appointment booking and management
 - Doctor availability management
-- Patient and doctor profiles
-- Admin dashboard for system oversight
+- Patient and doctor profile management
+- Admin dashboard API endpoints
+- Microsoft SQL Server integration
 
 ## Technology Stack
 
@@ -20,13 +21,39 @@ A comprehensive web application for managing HIV medical treatment with appointm
 - Microsoft SQL Server
 - Maven
 
-### Frontend
+## API Endpoints
 
-- React 18
-- Vite
-- Axios for API communication
-- React Router for navigation
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User authentication
+- `GET /api/auth/me` - Get current user profile
+- `PUT /api/auth/profile` - Update user profile
+### Appointments
+- `GET /api/appointments/patient/my-appointments` - Get patient appointments
+- `GET /api/appointments/doctor/my-appointments` - Get doctor appointments
+- `POST /api/appointments/book` - Book new appointment
+- `PUT /api/appointments/{id}/cancel` - Cancel appointment
 
+### Doctors
+- `GET /api/doctors` - Get all doctors
+- `GET /api/doctors/{id}/available-slots` - Get doctor availability
+- `POST /api/doctors/availability` - Add availability slot
+- `DELETE /api/doctors/availability/{id}` - Remove availability slot
+
+### Admin
+- `GET /api/admin/users` - Get all users
+- `GET /api/admin/doctors` - Get all doctors
+- `GET /api/admin/appointments` - Get all appointments
+- `POST /api/admin/doctors` - Create doctor account
 ## Getting Started
 
-Follow these steps to set up and run the application locally. a
+### Prerequisites
+
+- Java 17 or higher
+- Maven 3.6+
+- Microsoft SQL Server
+
+### Database Setup
+
+1. Run the database setup script:
+
