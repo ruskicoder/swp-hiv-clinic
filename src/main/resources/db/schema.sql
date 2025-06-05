@@ -67,6 +67,23 @@ CREATE TABLE PatientProfiles (
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
+-- PatientRecords Table: Enhanced for better medical record management
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
+CREATE TABLE PatientRecords (
+    RecordID INT PRIMARY KEY IDENTITY(1,1),
+    PatientUserID INT NOT NULL,
+    MedicalHistory NVARCHAR(MAX) NULL,
+    Allergies NVARCHAR(MAX) NULL,
+    CurrentMedications NVARCHAR(MAX) NULL,
+    Notes NVARCHAR(MAX) NULL,
+    BloodType NVARCHAR(10) NULL,
+    EmergencyContact NVARCHAR(255) NULL,
+    EmergencyPhone NVARCHAR(20) NULL,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
 -- DoctorAvailabilitySlots Table: Doctors define their work slots
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
 CREATE TABLE DoctorAvailabilitySlots (
@@ -95,6 +112,7 @@ CREATE TABLE Appointments (
     Status VARCHAR(50) NOT NULL DEFAULT 'Scheduled', -- e.g., 'Scheduled', 'Completed', 'CancelledByPatient', 'CancelledByDoctor', 'NoShow'
     PatientCancellationReason NVARCHAR(MAX) NULL,
     DoctorCancellationReason NVARCHAR(MAX) NULL,
+    AppointmentNotes NVARCHAR(MAX) NULL, -- Doctor's notes during/after appointment
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION ON UPDATE NO ACTION, -- Don't delete appointments if patient is deleted without review
@@ -151,6 +169,27 @@ CREATE TABLE PasswordResetTokens (
     IsUsed BIT DEFAULT 0,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE -- If user is deleted, their reset tokens are also deleted
+);
+
+-- ARVTreatments Table: Enhanced for better treatment management
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ARVTreatments' AND xtype='U')
+CREATE TABLE ARVTreatments (
+    ARVTreatmentID INT PRIMARY KEY IDENTITY(1,1),
+    PatientUserID INT NOT NULL,
+    DoctorUserID INT NULL,
+    AppointmentID INT NULL, -- Link to the appointment where this treatment was prescribed
+    Regimen NVARCHAR(255) NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NULL, -- NULL means ongoing treatment
+    Adherence NVARCHAR(255) NULL, -- e.g., 'Good', 'Fair', 'Poor'
+    SideEffects NVARCHAR(MAX) NULL,
+    Notes NVARCHAR(MAX) NULL,
+    IsActive BIT DEFAULT 1, -- Whether this treatment is currently active
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE SET NULL ON UPDATE NO ACTION,
+    FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL ON UPDATE NO ACTION
 );
 
 PRINT 'Database schema created successfully!';

@@ -1,0 +1,6 @@
+﻿UserID,Username,PasswordHash,Email,RoleID,IsActive,CreatedAt,UpdatedAt
+1,admin,$2a$10$9nvqsbFQvYMKYqMWbS1QheLoPfyE/cYwaUEr0ua4TLy04tK3bUMOG,admin@hivclinic.com,3,1,2025-06-02 22:09:56.7233333,2025-06-03 00:43:40.4252514
+2,doctor1,$2a$10$DO.l6ooFT6AyehqZGBksM.x0ut7VFUYAAVwzvzcjgCh2YXR2EW2h.,doctor1@hivclinic.com,2,1,2025-06-02 22:09:56.7266667,2025-06-03 17:04:37.4572220
+3,khoa7577,$2a$10$OUdnS/tJxz5xTbOoSezrS.gezaejLwbBX3.lZ18lhFPmNjS6HO9vS,khoado7577@gmail.com,3,1,2025-06-02 22:29:00.9482693,2025-06-02 22:29:00.9482693
+7,doktor,$2a$10$FbRZ3j3sbu7UTmA9BEOYjufOdGrBoSbFQCEmwRiu96utdQte0jmh2,doktor@hiv.com,2,1,2025-06-02 22:57:03.4226491,2025-06-02 22:57:03.4226491
+8,patient1,$2a$10$/ABlCIkK.QK8PwRcfhjdqev0CrHqGQb.p5SkUVMGVQzWGHXtu8.ii,patient1@hiv.com,1,1,2025-06-02 22:59:56.2847641,2025-06-02 22:59:56.2847641

@@ -1,0 +1,325 @@
+.weekly-schedule {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.schedule-header {
+  background: linear-gradient(135deg, #2d5a27 0%, #4a7c59 100%);
+  color: white;
+  padding: 1rem;
+}
+
+.schedule-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nav-btn, .today-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover, .today-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.nav-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  padding: 0;
+}
+
+.current-period h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.view-selector {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.view-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.view-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.view-btn.active {
+  background: white;
+  color: #2d5a27;
+  font-weight: 600;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  min-height: 600px;
+}
+
+.time-column {
+  background: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+}
+
+.time-header {
+  height: 60px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.time-slot {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #6c757d;
+  border-bottom: 1px solid #e9ecef;
+  font-weight: 500;
+}
+
+.day-column {
+  border-right: 1px solid #e9ecef;
+}
+
+.day-column:last-child {
+  border-right: none;
+}
+
+.day-header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  font-weight: 600;
+  color: #495057;
+}
+
+.day-name {
+  text-align: center;
+}
+
+.schedule-slot {
+  height: 60px;
+  border-bottom: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.schedule-slot.available {
+  background: #e8f5e8;
+  border-left: 3px solid #28a745;
+}
+
+.schedule-slot.available:hover {
+  background: #d4edda;
+  transform: scale(1.02);
+}
+
+.schedule-slot.unavailable {
+  background: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.schedule-slot.selected {
+  background: #2d5a27;
+  color: white;
+  border-left: 3px solid #1e3a1a;
+}
+
+.slot-content {
+  padding: 0.25rem;
+  text-align: center;
+  width: 100%;
+}
+
+.doctor-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slot-time {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.schedule-legend {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.legend-color.available {
+  background: #28a745;
+}
+
+.legend-color.unavailable {
+  background: #6c757d;
+}
+
+.legend-color.selected {
+  background: #2d5a27;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .schedule-navigation {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .current-period h3 {
+    font-size: 1.25rem;
+  }
+  
+  .schedule-grid {
+    grid-template-columns: 60px repeat(7, 1fr);
+  }
+  
+  .time-slot {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-grid {
+    grid-template-columns: 50px repeat(7, 1fr);
+    font-size: 0.8rem;
+  }
+  
+  .day-header {
+    height: 50px;
+    font-size: 0.8rem;
+  }
+  
+  .schedule-slot {
+    height: 50px;
+  }
+  
+  .time-slot {
+    height: 50px;
+    font-size: 0.65rem;
+  }
+  
+  .doctor-name {
+    font-size: 0.65rem;
+  }
+  
+  .slot-time {
+    font-size: 0.6rem;
+  }
+  
+  .schedule-legend {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-navigation {
+    gap: 0.5rem;
+  }
+  
+  .nav-buttons {
+    gap: 0.25rem;
+  }
+  
+  .nav-btn, .today-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .view-selector {
+    gap: 0.125rem;
+  }
+  
+  .view-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .current-period h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .weekly-schedule {
+    background: #1a1a1a;
+    color: #e9ecef;
+  }
+  
+  .time-column, .day-header {
+    background: #2d2d2d;
+  }
+  
+  .schedule-slot.unavailable {
+    background: #2d2d2d;
+  }
+  
+  .schedule-legend {
+    background: #2d2d2d;
+  }
+}
