@@ -84,7 +84,7 @@ const Settings = () => {
     setError('');
     setMessage('');
 
-    // Only send updatable fields
+    // Only send updatable fields (do not require image)
     const updatableFields = [
       'firstName',
       'lastName',
@@ -185,7 +185,7 @@ const Settings = () => {
     }
   };
 
-  // Handle profile image upload
+  // Handle profile image upload (optional, separate from profile edit)
   const handleProfileImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -198,31 +198,34 @@ const Settings = () => {
       setError('');
       setMessage('');
       try {
-        const uploadRes = await apiClient.post('/patient-records/upload-image', { image: base64String });
-        if (uploadRes.data && uploadRes.data.success) {
-          setMessage('Profile image updated successfully!');
-        } else {
-          setError(uploadRes.data?.message || 'Failed to upload image');
-        }
-        // Always fetch latest profile after upload
-        try {
-          const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } }); // prevent cache
-          if (updateUser && meRes.data) {
-            updateUser(meRes.data);
+        // Only upload if image is selected
+        if (base64String && base64String.startsWith('data:image/')) {
+          const uploadRes = await apiClient.post('/patient-records/upload-image', { image: base64String });
+          if (uploadRes.data && uploadRes.data.success) {
+            setMessage('Profile image updated successfully!');
+          } else {
+            setError(uploadRes.data?.message || 'Failed to upload image');
+          }
+          // Always fetch latest profile after upload
+          try {
+            const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } }); // prevent cache
+            if (updateUser && meRes.data) {
+              updateUser(meRes.data);
+              setProfileData(prev => ({
+                ...prev,
+                profileImageBase64: meRes.data.profileImageBase64 || ''
+              }));
+            }
+          } catch (fetchError) {
+            // fallback: update context and local state with uploaded image
+            if (updateUser) {
+              updateUser({ ...user, profileImageBase64: base64String });
+            }
             setProfileData(prev => ({
               ...prev,
-              profileImageBase64: meRes.data.profileImageBase64 || ''
+              profileImageBase64: base64String
             }));
           }
-        } catch (fetchError) {
-          // fallback: update context and local state with uploaded image
-          if (updateUser) {
-            updateUser({ ...user, profileImageBase64: base64String });
-          }
-          setProfileData(prev => ({
-            ...prev,
-            profileImageBase64: base64String
-          }));
         }
       } catch (err) {
         setError(err?.response?.data?.message || 'Failed to upload image');
