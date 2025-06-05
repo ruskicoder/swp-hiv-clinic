@@ -21,7 +21,8 @@ const Settings = () => {
     email: '',
     dateOfBirth: '',
     address: '',
-    bio: ''
+    bio: '',
+    profileImageBase64: '' // add this field
   });
 
   // Password change state
@@ -47,7 +48,8 @@ const Settings = () => {
         email: user.email || '',
         dateOfBirth: user.dateOfBirth || '',
         address: user.address || '',
-        bio: user.bio || ''
+        bio: user.bio || '',
+        profileImageBase64: user.profileImageBase64 || ''
       });
     }
   }, [user]);
@@ -183,6 +185,55 @@ const Settings = () => {
     }
   };
 
+  // Handle profile image upload
+  const handleProfileImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setError('');
+    setMessage('');
+    const reader = new window.FileReader();
+    reader.onload = async (event) => {
+      const base64String = event.target.result;
+      setLoading(true);
+      setError('');
+      setMessage('');
+      try {
+        const uploadRes = await apiClient.post('/patient-records/upload-image', { image: base64String });
+        if (uploadRes.data && uploadRes.data.success) {
+          setMessage('Profile image updated successfully!');
+        } else {
+          setError(uploadRes.data?.message || 'Failed to upload image');
+        }
+        // Always fetch latest profile after upload
+        try {
+          const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } }); // prevent cache
+          if (updateUser && meRes.data) {
+            updateUser(meRes.data);
+            setProfileData(prev => ({
+              ...prev,
+              profileImageBase64: meRes.data.profileImageBase64 || ''
+            }));
+          }
+        } catch (fetchError) {
+          // fallback: update context and local state with uploaded image
+          if (updateUser) {
+            updateUser({ ...user, profileImageBase64: base64String });
+          }
+          setProfileData(prev => ({
+            ...prev,
+            profileImageBase64: base64String
+          }));
+        }
+      } catch (err) {
+        setError(err?.response?.data?.message || 'Failed to upload image');
+      } finally {
+        setLoading(false);
+      }
+    };
+    reader.onerror = () => setError('Failed to read image file');
+    reader.readAsDataURL(file);
+  };
+
   const renderProfileSettings = () => (
     <div className="settings-section">
       <div className="section-header">
@@ -193,6 +244,34 @@ const Settings = () => {
         >
           {isEditing ? 'Cancel' : 'Edit Profile'}
         </button>
+      </div>
+
+      {/* Profile image display and upload */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        <div style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', border: '2px solid #e2e8f0', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {profileData.profileImageBase64 ? (
+            <img
+              src={profileData.profileImageBase64}
+              alt="Profile"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span style={{ color: '#9ca3af' }}>No Image</span>
+          )}
+        </div>
+        <div>
+          <input
+            type="file"
+            id="profileImageInput"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleProfileImageChange}
+            disabled={loading}
+          />
+          <label htmlFor="profileImageInput" className="btn btn-outline" style={{ cursor: loading ? 'not-allowed' : 'pointer' }}>
+            Upload Photo
+          </label>
+        </div>
       </div>
 
       {message && (

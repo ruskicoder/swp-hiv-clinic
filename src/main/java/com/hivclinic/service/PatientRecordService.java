@@ -177,11 +177,12 @@ public class PatientRecordService {
             PatientProfile profile = profileOpt.get();
             
             // Validate base64 image (basic validation)
-            if (!base64Image.startsWith("data:image/")) {
+            String trimmed = base64Image == null ? "" : base64Image.trim();
+            if (trimmed.isEmpty() || !trimmed.startsWith("data:image/")) {
                 return MessageResponse.error("Invalid image format");
             }
 
-            profile.setProfileImageBase64(base64Image);
+            profile.setProfileImageBase64(trimmed);
             patientProfileRepository.save(profile);
 
             logger.info("Profile image updated successfully for user ID: {}", userId);

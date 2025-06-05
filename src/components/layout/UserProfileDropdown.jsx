@@ -106,7 +106,7 @@ const UserProfileDropdown = () => {
         <div className="profile-avatar">
           {user?.profileImageBase64 ? (
             <img 
-              src={`data:image/jpeg;base64,${user.profileImageBase64}`}
+              src={user.profileImageBase64}
               alt="Profile"
               className="profile-image"
             />
@@ -149,7 +149,7 @@ const UserProfileDropdown = () => {
             <div className="dropdown-avatar">
               {user?.profileImageBase64 ? (
                 <img 
-                  src={`data:image/jpeg;base64,${user.profileImageBase64}`}
+                  src={user.profileImageBase64}
                   alt="Profile"
                   className="dropdown-profile-image"
                 />

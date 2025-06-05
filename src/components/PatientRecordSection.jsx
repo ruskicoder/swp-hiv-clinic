@@ -15,6 +15,9 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
 
   React.useEffect(() => {
     if (record) {
@@ -41,7 +44,6 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       await onSave(formData);
       setIsEditing(false);
@@ -52,14 +54,27 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
     }
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
+    setUploadError('');
+    setUploadSuccess('');
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         const base64String = event.target.result;
-        onImageUpload(base64String);
+        setUploading(true);
+        setUploadError('');
+        setUploadSuccess('');
+        try {
+          await onImageUpload(base64String);
+          setUploadSuccess('Profile image updated successfully!');
+        } catch (err) {
+          setUploadError('Failed to upload image');
+        } finally {
+          setUploading(false);
+        }
       };
+      reader.onerror = () => setUploadError('Failed to read image file');
       reader.readAsDataURL(file);
     }
   };
@@ -71,7 +86,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
         <div className="record-actions">
           {!isEditing ? (
             <button 
-                            className="btn-primary"
+              className="btn-primary"
               onClick={() => setIsEditing(true)}
             >
               Edit Record
@@ -129,10 +144,13 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
               accept="image/*"
               onChange={handleImageUpload}
               style={{ display: 'none' }}
+              disabled={uploading}
             />
-            <label htmlFor="profileImage" className="upload-btn">
-              Upload Photo
+            <label htmlFor="profileImage" className="upload-btn" style={{ opacity: uploading ? 0.6 : 1, pointerEvents: uploading ? 'none' : 'auto' }}>
+              {uploading ? 'Uploading...' : 'Upload Photo'}
             </label>
+            {uploadError && <div className="error-message">{uploadError}</div>}
+            {uploadSuccess && <div className="success-message">{uploadSuccess}</div>}
           </div>
         </div>
 

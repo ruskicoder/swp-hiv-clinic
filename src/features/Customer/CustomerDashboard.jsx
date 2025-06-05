@@ -132,8 +132,9 @@ const CustomerDashboard = () => {
   const handleSavePatientRecord = async (data) => {
     try {
       await apiClient.put('/patient-records/my-record', data);
-      loadPatientRecord();
+      await loadPatientRecord();
     } catch (e) {
+      setError('Failed to save patient record');
       throw new Error('Failed to save patient record');
     }
   };
@@ -142,11 +143,11 @@ const CustomerDashboard = () => {
     setError('');
     try {
       await apiClient.post('/patient-records/upload-image', { image: base64Image });
-      loadPatientRecord();
+      await loadPatientRecord();
     } catch (e) {
-      console.error('Image upload error:', e);
       setError('Failed to upload image');
       alert('Failed to upload image');
+      throw new Error('Failed to upload image');
     }
   };
 
