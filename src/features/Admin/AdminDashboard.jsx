@@ -32,6 +32,8 @@ const [appointments, setAppointments] = useState([]);
   const loadDashboardData = async () => {
     setLoading(true);
     setError('');
+    setUsersError('');
+    setAppointmentsError('');
 
     try {
       console.log('Loading admin dashboard data...');
@@ -302,6 +304,7 @@ const [appointments, setAppointments] = useState([]);
                   <th>Date & Time</th>
                   <th>Duration</th>
                   <th>Status</th>
+                  <th>Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -316,6 +319,7 @@ const [appointments, setAppointments] = useState([]);
                         {safeRender(appointment?.status, 'Unknown')}
                       </span>
                     </td>
+                    <td>{safeRender(appointment?.appointmentNotes)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * REST Controller for appointment management
@@ -136,6 +137,55 @@ public class AppointmentController {
             logger.error("Error cancelling appointment {}: {}", appointmentId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to cancel appointment: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Doctor updates appointment status, adds notes, and can schedule re-check
+     */
+    @PutMapping("/{appointmentId}/status")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<?> updateAppointmentStatus(
+            @PathVariable Integer appointmentId,
+            @RequestBody Map<String, Object> statusData,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        try {
+            String status = (String) statusData.get("status");
+            String notes = (String) statusData.getOrDefault("notes", "");
+            Boolean scheduleRecheck = (Boolean) statusData.getOrDefault("scheduleRecheck", false);
+            String recheckDateTime = (String) statusData.getOrDefault("recheckDateTime", null);
+            Integer durationMinutes = statusData.get("durationMinutes") != null ? (Integer) statusData.get("durationMinutes") : null;
+
+            MessageResponse response = appointmentService.updateAppointmentStatus(
+                appointmentId, userPrincipal.getId(), status, notes, scheduleRecheck, recheckDateTime, durationMinutes
+            );
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            logger.error("Error updating appointment status: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to update appointment status: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Doctor accesses patient record for a specific appointment (only if appointment is not completed)
+     */
+    @GetMapping("/{appointmentId}/patient-record")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<?> getPatientRecordForAppointment(
+            @PathVariable Integer appointmentId,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        try {
+            var record = appointmentService.getPatientRecordForAppointment(appointmentId, userPrincipal.getId());
+            return ResponseEntity.ok(record);
+        } catch (Exception e) {
+            logger.error("Error getting patient record for appointment {}: {}", appointmentId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(MessageResponse.error("Access denied or record not found: " + e.getMessage()));
         }
     }
 }

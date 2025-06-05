@@ -51,7 +51,7 @@ const CustomerDashboard = () => {
       // Load appointments and doctors concurrently
       const [appointmentsResult, doctorsResult] = await Promise.allSettled([
         apiClient.get('/appointments/patient/my-appointments'),
-        apiClient.get('/admin/doctors')
+        apiClient.get('/doctors') // changed from '/admin/doctors'
       ]);
 
       // Handle appointments
@@ -79,6 +79,7 @@ const CustomerDashboard = () => {
   };
 
   const loadPatientRecord = async () => {
+    setError('');
     try {
       const res = await apiClient.get('/patient-records/my-record');
       setPatientRecord(res.data);
@@ -88,6 +89,7 @@ const CustomerDashboard = () => {
   };
 
   const loadARVTreatments = async () => {
+    setError('');
     try {
       const res = await apiClient.get('/arv-treatments/my-treatments');
       setArvTreatments(res.data || []);
@@ -97,6 +99,7 @@ const CustomerDashboard = () => {
   };
 
   const loadAllSlots = async () => {
+    setError('');
     try {
       const res = await apiClient.get('/doctors/availability/all-slots');
       setAllSlots(res.data || []);
@@ -106,6 +109,7 @@ const CustomerDashboard = () => {
   };
 
   const handleCancelAppointment = async (appointmentId, reason) => {
+    setError('');
     try {
       const response = await apiClient.put(`/appointments/${appointmentId}/cancel`, null, {
         params: { reason }
@@ -135,11 +139,13 @@ const CustomerDashboard = () => {
   };
 
   const handleUploadImage = async (base64Image) => {
+    setError('');
     try {
       await apiClient.post('/patient-records/upload-image', { image: base64Image });
       loadPatientRecord();
     } catch (e) {
       console.error('Image upload error:', e);
+      setError('Failed to upload image');
       alert('Failed to upload image');
     }
   };

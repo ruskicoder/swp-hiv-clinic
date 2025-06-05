@@ -7,6 +7,7 @@ import com.hivclinic.model.DoctorAvailabilitySlot;
 import com.hivclinic.model.User;
 import com.hivclinic.repository.AppointmentRepository;
 import com.hivclinic.repository.DoctorAvailabilitySlotRepository;
+import com.hivclinic.repository.DoctorProfileRepository;
 import com.hivclinic.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,9 @@ public class AppointmentService {
 
     @Autowired
     private DoctorAvailabilitySlotRepository availabilitySlotRepository;
+
+    @Autowired
+    private DoctorProfileRepository doctorProfileRepository;
 
     /**
      * Book an appointment
@@ -154,6 +158,14 @@ public class AppointmentService {
                 if (appointment.getDoctorUser().getRole() != null) {
                     appointment.getDoctorUser().getRole().getRoleName(); // Force initialization
                 }
+                // Attach doctor profile info for display
+                doctorProfileRepository.findByUser(appointment.getDoctorUser()).ifPresent(profile -> {
+                    appointment.getDoctorUser().setFirstName(profile.getFirstName());
+                    appointment.getDoctorUser().setLastName(profile.getLastName());
+                    if (profile.getSpecialty() != null) {
+                        appointment.getDoctorUser().setSpecialty(profile.getSpecialty().getSpecialtyName());
+                    }
+                });
             }
             if (appointment.getAvailabilitySlot() != null) {
                 appointment.getAvailabilitySlot().getSlotDate(); // Force initialization
@@ -189,6 +201,14 @@ public class AppointmentService {
                 if (appointment.getDoctorUser().getRole() != null) {
                     appointment.getDoctorUser().getRole().getRoleName();
                 }
+                // Attach doctor profile info for display
+                doctorProfileRepository.findByUser(appointment.getDoctorUser()).ifPresent(profile -> {
+                    appointment.getDoctorUser().setFirstName(profile.getFirstName());
+                    appointment.getDoctorUser().setLastName(profile.getLastName());
+                    if (profile.getSpecialty() != null) {
+                        appointment.getDoctorUser().setSpecialty(profile.getSpecialty().getSpecialtyName());
+                    }
+                });
             }
         });
         
@@ -279,5 +299,68 @@ public class AppointmentService {
             logger.error("Error cancelling appointment: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to cancel appointment: " + e.getMessage());
         }
+    }
+
+    /**
+     * Doctor updates appointment status, adds notes, and can schedule re-check
+     */
+    @Transactional
+    public MessageResponse updateAppointmentStatus(Integer appointmentId, Integer doctorUserId, String status, String notes, Boolean scheduleRecheck, String recheckDateTime, Integer durationMinutes) {
+        try {
+            Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
+            if (appointmentOpt.isEmpty()) {
+                return MessageResponse.error("Appointment not found");
+            }
+            Appointment appointment = appointmentOpt.get();
+
+            // Only allow doctor of this appointment to update
+            if (!appointment.getDoctorUser().getUserId().equals(doctorUserId)) {
+                return MessageResponse.error("You don't have permission to update this appointment");
+            }
+
+            // Only allow update if not already completed/cancelled
+            if ("Completed".equalsIgnoreCase(appointment.getStatus()) || "Cancelled".equalsIgnoreCase(appointment.getStatus())) {
+                return MessageResponse.error("Cannot update a completed or cancelled appointment");
+            }
+
+            appointment.setStatus(status);
+            appointment.setAppointmentNotes(notes);
+            appointment.setUpdatedAt(LocalDateTime.now());
+            appointmentRepository.save(appointment);
+
+            // If doctor requests a re-check, create new appointment for same patient/doctor
+            if (Boolean.TRUE.equals(scheduleRecheck) && recheckDateTime != null) {
+                Appointment recheck = new Appointment();
+                recheck.setPatientUser(appointment.getPatientUser());
+                recheck.setDoctorUser(appointment.getDoctorUser());
+                recheck.setAppointmentDateTime(LocalDateTime.parse(recheckDateTime));
+                recheck.setDurationMinutes(durationMinutes != null ? durationMinutes : 30);
+                recheck.setStatus("Scheduled");
+                appointmentRepository.save(recheck);
+            }
+
+            return MessageResponse.success("Appointment status updated successfully");
+        } catch (Exception e) {
+            logger.error("Error updating appointment status: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to update appointment status: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Doctor can access patient record for an appointment if appointment is not completed
+     */
+    @Transactional(readOnly = true)
+    public Object getPatientRecordForAppointment(Integer appointmentId, Integer doctorUserId) {
+        Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
+        if (appointmentOpt.isEmpty()) throw new RuntimeException("Appointment not found");
+        Appointment appointment = appointmentOpt.get();
+        if (!appointment.getDoctorUser().getUserId().equals(doctorUserId))
+            throw new RuntimeException("Access denied");
+        if ("Completed".equalsIgnoreCase(appointment.getStatus()))
+            throw new RuntimeException("Cannot access patient record after appointment is completed");
+        // Return patient record (implement as needed, e.g. fetch PatientRecords by patientUserId)
+        // Example:
+        // return patientRecordRepository.findByPatientUserId(appointment.getPatientUser().getUserId());
+        return null; // placeholder, implement actual fetch
     }
 }

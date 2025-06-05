@@ -79,6 +79,7 @@ CREATE TABLE PatientRecords (
     BloodType NVARCHAR(10) NULL,
     EmergencyContact NVARCHAR(255) NULL,
     EmergencyPhone NVARCHAR(20) NULL,
+    ProfileImageBase64 NVARCHAR(MAX) NULL, -- for base64 image upload
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE
@@ -192,4 +193,7 @@ CREATE TABLE ARVTreatments (
     FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL ON UPDATE NO ACTION
 );
 
+-- Add AppointmentNotes column to Appointments table if not exists
+IF COL_LENGTH('Appointments', 'AppointmentNotes') IS NULL
+    ALTER TABLE Appointments ADD AppointmentNotes NVARCHAR(MAX) NULL;
 PRINT 'Database schema created successfully!';

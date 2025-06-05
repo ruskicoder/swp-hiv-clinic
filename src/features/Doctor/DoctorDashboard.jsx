@@ -129,18 +129,17 @@ const DoctorDashboard = () => {
     }
   };
 
-  // Handle appointment status update
-  const handleUpdateAppointmentStatus = async (appointmentId, newStatus, notes = '') => {
+  // Handle appointment status update, including scheduling a re-check
+  const handleUpdateAppointmentStatus = async (appointmentId, newStatus, notes = '', scheduleRecheck = false, recheckDateTime = '', durationMinutes = 30) => {
     try {
       await apiClient.put(`/appointments/${appointmentId}/status`, {
         status: newStatus,
-        notes: notes
+        notes,
+        scheduleRecheck,
+        recheckDateTime,
+        durationMinutes
       });
-      
-      // Reload appointments
       loadDashboardData();
-      
-      // If completing appointment, show ARV treatment form
       if (newStatus === 'Completed') {
         setActiveTab('add-treatment');
       }
@@ -153,7 +152,8 @@ const DoctorDashboard = () => {
   // Handle ARV treatment submission
   const handleAddARVTreatment = async (e) => {
     e.preventDefault();
-    
+    setFormError('');
+
     if (!selectedAppointment) {
       setFormError('No appointment selected');
       return;
@@ -359,6 +359,18 @@ const DoctorDashboard = () => {
                           }}
                         >
                           Cancel
+                        </button>
+                        <button
+                          className="btn-secondary"
+                          onClick={() => {
+                            // Schedule re-check (prompt for date/time)
+                            const recheckDateTime = prompt('Enter re-check date and time (YYYY-MM-DDTHH:mm):');
+                            if (recheckDateTime) {
+                              handleUpdateAppointmentStatus(appointment.appointmentId, 'Scheduled', '', true, recheckDateTime);
+                            }
+                          }}
+                        >
+                          Schedule Re-Check
                         </button>
                       </>
                     )}

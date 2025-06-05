@@ -60,6 +60,9 @@ public class Appointment {
     @Column(name = "UpdatedAt", columnDefinition = "DATETIME2 DEFAULT GETDATE()")
     private LocalDateTime updatedAt;
 
+    @Column(name = "AppointmentNotes", columnDefinition = "NVARCHAR(MAX)")
+    private String appointmentNotes;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

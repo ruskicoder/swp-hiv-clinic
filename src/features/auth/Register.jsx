@@ -72,12 +72,13 @@ const Register = () => {
 
     // Check username availability
     if (!newErrors.username && formData.username.trim()) {
-    try {
+      try {
         const usernameCheck = await authService.checkUsername(formData.username);
-        if (!usernameCheck.available) {
+        // Fix: check .success property (backend returns { success: true/false, message: ... })
+        if (usernameCheck && usernameCheck.success === false) {
           newErrors.username = 'Username is already taken';
         }
-    } catch (error) {
+      } catch (error) {
         console.error('Username check failed:', error);
       }
     }
@@ -86,9 +87,10 @@ const Register = () => {
     if (!newErrors.email && formData.email.trim()) {
       try {
         const emailCheck = await authService.checkEmail(formData.email);
-        if (!emailCheck.available) {
+        // Fix: check .success property
+        if (emailCheck && emailCheck.success === false) {
           newErrors.email = 'Email is already registered';
-    }
+        }
       } catch (error) {
         console.error('Email check failed:', error);
       }

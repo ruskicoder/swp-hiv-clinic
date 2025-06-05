@@ -128,9 +128,20 @@ public class AdminService {
      * Get all doctors
      */
     public List<User> getAllDoctors() {
-        return userRepository.findAll().stream()
+        List<User> doctors = userRepository.findAll().stream()
                 .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
                 .toList();
+        // Attach doctor profile info for each doctor
+        for (User doctor : doctors) {
+            doctorProfileRepository.findByUser(doctor).ifPresent(profile -> {
+                doctor.setFirstName(profile.getFirstName());
+                doctor.setLastName(profile.getLastName());
+                if (profile.getSpecialty() != null) {
+                    doctor.setSpecialty(profile.getSpecialty().getSpecialtyName());
+                }
+            });
+        }
+        return doctors;
     }
 
     /**

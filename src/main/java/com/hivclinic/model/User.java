@@ -49,6 +49,15 @@ public class User {
     @Column(name = "UpdatedAt", columnDefinition = "DATETIME2 DEFAULT GETDATE()")
     private LocalDateTime updatedAt;
 
+    @Transient
+    private String firstName;
+
+    @Transient
+    private String lastName;
+
+    @Transient
+    private String specialty;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -59,4 +68,14 @@ public class User {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    // Add getters and setters for new fields
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getSpecialty() { return specialty; }
+    public void setSpecialty(String specialty) { this.specialty = specialty; }
 }

@@ -84,6 +84,7 @@ CREATE TABLE Appointments (
     Status VARCHAR(50) DEFAULT 'Scheduled',
     PatientCancellationReason NVARCHAR(MAX),
     DoctorCancellationReason NVARCHAR(MAX),
+    AppointmentNotes NVARCHAR(MAX),
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
@@ -138,6 +139,7 @@ CREATE TABLE PatientRecords (
     Allergies NVARCHAR(MAX),
     CurrentMedications NVARCHAR(MAX),
     Notes NVARCHAR(MAX),
+    ProfileImageBase64 NVARCHAR(MAX),
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
@@ -153,6 +155,7 @@ CREATE TABLE ARVTreatments (
     Adherence NVARCHAR(255),
     SideEffects NVARCHAR(MAX),
     Notes NVARCHAR(MAX),
+    ProfileImageBase64 NVARCHAR(MAX),
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
