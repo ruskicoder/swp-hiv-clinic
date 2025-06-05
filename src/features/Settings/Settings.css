@@ -31,6 +31,7 @@
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  align-items: flex-start;
 }
 
 .settings-sidebar {
@@ -109,8 +110,9 @@
 
 .section-header {
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -126,15 +128,17 @@
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 200px;
 }
 
 .form-group label {
@@ -382,7 +386,8 @@
   }
   
   .form-row {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 1rem;
   }
   
   .section-header {
@@ -392,26 +397,37 @@
   }
 }
 
+@media (max-width: 900px) {
+  .settings-content {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .settings-sidebar {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .settings-main {
+    padding: 1.5rem;
+  }
+  .form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
 @media (max-width: 480px) {
   .settings-header h1 {
     font-size: 1.5rem;
   }
-  
-  .settings-nav-item {
-    font-size: 0.85rem;
-    padding: 0.5rem 0.75rem;
-  }
-  
-  .settings-nav-item svg {
-    width: 16px;
-    height: 16px;
-  }
-  
   .settings-main {
     padding: 1rem;
   }
-  
-  .setting-description {
-    margin-left: 1.5rem;
+  .form-group {
+    min-width: 0;
+  }
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
   }
 }

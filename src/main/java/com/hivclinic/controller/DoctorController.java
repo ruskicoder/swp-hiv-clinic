@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * REST Controller for doctor-related operations
@@ -64,16 +65,21 @@ public class DoctorController {
     public ResponseEntity<?> getDoctorById(@PathVariable Integer doctorId) {
         try {
             logger.debug("Fetching doctor with ID: {}", doctorId);
-            User doctor = doctorService.getDoctorById(doctorId);
-            logger.info("Retrieved doctor: {}", doctor.getUsername());
-            return ResponseEntity.ok(doctor);
-        } catch (RuntimeException e) {
-            logger.warn("Doctor not found with ID: {}", doctorId);
-            return ResponseEntity.notFound().build();
+            Optional<User> doctorOpt = doctorService.getDoctorById(doctorId);
+            
+            if (doctorOpt.isPresent()) {
+                User doctor = doctorOpt.get();
+                logger.info("Retrieved doctor: {}", doctor.getUsername());
+                return ResponseEntity.ok(doctor);
+            } else {
+                logger.warn("Doctor not found with ID: {}", doctorId);
+                return ResponseEntity.notFound().build();
+            }
+            
         } catch (Exception e) {
-            logger.error("Error getting doctor {}: {}", doctorId, e.getMessage(), e);
+            logger.error("Error fetching doctor with ID {}: {}", doctorId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to get doctor: " + e.getMessage()));
+                    .body(MessageResponse.error("Failed to fetch doctor: " + e.getMessage()));
         }
     }
 
@@ -136,7 +142,7 @@ public class DoctorController {
             logger.error("Error getting available slots for doctor {}: {}", doctorId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to get available slots: " + e.getMessage()));
-}
+        }
     }
 
     /**

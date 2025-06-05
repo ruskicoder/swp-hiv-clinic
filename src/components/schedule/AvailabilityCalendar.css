@@ -1,0 +1,261 @@
+.availability-calendar {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.nav-btn {
+  background: #059669;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background: #047857;
+  transform: scale(1.1);
+}
+
+.month-year {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.today-btn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.today-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.calendar-grid {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #f8fafc;
+}
+
+.weekday {
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  color: #64748b;
+  border-right: 1px solid #e2e8f0;
+  font-size: 0.875rem;
+}
+
+.weekday:last-child {
+  border-right: none;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.day-cell {
+  min-height: 80px;
+  padding: 0.5rem;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.day-cell:nth-child(7n) {
+  border-right: none;
+}
+
+.day-cell:hover:not(.disabled) {
+  background: #f0fdf4;
+  transform: scale(1.02);
+}
+
+.day-cell.disabled {
+  background: #f8fafc;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.day-cell.disabled:hover {
+  transform: none;
+  background: #f8fafc;
+}
+
+.day-cell.has-slots {
+  background: #fefce8;
+}
+
+.day-cell.has-available {
+  background: #f0fdf4;
+}
+
+.day-cell.has-booked {
+  background: #fef2f2;
+}
+
+.day-cell.has-available.has-booked {
+  background: linear-gradient(45deg, #f0fdf4 50%, #fef2f2 50%);
+}
+
+.empty-day {
+  min-height: 80px;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.empty-day:nth-child(7n) {
+  border-right: none;
+}
+
+.day-number {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.disabled .day-number {
+  color: #cbd5e1;
+}
+
+.slot-indicators {
+  display: flex;
+  gap: 2px;
+  margin-top: auto;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.indicator.available {
+  background: #10b981;
+}
+
+.indicator.booked {
+  background: #ef4444;
+}
+
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.legend-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-indicator.available {
+  background: #10b981;
+}
+
+.legend-indicator.booked {
+  background: #ef4444;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .availability-calendar {
+    padding: 1rem;
+  }
+  
+  .calendar-header {
+    margin-bottom: 0.75rem;
+  }
+  
+  .month-year {
+    font-size: 1.25rem;
+  }
+  
+  .nav-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .day-cell {
+    min-height: 60px;
+    padding: 0.25rem;
+  }
+  
+  .weekday {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .calendar-legend {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .day-cell {
+    min-height: 50px;
+  }
+  
+  .day-number {
+    font-size: 0.875rem;
+  }
+  
+  .indicator {
+    width: 6px;
+    height: 6px;
+  }
+}

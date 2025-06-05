@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { SafeText } from '../utils/SafeComponents';
 import './PatientRecordSection.css';
 
-const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
-  const [isEditing, setIsEditing] = useState(false);
+const PatientRecordSection = ({
+  record,
+  onSave,
+  onImageUpload,
+  loading = false,
+  isEditable = true
+}) => {
   const [formData, setFormData] = useState({
     medicalHistory: record?.medicalHistory || '',
     allergies: record?.allergies || '',
@@ -13,7 +18,6 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
     emergencyContact: record?.emergencyContact || '',
     emergencyPhone: record?.emergencyPhone || ''
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
@@ -42,15 +46,11 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
     try {
       await onSave(formData);
-      setIsEditing(false);
     } catch (err) {
       setError('Failed to save patient record');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -61,18 +61,39 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = async (event) => {
-        const base64String = event.target.result;
-        setUploading(true);
-        setUploadError('');
-        setUploadSuccess('');
-        try {
-          await onImageUpload(base64String);
-          setUploadSuccess('Profile image updated successfully!');
-        } catch (err) {
-          setUploadError('Failed to upload image');
-        } finally {
-          setUploading(false);
-        }
+        // Create an image to crop and resize
+        const img = new window.Image();
+        img.onload = async () => {
+          // Crop to center square
+          const minSide = Math.min(img.width, img.height);
+          const sx = (img.width - minSide) / 2;
+          const sy = (img.height - minSide) / 2;
+          // Draw to 512x512 canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = 512;
+          canvas.height = 512;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(
+            img,
+            sx, sy, minSide, minSide,
+            0, 0, 512, 512
+          );
+          // Always use jpeg for compatibility
+          const base64String = canvas.toDataURL('image/jpeg', 0.92);
+          setUploading(true);
+          setUploadError('');
+          setUploadSuccess('');
+          try {
+            await onImageUpload(base64String);
+            setUploadSuccess('Profile image updated successfully!');
+          } catch (err) {
+            setUploadError('Failed to upload image');
+          } finally {
+            setUploading(false);
+          }
+        };
+        img.onerror = () => setUploadError('Failed to process image');
+        img.src = event.target.result;
       };
       reader.onerror = () => setUploadError('Failed to read image file');
       reader.readAsDataURL(file);
@@ -83,36 +104,6 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
     <div className="patient-record-section">
       <div className="record-header">
         <h3>My Medical Record</h3>
-        <div className="record-actions">
-          {!isEditing ? (
-            <button 
-              className="btn-primary"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit Record
-            </button>
-          ) : (
-            <div className="edit-actions">
-              <button 
-                type="submit" 
-                form="patient-record-form"
-                className="btn-primary" 
-                disabled={loading}
-              >
-                {loading ? 'Saving...' : 'Save Changes'}
-              </button>
-              <button 
-                className="btn-secondary"
-                onClick={() => {
-                  setIsEditing(false);
-                  setError('');
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
       {error && (
@@ -126,10 +117,11 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
         <div className="profile-image-section">
           <div className="profile-image-container">
             {record?.profileImageBase64 ? (
-              <img 
-                src={record.profileImageBase64} 
-                alt="Profile" 
+              <img
+                src={record.profileImageBase64}
+                alt="Profile"
                 className="profile-image"
+                // If backend only returns base64 without prefix, add: src={`data:image/jpeg;base64,${record.profileImageBase64}`}
               />
             ) : (
               <div className="profile-placeholder">
@@ -159,7 +151,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
           <div className="form-grid">
             <div className="form-group">
               <label htmlFor="medicalHistory">Medical History</label>
-              {isEditing ? (
+              {isEditable ? (
                 <textarea
                   id="medicalHistory"
                   name="medicalHistory"
@@ -177,7 +169,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 
             <div className="form-group">
               <label htmlFor="allergies">Allergies</label>
-              {isEditing ? (
+              {isEditable ? (
                 <textarea
                   id="allergies"
                   name="allergies"
@@ -195,7 +187,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 
             <div className="form-group">
               <label htmlFor="currentMedications">Current Medications</label>
-              {isEditing ? (
+              {isEditable ? (
                 <textarea
                   id="currentMedications"
                   name="currentMedications"
@@ -213,7 +205,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 
             <div className="form-group">
               <label htmlFor="bloodType">Blood Type</label>
-              {isEditing ? (
+              {isEditable ? (
                 <select
                   id="bloodType"
                   name="bloodType"
@@ -239,7 +231,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 
             <div className="form-group">
               <label htmlFor="emergencyContact">Emergency Contact</label>
-              {isEditing ? (
+              {isEditable ? (
                 <input
                   type="text"
                   id="emergencyContact"
@@ -257,7 +249,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 
             <div className="form-group">
               <label htmlFor="emergencyPhone">Emergency Phone</label>
-              {isEditing ? (
+              {isEditable ? (
                 <input
                   type="tel"
                   id="emergencyPhone"
@@ -275,7 +267,7 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 
             <div className="form-group full-width">
               <label htmlFor="notes">Additional Notes</label>
-              {isEditing ? (
+              {isEditable ? (
                 <textarea
                   id="notes"
                   name="notes"
@@ -291,6 +283,17 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
               )}
             </div>
           </div>
+          {isEditable && (
+            <div className="form-actions">
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={loading}
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>
@@ -298,4 +301,3 @@ const PatientRecordSection = ({ record, onSave, onImageUpload }) => {
 };
 
 export default PatientRecordSection;
-

@@ -1,34 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './WeeklySchedule.css';
 
 const WeeklySchedule = ({ 
   availableSlots = [], 
   onSlotSelect, 
   selectedSlot = null,
-  viewMode = 'week' // 'week', 'month', 'year'
+  viewMode = 'week'
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [currentView, setCurrentView] = useState(viewMode);
 
-  // Get the start of the week (Monday)
+  // Get the start of the week (Monday) - fixed timezone handling
   const getWeekStart = (date) => {
     const d = new Date(date);
+    d.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-    return new Date(d.setDate(diff));
+    const diff = d.getDate() - ((day + 6) % 7); // Monday as start of week
+    const monday = new Date(d);
+    monday.setDate(diff);
+    monday.setHours(12, 0, 0, 0); // Ensure consistent time
+    return monday;
   };
 
   // Generate week days
   const getWeekDays = () => {
     const weekStart = getWeekStart(currentDate);
     const days = [];
-    
     for (let i = 0; i < 7; i++) {
       const day = new Date(weekStart);
       day.setDate(weekStart.getDate() + i);
+      day.setHours(12, 0, 0, 0); // Ensure time is noon to avoid timezone issues
       days.push(day);
     }
-    
     return days;
   };
 
@@ -42,30 +45,73 @@ const WeeklySchedule = ({
     return slots;
   };
 
-  // Check if a slot is available
+  // Check if a slot is available - fixed date comparison
   const isSlotAvailable = (date, time) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return availableSlots.some(slot => 
-      slot.slotDate === dateStr && 
-      slot.startTime === time + ':00' && 
-      !slot.isBooked
-    );
+    // Format date consistently as YYYY-MM-DD in local timezone
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    const slot = availableSlots.find(slot => {
+      let slotDateStr;
+      if (slot.slotDate instanceof Date) {
+        const slotYear = slot.slotDate.getFullYear();
+        const slotMonth = String(slot.slotDate.getMonth() + 1).padStart(2, '0');
+        const slotDay = String(slot.slotDate.getDate()).padStart(2, '0');
+        slotDateStr = `${slotYear}-${slotMonth}-${slotDay}`;
+      } else if (typeof slot.slotDate === 'string') {
+        slotDateStr = slot.slotDate.split('T')[0]; // Extract date part
+      } else {
+        return false;
+      }
+      
+      return slotDateStr === dateStr && slot.startTime === time + ':00';
+    });
+    return !slot || !slot.isBooked;
   };
 
-  // Get slot data
+  // Get slot data - fixed date comparison
   const getSlotData = (date, time) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return availableSlots.find(slot => 
-      slot.slotDate === dateStr && 
-      slot.startTime === time + ':00'
-    );
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    return availableSlots.find(slot => {
+      let slotDateStr;
+      if (slot.slotDate instanceof Date) {
+        const slotYear = slot.slotDate.getFullYear();
+        const slotMonth = String(slot.slotDate.getMonth() + 1).padStart(2, '0');
+        const slotDay = String(slot.slotDate.getDate()).padStart(2, '0');
+        slotDateStr = `${slotYear}-${slotMonth}-${slotDay}`;
+      } else if (typeof slot.slotDate === 'string') {
+        slotDateStr = slot.slotDate.split('T')[0];
+      } else {
+        return false;
+      }
+      
+      return slotDateStr === dateStr && slot.startTime === time + ':00';
+    });
   };
 
   // Handle slot click
   const handleSlotClick = (date, time) => {
     const slotData = getSlotData(date, time);
-    if (slotData && !slotData.isBooked && onSlotSelect) {
-      onSlotSelect(slotData);
+    // Allow selection if slot is empty or not booked
+    if ((!slotData || !slotData.isBooked) && onSlotSelect) {
+      // Format date consistently
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      
+      // If slotData exists, pass it; else pass info to create new slot
+      onSlotSelect(slotData || { 
+        slotDate: formattedDate, 
+        startTime: time + ':00', 
+        endTime: null 
+      });
     }
   };
 
@@ -73,41 +119,49 @@ const WeeklySchedule = ({
   const goToPreviousWeek = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() - 7);
+    newDate.setHours(12, 0, 0, 0);
     setCurrentDate(newDate);
   };
 
   const goToNextWeek = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + 7);
+    newDate.setHours(12, 0, 0, 0);
     setCurrentDate(newDate);
   };
 
   const goToPreviousMonth = () => {
     const newDate = new Date(currentDate);
     newDate.setMonth(currentDate.getMonth() - 1);
+    newDate.setHours(12, 0, 0, 0);
     setCurrentDate(newDate);
   };
 
   const goToNextMonth = () => {
     const newDate = new Date(currentDate);
     newDate.setMonth(currentDate.getMonth() + 1);
+    newDate.setHours(12, 0, 0, 0);
     setCurrentDate(newDate);
   };
 
   const goToPreviousYear = () => {
     const newDate = new Date(currentDate);
     newDate.setFullYear(currentDate.getFullYear() - 1);
+    newDate.setHours(12, 0, 0, 0);
     setCurrentDate(newDate);
   };
 
   const goToNextYear = () => {
     const newDate = new Date(currentDate);
     newDate.setFullYear(currentDate.getFullYear() + 1);
+    newDate.setHours(12, 0, 0, 0);
     setCurrentDate(newDate);
   };
 
   const goToToday = () => {
-    setCurrentDate(new Date());
+    const today = new Date();
+    today.setHours(12, 0, 0, 0);
+    setCurrentDate(today);
   };
 
   // Format date for display
@@ -130,9 +184,15 @@ const WeeklySchedule = ({
   const weekDays = getWeekDays();
   const timeSlots = getTimeSlots();
 
+  // Allow clicking on day header to select a date for availability
+  const handleDayHeaderClick = (day) => {
+    if (onSlotSelect) {
+      onSlotSelect(day);
+    }
+  };
+
   return (
     <div className="weekly-schedule">
-      {/* Header with navigation */}
       <div className="schedule-header">
         <div className="schedule-navigation">
           <div className="nav-buttons">
@@ -141,7 +201,7 @@ const WeeklySchedule = ({
               onClick={currentView === 'week' ? goToPreviousWeek : 
                       currentView === 'month' ? goToPreviousMonth : goToPreviousYear}
             >
-              &#8249;
+              ‹
             </button>
             <button className="today-btn" onClick={goToToday}>
               Today
@@ -151,7 +211,7 @@ const WeeklySchedule = ({
               onClick={currentView === 'week' ? goToNextWeek : 
                       currentView === 'month' ? goToNextMonth : goToNextYear}
             >
-              &#8250;
+              ›
             </button>
           </div>
           
@@ -182,7 +242,6 @@ const WeeklySchedule = ({
         </div>
       </div>
 
-      {/* Week view */}
       {currentView === 'week' && (
         <div className="schedule-grid">
           {/* Time column */}
@@ -198,32 +257,40 @@ const WeeklySchedule = ({
           {/* Day columns */}
           {weekDays.map(day => (
             <div key={day.toISOString()} className="day-column">
-              <div className="day-header">
+              <div
+                className="day-header"
+                style={{ cursor: onSlotSelect ? 'pointer' : 'default', background: '#f8f9fa' }}
+                onClick={() => handleDayHeaderClick(day)}
+                title={onSlotSelect ? 'Add availability for this day' : undefined}
+              >
                 <div className="day-name">{formatDate(day)}</div>
               </div>
               
               {timeSlots.map(time => {
-                const isAvailable = isSlotAvailable(day, time);
                 const slotData = getSlotData(day, time);
+                const isAvailable = isSlotAvailable(day, time);
                 const isSelected = selectedSlot && 
-                  selectedSlot.availabilitySlotID === slotData?.availabilitySlotID;
-                
+                  selectedSlot.slotDate === day.toISOString().split('T')[0] && 
+                  selectedSlot.startTime === time + ':00';
+
                 return (
                   <div
-                    key={`${day.toISOString()}-${time}`}
-                    className={`schedule-slot ${isAvailable ? 'available' : 'unavailable'} ${isSelected ? 'selected' : ''}`}
-                    onClick={() => isAvailable && handleSlotClick(day, time)}
+                    key={time}
+                    className={`schedule-slot ${
+                      slotData ? (slotData.isBooked ? 'unavailable' : 'available') : ''
+                    } ${isSelected ? 'selected' : ''}`}
+                    onClick={() => handleSlotClick(day, time)}
                   >
-                    {isAvailable && slotData && (
-                      <div className="slot-content">
-                        <div className="doctor-name">
-                          Dr. {slotData.doctorFirstName} {slotData.doctorLastName}
-                        </div>
-                        <div className="slot-time">
-                          {time} - {slotData.endTime?.substring(0, 5)}
-                        </div>
-                      </div>
-                    )}
+                    <div className="slot-content">
+                      {slotData && (
+                        <>
+                          <div className="doctor-name">
+                            {slotData.isBooked ? 'Booked' : 'Available'}
+                          </div>
+                          <div className="slot-time">{time}</div>
+                        </>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -232,18 +299,17 @@ const WeeklySchedule = ({
         </div>
       )}
 
-      {/* Legend */}
       <div className="schedule-legend">
         <div className="legend-item">
-          <div className="legend-color available"></div>
+          <div className="legend-color" style={{ backgroundColor: '#e8f5e8' }}></div>
           <span>Available</span>
         </div>
         <div className="legend-item">
-          <div className="legend-color unavailable"></div>
+          <div className="legend-color" style={{ backgroundColor: '#f8f9fa' }}></div>
           <span>Unavailable</span>
         </div>
         <div className="legend-item">
-          <div className="legend-color selected"></div>
+          <div className="legend-color" style={{ backgroundColor: '#2d5a27' }}></div>
           <span>Selected</span>
         </div>
       </div>

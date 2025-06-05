@@ -5,72 +5,22 @@ import React from 'react';
  */
 
 /**
- * Safely render any value, handling null, undefined, and objects
+ * Safely renders a value, handling null, undefined, and object cases
+ * @param {any} value - The value to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Safe string representation
  */
-export const safeRender = (value, fallback = 'N/A') => {
-  // Handle null and undefined
+export const safeRender = (value, fallback = '') => {
   if (value === null || value === undefined) {
     return fallback;
   }
   
-  // Handle primitive types
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-  return String(value);
-  }
-  
-  // Handle objects
   if (typeof value === 'object') {
-    // Handle arrays
-    if (Array.isArray(value)) {
-      if (value.length === 0) return fallback;
-      return value.map(item => safeRender(item, '')).filter(Boolean).join(', ') || fallback;
-    }
-    
     // Handle Date objects
     if (value instanceof Date) {
-      return isNaN(value.getTime()) ? fallback : value.toLocaleDateString();
+      return value.toLocaleDateString();
     }
-    
-    // Handle common object patterns
-    const extractors = [
-      'name',
-      'username', 
-      'firstName',
-      'lastName',
-      'title',
-      'label',
-      'roleName',
-      'specialtyName',
-      'displayName',
-      'email'
-    ];
-    
-    for (const key of extractors) {
-      if (value[key] && typeof value[key] === 'string') {
-        return value[key];
-  }
-    }
-    
-    // Handle full name combination
-    if (value.firstName && value.lastName) {
-      return `${value.firstName} ${value.lastName}`;
-    }
-    
-    // Handle objects with id and name/title
-    if (value.id && (value.name || value.title)) {
-      return value.name || value.title;
-    }
-    
-    // Last resort: try to stringify safely
-    try {
-      const stringified = JSON.stringify(value);
-      if (stringified && stringified !== '{}' && stringified !== '[]') {
-        return stringified.length > 50 ? `${stringified.substring(0, 47)}...` : stringified;
-      }
-    } catch (error) {
-      console.warn('Failed to stringify object:', value, error);
-    }
-    
+    // For other objects, return fallback instead of trying to stringify
     return fallback;
   }
   
@@ -78,7 +28,10 @@ export const safeRender = (value, fallback = 'N/A') => {
 };
 
 /**
- * Safely render date values
+ * Safely renders a date value
+ * @param {any} dateValue - The date value to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Formatted date string
  */
 export const safeDate = (dateValue, fallback = 'N/A') => {
   if (!dateValue) return fallback;
@@ -88,12 +41,22 @@ export const safeDate = (dateValue, fallback = 'N/A') => {
     
     if (dateValue instanceof Date) {
       date = dateValue;
-    } else if (typeof dateValue === 'string' || typeof dateValue === 'number') {
+    } else if (typeof dateValue === 'string') {
+      // Handle date strings consistently
+      if (dateValue.includes('T')) {
+        // ISO datetime string - extract date part only
+        const datePart = dateValue.split('T')[0];
+        const [year, month, day] = datePart.split('-').map(Number);
+        date = new Date(year, month - 1, day); // month is 0-indexed
+      } else {
+        // Simple date string YYYY-MM-DD
+        const [year, month, day] = dateValue.split('-').map(Number);
+        date = new Date(year, month - 1, day); // month is 0-indexed
+      }
+    } else if (typeof dateValue === 'number') {
       date = new Date(dateValue);
-    } else if (typeof dateValue === 'object' && dateValue.toString) {
-      date = new Date(dateValue.toString());
     } else {
-  return fallback;
+      return fallback;
     }
     
     if (isNaN(date.getTime())) return fallback;
@@ -110,7 +73,10 @@ export const safeDate = (dateValue, fallback = 'N/A') => {
 };
 
 /**
- * Safely render datetime values
+ * Safely renders a date and time value
+ * @param {any} dateTimeValue - The datetime value to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Formatted datetime string
  */
 export const safeDateTime = (dateTimeValue, fallback = 'N/A') => {
   if (!dateTimeValue) return fallback;
@@ -120,14 +86,14 @@ export const safeDateTime = (dateTimeValue, fallback = 'N/A') => {
     
     if (dateTimeValue instanceof Date) {
       date = dateTimeValue;
-    } else if (typeof dateTimeValue === 'string' || typeof dateTimeValue === 'number') {
+    } else if (typeof dateTimeValue === 'string') {
       date = new Date(dateTimeValue);
-    } else if (typeof dateTimeValue === 'object' && dateTimeValue.toString) {
-      date = new Date(dateTimeValue.toString());
+    } else if (typeof dateTimeValue === 'number') {
+      date = new Date(dateTimeValue);
     } else {
-    return fallback;
-  }
-  
+      return fallback;
+    }
+    
     if (isNaN(date.getTime())) return fallback;
     
     return date.toLocaleString('en-US', {
@@ -144,26 +110,29 @@ export const safeDateTime = (dateTimeValue, fallback = 'N/A') => {
 };
 
 /**
- * Safely render time values
+ * Safely renders a time value
+ * @param {any} timeValue - The time value to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Formatted time string
  */
 export const safeTime = (timeValue, fallback = 'N/A') => {
   if (!timeValue) return fallback;
   
   try {
     // Handle time strings like "14:30:00" or "14:30"
-    if (typeof timeValue === 'string' && timeValue.includes(':')) {
+    if (typeof timeValue === 'string') {
       const timeParts = timeValue.split(':');
       if (timeParts.length >= 2) {
-        const hours = parseInt(timeParts[0], 10);
-        const minutes = parseInt(timeParts[1], 10);
+        const hours = parseInt(timeParts[0]);
+        const minutes = parseInt(timeParts[1]);
         
         if (!isNaN(hours) && !isNaN(minutes)) {
           const date = new Date();
           date.setHours(hours, minutes, 0, 0);
           return date.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
+            hour: 'numeric', 
             minute: '2-digit',
-            hour12: true
+            hour12: true 
           });
         }
       }
@@ -171,11 +140,10 @@ export const safeTime = (timeValue, fallback = 'N/A') => {
     
     // Handle Date objects
     if (timeValue instanceof Date) {
-      if (isNaN(timeValue.getTime())) return fallback;
       return timeValue.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
+        hour: 'numeric', 
         minute: '2-digit',
-        hour12: true
+        hour12: true 
       });
     }
     
@@ -183,9 +151,9 @@ export const safeTime = (timeValue, fallback = 'N/A') => {
     const date = new Date(timeValue);
     if (!isNaN(date.getTime())) {
       return date.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
+        hour: 'numeric', 
         minute: '2-digit',
-        hour12: true
+        hour12: true 
       });
     }
     
@@ -197,7 +165,10 @@ export const safeTime = (timeValue, fallback = 'N/A') => {
 };
 
 /**
- * Safely render user information
+ * Safely renders user information
+ * @param {any} user - The user object to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - User display name
  */
 export const safeUser = (user, fallback = 'N/A') => {
   if (!user) return fallback;
@@ -205,27 +176,27 @@ export const safeUser = (user, fallback = 'N/A') => {
   if (typeof user === 'string') return user;
   
   if (typeof user === 'object') {
-    // Try different user property combinations
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    }
+    // Handle nested user objects
+    const userObj = user.user || user;
     
-    if (user.username) return user.username;
-    if (user.name) return user.name;
-    if (user.displayName) return user.displayName;
-    if (user.email) return user.email;
-    
-    // Handle user objects with nested properties
-    if (user.user) {
-      return safeUser(user.user, fallback);
+    // Try different combinations of name fields
+    if (userObj.firstName && userObj.lastName) {
+      return `${userObj.firstName} ${userObj.lastName}`;
     }
+    if (userObj.username) return userObj.username;
+    if (userObj.name) return userObj.name;
+    if (userObj.displayName) return userObj.displayName;
+    if (userObj.email) return userObj.email;
   }
   
   return fallback;
 };
 
 /**
- * Safely render role information
+ * Safely renders role information
+ * @param {any} role - The role object to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Role name
  */
 export const safeRole = (role, fallback = 'N/A') => {
   if (!role) return fallback;
@@ -233,16 +204,21 @@ export const safeRole = (role, fallback = 'N/A') => {
   if (typeof role === 'string') return role;
   
   if (typeof role === 'object') {
-    if (role.roleName) return role.roleName;
-    if (role.name) return role.name;
-    if (role.role) return safeRole(role.role, fallback);
+    // Handle nested role objects
+    const roleObj = role.role || role;
+    
+    if (roleObj.roleName) return roleObj.roleName;
+    if (roleObj.name) return roleObj.name;
   }
   
   return fallback;
 };
 
 /**
- * Safely render status with proper formatting
+ * Safely renders status with proper capitalization
+ * @param {any} status - The status to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Formatted status
  */
 export const safeStatus = (status, fallback = 'N/A') => {
   if (!status) return fallback;
@@ -252,27 +228,27 @@ export const safeStatus = (status, fallback = 'N/A') => {
 };
 
 /**
- * Format duration in minutes to readable format
+ * Formats duration in minutes to human readable format
+ * @param {number} minutes - Duration in minutes
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Formatted duration
  */
 export const formatDuration = (minutes, fallback = 'N/A') => {
   if (!minutes || isNaN(minutes)) return fallback;
   
-  const mins = parseInt(minutes, 10);
-  if (mins < 60) {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  
+  if (hours === 0) {
     return `${mins} min`;
-  }
-  
-  const hours = Math.floor(mins / 60);
-  const remainingMins = mins % 60;
-  
-  if (remainingMins === 0) {
+  } else if (mins === 0) {
     return `${hours} hr`;
+  } else {
+    return `${hours} hr ${mins} min`;
   }
-  
-  return `${hours} hr ${remainingMins} min`;
 };
 
-// Export all functions as default for backward compatibility
+// Export all functions as named exports
 export default {
   safeRender,
   safeDate,

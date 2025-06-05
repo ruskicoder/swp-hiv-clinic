@@ -350,20 +350,25 @@ const [appointments, setAppointments] = useState([]);
       setFormError('');
 
       try {
-        const formDataToSend = new FormData();
+        // Use URLSearchParams for x-www-form-urlencoded, and send all fields as strings
+        const params = new URLSearchParams();
         Object.keys(formData).forEach(key => {
-          if (formData[key]) {
-            formDataToSend.append(key, formData[key]);
+          // Always send all fields, even if empty (backend expects all params)
+          // specialtyId must be sent as a number or empty string
+          if (key === 'specialtyId' && formData[key]) {
+            params.append(key, Number(formData[key]));
+          } else {
+            params.append(key, formData[key] ?? '');
           }
         });
 
-        const response = await apiClient.post('/admin/doctors', formDataToSend, {
+        const response = await apiClient.post('/admin/doctors', params, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/x-www-form-urlencoded',
           },
         });
 
-        if (response.data.success) {
+        if (response.data && (response.data.success || response.data.isSuccess)) {
           alert('Doctor created successfully!');
           setFormData({
             username: '',
@@ -377,14 +382,21 @@ const [appointments, setAppointments] = useState([]);
           });
           loadDashboardData();
           setActiveTab('doctors');
+        } else {
+          setFormError(response.data?.message || response.data?.msg || 'Failed to create doctor');
         }
       } catch (error) {
-        console.error('Create doctor error:', error);
-        setFormError(error.response?.data?.message || 'Failed to create doctor');
+        setFormError(
+          error?.response?.data?.message ||
+          error?.response?.data?.msg ||
+          error?.response?.data?.error ||
+          error?.message ||
+          'Failed to create doctor'
+        );
       } finally {
         setFormLoading(false);
       }
-};
+    };
 
     const handleChange = (e) => {
       setFormData({

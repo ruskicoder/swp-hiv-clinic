@@ -1,6 +1,5 @@
 package com.hivclinic.service;
 
-import com.hivclinic.model.DoctorProfile;
 import com.hivclinic.model.User;
 import com.hivclinic.repository.DoctorProfileRepository;
 import com.hivclinic.repository.UserRepository;
@@ -13,20 +12,19 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service class for doctor-related operations
- * Handles doctor information retrieval and management
+ * Service for managing doctor-related operations
  */
 @Service
 public class DoctorService {
-
+    
     private static final Logger logger = LoggerFactory.getLogger(DoctorService.class);
-
+    
     @Autowired
     private UserRepository userRepository;
-
+    
     @Autowired
     private DoctorProfileRepository doctorProfileRepository;
-
+    
     /**
      * Get all doctors in the system
      */
@@ -57,37 +55,27 @@ public class DoctorService {
     /**
      * Get doctor by ID
      */
-    public User getDoctorById(Integer doctorId) {
+    public Optional<User> getDoctorById(Integer doctorId) {
         try {
-            Optional<User> userOpt = userRepository.findById(doctorId);
-            if (userOpt.isEmpty()) {
-                throw new RuntimeException("Doctor not found");
-}
-
-            User doctor = userOpt.get();
-            if (!"Doctor".equalsIgnoreCase(doctor.getRole().getRoleName())) {
-                throw new RuntimeException("User is not a doctor");
+            Optional<User> doctorOpt = userRepository.findById(doctorId);
+            if (doctorOpt.isPresent()) {
+                User doctor = doctorOpt.get();
+                if ("Doctor".equalsIgnoreCase(doctor.getRole().getRoleName()) && doctor.getIsActive()) {
+                    // Attach doctor profile info
+                    doctorProfileRepository.findByUser(doctor).ifPresent(profile -> {
+                        doctor.setFirstName(profile.getFirstName());
+                        doctor.setLastName(profile.getLastName());
+                        if (profile.getSpecialty() != null) {
+                            doctor.setSpecialty(profile.getSpecialty().getSpecialtyName());
+                        }
+                    });
+                    return Optional.of(doctor);
+                }
             }
-
-            return doctor;
+            return Optional.empty();
         } catch (Exception e) {
             logger.error("Error fetching doctor by ID {}: {}", doctorId, e.getMessage(), e);
             throw new RuntimeException("Failed to fetch doctor: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Get all active doctors
-     */
-    public List<User> getActiveDoctors() {
-        try {
-            return userRepository.findAll().stream()
-                    .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
-                    .filter(User::getIsActive)
-                    .toList();
-        } catch (Exception e) {
-            logger.error("Error fetching active doctors: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch active doctors: " + e.getMessage());
         }
     }
 }

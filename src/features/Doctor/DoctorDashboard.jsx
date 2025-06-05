@@ -4,40 +4,36 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import DashboardHeader from '../../components/layout/DashboardHeader';
-import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
+import PatientRecordSection from '../../components/PatientRecordSection';
+import AvailabilityCalendar from '../../components/schedule/AvailabilityCalendar';
+import SlotManagementModal from '../../components/schedule/SlotManagementModal';
+import TimeSlotModal from '../../components/schedule/TimeSlotModal';
+import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
 
 const DoctorDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   
-  // State management
+  // Main state
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // Data states
+  // Data state
   const [appointments, setAppointments] = useState([]);
   const [availabilitySlots, setAvailabilitySlots] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [patientRecord, setPatientRecord] = useState(null);
   const [arvTreatments, setArvTreatments] = useState([]);
   
-  // Error states
-  const [appointmentsError, setAppointmentsError] = useState('');
-  const [slotsError, setSlotsError] = useState('');
+  // Modal state
+  const [showTimeModal, setShowTimeModal] = useState(false);
+  const [showSlotModal, setShowSlotModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDateSlots, setSelectedDateSlots] = useState([]);
   
-  // Form states
-  const [formData, setFormData] = useState({
-    slotDate: '',
-    startTime: '',
-    endTime: '',
-    notes: ''
-  });
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState('');
-
-  // ARV Treatment form state
+  // Form state
   const [arvFormData, setArvFormData] = useState({
     regimen: '',
     startDate: '',
@@ -47,64 +43,73 @@ const DoctorDashboard = () => {
     notes: ''
   });
 
+  const [appointmentUpdateData, setAppointmentUpdateData] = useState({
+    status: '',
+    notes: '',
+    scheduleRecheck: false,
+    recheckDateTime: '',
+    durationMinutes: 30
+  });
+
+  // Navigation items for the sidebar
+  const navigationItems = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'appointments', label: 'Appointments', icon: '📅' },
+    { id: 'availability', label: 'Availability', icon: '🕒' }
+  ];
+
   useEffect(() => {
     loadDashboardData();
   }, []);
 
   const loadDashboardData = async () => {
     setLoading(true);
-    setError('');
-    setAppointmentsError('');
-    setSlotsError('');
-
     try {
-      console.log('Loading doctor dashboard data...');
-      
-      // Initialize with empty arrays
-      setAppointments([]);
-      setAvailabilitySlots([]);
-      
-      // Load appointments and availability slots concurrently
-      const [appointmentsResult, slotsResult] = await Promise.allSettled([
+      const results = await Promise.allSettled([
         apiClient.get('/appointments/doctor/my-appointments'),
         apiClient.get('/doctors/availability/my-slots')
       ]);
 
-      // Handle appointments
-      if (appointmentsResult.status === 'fulfilled' && appointmentsResult.value?.data) {
-        const appointmentsData = Array.isArray(appointmentsResult.value.data) ? appointmentsResult.value.data : [];
-        setAppointments(appointmentsData);
+      if (results[0].status === 'fulfilled') {
+        setAppointments(results[0].value.data || []);
       } else {
-        setAppointmentsError('Failed to load appointments');
+        console.error('Failed to load appointments:', results[0].reason);
       }
 
-      // Handle availability slots
-      if (slotsResult.status === 'fulfilled' && slotsResult.value?.data) {
-        const slotsData = Array.isArray(slotsResult.value.data) ? slotsResult.value.data : [];
-        setAvailabilitySlots(slotsData);
+      if (results[1].status === 'fulfilled') {
+        setAvailabilitySlots(results[1].value.data || []);
       } else {
-        setSlotsError('Failed to load availability slots');
+        console.error('Failed to load availability slots:', results[1].reason);
       }
-
     } catch (error) {
-      console.error('Dashboard error:', error);
-      setError('Failed to load dashboard data. Please try again.');
+      console.error('Error loading dashboard data:', error);
+      setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteSlot = async (slotId) => {
-    if (!confirm('Are you sure you want to delete this availability slot?')) {
-      return;
-    }
-
     try {
-      await apiClient.delete(`/doctors/availability/${slotId}`);
-      loadDashboardData();
+      // Use correct endpoint and method, and handle backend error messages
+      const response = await apiClient.delete(`/doctors/availability/${slotId}`);
+      if (response.data && response.data.success === false) {
+        setError(response.data.message || 'Failed to delete availability slot');
+      } else {
+        await loadDashboardData();
+        setShowSlotModal(false);
+        setSelectedDate(null);
+        setSelectedDateSlots([]);
+      }
     } catch (error) {
-      console.error('Delete slot error:', error);
-      setError('Failed to delete availability slot');
+      // Show backend error message if available
+      setError(
+        error?.response?.data?.message ||
+        error?.response?.data?.msg ||
+        error?.message ||
+        'Failed to delete availability slot'
+      );
+      console.error('Error deleting slot:', error);
     }
   };
 
@@ -113,63 +118,75 @@ const DoctorDashboard = () => {
     navigate('/');
   };
 
-  // Load patient record for selected appointment
-  const loadPatientRecord = async (patientId) => {
+  const loadPatientRecord = async (appointment) => {
     try {
-      const response = await apiClient.get(`/patient-records/${patientId}`);
-      setPatientRecord(response.data);
+      setSelectedAppointment(appointment);
+      setActiveTab('patient-record');
       
-      // Load ARV treatments for this patient
-      const arvResponse = await apiClient.get(`/arv-treatments/patient/${patientId}`);
+      // Load patient record for the appointment
+      const recordResponse = await apiClient.get(`/appointments/${appointment.appointmentId}/patient-record`);
+      setPatientRecord(recordResponse.data);
+      
+      // Load ARV treatments for the patient
+      const arvResponse = await apiClient.get(`/arv-treatments/patient/${appointment.patientUser.userId}`);
       setArvTreatments(arvResponse.data || []);
+      
+      // Initialize appointment update form
+      setAppointmentUpdateData({
+        status: appointment.status || 'Scheduled',
+        notes: appointment.appointmentNotes || '',
+        scheduleRecheck: false,
+        recheckDateTime: '',
+        durationMinutes: appointment.durationMinutes || 30
+      });
+      
     } catch (error) {
       console.error('Error loading patient record:', error);
-      setPatientRecord(null);
-      setArvTreatments([]);
+      if (error.response?.status === 403) {
+        setError('Cannot access patient record after appointment is completed');
+      } else {
+        setError('Failed to load patient record');
+      }
     }
   };
 
-  // Handle appointment status update, including scheduling a re-check
-  const handleUpdateAppointmentStatus = async (appointmentId, newStatus, notes = '', scheduleRecheck = false, recheckDateTime = '', durationMinutes = 30) => {
+  const handleUpdateAppointmentStatus = async () => {
     try {
-      await apiClient.put(`/appointments/${appointmentId}/status`, {
-        status: newStatus,
-        notes,
-        scheduleRecheck,
-        recheckDateTime,
-        durationMinutes
-      });
-      loadDashboardData();
-      if (newStatus === 'Completed') {
-        setActiveTab('add-treatment');
-      }
+      const updateData = {
+        status: appointmentUpdateData.status,
+        notes: appointmentUpdateData.notes,
+        scheduleRecheck: appointmentUpdateData.scheduleRecheck,
+        recheckDateTime: appointmentUpdateData.recheckDateTime,
+        durationMinutes: appointmentUpdateData.durationMinutes
+      };
+
+      await apiClient.put(`/appointments/${selectedAppointment.appointmentId}/status`, updateData);
+      
+      // Reload appointments and go back to appointments view
+      await loadDashboardData();
+      setActiveTab('appointments');
+      setSelectedAppointment(null);
+      setPatientRecord(null);
+      
     } catch (error) {
-      console.error('Error updating appointment status:', error);
+      console.error('Error updating appointment:', error);
       setError('Failed to update appointment status');
     }
   };
 
-  // Handle ARV treatment submission
-  const handleAddARVTreatment = async (e) => {
-    e.preventDefault();
-    setFormError('');
-
-    if (!selectedAppointment) {
-      setFormError('No appointment selected');
-      return;
-    }
-
-    setFormLoading(true);
-    setFormError('');
-
+  const handleAddARVTreatment = async () => {
     try {
       const treatmentData = {
         ...arvFormData,
-        patientUserId: selectedAppointment.patientUserId,
+        patientUserId: selectedAppointment.patientUser.userId,
         appointmentId: selectedAppointment.appointmentId
       };
 
       await apiClient.post('/arv-treatments/add', treatmentData);
+      
+      // Reload ARV treatments
+      const arvResponse = await apiClient.get(`/arv-treatments/patient/${selectedAppointment.patientUser.userId}`);
+      setArvTreatments(arvResponse.data || []);
       
       // Reset form
       setArvFormData({
@@ -181,114 +198,147 @@ const DoctorDashboard = () => {
         notes: ''
       });
       
-      // Reload patient record
-      if (selectedAppointment.patientUserId) {
-        loadPatientRecord(selectedAppointment.patientUserId);
-      }
-      
-      alert('ARV treatment added successfully');
-      setActiveTab('appointments');
     } catch (error) {
       console.error('Error adding ARV treatment:', error);
-      setFormError('Failed to add ARV treatment');
-    } finally {
-      setFormLoading(false);
+      setError('Failed to add ARV treatment');
     }
   };
 
-  // Form handlers for availability
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleCalendarSlotSelect = (date, existingSlots) => {
+    setSelectedDate(date);
+    setSelectedDateSlots(existingSlots);
+    
+    if (existingSlots.length > 0) {
+      // Show slot management modal if there are existing slots
+      setShowSlotModal(true);
+    } else {
+      // Show time slot creation modal if no existing slots
+      setShowTimeModal(true);
+    }
+  };
+
+  const handleTimeSlotSubmit = async (slotData) => {
+    try {
+      // Ensure slotDate is in YYYY-MM-DD format (ISO string)
+      let slotDate = slotData.slotDate;
+      if (slotDate instanceof Date) {
+        slotDate = slotDate.toISOString().split('T')[0];
+      }
+      // Prepare payload for backend
+      const payload = {
+        slotDate,
+        startTime: slotData.startTime,
+        endTime: slotData.endTime,
+        notes: slotData.notes
+      };
+      // Use correct endpoint and method
+      await apiClient.post('/doctors/availability', payload);
+      await loadDashboardData();
+      setShowTimeModal(false);
+      setShowSlotModal(false);
+      setSelectedDate(null);
+      setSelectedDateSlots([]);
+    } catch (error) {
+      console.error('Error adding availability slot:', error);
+      setError(
+        error?.response?.data?.message ||
+        error?.response?.data?.msg ||
+        error?.message ||
+        'Failed to add availability slot'
+      );
+    }
   };
 
   const handleARVChange = (e) => {
-    setArvFormData({
-      ...arvFormData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setArvFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormLoading(true);
-    setFormError('');
-
-    try {
-      await apiClient.post('/doctors/availability/add', formData);
-      setFormData({
-        slotDate: '',
-        startTime: '',
-        endTime: '',
-        notes: ''
-      });
-      loadDashboardData();
-      alert('Availability slot added successfully');
-    } catch (error) {
-      console.error('Add availability error:', error);
-      setFormError('Failed to add availability slot');
-    } finally {
-      setFormLoading(false);
-    }
+  const handleAppointmentUpdateChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAppointmentUpdateData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
-
-  const navigationItems = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'appointments', label: 'My Appointments', icon: '📅' },
-    { id: 'availability', label: 'My Availability', icon: '🕒' },
-    { id: 'add-availability', label: 'Add Availability', icon: '➕' },
-    { id: 'add-treatment', label: 'Add ARV Treatment', icon: '💊' }
-  ];
 
   const renderOverview = () => (
     <ErrorBoundary>
       <div className="overview-section">
         <div className="content-header">
-          <h2>Doctor Dashboard</h2>
-          <p>Welcome back, Dr. {user?.firstName || ''} {user?.lastName || ''}</p>
+          <h2>Dashboard Overview</h2>
+          <p>Welcome back, Dr. {safeRender(user?.firstName || user?.username)}</p>
         </div>
-
-        {(appointmentsError || slotsError) && (
-          <div className="error-message">
-            {appointmentsError && <div>{appointmentsError}</div>}
-            {slotsError && <div>{slotsError}</div>}
-          </div>
-        )}
 
         <div className="stats-grid">
           <div className="stat-card">
-            <h3>Total Appointments</h3>
-            <p className="stat-number">{appointments?.length || 0}</p>
+            <div className="stat-icon">📅</div>
+            <div className="stat-content">
+              <h3>Total Appointments</h3>
+              <div className="stat-number">{appointments.length}</div>
+            </div>
           </div>
           <div className="stat-card">
-            <h3>Today's Appointments</h3>
-            <p className="stat-number">
-              {appointments?.filter(apt => {
-                try {
-                  const today = new Date().toDateString();
-                  return new Date(apt?.appointmentDateTime).toDateString() === today;
-                } catch {
-                  return false;
-                }
-              }).length || 0}
-            </p>
+            <div className="stat-icon">⏰</div>
+            <div className="stat-content">
+              <h3>Upcoming Appointments</h3>
+              <div className="stat-number">
+                {appointments.filter(apt => 
+                  apt.status === 'Scheduled' && 
+                  new Date(apt.appointmentDateTime) > new Date()
+                ).length}
+              </div>
+            </div>
           </div>
           <div className="stat-card">
-            <h3>Available Slots</h3>
-            <p className="stat-number">{availabilitySlots?.filter(slot => !slot?.isBooked).length || 0}</p>
+            <div className="stat-icon">🕒</div>
+            <div className="stat-content">
+              <h3>Available Slots</h3>
+              <div className="stat-number">
+                {availabilitySlots.filter(slot => !slot.isBooked).length}
+              </div>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">✅</div>
+            <div className="stat-content">
+              <h3>Completed Today</h3>
+              <div className="stat-number">
+                {appointments.filter(apt => 
+                  apt.status === 'Completed' && 
+                  new Date(apt.appointmentDateTime).toDateString() === new Date().toDateString()
+                ).length}
+              </div>
+            </div>
           </div>
         </div>
 
-        {error && (
-          <div className="error-message">
-            {error}
-            <button onClick={loadDashboardData} className="retry-btn">
-              Retry
-            </button>
+        <div className="recent-appointments">
+          <h3>Recent Appointments</h3>
+          <div className="appointments-list">
+            {appointments.slice(0, 5).map(appointment => (
+              <div key={appointment.appointmentId} className="appointment-card">
+                <div className="appointment-info">
+                  <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
+                  <p>Date: {safeDateTime(appointment.appointmentDateTime)}</p>
+                  <p>Status: <span className={`status ${appointment.status?.toLowerCase()}`}>
+                    {safeRender(appointment.status)}
+                  </span></p>
+                </div>
+                <button 
+                  className="btn-secondary"
+                  onClick={() => loadPatientRecord(appointment)}
+                  disabled={appointment.status === 'Completed'}
+                >
+                  {appointment.status === 'Completed' ? 'Completed' : 'View Patient'}
+                </button>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </ErrorBoundary>
   );
@@ -300,98 +350,36 @@ const DoctorDashboard = () => {
           <h2>My Appointments</h2>
           <p>Manage your scheduled appointments</p>
         </div>
-
-        {appointmentsError && (
-          <div className="error-message">
-            {appointmentsError}
-          </div>
-        )}
-
-        {!appointments || appointments.length === 0 ? (
-          <div className="no-data">
-            <p>No appointments found.</p>
-            <button className="refresh-btn" onClick={loadDashboardData}>
-              Refresh
-            </button>
-          </div>
-        ) : (
-          <div className="appointments-list">
-            {appointments.map((appointment, index) => (
-              <ErrorBoundary key={appointment?.appointmentId || index}>
-                <div className="appointment-card">
-                  <div className="appointment-details">
-                    <h4>Patient: {safeRender(appointment?.patientName)}</h4>
-                    <p><strong>Date:</strong> {safeDate(appointment?.appointmentDateTime)}</p>
-                    <p><strong>Time:</strong> {safeDateTime(appointment?.appointmentDateTime)}</p>
-                    <p><strong>Status:</strong> 
-                      <span className={`status ${appointment?.status?.toLowerCase()}`}>
-                        {safeRender(appointment?.status)}
-                      </span>
-                    </p>
-                    {appointment?.notes && <p><strong>Notes:</strong> {safeRender(appointment?.notes)}</p>}
-                  </div>
-                  <div className="appointment-actions">
-                    {appointment?.status === 'Scheduled' && (
-                      <>
-                        <button 
-                          className="btn-primary"
-                          onClick={() => {
-                            setSelectedAppointment(appointment);
-                            loadPatientRecord(appointment.patientUserId);
-                            setActiveTab('patient-record');
-                          }}
-                        >
-                          View Patient Record
-                        </button>
-                        <button 
-                          className="btn-success"
-                          onClick={() => handleUpdateAppointmentStatus(appointment.appointmentId, 'Completed')}
-                        >
-                          Mark Complete
-                        </button>
-                        <button 
-                          className="btn-warning"
-                          onClick={() => {
-                            const reason = prompt('Reason for cancellation:');
-                            if (reason) {
-                              handleUpdateAppointmentStatus(appointment.appointmentId, 'CancelledByDoctor', reason);
-                            }
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          className="btn-secondary"
-                          onClick={() => {
-                            // Schedule re-check (prompt for date/time)
-                            const recheckDateTime = prompt('Enter re-check date and time (YYYY-MM-DDTHH:mm):');
-                            if (recheckDateTime) {
-                              handleUpdateAppointmentStatus(appointment.appointmentId, 'Scheduled', '', true, recheckDateTime);
-                            }
-                          }}
-                        >
-                          Schedule Re-Check
-                        </button>
-                      </>
-                    )}
-                    {appointment?.status === 'Completed' && (
-                      <button 
-                        className="btn-primary"
-                        onClick={() => {
-                          setSelectedAppointment(appointment);
-                          loadPatientRecord(appointment.patientUserId);
-                          setActiveTab('patient-record');
-                        }}
-                      >
-                        View Patient Record
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </ErrorBoundary>
-            ))}
-          </div>
-        )}
+        
+        <div className="appointments-grid">
+          {appointments.map(appointment => (
+            <div key={appointment.appointmentId} className="appointment-card">
+              <div className="appointment-header">
+                <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
+                <span className={`status ${appointment.status?.toLowerCase()}`}>
+                  {safeRender(appointment.status)}
+                </span>
+              </div>
+              <div className="appointment-details">
+                <p><strong>Date:</strong> {safeDate(appointment.appointmentDateTime)}</p>
+                <p><strong>Time:</strong> {safeTime(appointment.appointmentDateTime)}</p>
+                <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
+                {appointment.appointmentNotes && (
+                  <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
+                )}
+              </div>
+              <div className="appointment-actions">
+                <button 
+                  className="btn-primary"
+                  onClick={() => loadPatientRecord(appointment)}
+                  disabled={appointment.status === 'Completed'}
+                >
+                  {appointment.status === 'Completed' ? 'Completed' : 'Manage Patient'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </ErrorBoundary>
   );
@@ -399,230 +387,217 @@ const DoctorDashboard = () => {
   const renderPatientRecord = () => (
     <ErrorBoundary>
       <div className="patient-record-section">
-        <div className="content-header">
-          <h2>Patient Medical Record</h2>
-          {selectedAppointment && (
-            <p>Patient: {safeRender(selectedAppointment.patientName)}</p>
-          )}
-        </div>
-
-        {patientRecord ? (
-          <div className="patient-record-content">
-            <div className="record-section">
-              <h3>Medical Information</h3>
-              <div className="record-grid">
-                <div className="record-item">
-                  <label>Medical History:</label>
-                  <p>{patientRecord.medicalHistory || 'No medical history recorded'}</p>
-                </div>
-                <div className="record-item">
-                  <label>Allergies:</label>
-                  <p>{patientRecord.allergies || 'No allergies recorded'}</p>
-                </div>
-                <div className="record-item">
-                  <label>Current Medications:</label>
-                  <p>{patientRecord.currentMedications || 'No current medications'}</p>
-                </div>
-                <div className="record-item">
-                  <label>Blood Type:</label>
-                  <p>{patientRecord.bloodType || 'Not specified'}</p>
-                </div>
-                <div className="record-item">
-                  <label>Emergency Contact:</label>
-                  <p>{patientRecord.emergencyContact || 'Not specified'}</p>
-                </div>
-                <div className="record-item">
-                  <label>Emergency Phone:</label>
-                  <p>{patientRecord.emergencyPhone || 'Not specified'}</p>
-                </div>
-                <div className="record-item">
-                  <label>Notes:</label>
-                  <p>{patientRecord.notes || 'No additional notes'}</p>
-                </div>
+        {selectedAppointment && (
+          <>
+            <div className="appointment-context">
+              <h3>Managing Patient: {safeRender(selectedAppointment.patientUser?.username)}</h3>
+              <div className="appointment-info">
+                <p><strong>Appointment:</strong> {safeDateTime(selectedAppointment.appointmentDateTime)}</p>
+                <p><strong>Current Status:</strong> 
+                  <span className={`status ${selectedAppointment.status?.toLowerCase()}`}>
+                    {safeRender(selectedAppointment.status)}
+                  </span>
+                </p>
               </div>
             </div>
 
-            <div className="arv-treatments-section">
-              <h3>ARV Treatment History</h3>
-              {arvTreatments.length === 0 ? (
-                <p>No ARV treatments recorded</p>
-              ) : (
+            <div className="patient-management-content">
+              <div className="patient-record-container">
+                {patientRecord && (
+                  <PatientRecordSection 
+                    patientRecord={patientRecord}
+                    isEditable={false}
+                  />
+                )}
+              </div>
+
+              <div className="arv-treatments-section">
+                <h4>ARV Treatments</h4>
                 <div className="treatments-list">
-                  {arvTreatments.map((treatment, index) => (
-                    <div key={treatment.arvTreatmentId || index} className="treatment-card">
-                      <h4>{treatment.regimen}</h4>
+                  {arvTreatments.map(treatment => (
+                    <div key={treatment.arvTreatmentId} className="treatment-card">
+                      <h5>{safeRender(treatment.regimen)}</h5>
                       <p><strong>Start Date:</strong> {safeDate(treatment.startDate)}</p>
-                      <p><strong>End Date:</strong> {treatment.endDate ? safeDate(treatment.endDate) : 'Ongoing'}</p>
-                      <p><strong>Adherence:</strong> {treatment.adherence || 'Not specified'}</p>
+                      {treatment.endDate && (
+                        <p><strong>End Date:</strong> {safeDate(treatment.endDate)}</p>
+                      )}
+                      <p><strong>Adherence:</strong> {safeRender(treatment.adherence)}</p>
                       {treatment.sideEffects && (
-                        <p><strong>Side Effects:</strong> {treatment.sideEffects}</p>
+                        <p><strong>Side Effects:</strong> {safeRender(treatment.sideEffects)}</p>
                       )}
                       {treatment.notes && (
-                        <p><strong>Notes:</strong> {treatment.notes}</p>
+                        <p><strong>Notes:</strong> {safeRender(treatment.notes)}</p>
                       )}
-                      <p><strong>Status:</strong> 
-                        <span className={`status ${treatment.isActive ? 'active' : 'inactive'}`}>
-                          {treatment.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </p>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
 
-            <div className="record-actions">
-              <button 
-                className="btn-primary"
-                onClick={() => {
-                  setSelectedAppointment(selectedAppointment);
-                  setActiveTab('add-treatment');
-                }}
-              >
-                Add ARV Treatment
-              </button>
-              <button 
-                className="btn-secondary"
-                onClick={() => setActiveTab('appointments')}
-              >
-                Back to Appointments
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="no-data">
-            <p>No patient record found or failed to load.</p>
-            <button 
-              className="refresh-btn" 
-              onClick={() => selectedAppointment && loadPatientRecord(selectedAppointment.patientUserId)}
-            >
-              Retry
-            </button>
-          </div>
-        )}
-      </div>
-    </ErrorBoundary>
-  );
-
-  const renderAddTreatment = () => (
-    <ErrorBoundary>
-      <div className="add-treatment-section">
-        <div className="content-header">
-          <h2>Add ARV Treatment</h2>
-          {selectedAppointment && (
-            <p>Patient: {safeRender(selectedAppointment.patientName)}</p>
-          )}
-        </div>
-
-        {!selectedAppointment ? (
-          <div className="no-data">
-            <p>Please select an appointment first to add ARV treatment.</p>
-            <button 
-              className="btn-primary"
-              onClick={() => setActiveTab('appointments')}
-            >
-              Go to Appointments
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleAddARVTreatment} className="treatment-form">
-            {formError && (
-              <div className="error-message">
-                {formError}
-              </div>
-            )}
-
-            <div className="form-group">
-              <label htmlFor="regimen">ARV Regimen *</label>
-              <input
-                type="text"
-                id="regimen"
-                name="regimen"
-                value={arvFormData.regimen}
-                onChange={handleARVChange}
-                placeholder="e.g., TDF/3TC/EFV"
-                required
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="startDate">Start Date *</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  name="startDate"
-                  value={arvFormData.startDate}
-                  onChange={handleARVChange}
-                  required
-                />
+                <div className="add-treatment-form">
+                  <h5>Add New ARV Treatment</h5>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Regimen:</label>
+                      <input
+                        type="text"
+                        name="regimen"
+                        value={arvFormData.regimen}
+                        onChange={handleARVChange}
+                        placeholder="Enter ARV regimen"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Start Date:</label>
+                      <input
+                        type="date"
+                        name="startDate"
+                        value={arvFormData.startDate}
+                        onChange={handleARVChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>End Date:</label>
+                      <input
+                        type="date"
+                        name="endDate"
+                        value={arvFormData.endDate}
+                        onChange={handleARVChange}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Adherence:</label>
+                      <select
+                        name="adherence"
+                        value={arvFormData.adherence}
+                        onChange={handleARVChange}
+                      >
+                        <option value="">Select adherence level</option>
+                        <option value="Excellent">Excellent (95-100%)</option>
+                        <option value="Good">Good (85-94%)</option>
+                        <option value="Fair">Fair (75-84%)</option>
+                        <option value="Poor">Poor (Under 75%)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Side Effects:</label>
+                    <textarea
+                      name="sideEffects"
+                      value={arvFormData.sideEffects}
+                      onChange={handleARVChange}
+                      rows="3"
+                      placeholder="Enter any side effects..."
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Notes:</label>
+                    <textarea
+                      name="notes"
+                      value={arvFormData.notes}
+                      onChange={handleARVChange}
+                      rows="3"
+                      placeholder="Enter additional notes..."
+                    />
+                  </div>
+                  <button 
+                    type="button" 
+                    className="btn-primary"
+                    onClick={handleAddARVTreatment}
+                  >
+                    Add Treatment
+                  </button>
+                </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="endDate">End Date (Optional)</label>
-                <input
-                  type="date"
-                  id="endDate"
-                  name="endDate"
-                  value={arvFormData.endDate}
-                  onChange={handleARVChange}
-                />
+              <div className="appointment-management-section">
+                <h4>Appointment Management</h4>
+                <div className="appointment-update-form">
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Status:</label>
+                      <select
+                        name="status"
+                        value={appointmentUpdateData.status}
+                        onChange={handleAppointmentUpdateChange}
+                      >
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="No Show">No Show</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Duration (minutes):</label>
+                      <input
+                        type="number"
+                        name="durationMinutes"
+                        value={appointmentUpdateData.durationMinutes}
+                        onChange={handleAppointmentUpdateChange}
+                        min="15"
+                        max="180"
+                      />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Appointment Notes:</label>
+                    <textarea
+                      name="notes"
+                      value={appointmentUpdateData.notes}
+                      onChange={handleAppointmentUpdateChange}
+                      rows="4"
+                      placeholder="Enter appointment notes..."
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="scheduleRecheck"
+                        checked={appointmentUpdateData.scheduleRecheck}
+                        onChange={handleAppointmentUpdateChange}
+                      />
+                      Schedule Re-check Appointment
+                    </label>
+                  </div>
+                  {appointmentUpdateData.scheduleRecheck && (
+                    <div className="form-group">
+                      <label>Re-check Date & Time:</label>
+                      <input
+                        type="datetime-local"
+                        name="recheckDateTime"
+                        value={appointmentUpdateData.recheckDateTime}
+                        onChange={handleAppointmentUpdateChange}
+                      />
+                    </div>
+                  )}
+                  <div className="form-actions">
+                    <button 
+                      type="button" 
+                      className="btn-primary"
+                      onClick={handleUpdateAppointmentStatus}
+                    >
+                      Update Appointment
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn-secondary"
+                      onClick={() => {
+                        setActiveTab('appointments');
+                        setSelectedAppointment(null);
+                        setPatientRecord(null);
+                      }}
+                    >
+                      Back to Appointments
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="adherence">Adherence</label>
-              <select
-                id="adherence"
-                name="adherence"
-                value={arvFormData.adherence}
-                onChange={handleARVChange}
-              >
-                <option value="">Select adherence level</option>
-                <option value="Excellent">Excellent</option>
-                <option value="Good">Good</option>
-                <option value="Fair">Fair</option>
-                <option value="Poor">Poor</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="sideEffects">Side Effects</label>
-              <textarea
-                id="sideEffects"
-                name="sideEffects"
-                value={arvFormData.sideEffects}
-                onChange={handleARVChange}
-                placeholder="Document any side effects experienced..."
-                rows="3"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="notes">Treatment Notes</label>
-              <textarea
-                id="notes"
-                name="notes"
-                value={arvFormData.notes}
-                onChange={handleARVChange}
-                placeholder="Additional notes about the treatment..."
-                rows="3"
-              />
-            </div>
-
-            <div className="form-actions">
-              <button type="submit" className="submit-btn" disabled={formLoading}>
-                {formLoading ? 'Adding Treatment...' : 'Add ARV Treatment'}
-              </button>
-              <button 
-                type="button" 
-                className="btn-secondary"
-                onClick={() => setActiveTab('appointments')}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+          </>
         )}
       </div>
     </ErrorBoundary>
@@ -632,127 +607,41 @@ const DoctorDashboard = () => {
     <ErrorBoundary>
       <div className="availability-section">
         <div className="content-header">
-          <h2>My Availability</h2>
-          <p>Manage your available time slots</p>
+          <h2>Manage Availability</h2>
+          <p>Click on a date to add new slots or manage existing ones</p>
         </div>
 
-        {slotsError && (
-          <div className="error-message">
-            {slotsError}
-          </div>
-        )}
+        <AvailabilityCalendar
+          onSlotSelect={handleCalendarSlotSelect}
+          existingSlots={availabilitySlots}
+        />
 
-        {!availabilitySlots || availabilitySlots.length === 0 ? (
-          <div className="no-data">
-            <p>No availability slots found.</p>
-            <button className="refresh-btn" onClick={loadDashboardData}>
-              Refresh
-            </button>
-          </div>
-        ) : (
-          <div className="slots-list">
-            {availabilitySlots.map((slot, index) => (
-              <ErrorBoundary key={slot?.availabilitySlotId || index}>
-                <div className="slot-card">
-                  <div className="slot-details">
-                    <h4>{safeDate(slot?.slotDate)}</h4>
-                    <p><strong>Time:</strong> {safeRender(slot?.startTime)} - {safeRender(slot?.endTime)}</p>
-                    <p><strong>Status:</strong> 
-                      <span className={`status ${slot?.isBooked ? 'booked' : 'available'}`}>
-                        {slot?.isBooked ? 'Booked' : 'Available'}
-                      </span>
-                    </p>
-                    {slot?.notes && <p><strong>Notes:</strong> {safeRender(slot?.notes)}</p>}
-                  </div>
-                  <div className="slot-actions">
-                    {!slot?.isBooked && (
-                      <button 
-                        className="delete-btn"
-                        onClick={() => handleDeleteSlot(slot?.availabilitySlotId)}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
+        <div className="existing-slots">
+          <h3>Current Availability Slots</h3>
+          <div className="slots-grid">
+            {availabilitySlots.map(slot => (
+              <div key={slot.availabilitySlotId} className="slot-card">
+                <div className="slot-info">
+                  <h4>{safeDate(slot.slotDate)}</h4>
+                  <p className="slot-time">{safeTime(slot.startTime)} - {safeTime(slot.endTime)}</p>
+                  <p className={`booking-status ${slot.isBooked ? 'booked' : 'available'}`}>
+                    {slot.isBooked ? 'Booked' : 'Available'}
+                  </p>
+                  {slot.notes && <p className="slot-notes">{safeRender(slot.notes)}</p>}
                 </div>
-              </ErrorBoundary>
+                <div className="slot-actions">
+                  <button 
+                    className="btn-danger"
+                    onClick={() => handleDeleteSlot(slot.availabilitySlotId)}
+                    disabled={slot.isBooked}
+                  >
+                    {slot.isBooked ? 'Booked' : 'Delete'}
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
-        )}
-      </div>
-    </ErrorBoundary>
-  );
-
-  const AddAvailabilityForm = () => (
-    <ErrorBoundary>
-      <div className="add-availability-section">
-        <div className="content-header">
-          <h2>Add Availability Slot</h2>
-          <p>Create new time slots for patient appointments</p>
         </div>
-
-        <form onSubmit={handleSubmit} className="availability-form">
-          {formError && (
-            <div className="error-message">
-              {formError}
-            </div>
-          )}
-
-          <div className="form-group">
-            <label htmlFor="slotDate">Date</label>
-            <input
-              type="date"
-              id="slotDate"
-              name="slotDate"
-              value={formData.slotDate}
-              onChange={handleChange}
-              min={new Date().toISOString().split('T')[0]}
-              required
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="startTime">Start Time</label>
-              <input
-                type="time"
-                id="startTime"
-                name="startTime"
-                value={formData.startTime}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="endTime">End Time</label>
-              <input
-                type="time"
-                id="endTime"
-                name="endTime"
-                value={formData.endTime}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="notes">Notes (Optional)</label>
-            <textarea
-              id="notes"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              placeholder="Add any notes about this availability slot..."
-              rows="3"
-            />
-          </div>
-
-          <button type="submit" className="submit-btn" disabled={formLoading}>
-            {formLoading ? 'Adding...' : 'Add Availability Slot'}
-          </button>
-        </form>
       </div>
     </ErrorBoundary>
   );
@@ -763,14 +652,10 @@ const DoctorDashboard = () => {
         return renderOverview();
       case 'appointments':
         return renderAppointments();
-      case 'availability':
-        return renderAvailability();
-      case 'add-availability':
-        return <AddAvailabilityForm />;
       case 'patient-record':
         return renderPatientRecord();
-      case 'add-treatment':
-        return renderAddTreatment();
+      case 'availability':
+        return renderAvailability();
       default:
         return renderOverview();
     }
@@ -779,7 +664,7 @@ const DoctorDashboard = () => {
   if (loading) {
     return (
       <div className="doctor-dashboard">
-        <div className="loading">Loading dashboard data...</div>
+        <div className="loading">Loading dashboard...</div>
       </div>
     );
   }
@@ -787,8 +672,9 @@ const DoctorDashboard = () => {
   return (
     <div className="doctor-dashboard">
       <DashboardHeader 
-        title="Doctor Dashboard" 
-        subtitle={`Welcome, Dr. ${user?.firstName || user?.username || 'Doctor'}`}
+        user={user} 
+        onLogout={handleLogout}
+        title="Doctor Dashboard"
       />
       
       <div className="dashboard-layout">
@@ -813,9 +699,38 @@ const DoctorDashboard = () => {
         </div>
 
         <div className="dashboard-content">
+          {error && (
+            <div className="error-message">
+              {error}
+              <button onClick={() => setError('')} className="close-error">×</button>
+            </div>
+          )}
           {renderContent()}
         </div>
       </div>
+
+      <TimeSlotModal
+        isOpen={showTimeModal}
+        onClose={() => {
+          setShowTimeModal(false);
+          setSelectedDate(null);
+        }}
+        onSubmit={handleTimeSlotSubmit}
+        selectedDate={selectedDate}
+      />
+
+      <SlotManagementModal
+        isOpen={showSlotModal}
+        onClose={() => {
+          setShowSlotModal(false);
+          setSelectedDate(null);
+          setSelectedDateSlots([]);
+        }}
+        selectedDate={selectedDate}
+        existingSlots={selectedDateSlots}
+        onAddSlot={handleTimeSlotSubmit}
+        onDeleteSlot={handleDeleteSlot}
+      />
     </div>
   );
 };
