@@ -26,10 +26,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        // Ensure role has proper prefix
-        String roleWithPrefix = user.getRole().getRoleName().startsWith("ROLE_")
-                ? user.getRole().getRoleName()
-                : "ROLE_" + user.getRole().getRoleName().toUpperCase();
+        // Always use ROLE_ prefix
+        String roleWithPrefix = user.getRole().getRoleName().startsWith("ROLE_") 
+            ? user.getRole().getRoleName()
+            : "ROLE_" + user.getRole().getRoleName().toUpperCase();
 
         return UserPrincipal.build(user, roleWithPrefix);
     }

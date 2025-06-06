@@ -18,7 +18,7 @@
 .dashboard-sidebar {
   width: 280px;
   min-width: 220px;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%); /* Themed sidebar */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Changed from #22c55e, #16a34a */
   border-radius: 16px;
   padding: 2rem;
   color: #fff;
@@ -192,6 +192,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  color: #ffffff; /* Make text white for better contrast */
 }
 
 .stat-card::before {
@@ -583,19 +584,18 @@
 
 /* Button Styles */
 .btn-primary {
-  background-color: #059669;
+  background: #059669;
   color: white;
-  border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  min-width: 100px;
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-.btn-primary:hover {
-  background-color: #047857;
+.btn-primary:hover:not(:disabled) {
+  background: #047857;
   transform: translateY(-1px);
 }
 
@@ -606,20 +606,21 @@
 }
 
 .btn-secondary {
-  background-color: #6c757d;
-  color: white;
-  border: none;
+  background: white;
+  color: #374151;
+  border: 2px solid #e5e7eb;
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  border-radius: 8px;
+  min-width: 100px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background-color: #545b62;
-  transform: translateY(-1px);
+  background: #f3f4f6;
+  color: #1f2937;
+  border-color: #d1d5db;
 }
 
 .btn-danger {
@@ -643,6 +644,40 @@
   background-color: #9ca3af;
   cursor: not-allowed;
   transform: none;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  min-width: 80px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: white;
+  color: #059669;
+  border: 1px solid #059669;
+}
+
+.edit-btn:hover {
+  background: #f0fdf4;
+  color: #047857;
+  border-color: #047857;
+}
+
+.delete-btn {
+  background: white;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+.delete-btn:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #b91c1c;
 }
 
 /* Responsive Design */

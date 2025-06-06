@@ -176,4 +176,31 @@ public class AuthController {
                     .body(MessageResponse.error("Failed to update profile: " + e.getMessage()));
         }
     }
+
+    /**
+     * Upload profile image for current user (Patient or Doctor)
+     */
+    @PostMapping("/upload-image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> uploadProfileImage(
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
+            @RequestBody java.util.Map<String, String> imageData
+    ) {
+        try {
+            String base64Image = imageData.get("image");
+            if (base64Image == null || base64Image.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(MessageResponse.error("Image data is required"));
+            }
+            MessageResponse response = authService.updateProfileImage(userPrincipal.getId(), base64Image);
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            logger.error("Error uploading profile image for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to upload profile image: " + e.getMessage()));
+        }
+    }
 }

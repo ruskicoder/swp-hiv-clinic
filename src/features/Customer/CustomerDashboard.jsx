@@ -95,9 +95,15 @@ const CustomerDashboard = () => {
   const loadPatientRecord = async () => {
     setError('');
     try {
-      const res = await apiClient.get('/patient-records/my-record');
-      setPatientRecord(res.data);
-    } catch (e) {
+      const response = await apiClient.get('/patient-records/my-record');
+      if (!response.data) {
+        throw new Error('No record data received');
+      }
+      console.debug('Loaded patient record:', response.data);
+      setPatientRecord(response.data);
+    } catch (error) {
+      console.error('Failed to load patient record:', error);
+      setError(error.response?.data?.message || 'Failed to load patient record');
       setPatientRecord(null);
     }
   };
@@ -156,8 +162,23 @@ const CustomerDashboard = () => {
   const handleUploadImage = async (base64Image) => {
     setError('');
     try {
-      await apiClient.post('/patient-records/upload-image', { image: base64Image });
-      await loadPatientRecord();
+      await apiClient.post('/auth/upload-image', { image: base64Image });
+      // Always fetch latest profile after upload
+      try {
+        const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } });
+        if (meRes.data) {
+          setPatientRecord(prev => ({
+            ...prev,
+            profileImageBase64: meRes.data.profileImageBase64 || ''
+          }));
+        }
+      } catch (fetchError) {
+        // fallback: update local state with uploaded image
+        setPatientRecord(prev => ({
+          ...prev,
+          profileImageBase64: base64Image
+        }));
+      }
     } catch (e) {
       setError('Failed to upload image');
       alert('Failed to upload image');

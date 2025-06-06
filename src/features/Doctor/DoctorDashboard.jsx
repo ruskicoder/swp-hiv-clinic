@@ -8,6 +8,7 @@ import PatientRecordSection from '../../components/PatientRecordSection';
 import AvailabilityCalendar from '../../components/schedule/AvailabilityCalendar';
 import SlotManagementModal from '../../components/schedule/SlotManagementModal';
 import TimeSlotModal from '../../components/schedule/TimeSlotModal';
+import ARVTreatmentModal from '../../components/arv/ARVTreatmentModal';
 import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
 
@@ -30,8 +31,10 @@ const DoctorDashboard = () => {
   // Modal state
   const [showTimeModal, setShowTimeModal] = useState(false);
   const [showSlotModal, setShowSlotModal] = useState(false);
+  const [showARVModal, setShowARVModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDateSlots, setSelectedDateSlots] = useState([]);
+  const [editingARV, setEditingARV] = useState(null);
   
   // Form state
   const [arvFormData, setArvFormData] = useState({
@@ -118,36 +121,56 @@ const DoctorDashboard = () => {
     navigate('/');
   };
 
+  const handleDeleteARVTreatment = async (arvTreatmentId) => {
+    try {
+      await apiClient.delete(`/arv-treatments/${arvTreatmentId}`);
+      // Reload ARV treatments after deletion
+      if (selectedAppointment?.patientUser?.userId) {
+        const arvResponse = await apiClient.get(`/arv-treatments/patient/${selectedAppointment.patientUser.userId}`);
+        setArvTreatments(arvResponse.data || []);
+      }
+    } catch (error) {
+      setError('Failed to delete ARV treatment');
+      console.error('Error deleting ARV treatment:', error);
+    }
+  };
+
   const loadPatientRecord = async (appointment) => {
     try {
       setSelectedAppointment(appointment);
       setActiveTab('patient-record');
       
-      // Load patient record for the appointment
-      const recordResponse = await apiClient.get(`/appointments/${appointment.appointmentId}/patient-record`);
-      setPatientRecord(recordResponse.data);
-      
-      // Load ARV treatments for the patient
-      const arvResponse = await apiClient.get(`/arv-treatments/patient/${appointment.patientUser.userId}`);
-      setArvTreatments(arvResponse.data || []);
-      
-      // Initialize appointment update form
-      setAppointmentUpdateData({
-        status: appointment.status || 'Scheduled',
-        notes: appointment.appointmentNotes || '',
-        scheduleRecheck: false,
-        recheckDateTime: '',
-        durationMinutes: appointment.durationMinutes || 30
-      });
-      
+      // First try to load using appointment ID
+      try {
+        const recordResponse = await apiClient.get(`/patient-records/appointment/${appointment.appointmentId}`);
+        setPatientRecord(recordResponse.data);
+      } catch (e) {
+        // Fallback to loading by patient ID if appointment method fails
+        const recordResponse = await apiClient.get(`/patient-records/patient/${appointment.patientUser.userId}`);
+        setPatientRecord(recordResponse.data);
+      }
     } catch (error) {
       console.error('Error loading patient record:', error);
-      if (error.response?.status === 403) {
-        setError('Cannot access patient record after appointment is completed');
-      } else {
-        setError('Failed to load patient record');
+      setError('Failed to load patient record');
+      setPatientRecord(null);
+    }
+    // Always load ARV treatments for the patient, regardless of patient record load success
+    if (appointment?.patientUser?.userId) {
+      try {
+        const arvResponse = await apiClient.get(`/arv-treatments/patient/${appointment.patientUser.userId}`);
+        setArvTreatments(arvResponse.data || []);
+      } catch (error) {
+        setArvTreatments([]);
       }
     }
+    // Initialize appointment update form
+    setAppointmentUpdateData({
+      status: appointment.status || 'Scheduled',
+      notes: appointment.appointmentNotes || '',
+      scheduleRecheck: false,
+      recheckDateTime: '',
+      durationMinutes: appointment.durationMinutes || 30
+    });
   };
 
   const handleUpdateAppointmentStatus = async () => {
@@ -263,6 +286,37 @@ const DoctorDashboard = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  const handleEditARVTreatment = (treatment) => {
+    setEditingARV(treatment);
+    setShowARVModal(true);
+  };
+
+  const handleARVSubmit = async (formData) => {
+    try {
+      if (editingARV) {
+        await apiClient.put(`/arv-treatments/${editingARV.arvTreatmentId}/edit`, formData);
+      } else {
+        await apiClient.post('/arv-treatments/add', {
+          ...formData,
+          patientUserId: selectedAppointment.patientUser.userId,
+          appointmentId: selectedAppointment.appointmentId
+        });
+      }
+      
+      // Reload ARV treatments
+      const arvResponse = await apiClient.get(`/arv-treatments/patient/${selectedAppointment.patientUser.userId}`);
+      setArvTreatments(arvResponse.data || []);
+      
+      // Reset state
+      setShowARVModal(false);
+      setEditingARV(null);
+      
+    } catch (error) {
+      console.error('Error managing ARV treatment:', error);
+      setError('Failed to manage ARV treatment');
+    }
   };
 
   const renderOverview = () => (
@@ -412,7 +466,18 @@ const DoctorDashboard = () => {
               </div>
 
               <div className="arv-treatments-section">
-                <h4>ARV Treatments</h4>
+                <div className="section-header">
+                  <h4>ARV Treatments</h4>
+                  <button 
+                    className="btn-primary"
+                    onClick={() => {
+                      setEditingARV(null);
+                      setShowARVModal(true);
+                    }}
+                  >
+                    Add New Treatment
+                  </button>
+                </div>
                 <div className="treatments-list">
                   {arvTreatments.map(treatment => (
                     <div key={treatment.arvTreatmentId} className="treatment-card">
@@ -428,87 +493,22 @@ const DoctorDashboard = () => {
                       {treatment.notes && (
                         <p><strong>Notes:</strong> {safeRender(treatment.notes)}</p>
                       )}
+                      <div className="treatment-actions">
+                        <button 
+                          className="btn-secondary"
+                          onClick={() => handleEditARVTreatment(treatment)}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="btn-danger"
+                          onClick={() => handleDeleteARVTreatment(treatment.arvTreatmentId)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   ))}
-                </div>
-
-                <div className="add-treatment-form">
-                  <h5>Add New ARV Treatment</h5>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Regimen:</label>
-                      <input
-                        type="text"
-                        name="regimen"
-                        value={arvFormData.regimen}
-                        onChange={handleARVChange}
-                        placeholder="Enter ARV regimen"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Start Date:</label>
-                      <input
-                        type="date"
-                        name="startDate"
-                        value={arvFormData.startDate}
-                        onChange={handleARVChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>End Date:</label>
-                      <input
-                        type="date"
-                        name="endDate"
-                        value={arvFormData.endDate}
-                        onChange={handleARVChange}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Adherence:</label>
-                      <select
-                        name="adherence"
-                        value={arvFormData.adherence}
-                        onChange={handleARVChange}
-                      >
-                        <option value="">Select adherence level</option>
-                        <option value="Excellent">Excellent (95-100%)</option>
-                        <option value="Good">Good (85-94%)</option>
-                        <option value="Fair">Fair (75-84%)</option>
-                        <option value="Poor">Poor (Under 75%)</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Side Effects:</label>
-                    <textarea
-                      name="sideEffects"
-                      value={arvFormData.sideEffects}
-                      onChange={handleARVChange}
-                      rows="3"
-                      placeholder="Enter any side effects..."
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Notes:</label>
-                    <textarea
-                      name="notes"
-                      value={arvFormData.notes}
-                      onChange={handleARVChange}
-                      rows="3"
-                      placeholder="Enter additional notes..."
-                    />
-                  </div>
-                  <button 
-                    type="button" 
-                    className="btn-primary"
-                    onClick={handleAddARVTreatment}
-                  >
-                    Add Treatment
-                  </button>
                 </div>
               </div>
 
@@ -730,6 +730,16 @@ const DoctorDashboard = () => {
         existingSlots={selectedDateSlots}
         onAddSlot={handleTimeSlotSubmit}
         onDeleteSlot={handleDeleteSlot}
+      />
+
+      <ARVTreatmentModal
+        isOpen={showARVModal}
+        onClose={() => {
+          setShowARVModal(false);
+          setEditingARV(null);
+        }}
+        onSubmit={handleARVSubmit}
+        initialData={editingARV}
       />
     </div>
   );

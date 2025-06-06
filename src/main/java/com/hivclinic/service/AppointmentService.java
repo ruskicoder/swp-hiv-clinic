@@ -402,7 +402,7 @@ public class AppointmentService {
                 throw new RuntimeException("Cannot access patient record after appointment is completed");
             }
 
-            // Get patient record
+            // Get patient record with explicit fetch
             Integer patientUserId = appointment.getPatientUser().getUserId();
             Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(patientUserId);
             
@@ -419,7 +419,7 @@ public class AppointmentService {
             result.put("patientId", patient.getUserId());
             result.put("patientUsername", patient.getUsername());
             result.put("patientEmail", patient.getEmail());
-            
+
             // Add patient record if exists
             if (recordOpt.isPresent()) {
                 PatientRecord record = recordOpt.get();
@@ -431,20 +431,10 @@ public class AppointmentService {
                 result.put("bloodType", record.getBloodType());
                 result.put("emergencyContact", record.getEmergencyContact());
                 result.put("emergencyPhone", record.getEmergencyPhone());
-            } else {
-                // Create basic record structure if none exists
-                result.put("recordId", null);
-                result.put("medicalHistory", "");
-                result.put("allergies", "");
-                result.put("currentMedications", "");
-                result.put("notes", "");
-                result.put("bloodType", "");
-                result.put("emergencyContact", "");
-                result.put("emergencyPhone", "");
+                result.put("profileImageBase64", record.getProfileImageBase64());
             }
 
             return result;
-
         } catch (Exception e) {
             logger.error("Error getting patient record for appointment: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to get patient record: " + e.getMessage());

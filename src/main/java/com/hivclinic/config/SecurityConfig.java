@@ -88,10 +88,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/health/**").permitAll()
-                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")  // Changed from hasRole
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")  // Changed from hasAuthority()
                 .requestMatchers("/api/doctors/**").authenticated()
                 .requestMatchers("/api/appointments/**").authenticated()
-                .requestMatchers("/api/patient-records/**").hasAnyAuthority("ROLE_PATIENT", "ROLE_DOCTOR", "ROLE_ADMIN")  // Changed from hasAnyRole
+                .requestMatchers("/api/arv-treatments/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN")  // Changed
                 .anyRequest().authenticated()
             );
 

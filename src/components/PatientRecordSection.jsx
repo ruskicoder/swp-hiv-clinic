@@ -1,30 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeText } from '../utils/SafeComponents';
 import './PatientRecordSection.css';
 
 const PatientRecordSection = ({
-  record,
+  record = null,  // Change default to null for better null checking
   onSave,
   onImageUpload,
   loading = false,
   isEditable = true
 }) => {
+  // Debug log to track incoming data
+  console.debug('PatientRecordSection received record:', record);
+
   const [formData, setFormData] = useState({
-    medicalHistory: record?.medicalHistory || '',
-    allergies: record?.allergies || '',
-    currentMedications: record?.currentMedications || '',
-    notes: record?.notes || '',
-    bloodType: record?.bloodType || '',
-    emergencyContact: record?.emergencyContact || '',
-    emergencyPhone: record?.emergencyPhone || ''
+    medicalHistory: '',
+    allergies: '',
+    currentMedications: '', 
+    notes: '',
+    bloodType: '',
+    emergencyContact: '',
+    emergencyPhone: ''
   });
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
 
-  React.useEffect(() => {
-    if (record) {
+  // Add debug logging
+  useEffect(() => {
+    console.debug('PatientRecordSection mounted with record:', record);
+  }, []);
+
+  // Update form data when record changes
+  useEffect(() => {
+    console.debug('Updating form data with record:', record);
+    
+    if (record && typeof record === 'object') {
       setFormData({
         medicalHistory: record.medicalHistory || '',
         allergies: record.allergies || '',
@@ -34,8 +45,29 @@ const PatientRecordSection = ({
         emergencyContact: record.emergencyContact || '',
         emergencyPhone: record.emergencyPhone || ''
       });
+      // Clear any previous errors
+      setError('');
+    } else {
+      console.debug('No valid record data provided');
+      // Reset form to empty state
+      setFormData({
+        medicalHistory: '',
+        allergies: '',
+        currentMedications: '',
+        notes: '',
+        bloodType: '',
+        emergencyContact: '',
+        emergencyPhone: ''
+      });
     }
   }, [record]);
+
+  // Update SafeText rendering in the JSX
+  const renderSafeText = (value, placeholder = 'N/A') => (
+    <SafeText>
+      {value && value.toString().trim() !== '' ? value : placeholder}
+    </SafeText>
+  );
 
   const handleChange = (e) => {
     setFormData({
@@ -156,7 +188,6 @@ const PatientRecordSection = ({
                 src={record.profileImageBase64}
                 alt="Profile"
                 className="profile-image"
-                // If backend only returns base64 without prefix, add: src={`data:image/jpeg;base64,${record.profileImageBase64}`}
               />
             ) : (
               <div className="profile-placeholder">
@@ -197,7 +228,7 @@ const PatientRecordSection = ({
                 />
               ) : (
                 <div className="form-display">
-                  <SafeText>{record?.medicalHistory}</SafeText>
+                  {renderSafeText(record?.medicalHistory)}
                 </div>
               )}
             </div>
@@ -215,7 +246,7 @@ const PatientRecordSection = ({
                 />
               ) : (
                 <div className="form-display">
-                  <SafeText>{record?.allergies}</SafeText>
+                  {renderSafeText(record?.allergies)}
                 </div>
               )}
             </div>
@@ -233,7 +264,7 @@ const PatientRecordSection = ({
                 />
               ) : (
                 <div className="form-display">
-                  <SafeText>{record?.currentMedications}</SafeText>
+                  {renderSafeText(record?.currentMedications)}
                 </div>
               )}
             </div>
@@ -259,7 +290,7 @@ const PatientRecordSection = ({
                 </select>
               ) : (
                 <div className="form-display">
-                  <SafeText>{record?.bloodType}</SafeText>
+                  {renderSafeText(record?.bloodType)}
                 </div>
               )}
             </div>
@@ -277,7 +308,7 @@ const PatientRecordSection = ({
                 />
               ) : (
                 <div className="form-display">
-                  <SafeText>{record?.emergencyContact}</SafeText>
+                  {renderSafeText(record?.emergencyContact)}
                 </div>
               )}
             </div>
@@ -300,7 +331,7 @@ const PatientRecordSection = ({
                 </>
               ) : (
                 <div className="form-display">
-                  <SafeText>{record?.emergencyPhone}</SafeText>
+                  {renderSafeText(record?.emergencyPhone)}
                 </div>
               )}
             </div>
@@ -318,7 +349,7 @@ const PatientRecordSection = ({
                 />
               ) : (
                 <div className="form-display">
-                  <SafeText>{record?.notes}</SafeText>
+                  {renderSafeText(record?.notes)}
                 </div>
               )}
             </div>

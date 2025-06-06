@@ -19,7 +19,7 @@
 .dashboard-sidebar {
   width: 280px;
   min-width: 220px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Themed sidebar */
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Changed from #22c55e, #16a34a */
   border-radius: 16px;
   padding: 2rem;
   color: #fff;
@@ -97,8 +97,7 @@
   bottom: 12px;
   width: 5px;
   border-radius: 4px;
-  background: #10b981;
-  /* solid green vertical bar */
+  background: #ffffff; /* Make active indicator white for contrast */
 }
 
 .nav-icon {
@@ -282,8 +281,8 @@
 }
 
 .book-btn {
-  background: #10b981;
-  color: white;
+  background: #22c55e;
+  color: #ffffff;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -295,7 +294,7 @@
 }
 
 .book-btn:hover {
-  background: #059669;
+  background: #16a34a;
   transform: translateY(-1px);
 }
 

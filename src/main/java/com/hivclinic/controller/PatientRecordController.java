@@ -66,13 +66,13 @@ public class PatientRecordController {
 
             logger.info("Updating medical record for patient: {}", userPrincipal.getUsername());
             MessageResponse response = patientRecordService.updatePatientRecord(userPrincipal.getId(), recordData);
-            
+
             if (response.isSuccess()) {
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
         } catch (Exception e) {
             logger.error("Error updating patient record for user {}: {}", 
                 userPrincipal.getUsername(), e.getMessage(), e);
@@ -113,15 +113,15 @@ public class PatientRecordController {
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
         try {
             logger.info("Doctor {} updating medical record for patient ID: {}", userPrincipal.getUsername(), patientId);
-            
+
             MessageResponse response = patientRecordService.updatePatientRecord(patientId, recordData);
-            
+
             if (response.isSuccess()) {
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest().body(response);
             }
-            
+
         } catch (Exception e) {
             logger.error("Error updating patient record for patient ID {}: {}", patientId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -133,7 +133,7 @@ public class PatientRecordController {
      * Upload profile image for patient
      */
     @PostMapping("/upload-image")
-    @PreAuthorize("hasAuthority('ROLE_PATIENT')")  // Changed from hasRole to hasAuthority
+    @PreAuthorize("hasAnyAuthority('ROLE_PATIENT', 'ROLE_DOCTOR', 'ROLE_ADMIN')")
     public ResponseEntity<?> uploadProfileImage(
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
             @RequestBody Map<String, String> imageData) {
@@ -145,18 +145,39 @@ public class PatientRecordController {
                 return ResponseEntity.badRequest().body(MessageResponse.error("Image data is required"));
             }
             
-            MessageResponse response = patientRecordService.updateProfileImage(userPrincipal.getId(), base64Image);
-            
-            if (response.isSuccess()) {
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.badRequest().body(response);
+            try {
+                patientRecordService.updateProfileImage(userPrincipal.getId(), base64Image);
+                return ResponseEntity.ok(MessageResponse.success("Profile image uploaded successfully"));
+            } catch (Exception ex) {
+                logger.error("Error in service while uploading profile image for user {}: {}", userPrincipal.getUsername(), ex.getMessage(), ex);
+                return ResponseEntity.badRequest().body(MessageResponse.error("Failed to upload profile image: " + ex.getMessage()));
             }
             
         } catch (Exception e) {
             logger.error("Error uploading profile image for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to upload profile image: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Get patient record by appointment ID (for doctors)
+     */
+    @GetMapping("/appointment/{appointmentId}")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
+    public ResponseEntity<?> getPatientRecordByAppointment(
+            @PathVariable Integer appointmentId,
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+        try {
+            logger.debug("Doctor {} fetching patient record for appointment ID: {}", userPrincipal.getUsername(), appointmentId);
+
+            var record = patientRecordService.getPatientRecordForAppointment(appointmentId, userPrincipal.getId());
+            return ResponseEntity.ok(record);
+
+        } catch (Exception e) {
+            logger.error("Error fetching patient record for appointment ID {}: {}", appointmentId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to fetch patient record: " + e.getMessage()));
         }
     }
 }

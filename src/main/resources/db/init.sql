@@ -136,7 +136,7 @@ CREATE TABLE PatientRecords (
     RecordID INT IDENTITY(1,1) PRIMARY KEY,
     PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     MedicalHistory NVARCHAR(MAX),
-    Allergies NVARCHAR(MAX),
+    Allergies NVARCHAR(MAX), 
     CurrentMedications NVARCHAR(MAX),
     Notes NVARCHAR(MAX),
     BloodType NVARCHAR(10),
@@ -144,7 +144,8 @@ CREATE TABLE PatientRecords (
     EmergencyPhone NVARCHAR(20),
     ProfileImageBase64 NVARCHAR(MAX),
     CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE()
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    INDEX IX_PatientRecords_PatientUserID (PatientUserID)
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ARVTreatments' AND xtype='U')

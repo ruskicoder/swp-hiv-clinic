@@ -84,7 +84,7 @@ const Settings = () => {
     setError('');
     setMessage('');
 
-    // Only send updatable fields (do not require image)
+    // Only send updatable fields that are not empty strings
     const updatableFields = [
       'firstName',
       'lastName',
@@ -95,8 +95,9 @@ const Settings = () => {
     ];
     const payload = {};
     updatableFields.forEach((key) => {
-      if (profileData[key] !== undefined) {
-        payload[key] = profileData[key];
+      const value = profileData[key];
+      if (value !== undefined && String(value).trim() !== '') {
+        payload[key] = value;
       }
     });
 
@@ -198,9 +199,8 @@ const Settings = () => {
       setError('');
       setMessage('');
       try {
-        // Only upload if image is selected
         if (base64String && base64String.startsWith('data:image/')) {
-          const uploadRes = await apiClient.post('/patient-records/upload-image', { image: base64String });
+          const uploadRes = await apiClient.post('/auth/upload-image', { image: base64String });
           if (uploadRes.data && uploadRes.data.success) {
             setMessage('Profile image updated successfully!');
           } else {
@@ -208,7 +208,7 @@ const Settings = () => {
           }
           // Always fetch latest profile after upload
           try {
-            const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } }); // prevent cache
+            const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } });
             if (updateUser && meRes.data) {
               updateUser(meRes.data);
               setProfileData(prev => ({
@@ -320,7 +320,7 @@ const Settings = () => {
             name="email"
             value={profileData.email} 
             onChange={handleProfileChange}
-            disabled={!isEditing} 
+            disabled // always disabled, not editable
           />
         </div>
 

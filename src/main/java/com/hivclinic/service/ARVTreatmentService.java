@@ -271,6 +271,16 @@ public class ARVTreatmentService {
         response.put("createdAt", treatment.getCreatedAt());
         response.put("updatedAt", treatment.getUpdatedAt());
 
+        // Add patient information
+        if (treatment.getPatientUserID() != null) {
+            Optional<User> patientOpt = userRepository.findById(treatment.getPatientUserID());
+            if (patientOpt.isPresent()) {
+                User patient = patientOpt.get();
+                response.put("patientName", patient.getUsername());
+                // Add any other patient fields you want to include
+            }
+        }
+
         // Add doctor name if available
         if (treatment.getDoctorUserID() != null) {
             Optional<User> doctorOpt = userRepository.findById(treatment.getDoctorUserID());
@@ -281,5 +291,109 @@ public class ARVTreatmentService {
         }
 
         return response;
+    }
+
+    /**
+     * Edit an existing ARV treatment
+     */
+    @Transactional
+    public MessageResponse editTreatment(Integer treatmentId, Map<String, Object> treatmentData, Integer doctorUserId) {
+        try {
+            Optional<ARVTreatment> treatmentOpt = arvTreatmentRepository.findById(treatmentId);
+            if (treatmentOpt.isEmpty()) {
+                return MessageResponse.error("ARV treatment not found");
+            }
+
+            ARVTreatment treatment = treatmentOpt.get();
+
+            // Verify doctor has permission to edit
+            if (!treatment.getDoctorUserID().equals(doctorUserId)) {
+                return MessageResponse.error("You don't have permission to edit this treatment");
+            }
+
+            // Update fields if provided
+            if (treatmentData.containsKey("regimen")) {
+                treatment.setRegimen((String) treatmentData.get("regimen"));
+            }
+            if (treatmentData.containsKey("startDate")) {
+                treatment.setStartDate(LocalDate.parse((String) treatmentData.get("startDate")));
+            }
+            if (treatmentData.containsKey("endDate")) {
+                String endDate = (String) treatmentData.get("endDate");
+                treatment.setEndDate(endDate != null ? LocalDate.parse(endDate) : null);
+            }
+            if (treatmentData.containsKey("adherence")) {
+                treatment.setAdherence((String) treatmentData.get("adherence"));
+            }
+            if (treatmentData.containsKey("sideEffects")) {
+                treatment.setSideEffects((String) treatmentData.get("sideEffects"));
+            }
+            if (treatmentData.containsKey("notes")) {
+                treatment.setNotes((String) treatmentData.get("notes"));
+            }
+
+            treatment.setUpdatedAt(LocalDateTime.now());
+            arvTreatmentRepository.save(treatment);
+
+            return MessageResponse.success("ARV treatment updated successfully");
+        } catch (Exception e) {
+            logger.error("Error editing ARV treatment: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to edit treatment: " + e.getMessage());
+        }
+    }
+
+    /**
+     * End an ARV treatment
+     */
+    @Transactional
+    public MessageResponse endTreatment(Integer treatmentId, Integer doctorUserId) {
+        try {
+            Optional<ARVTreatment> treatmentOpt = arvTreatmentRepository.findById(treatmentId);
+            if (treatmentOpt.isEmpty()) {
+                return MessageResponse.error("ARV treatment not found");
+            }
+
+            ARVTreatment treatment = treatmentOpt.get();
+
+            // Verify doctor has permission
+            if (!treatment.getDoctorUserID().equals(doctorUserId)) {
+                return MessageResponse.error("You don't have permission to end this treatment");
+            }
+
+            // Set end date to today and deactivate
+            treatment.setEndDate(LocalDate.now());
+            treatment.setIsActive(false);
+            treatment.setUpdatedAt(LocalDateTime.now());
+
+            arvTreatmentRepository.save(treatment);
+
+            return MessageResponse.success("ARV treatment ended successfully");
+        } catch (Exception e) {
+            logger.error("Error ending ARV treatment: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to end treatment: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Delete an ARV treatment
+     */
+    @Transactional
+    public MessageResponse deleteTreatment(Integer treatmentId, Integer doctorUserId) {
+        try {
+            Optional<ARVTreatment> treatmentOpt = arvTreatmentRepository.findById(treatmentId);
+            if (treatmentOpt.isEmpty()) {
+                return MessageResponse.error("ARV treatment not found");
+            }
+            ARVTreatment treatment = treatmentOpt.get();
+            // Only the doctor who created the treatment can delete it
+            if (!treatment.getDoctorUserID().equals(doctorUserId)) {
+                return MessageResponse.error("You don't have permission to delete this treatment");
+            }
+            arvTreatmentRepository.deleteById(treatmentId);
+            return MessageResponse.success("ARV treatment deleted successfully");
+        } catch (Exception e) {
+            logger.error("Error deleting ARV treatment: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to delete ARV treatment: " + e.getMessage());
+        }
     }
 }

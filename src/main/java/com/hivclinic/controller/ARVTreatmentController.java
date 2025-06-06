@@ -32,7 +32,7 @@ public class ARVTreatmentController {
      * Get patient's ARV treatments (for patients)
      */
     @GetMapping("/my-treatments")
-    @PreAuthorize("hasRole('Patient')")
+    @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<?> getMyTreatments(@AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
         try {
             logger.debug("Fetching ARV treatments for patient: {}", userPrincipal.getUsername());
@@ -51,7 +51,7 @@ public class ARVTreatmentController {
      * Get ARV treatments for a specific patient (for doctors)
      */
     @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasRole('Doctor') or hasRole('Admin')")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ADMIN')")
     public ResponseEntity<?> getPatientTreatments(
             @PathVariable Integer patientId,
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
@@ -72,7 +72,7 @@ public class ARVTreatmentController {
      * Add new ARV treatment (for doctors)
      */
     @PostMapping("/add")
-    @PreAuthorize("hasRole('Doctor')")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<?> addTreatment(
             @RequestBody Map<String, Object> treatmentData,
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
@@ -98,7 +98,7 @@ public class ARVTreatmentController {
      * Update ARV treatment (for doctors)
      */
     @PutMapping("/{treatmentId}")
-    @PreAuthorize("hasRole('Doctor')")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<?> updateTreatment(
             @PathVariable Integer treatmentId,
             @RequestBody Map<String, Object> treatmentData,
@@ -125,7 +125,7 @@ public class ARVTreatmentController {
      * Deactivate ARV treatment (for doctors)
      */
     @PutMapping("/{treatmentId}/deactivate")
-    @PreAuthorize("hasRole('Doctor')")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<?> deactivateTreatment(
             @PathVariable Integer treatmentId,
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
@@ -144,6 +144,60 @@ public class ARVTreatmentController {
             logger.error("Error deactivating ARV treatment ID {}: {}", treatmentId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to deactivate ARV treatment: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Edit an existing ARV treatment (for doctors)
+     */
+    @PutMapping("/{treatmentId}/edit")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<?> editTreatment(
+            @PathVariable Integer treatmentId,
+            @RequestBody Map<String, Object> treatmentData,
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+        try {
+            logger.info("Doctor {} editing ARV treatment ID: {}", userPrincipal.getUsername(), treatmentId);
+            
+            MessageResponse response = arvTreatmentService.editTreatment(treatmentId, treatmentData, userPrincipal.getId());
+            
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+        } catch (Exception e) {
+            logger.error("Error editing ARV treatment ID {}: {}", treatmentId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to edit ARV treatment: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Delete ARV treatment (for doctors)
+     */
+    @DeleteMapping("/{treatmentId}")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<?> deleteTreatment(
+            @PathVariable Integer treatmentId,
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+        try {
+            logger.info("Doctor {} deleting ARV treatment ID: {}", userPrincipal.getUsername(), treatmentId);
+
+            // If ARVTreatmentService.deleteTreatment expects only treatmentId, remove userPrincipal.getId()
+            MessageResponse response = arvTreatmentService.deleteTreatment(treatmentId, userPrincipal.getId());
+
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error deleting ARV treatment ID {}: {}", treatmentId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to delete ARV treatment: " + e.getMessage()));
         }
     }
 }

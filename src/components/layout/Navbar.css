@@ -23,7 +23,7 @@
   text-decoration: none;
   font-size: 1.2rem;
   font-weight: 700;
-  color: #059669;
+  color: #10b981;
   gap: 0.5rem;
 }
 
@@ -56,7 +56,8 @@
 
 .nav-link:hover {
   color: #10b981;
-  background-color: #f0fdf4;
+  background-color: #6ee7b7;
+  opacity: 0.1;
 }
 
 .nav-cta {

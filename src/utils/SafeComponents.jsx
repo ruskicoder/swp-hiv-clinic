@@ -13,7 +13,12 @@ import {
  * Safe text component for React
  */
 export const SafeText = ({ children, fallback = 'N/A', className = '' }) => {
-  const safeValue = safeRender(children, fallback);
+  const safeValue = React.useMemo(() => {
+    if (children === null || children === undefined) return fallback;
+    if (typeof children === 'string' && children.trim() === '') return fallback;
+    return children.toString();
+  }, [children, fallback]);
+
   return <span className={className}>{safeValue}</span>;
 };
 

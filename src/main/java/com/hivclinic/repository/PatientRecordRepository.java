@@ -25,4 +25,12 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, In
      */
     @Query("SELECT COUNT(pr) > 0 FROM PatientRecord pr WHERE pr.patientUserID = :patientUserID")
     boolean existsByPatientUserID(@Param("patientUserID") Integer patientUserID);
+    
+    /**
+     * Find patient record by appointment ID
+     */
+    @Query("SELECT pr FROM PatientRecord pr " +
+           "JOIN Appointment a ON a.patientUser.id = pr.patientUserID " +
+           "WHERE a.appointmentId = :appointmentId")
+    Optional<PatientRecord> findByAppointmentId(@Param("appointmentId") Integer appointmentId);
 }

@@ -278,13 +278,48 @@ public class AuthService {
                 if (lastName != null) profile.setLastName(lastName);
                 if (phoneNumber != null) profile.setPhoneNumber(phoneNumber);
                 if (bio != null) profile.setBio(bio);
-                doctorProfileRepository.save(profile);
+                doctorProfileRepository.save(profile); // ensure save after update
             }
             // Optionally update email on user entity if needed
             return MessageResponse.success("Profile updated successfully!");
         } catch (Exception e) {
             logger.error("Error updating profile: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to update profile: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update profile image for current user (Patient or Doctor)
+     */
+    @Transactional
+    public MessageResponse updateProfileImage(Integer userId, String base64Image) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return MessageResponse.error("User not found");
+        }
+        User user = userOpt.get();
+        String role = user.getRole().getRoleName();
+
+        try {
+            if ("Patient".equalsIgnoreCase(role)) {
+                var profileOpt = patientProfileRepository.findByUser(user);
+                if (profileOpt.isEmpty()) return MessageResponse.error("Patient profile not found");
+                var profile = profileOpt.get();
+                profile.setProfileImageBase64(base64Image);
+                patientProfileRepository.save(profile);
+            } else if ("Doctor".equalsIgnoreCase(role)) {
+                var profileOpt = doctorProfileRepository.findByUser(user);
+                if (profileOpt.isEmpty()) return MessageResponse.error("Doctor profile not found");
+                var profile = profileOpt.get();
+                profile.setProfileImageBase64(base64Image);
+                doctorProfileRepository.save(profile);
+            } else {
+                return MessageResponse.error("Profile image upload not supported for this role");
+            }
+            return MessageResponse.success("Profile image uploaded successfully");
+        } catch (Exception e) {
+            logger.error("Error updating profile image: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to update profile image: " + e.getMessage());
         }
     }
 }
