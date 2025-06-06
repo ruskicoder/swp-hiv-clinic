@@ -32,7 +32,7 @@ public class PatientRecordController {
      * Get patient's own medical record
      */
     @GetMapping("/my-record")
-    @PreAuthorize("hasRole('Patient')")
+    @PreAuthorize("hasAuthority('ROLE_PATIENT')")  // Changed from hasRole('Patient')
     public ResponseEntity<?> getMyRecord(@AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
         try {
             logger.debug("Fetching medical record for patient: {}", userPrincipal.getUsername());
@@ -51,13 +51,20 @@ public class PatientRecordController {
      * Update patient's own medical record
      */
     @PutMapping("/my-record")
-    @PreAuthorize("hasRole('Patient')")
+    @PreAuthorize("hasAuthority('ROLE_PATIENT')")  // Changed from hasRole to hasAuthority
     public ResponseEntity<?> updateMyRecord(
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
             @RequestBody Map<String, Object> recordData) {
         try {
+            // Verify user has patient role
+            if (!userPrincipal.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_PATIENT"))) {
+                logger.warn("Unauthorized access attempt by user: {}", userPrincipal.getUsername());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(MessageResponse.error("Access denied: User is not a patient"));
+            }
+
             logger.info("Updating medical record for patient: {}", userPrincipal.getUsername());
-            
             MessageResponse response = patientRecordService.updatePatientRecord(userPrincipal.getId(), recordData);
             
             if (response.isSuccess()) {
@@ -67,7 +74,8 @@ public class PatientRecordController {
             }
             
         } catch (Exception e) {
-            logger.error("Error updating patient record for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            logger.error("Error updating patient record for user {}: {}", 
+                userPrincipal.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to update patient record: " + e.getMessage()));
         }
@@ -98,7 +106,7 @@ public class PatientRecordController {
      * Update patient record (for doctors)
      */
     @PutMapping("/{patientId}")
-    @PreAuthorize("hasRole('Doctor') or hasRole('Admin')")
+    @PreAuthorize("hasAnyAuthority('ROLE_DOCTOR', 'ROLE_ADMIN')")  // Changed from hasRole
     public ResponseEntity<?> updatePatientRecord(
             @PathVariable Integer patientId,
             @RequestBody Map<String, Object> recordData,
@@ -125,7 +133,7 @@ public class PatientRecordController {
      * Upload profile image for patient
      */
     @PostMapping("/upload-image")
-    @PreAuthorize("hasRole('Patient')")
+    @PreAuthorize("hasAuthority('ROLE_PATIENT')")  // Changed from hasRole to hasAuthority
     public ResponseEntity<?> uploadProfileImage(
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
             @RequestBody Map<String, String> imageData) {

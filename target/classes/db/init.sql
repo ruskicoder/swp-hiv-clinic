@@ -139,6 +139,9 @@ CREATE TABLE PatientRecords (
     Allergies NVARCHAR(MAX),
     CurrentMedications NVARCHAR(MAX),
     Notes NVARCHAR(MAX),
+    BloodType NVARCHAR(10),
+    EmergencyContact NVARCHAR(255),
+    EmergencyPhone NVARCHAR(20),
     ProfileImageBase64 NVARCHAR(MAX),
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()

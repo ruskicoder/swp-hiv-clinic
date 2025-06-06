@@ -48,9 +48,44 @@ const PatientRecordSection = ({
     e.preventDefault();
     setError('');
     try {
+      // Validate required fields
+      if (!formData.emergencyContact || !formData.emergencyPhone) {
+        setError('Emergency contact information is required');
+        return;
+      }
+
+      // Validate phone number format
+      const emergencyNumberRegex = /^[0-9]{3}$/;  // For numbers like 911, 112, 110
+      const phoneRegex = /^\+?[\d\s-()]{8,20}$/;  // For regular phone numbers
+      
+      if (!emergencyNumberRegex.test(formData.emergencyPhone) && 
+          !phoneRegex.test(formData.emergencyPhone)) {
+        setError('Please enter a valid phone number: \n' +
+                '- Emergency numbers (e.g., 911, 112) \n' +
+                '- Regular phone numbers (8-20 digits, may include +, spaces, -, ())');
+        return;
+      }
+
+      // Save record and wait for response
       await onSave(formData);
+      
+      // If we get here, the save was successful
+      const successMessage = document.createElement('div');
+      successMessage.className = 'success-message';
+      successMessage.textContent = 'Record saved successfully';
+      e.target.appendChild(successMessage);
+      setTimeout(() => successMessage.remove(), 3000);
+
     } catch (err) {
-      setError('Failed to save patient record');
+      // Enhanced error handling
+      const errorMessage = err.response?.data?.message || 
+                         err.response?.data?.error ||
+                         err.message || 
+                         'Failed to save patient record. Please try again.';
+      
+      setError(errorMessage);
+      console.error('Save error:', err);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -250,14 +285,19 @@ const PatientRecordSection = ({
             <div className="form-group">
               <label htmlFor="emergencyPhone">Emergency Phone</label>
               {isEditable ? (
-                <input
-                  type="tel"
-                  id="emergencyPhone"
-                  name="emergencyPhone"
-                  value={formData.emergencyPhone}
-                  onChange={handleChange}
-                  placeholder="Emergency contact phone"
-                />
+                <>
+                  <input
+                    type="tel"
+                    id="emergencyPhone"
+                    name="emergencyPhone"
+                    value={formData.emergencyPhone}
+                    onChange={handleChange}
+                    placeholder="Emergency number or phone number"
+                  />
+                  <small className="form-hint">
+                    Valid formats: Emergency numbers (911, 112) or regular phone numbers (+1234567890, (123) 456-7890)
+                  </small>
+                </>
               ) : (
                 <div className="form-display">
                   <SafeText>{record?.emergencyPhone}</SafeText>

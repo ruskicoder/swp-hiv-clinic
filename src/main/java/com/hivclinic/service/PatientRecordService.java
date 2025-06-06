@@ -104,7 +104,15 @@ public class PatientRecordService {
 
             Optional<User> userOpt = userRepository.findById(userId);
             if (userOpt.isEmpty()) {
+                logger.error("User not found for ID: {}", userId);
                 return MessageResponse.error("User not found");
+            }
+
+            // First ensure patient profile exists
+            User user = userOpt.get();
+            if (patientProfileRepository.findByUser(user).isEmpty()) {
+                logger.error("Patient profile not found for user ID: {}", userId);
+                return MessageResponse.error("Patient profile not found. Please complete your profile first.");
             }
 
             // Get or create patient record
@@ -115,31 +123,47 @@ public class PatientRecordService {
                 record = new PatientRecord();
                 record.setPatientUserID(userId);
                 record.setCreatedAt(LocalDateTime.now());
+                logger.info("Creating new patient record for user ID: {}", userId);
             } else {
                 record = recordOpt.get();
             }
 
-            // Update record fields
-            if (recordData.containsKey("medicalHistory")) {
-                record.setMedicalHistory((String) recordData.get("medicalHistory"));
+            // Validate data before updating
+            if (recordData == null) {
+                logger.error("Record data is null for user ID: {}", userId);
+                return MessageResponse.error("No data provided for update");
             }
-            if (recordData.containsKey("allergies")) {
-                record.setAllergies((String) recordData.get("allergies"));
-            }
-            if (recordData.containsKey("currentMedications")) {
-                record.setCurrentMedications((String) recordData.get("currentMedications"));
-            }
-            if (recordData.containsKey("notes")) {
-                record.setNotes((String) recordData.get("notes"));
-            }
-            if (recordData.containsKey("bloodType")) {
-                record.setBloodType((String) recordData.get("bloodType"));
-            }
-            if (recordData.containsKey("emergencyContact")) {
-                record.setEmergencyContact((String) recordData.get("emergencyContact"));
-            }
-            if (recordData.containsKey("emergencyPhone")) {
-                record.setEmergencyPhone((String) recordData.get("emergencyPhone"));
+
+            // Update record fields with validation
+            try {
+                if (recordData.containsKey("medicalHistory")) {
+                    record.setMedicalHistory((String) recordData.get("medicalHistory"));
+                }
+                if (recordData.containsKey("allergies")) {
+                    record.setAllergies((String) recordData.get("allergies"));
+                }
+                if (recordData.containsKey("currentMedications")) {
+                    record.setCurrentMedications((String) recordData.get("currentMedications"));
+                }
+                if (recordData.containsKey("notes")) {
+                    record.setNotes((String) recordData.get("notes"));
+                }
+                if (recordData.containsKey("bloodType")) {
+                    String bloodType = (String) recordData.get("bloodType");
+                    if (bloodType != null && !bloodType.matches("^(A|B|AB|O)[+-]$")) {
+                        return MessageResponse.error("Invalid blood type format");
+                    }
+                    record.setBloodType(bloodType);
+                }
+                if (recordData.containsKey("emergencyContact")) {
+                    record.setEmergencyContact((String) recordData.get("emergencyContact"));
+                }
+                if (recordData.containsKey("emergencyPhone")) {
+                    record.setEmergencyPhone((String) recordData.get("emergencyPhone"));
+                }
+            } catch (ClassCastException e) {
+                logger.error("Invalid data format in record update for user ID {}: {}", userId, e.getMessage());
+                return MessageResponse.error("Invalid data format in one or more fields");
             }
 
             record.setUpdatedAt(LocalDateTime.now());
