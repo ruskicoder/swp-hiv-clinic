@@ -9,7 +9,7 @@ const Home = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="hero-section">
+      <section className="hero-section" >
         <div className="container">
           <div className="hero-content">
             <div className="hero-text">
@@ -36,10 +36,11 @@ const Home = () => {
             <div className="hero-image">
               <div className="hero-placeholder">
                 <div className="medical-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/>
-                </svg>
-              </div>
+                  {/* Use a medical cross SVG icon */}
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 13h-6v6a1 1 0 0 1-2 0v-6H5a1 1 0 0 1 0-2h6V5a1 1 0 0 1 2 0v6h6a1 1 0 0 1 0 2z"/>
+                  </svg>
+                </div>
                 <h3>Advanced Healthcare Platform</h3>
                 <p>Secure, reliable, and user-friendly medical management system</p>
             </div>

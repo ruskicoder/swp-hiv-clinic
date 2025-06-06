@@ -7,12 +7,30 @@
 /* Hero Section */
 .hero-section {
   padding: 120px 20px 100px;
-  background: linear-gradient(135deg, #e6f9f0 0%, #f3fdf7 100%);
+  position: relative;
+  z-index: 1; /* Ensure hero-section is above background */
+  /* Add background image and acrylic effect */
+  background:
+    linear-gradient(135deg, #e6f9f0 20%, #f3fdf7 20%),
+    url('/images/doctors.jpg') center center/cover no-repeat;
+  /* fallback color and image layering */
   color: #1f2937;
   min-height: 90vh;
   display: flex;
   align-items: center;
-  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2; /* Raise blur overlay above background image */
+  /* Acrylic/blurred glass effect */
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(16px) saturate(1.5) brightness(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5) brightness(1.1);
+  pointer-events: none;
 }
 
 .hero-content {
@@ -23,8 +41,10 @@
   gap: 60px;
     align-items: center;
     width: 100%;
-  }
-  
+  position: relative;
+  z-index: 3; /* Ensure content is above blur and image */
+}
+
 .hero-text {
   max-width: 600px;
   }
