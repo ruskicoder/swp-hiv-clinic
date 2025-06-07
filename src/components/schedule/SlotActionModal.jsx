@@ -95,9 +95,17 @@ const SlotActionModal = ({
 
     setLoading(true);
     try {
-      await onBookSlot(selectedSlot);
+      const formattedData = {
+        doctorUserId: selectedSlot.doctorUser.userId,
+        availabilitySlotId: selectedSlot.availabilitySlotId,
+        appointmentDateTime: `${selectedSlot.slotDate}T${selectedSlot.startTime}`,
+        durationMinutes: selectedSlot.durationMinutes
+      };
+
+      await onBookSlot(formattedData);
       setShowConfirmBooking(false);
       setSelectedSlot(null);
+      onClose();
     } catch (error) {
       console.error('Booking failed:', error);
       alert('Failed to book appointment. Please try again.');
@@ -147,15 +155,56 @@ const SlotActionModal = ({
     setShowAddModal(true);
   };
 
-  // Handle slot creation from TimeSlotModal
-  const handleSlotCreated = (slotData) => {
-    if (onAddSlot) {
-      onAddSlot({
-        ...slotData,
-        slotDate: selectedDate
-      });
+  // Add this helper function before handleSlotCreated
+  const calculateEndTime = (startTime, durationMinutes) => {
+    if (!startTime || !durationMinutes) return '';
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes);
+    date.setMinutes(date.getMinutes() + parseInt(durationMinutes));
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:00`;
+  };
+
+  // Update handleSlotCreated to use calculated endTime
+  const handleSlotCreated = async (slotData) => {
+    if (!onAddSlot) return;
+    
+    try {
+      const formattedData = {
+        slotDate: selectedDate instanceof Date 
+          ? selectedDate.toISOString().split('T')[0] 
+          : selectedDate,
+        startTime: slotData.startTime + ':00',
+        durationMinutes: parseInt(slotData.durationMinutes),
+        notes: slotData.notes || ''
+      };
+
+      const response = await onAddSlot(formattedData);
+      
+      if (response?.error) {
+        throw new Error(response.error);
+      }
+
+      setShowAddModal(false);
+      onClose();
+      return { success: true };
+        
+    } catch (error) {
+      console.error('Error creating time slot:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to create time slot'
+      };
     }
-    setShowAddModal(false);
+  };
+
+  // Helper function to calculate end time
+  const addMinutesToTime = (startTime, minutes) => {
+    const [hours, mins] = startTime.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, mins);
+    date.setMinutes(date.getMinutes() + minutes);
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
 
   // Render slot list
@@ -349,18 +398,18 @@ const SlotActionModal = ({
               </button>
             </div>
           )}
+          {/* Time Slot Modal for adding new slots */}
+          {showAddModal && (
+            <TimeSlotModal
+              isOpen={showAddModal}
+              onClose={() => setShowAddModal(false)}
+              onSave={handleSlotCreated}
+              selectedDate={selectedDate}
+              existingSlots={existingSlots}
+            />
+          )}
         </div>
       </div>
-
-      {/* Time Slot Modal for adding new slots */}
-      {showAddModal && (
-        <TimeSlotModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSave={handleSlotCreated}
-          selectedDate={selectedDate}
-        />
-      )}
     </>
   );
 };

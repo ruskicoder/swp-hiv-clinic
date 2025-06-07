@@ -177,7 +177,6 @@ CREATE TABLE PasswordResetTokens (
 -- ARVTreatments Table: Enhanced for better treatment management
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ARVTreatments' AND xtype='U')
 CREATE TABLE ARVTreatments (
-    ARVTreatmentID INT PRIMARY KEY IDENTITY(1,1),
     PatientUserID INT NOT NULL,
     DoctorUserID INT NULL,
     AppointmentID INT NULL, -- Link to the appointment where this treatment was prescribed
@@ -211,6 +210,18 @@ ALTER TABLE PatientRecords
     FOREIGN KEY (AppointmentId) 
     REFERENCES Appointments(AppointmentID)
     ON DELETE SET NULL;
+GO
+
+-- Add DurationMinutes column to DoctorAvailabilitySlots if it doesn't exist
+IF NOT EXISTS (
+    SELECT * FROM sys.columns 
+    WHERE object_id = OBJECT_ID('DoctorAvailabilitySlots')
+    AND name = 'DurationMinutes'
+)
+BEGIN
+    ALTER TABLE DoctorAvailabilitySlots
+    ADD DurationMinutes INT NOT NULL DEFAULT 30;
+END
 GO
 
 PRINT 'Database schema created successfully!';

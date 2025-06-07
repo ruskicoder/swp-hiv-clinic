@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Entity representing doctor availability slots
@@ -43,6 +44,16 @@ public class DoctorAvailabilitySlot {
     @Column(name = "EndTime", nullable = false)
     private LocalTime endTime;
 
+    @Column(name = "DurationMinutes", nullable = false)
+    private Integer durationMinutes = 30;
+
+    public void setDurationMinutes(Integer durationMinutes) {
+        this.durationMinutes = durationMinutes;
+        if (this.startTime != null && durationMinutes != null) {
+            this.endTime = this.startTime.plusMinutes(durationMinutes);
+        }
+    }
+
     @Column(name = "IsBooked", columnDefinition = "BIT DEFAULT 0")
     private Boolean isBooked = false;
 
@@ -59,10 +70,24 @@ public class DoctorAvailabilitySlot {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (startTime != null && durationMinutes != null && endTime == null) {
+            endTime = startTime.plusMinutes(durationMinutes);
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    @Transient // This field won't be persisted
+    public Integer getDurationMinutes() {
+        if (startTime == null || endTime == null) {
+            return 0;
+        }
+        return (int) ChronoUnit.MINUTES.between(
+            LocalTime.parse(startTime.toString()), 
+            LocalTime.parse(endTime.toString())
+        );
     }
 }

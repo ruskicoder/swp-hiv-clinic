@@ -45,7 +45,7 @@ public interface DoctorAvailabilitySlotRepository extends JpaRepository<DoctorAv
      * Find available slots for a specific doctor from today onwards
      */
     List<DoctorAvailabilitySlot> findByDoctorUserAndIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(
-            User doctorUser, LocalDate fromDate);
+            User doctorUser, LocalDate date);
 
     /**
      * Find slots for a doctor between dates

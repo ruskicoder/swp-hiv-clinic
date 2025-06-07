@@ -1,330 +1,362 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
-import ErrorBoundary from '../../components/ErrorBoundary';
 import DashboardHeader from '../../components/layout/DashboardHeader';
-import WeeklySchedule from '../../components/schedule/WeeklySchedule';
 import PatientRecordSection from '../../components/PatientRecordSection';
+import UnifiedCalendar from '../../components/schedule/UnifiedCalendar';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
 import './CustomerDashboard.css';
-
-// Define navigationItems at the top-level to fix ReferenceError
-const navigationItems = [
-  { id: 'overview', label: 'Overview', icon: '📊' },
-  { id: 'appointments', label: 'My Appointments', icon: '📅' },
-  { id: 'doctors', label: 'Find Doctors', icon: '👨‍⚕️' },
-  { id: 'book-appointment', label: 'Book Appointment', icon: '📝' },
-  { id: 'record', label: 'My Record', icon: '📋' }
-];
 
 const CustomerDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // State management
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  // Data states
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [patientRecord, setPatientRecord] = useState(null);
   const [arvTreatments, setArvTreatments] = useState([]);
   const [allSlots, setAllSlots] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [doctorSlots, setDoctorSlots] = useState([]);
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
 
-  // Error states
-  const [appointmentsError, setAppointmentsError] = useState('');
-  const [doctorsError, setDoctorsError] = useState('');
-
-  useEffect(() => {
-    loadDashboardData();
-    // Load patient record and ARV treatments
-    loadPatientRecord();
-    loadARVTreatments();
-    loadAllSlots();
-  }, []);
-
+  // Load dashboard data
   const loadDashboardData = async () => {
-    setLoading(true);
-    setError('');
-    setAppointmentsError('');
-    setDoctorsError('');
-
     try {
-      console.log('Loading customer dashboard data...');
-      
-      // Initialize with empty arrays
-      setAppointments([]);
-      setDoctors([]);
-      
-      // Load appointments and doctors concurrently
-      const [appointmentsResult, doctorsResult] = await Promise.allSettled([
+      setLoading(true);
+      const [appointmentsRes, doctorsRes] = await Promise.allSettled([
         apiClient.get('/appointments/patient/my-appointments'),
-        apiClient.get('/doctors') // changed from '/admin/doctors'
+        apiClient.get('/doctors')
       ]);
 
-      // Handle appointments
-      if (appointmentsResult.status === 'fulfilled' && appointmentsResult.value?.data) {
-        const appointmentsData = Array.isArray(appointmentsResult.value.data) ? appointmentsResult.value.data : [];
-        setAppointments(appointmentsData);
+      if (appointmentsRes.status === 'fulfilled') {
+        setAppointments(appointmentsRes.value.data || []);
       } else {
-        setAppointmentsError('Failed to load appointments');
+        console.error('Failed to load appointments:', appointmentsRes.reason);
       }
 
-      // Handle doctors
-      if (doctorsResult.status === 'fulfilled' && doctorsResult.value?.data) {
-        const doctorsData = Array.isArray(doctorsResult.value.data) ? doctorsResult.value.data : [];
-        setDoctors(doctorsData);
+      if (doctorsRes.status === 'fulfilled') {
+        setDoctors(doctorsRes.value.data || []);
       } else {
-        setDoctorsError('Failed to load doctors');
+        console.error('Failed to load doctors:', doctorsRes.reason);
       }
-
     } catch (error) {
-      console.error('Dashboard error:', error);
-      setError('Failed to load dashboard data. Please try again.');
+      console.error('Error loading dashboard data:', error);
+      setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
+  // Load patient record
   const loadPatientRecord = async () => {
-    setError('');
     try {
       const response = await apiClient.get('/patient-records/my-record');
-      if (!response.data) {
-        throw new Error('No record data received');
-      }
-      console.debug('Loaded patient record:', response.data);
       setPatientRecord(response.data);
     } catch (error) {
-      console.error('Failed to load patient record:', error);
-      setError(error.response?.data?.message || 'Failed to load patient record');
-      setPatientRecord(null);
+      console.error('Error loading patient record:', error);
     }
   };
 
+  // Load ARV treatments
   const loadARVTreatments = async () => {
-    setError('');
     try {
-      const res = await apiClient.get('/arv-treatments/my-treatments');
-      setArvTreatments(res.data || []);
-    } catch (e) {
-      setArvTreatments([]);
+      const response = await apiClient.get('/arv-treatments/my-treatments');
+      setArvTreatments(response.data || []);
+    } catch (error) {
+      console.error('Error loading ARV treatments:', error);
     }
   };
 
-  const loadAllSlots = async () => {
-    setError('');
+  // Load doctor slots for booking
+  const loadDoctorSlots = async (doctorId) => {
     try {
-      const res = await apiClient.get('/doctors/availability/all-slots');
-      setAllSlots(res.data || []);
-    } catch (e) {
-      setAllSlots([]);
+      const response = await apiClient.get(`/doctors/${doctorId}/available-slots`);
+      setDoctorSlots(response.data || []);
+    } catch (error) {
+      console.error('Error loading doctor slots:', error);
+      setDoctorSlots([]);
     }
   };
 
-  const handleCancelAppointment = async (appointmentId, reason) => {
-    setError('');
+  // Handle doctor selection for booking
+  const handleBookDoctor = (doctor) => {
+    setSelectedDoctor(doctor);
+    loadDoctorSlots(doctor.userId);
+    setActiveTab('book-appointment');
+  };
+
+  // Handle appointment booking
+  const handleBookSlot = async (slot) => {
+    try {
+      if (!selectedDoctor || !slot) return;
+
+      const response = await apiClient.post('/appointments/book', {
+        doctorUserId: selectedDoctor.userId,
+        availabilitySlotId: slot.availabilitySlotId,
+        appointmentDateTime: `${slot.slotDate}T${slot.startTime}`
+      });
+
+      if (response.data.success) {
+        alert('Appointment booked successfully!');
+        await loadDashboardData();
+        await loadDoctorSlots(selectedDoctor.userId);
+        setActiveTab('appointments');
+      }
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      throw new Error('Failed to book appointment. Please try again.');
+    }
+  };
+
+  // Handle appointment cancellation
+  const handleCancelBooking = async (appointmentId, reason) => {
     try {
       const response = await apiClient.put(`/appointments/${appointmentId}/cancel`, null, {
         params: { reason }
       });
+
       if (response.data.success) {
-        alert('Appointment cancelled successfully');
-        loadDashboardData();
+        alert('Appointment cancelled successfully!');
+        await loadDashboardData();
+        if (selectedDoctor) {
+          await loadDoctorSlots(selectedDoctor.userId);
+        }
       }
     } catch (error) {
-      console.error('Cancel appointment error:', error);
-      setError('Failed to cancel appointment');
+      console.error('Error cancelling appointment:', error);
+      throw new Error('Failed to cancel appointment. Please try again.');
     }
   };
 
+  // Handle patient record save
+  const handleSavePatientRecord = async (recordData) => {
+    try {
+      const response = await apiClient.put('/patient-records/my-record', recordData);
+      if (response.data.success) {
+        alert('Patient record updated successfully');
+        await loadPatientRecord();
+      }
+    } catch (error) {
+      console.error('Error saving patient record:', error);
+      alert('Failed to save patient record');
+    }
+  };
+
+  // Handle image upload
+  const handleUploadImage = async (imageData) => {
+    try {
+      const response = await apiClient.post('/patient-records/upload-image', {
+        image: imageData
+      });
+      if (response.data.success) {
+        alert('Image uploaded successfully');
+        await loadPatientRecord();
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image');
+    }
+  };
+
+  // Handle logout
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
-  const handleSavePatientRecord = async (data) => {
-    try {
-      await apiClient.put('/patient-records/my-record', data);
-      await loadPatientRecord();
-    } catch (e) {
-      setError('Failed to save patient record');
-      throw new Error('Failed to save patient record');
-    }
-  };
+  // Load data on component mount
+  useEffect(() => {
+    loadDashboardData();
+    loadPatientRecord();
+    loadARVTreatments();
+  }, []);
 
-  const handleUploadImage = async (base64Image) => {
-    setError('');
-    try {
-      // Save image to patient record, not profile
-      await apiClient.post('/patient-records/upload-image', { image: base64Image });
-      // Always fetch latest patient record after upload
-      await loadPatientRecord();
-    } catch (e) {
-      setError('Failed to upload image');
-      alert('Failed to upload image');
-      throw new Error('Failed to upload image');
-    }
-  };
+  // Navigation items
+  const navigationItems = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'appointments', label: 'My Appointments', icon: '📅' },
+    { id: 'doctors', label: 'Find Doctors', icon: '👨‍⚕️' },
+    { id: 'book-appointment', label: 'Book Appointment', icon: '📝' },
+    { id: 'record', label: 'My Record', icon: '📋' }
+  ];
 
-  // Fetch slots for selected doctor
-  const fetchDoctorSlots = async (doctorId) => {
-    try {
-      const res = await apiClient.get(`/doctors/${doctorId}/available-slots`);
-      setDoctorSlots(res.data || []);
-    } catch {
-      setDoctorSlots([]);
-    }
-  };
+  // Render overview
+  const renderOverview = () => {
+    const upcomingAppointments = appointments.filter(apt => 
+      new Date(apt.appointmentDateTime) > new Date() && apt.status === 'Scheduled'
+    );
 
-  // When doctor is selected for booking, fetch slots
-  const handleBookDoctor = async (doctor) => {
-    setSelectedDoctor(doctor);
-    setActiveTab('book-appointment');
-    setDoctorSlots([]);
-    setSelectedDate(null);
-    setSelectedSlot(null);
-    await fetchDoctorSlots(doctor.userId);
-  };
-
-  // Add a simple modal component
-  const ConfirmBookingModal = ({ open, doctor, slot, onConfirm, onCancel }) => {
-    if (!open || !doctor || !slot) return null;
     return (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <h3>Confirm Appointment Booking</h3>
-          <div className="modal-details">
-            <p><strong>Doctor:</strong> Dr. {safeRender(doctor.firstName)} {safeRender(doctor.lastName)}</p>
-            <p><strong>Date:</strong> {safeDate(slot.slotDate)}</p>
-            <p><strong>Time:</strong> {slot.startTime} - {slot.endTime}</p>
+      <div className="overview-content">
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>{appointments.length}</h3>
+            <p>Total Appointments</p>
           </div>
-          <div className="modal-actions">
-            <button className="book-btn" onClick={onConfirm}>Confirm Booking</button>
-            <button className="cancel-btn" onClick={onCancel}>Cancel</button>
+          <div className="stat-card">
+            <h3>{upcomingAppointments.length}</h3>
+            <p>Upcoming Appointments</p>
+          </div>
+          <div className="stat-card">
+            <h3>{arvTreatments.length}</h3>
+            <p>ARV Treatments</p>
           </div>
         </div>
-        <style>{`
-          .modal-overlay {
-            position: fixed; z-index: 1000; left: 0; top: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;
-          }
-          .modal-content {
-            background: #fff; border-radius: 12px; padding: 2rem; min-width: 320px; max-width: 90vw;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-          }
-          .modal-details p { margin: 0.5rem 0; }
-          .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
-          .book-btn, .cancel-btn {
-            padding: 0.5rem 1.5rem; border-radius: 6px; border: none; font-size: 1rem; cursor: pointer;
-          }
-          .book-btn { background: #059669; color: #fff; }
-          .book-btn:hover { background: #047857; }
-          .cancel-btn { background: #e5e7eb; color: #374151; }
-          .cancel-btn:hover { background: #d1d5db; }
-        `}</style>
+
+        <div className="recent-appointments">
+          <h3>Upcoming Appointments</h3>
+          {upcomingAppointments.length > 0 ? (
+            <div className="appointments-list">
+              {upcomingAppointments.slice(0, 3).map(appointment => (
+                <div key={appointment.appointmentId} className="appointment-item">
+                  <div className="appointment-info">
+                    <p><strong>Doctor:</strong> Dr. {appointment.doctorUser?.firstName} {appointment.doctorUser?.lastName}</p>
+                    <p><strong>Date:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
+                    <p><strong>Status:</strong> {appointment.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No upcoming appointments. <button className="link-btn" onClick={() => setActiveTab('doctors')}>Book an appointment</button></p>
+          )}
+        </div>
       </div>
     );
   };
 
-  // Book Appointment Tab: Calendar + Modal + Slot selection
-  const handleBookAppointment = async () => {
-    if (!selectedDoctor || !selectedSlot) return;
-    try {
-      await apiClient.post('/appointments/book', {
-        doctorUserId: selectedDoctor.userId,
-        availabilitySlotId: selectedSlot.availabilitySlotId,
-        appointmentDateTime: `${selectedSlot.slotDate}T${selectedSlot.startTime}`
-      });
-      alert('Appointment booked successfully!');
-      setSelectedSlot(null);
-      setShowBookingModal(false);
-      setActiveTab('appointments');
-      loadDashboardData();
-      loadAllSlots();
-    } catch (error) {
-      alert('Failed to book appointment. Please try again.');
-    }
-  };
-
-  const BookAppointmentForm = () => (
+  // Render appointments
+  const renderAppointments = () => (
     <ErrorBoundary>
-      <div className="book-appointment-section">
-        <div className="content-header">
-          <h2>Book Appointment</h2>
-          <p>
-            {selectedDoctor
-              ? `Select an available slot for Dr. ${safeRender(selectedDoctor.firstName)} ${safeRender(selectedDoctor.lastName)}`
-              : 'Please select a doctor first.'}
-          </p>
-        </div>
-        {selectedDoctor && (
-          <>
-            <div className="available-slots-list">
-              {doctorSlots && doctorSlots.length > 0 ? (
-                <div className="slots-grid">
-                  {doctorSlots.map((slot) => (
-                    <div
-                      key={slot.availabilitySlotId}
-                      className={`slot-card${selectedSlot && selectedSlot.availabilitySlotId === slot.availabilitySlotId ? ' selected' : ''}`}
-                      onClick={() => {
-                        if (!slot.isBooked) {
-                          setSelectedSlot(slot);
-                          setShowBookingModal(true);
-                        }
-                      }}
-                      style={{
-                        cursor: slot.isBooked ? 'not-allowed' : 'pointer',
-                        opacity: slot.isBooked ? 0.5 : 1,
-                        border: selectedSlot && selectedSlot.availabilitySlotId === slot.availabilitySlotId ? '2px solid #059669' : undefined
-                      }}
-                    >
-                      <div>
-                        <strong>Date:</strong> {safeDate(slot.slotDate)}<br />
-                        <strong>Time:</strong> {slot.startTime} - {slot.endTime}
-                      </div>
-                      <div>
-                        <span className={`booking-status ${slot.isBooked ? 'booked' : 'available'}`}>
-                          {slot.isBooked ? 'Booked' : 'Available'}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+      <div className="appointments-content">
+        <h3>My Appointments</h3>
+        {appointments.length > 0 ? (
+          <div className="appointments-list">
+            {appointments.map((appointment, index) => (
+              <ErrorBoundary key={appointment?.appointmentId || index}>
+                <div className="appointment-card">
+                  <div className="appointment-details">
+                    <h4>
+                      Dr. {safeRender(appointment?.doctorUser?.firstName)} {safeRender(appointment?.doctorUser?.lastName)}
+                    </h4>
+                    <p><strong>Date:</strong> {safeDate(appointment?.appointmentDateTime)}</p>
+                    <p><strong>Time:</strong> {safeTime(appointment?.appointmentDateTime)}</p>
+                    <p><strong>Status:</strong>
+                      <span className={`status ${appointment?.status?.toLowerCase()}`}>
+                        {safeRender(appointment?.status)}
+                      </span>
+                    </p>
+                    {appointment?.notes && <p><strong>Notes:</strong> {safeRender(appointment?.notes)}</p>}
+                  </div>
+                  <div className="appointment-actions">
+                    {appointment?.status === 'Scheduled' && (
+                      <button
+                        className="cancel-btn"
+                        onClick={() => {
+                          const reason = prompt('Please provide a reason for cancellation:');
+                          if (reason) {
+                            handleCancelBooking(appointment.appointmentId, reason);
+                          }
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <div className="no-data">
-                  <p>No available slots for this doctor.</p>
-                </div>
-              )}
-            </div>
-            {/* Modal for booking confirmation */}
-            <ConfirmBookingModal
-              open={showBookingModal}
-              doctor={selectedDoctor}
-              slot={selectedSlot}
-              onConfirm={handleBookAppointment}
-              onCancel={() => {
-                setShowBookingModal(false);
-                setSelectedSlot(null);
-              }}
-            />
-          </>
-        )}
-        {!selectedDoctor && (
+              </ErrorBoundary>
+            ))}
+          </div>
+        ) : (
           <div className="no-data">
-            <p>Please select a doctor from the "Find Doctors" tab to book an appointment.</p>
+            <p>No appointments found.</p>
+            <button className="btn-primary" onClick={() => setActiveTab('doctors')}>
+              Book Your First Appointment
+            </button>
           </div>
         )}
       </div>
     </ErrorBoundary>
   );
 
+  // Render doctors
+  const renderDoctors = () => (
+    <ErrorBoundary>
+      <div className="doctors-content">
+        <h3>Available Doctors</h3>
+        {doctors.length > 0 ? (
+          <div className="doctors-grid">
+            {doctors.map(doctor => (
+              <div key={doctor.userId} className="doctor-card">
+                <div className="doctor-info">
+                  <h4>Dr. {safeRender(doctor.firstName)} {safeRender(doctor.lastName)}</h4>
+                  <p><strong>Specialty:</strong> {safeRender(doctor.specialty) || 'General Practice'}</p>
+                  <p><strong>Email:</strong> {safeRender(doctor.email)}</p>
+                </div>
+                <div className="doctor-actions">
+                  <button 
+                    className="book-btn"
+                    onClick={() => handleBookDoctor(doctor)}
+                  >
+                    Book Appointment
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-data">
+            <p>No doctors available at the moment.</p>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
+  );
+
+  // Render booking interface
+  const renderBookAppointment = () => (
+    <ErrorBoundary>
+      <div className="book-appointment-content">
+        <div className="content-header">
+          <h3>Book Appointment</h3>
+          {selectedDoctor ? (
+            <p>Booking with Dr. {selectedDoctor.firstName} {selectedDoctor.lastName}</p>
+          ) : (
+            <p>Please select a doctor first</p>
+          )}
+        </div>
+
+        {selectedDoctor ? (
+          <UnifiedCalendar
+            slots={doctorSlots}
+            userRole="patient"
+            currentUserId={user?.userId}
+            doctorInfo={selectedDoctor}
+            onBookSlot={handleBookSlot}
+            onCancelBooking={handleCancelBooking}
+          />
+        ) : (
+          <div className="no-doctor-selected">
+            <p>No doctor selected for booking.</p>
+            <button 
+              className="btn-primary"
+              onClick={() => setActiveTab('doctors')}
+            >
+              Select a Doctor
+            </button>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
+  );
+
+  // Render patient record
   const renderPatientRecord = () => (
     <ErrorBoundary>
       <PatientRecordSection
@@ -351,7 +383,7 @@ const CustomerDashboard = () => {
                 {arv.notes && (
                   <p><strong>Notes:</strong> {arv.notes}</p>
                 )}
-                <p><strong>Status:</strong> 
+                <p><strong>Status:</strong>
                   <span className={`status ${arv.isActive ? 'active' : 'inactive'}`}>
                     {arv.isActive ? 'Active' : 'Inactive'}
                   </span>
@@ -364,168 +396,7 @@ const CustomerDashboard = () => {
     </ErrorBoundary>
   );
 
-  // Add the missing renderOverview function
-  const renderOverview = () => (
-    <ErrorBoundary>
-      <div className="overview-section">
-        <div className="content-header">
-          <h2>Patient Dashboard</h2>
-          <p>Welcome back, {user?.firstName || user?.username || 'Patient'}</p>
-        </div>
-        <div className="stats-grid">
-          <div className="stat-card">
-            <h3>Total Appointments</h3>
-            <p className="stat-number">{appointments?.length || 0}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Upcoming Appointments</h3>
-            <p className="stat-number">
-              {appointments?.filter(apt => {
-                try {
-                  const now = new Date();
-                  return new Date(apt?.appointmentDateTime) > now && apt?.status === 'Scheduled';
-                } catch {
-                  return false;
-                }
-              }).length || 0}
-            </p>
-          </div>
-          <div className="stat-card">
-            <h3>Available Doctors</h3>
-            <p className="stat-number">{doctors?.filter(doc => doc?.isActive).length || 0}</p>
-          </div>
-        </div>
-        {(appointmentsError || doctorsError) && (
-          <div className="error-message">
-            {appointmentsError && <div>{appointmentsError}</div>}
-            {doctorsError && <div>{doctorsError}</div>}
-          </div>
-        )}
-        {error && (
-          <div className="error-message">
-            {error}
-            <button onClick={loadDashboardData} className="retry-btn">
-              Retry
-            </button>
-          </div>
-        )}
-      </div>
-    </ErrorBoundary>
-  );
-
-  // Add the missing renderDoctors function
-  const renderDoctors = () => (
-    <ErrorBoundary>
-      <div className="doctors-section">
-        <div className="content-header">
-          <h2>Find Doctors</h2>
-          <p>Browse available doctors and book appointments</p>
-        </div>
-        {doctorsError && (
-          <div className="error-message">
-            {doctorsError}
-          </div>
-        )}
-        {!doctors || doctors.length === 0 ? (
-          <div className="no-data">
-            <p>No doctors found.</p>
-            <button className="refresh-btn" onClick={loadDashboardData}>
-              Refresh
-            </button>
-          </div>
-        ) : (
-          <div className="doctors-grid">
-            {doctors.map((doctor, index) => (
-              <ErrorBoundary key={doctor?.userId || index}>
-                <div className="doctor-card">
-                  <h4>Dr. {safeRender(doctor?.firstName)} {safeRender(doctor?.lastName)}</h4>
-                  <p><strong>Email:</strong> {safeRender(doctor?.email)}</p>
-                  <p><strong>Specialty:</strong> {safeRender(doctor?.specialty || 'General Practice')}</p>
-                  <p><strong>Status:</strong> 
-                    <span className={`status ${doctor?.isActive ? 'active' : 'inactive'}`}>
-                      {doctor?.isActive ? 'Available' : 'Unavailable'}
-                    </span>
-                  </p>
-                  <div className="doctor-actions">
-                    <button 
-                      className="book-btn"
-                      onClick={() => handleBookDoctor(doctor)}
-                      disabled={!doctor?.isActive}
-                    >
-                      Book Appointment
-                    </button>
-                  </div>
-                </div>
-              </ErrorBoundary>
-            ))}
-          </div>
-        )}
-      </div>
-    </ErrorBoundary>
-  );
-
-  // Add the missing renderAppointments function
-  const renderAppointments = () => (
-    <ErrorBoundary>
-      <div className="appointments-section">
-        <div className="content-header">
-          <h2>My Appointments</h2>
-          <p>View and manage your scheduled appointments</p>
-        </div>
-        {appointmentsError && (
-          <div className="error-message">
-            {appointmentsError}
-          </div>
-        )}
-        {!appointments || appointments.length === 0 ? (
-          <div className="no-data">
-            <p>No appointments found.</p>
-            <button className="refresh-btn" onClick={loadDashboardData}>
-              Refresh
-            </button>
-          </div>
-        ) : (
-          <div className="appointments-list">
-            {appointments.map((appointment, index) => (
-              <ErrorBoundary key={appointment?.appointmentId || index}>
-                <div className="appointment-card">
-                  <div className="appointment-details">
-                    <h4>
-                      Dr. {safeRender(appointment?.doctorUser?.firstName)} {safeRender(appointment?.doctorUser?.lastName)}
-                    </h4>
-                    <p><strong>Date:</strong> {safeDate(appointment?.appointmentDateTime)}</p>
-                    <p><strong>Time:</strong> {safeTime(appointment?.appointmentDateTime)}</p>
-                    <p><strong>Status:</strong>
-                      <span className={`status ${appointment?.status?.toLowerCase()}`}>
-                        {safeRender(appointment?.status)}
-                      </span>
-                    </p>
-                    {appointment?.notes && <p><strong>Notes:</strong> {safeRender(appointment?.notes)}</p>}
-                  </div>
-                  <div className="appointment-actions">
-                    {appointment?.status === 'Scheduled' && (
-                      <button
-                        className="cancel-btn"
-                        onClick={() => {
-                          const reason = prompt('Please provide a reason for cancellation:');
-                          if (reason) {
-                            handleCancelAppointment(appointment.appointmentId, reason);
-                          }
-                        }}
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </ErrorBoundary>
-            ))}
-          </div>
-        )}
-      </div>
-    </ErrorBoundary>
-  );
-
+  // Render content based on active tab
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -535,7 +406,7 @@ const CustomerDashboard = () => {
       case 'doctors':
         return renderDoctors();
       case 'book-appointment':
-        return <BookAppointmentForm />;
+        return renderBookAppointment();
       case 'record':
         return renderPatientRecord();
       default:
@@ -545,8 +416,9 @@ const CustomerDashboard = () => {
 
   if (loading) {
     return (
-      <div className="customer-dashboard">
-        <div className="loading">Loading dashboard data...</div>
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard...</p>
       </div>
     );
   }
@@ -554,33 +426,38 @@ const CustomerDashboard = () => {
   return (
     <div className="customer-dashboard">
       <DashboardHeader 
-        title="Patient Dashboard" 
-        subtitle={`Welcome, ${user?.firstName || user?.username || 'Patient'}`}
+        user={user} 
+        onLogout={handleLogout}
+        title="Patient Dashboard"
       />
-      
+
       <div className="dashboard-layout">
         <div className="dashboard-sidebar">
-          <div className="sidebar-header">
-            <h1>Patient Portal</h1>
-          </div>
-          
           <nav className="dashboard-nav">
             {navigationItems.map(item => (
-              <div key={item.id} className="nav-item">
-                <button
-                  className={`nav-button ${activeTab === item.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(item.id)}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  {item.label}
-                </button>
-              </div>
+              <button
+                key={item.id}
+                className={`nav-button ${activeTab === item.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(item.id)}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </button>
             ))}
           </nav>
         </div>
 
-        <div className="dashboard-content">
-          {renderContent()}
+        <div className="dashboard-main">
+          {error && (
+            <div className="error-banner">
+              <p>{error}</p>
+              <button onClick={() => setError('')}>×</button>
+            </div>
+          )}
+
+          <ErrorBoundary>
+            {renderContent()}
+          </ErrorBoundary>
         </div>
       </div>
     </div>
