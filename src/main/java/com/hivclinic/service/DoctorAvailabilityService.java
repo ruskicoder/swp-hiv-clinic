@@ -13,11 +13,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for managing doctor availability slots
+ */
 @Service
 public class DoctorAvailabilityService {
+
     private static final Logger logger = LoggerFactory.getLogger(DoctorAvailabilityService.class);
 
     @Autowired
@@ -27,7 +32,7 @@ public class DoctorAvailabilityService {
     private UserRepository userRepository;
 
     /**
-     * Create availability slot for a doctor
+     * Create a new availability slot
      */
     @Transactional
     public MessageResponse createAvailabilitySlot(DoctorAvailabilityRequest request, Integer doctorUserId) {
@@ -37,51 +42,49 @@ public class DoctorAvailabilityService {
             if (doctorOpt.isEmpty()) {
                 return MessageResponse.error("Doctor not found");
             }
-            User doctor = doctorOpt.get();
 
-            // Validate doctor role
+            User doctor = doctorOpt.get();
             if (!"Doctor".equalsIgnoreCase(doctor.getRole().getRoleName())) {
                 return MessageResponse.error("User is not a doctor");
             }
 
-            // Validate time logic
+            // Validate slot date is not in the past
+            if (request.getSlotDate().isBefore(LocalDate.now())) {
+                return MessageResponse.error("Cannot create slots for past dates");
+            }
+
+            // Validate time range
             if (request.getStartTime().isAfter(request.getEndTime()) || 
                 request.getStartTime().equals(request.getEndTime())) {
                 return MessageResponse.error("Start time must be before end time");
             }
 
-            // Validate date is not in the past
-            if (request.getSlotDate().isBefore(LocalDate.now())) {
-                return MessageResponse.error("Cannot create availability for past dates");
-            }
-
             // Check for overlapping slots
             List<DoctorAvailabilitySlot> existingSlots = availabilitySlotRepository
                     .findByDoctorUserAndSlotDate(doctor, request.getSlotDate());
-            
-            boolean hasOverlap = existingSlots.stream()
-                    .anyMatch(slot -> 
-                        (request.getStartTime().isBefore(slot.getEndTime()) && 
-                         request.getEndTime().isAfter(slot.getStartTime())));
-            
+
+            boolean hasOverlap = existingSlots.stream().anyMatch(slot -> 
+                isTimeOverlapping(request.getStartTime(), request.getEndTime(), 
+                                slot.getStartTime(), slot.getEndTime()));
+
             if (hasOverlap) {
-                return MessageResponse.error("This time slot overlaps with existing availability");
+                return MessageResponse.error("Time slot overlaps with existing availability");
             }
 
-            // Create availability slot
-            DoctorAvailabilitySlot availabilitySlot = new DoctorAvailabilitySlot();
-            availabilitySlot.setDoctorUser(doctor);
-            availabilitySlot.setSlotDate(request.getSlotDate());
-            availabilitySlot.setStartTime(request.getStartTime());
-            availabilitySlot.setEndTime(request.getEndTime());
-            availabilitySlot.setNotes(request.getNotes());
-            availabilitySlot.setIsBooked(false);
+            // Create new slot
+            DoctorAvailabilitySlot slot = new DoctorAvailabilitySlot();
+            slot.setDoctorUser(doctor);
+            slot.setSlotDate(request.getSlotDate());
+            slot.setStartTime(request.getStartTime());
+            slot.setEndTime(request.getEndTime());
+            slot.setIsBooked(false);
+            slot.setNotes(request.getNotes());
 
-            availabilitySlotRepository.save(availabilitySlot);
+            availabilitySlotRepository.save(slot);
 
-            logger.info("Availability slot created for doctor: {} on date: {}", 
-                    doctor.getUsername(), request.getSlotDate());
-            
+            logger.info("Availability slot created for doctor: {} on date: {} from {} to {}", 
+                    doctor.getUsername(), request.getSlotDate(), request.getStartTime(), request.getEndTime());
+
             return MessageResponse.success("Availability slot created successfully!");
 
         } catch (Exception e) {
@@ -91,71 +94,42 @@ public class DoctorAvailabilityService {
     }
 
     /**
-     * Get all availability slots for a doctor
+     * Get doctor's availability slots
      */
+    @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailability(Integer doctorUserId) {
         Optional<User> doctorOpt = userRepository.findById(doctorUserId);
         if (doctorOpt.isEmpty()) {
             throw new RuntimeException("Doctor not found");
         }
-        return availabilitySlotRepository.findByDoctorUser(doctorOpt.get());
+
+        return availabilitySlotRepository.findByDoctorUserOrderBySlotDateAscStartTimeAsc(doctorOpt.get());
     }
 
     /**
-     * Get available slots for a doctor (not booked)
+     * Get doctor's available slots (not booked)
      */
+    @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailableSlots(Integer doctorUserId) {
         Optional<User> doctorOpt = userRepository.findById(doctorUserId);
         if (doctorOpt.isEmpty()) {
             throw new RuntimeException("Doctor not found");
         }
-        return availabilitySlotRepository.findByDoctorUserAndSlotDateGreaterThanEqualAndIsBookedFalse(
-                doctorOpt.get(), LocalDate.now());
+
+        return availabilitySlotRepository.findByDoctorUserAndIsBookedFalseOrderBySlotDateAscStartTimeAsc(doctorOpt.get());
     }
 
     /**
-     * Get availability slots for a specific date
+     * Get doctor's availability by date
      */
+    @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailabilityByDate(Integer doctorUserId, LocalDate date) {
         Optional<User> doctorOpt = userRepository.findById(doctorUserId);
         if (doctorOpt.isEmpty()) {
             throw new RuntimeException("Doctor not found");
         }
-        return availabilitySlotRepository.findByDoctorUserAndSlotDate(doctorOpt.get(), date);
-    }
 
-    /**
-     * Delete availability slot
-     */
-    @Transactional
-    public MessageResponse deleteAvailabilitySlot(Integer slotId, Integer doctorUserId) {
-        try {
-            Optional<DoctorAvailabilitySlot> slotOpt = availabilitySlotRepository.findById(slotId);
-            if (slotOpt.isEmpty()) {
-                return MessageResponse.error("Availability slot not found");
-            }
-
-            DoctorAvailabilitySlot slot = slotOpt.get();
-
-            // Verify the slot belongs to the doctor
-            if (!slot.getDoctorUser().getUserId().equals(doctorUserId)) {
-                return MessageResponse.error("You don't have permission to delete this slot");
-            }
-
-            // Check if slot is booked
-            if (slot.getIsBooked()) {
-                return MessageResponse.error("Cannot delete a booked slot");
-            }
-
-            availabilitySlotRepository.delete(slot);
-
-            logger.info("Availability slot {} deleted by doctor {}", slotId, doctorUserId);
-            return MessageResponse.success("Availability slot deleted successfully!");
-
-        } catch (Exception e) {
-            logger.error("Error deleting availability slot: {}", e.getMessage(), e);
-            return MessageResponse.error("Failed to delete availability slot: " + e.getMessage());
-        }
+        return availabilitySlotRepository.findByDoctorUserAndSlotDateOrderByStartTimeAsc(doctorOpt.get(), date);
     }
 
     /**
@@ -171,39 +145,33 @@ public class DoctorAvailabilityService {
 
             DoctorAvailabilitySlot slot = slotOpt.get();
 
-            // Verify the slot belongs to the doctor
+            // Verify ownership
             if (!slot.getDoctorUser().getUserId().equals(doctorUserId)) {
                 return MessageResponse.error("You don't have permission to update this slot");
             }
 
-            // Check if slot is booked
+            // Cannot update booked slots
             if (slot.getIsBooked()) {
                 return MessageResponse.error("Cannot update a booked slot");
             }
 
-            // Validate time logic
+            // Validate new time range
             if (request.getStartTime().isAfter(request.getEndTime()) || 
                 request.getStartTime().equals(request.getEndTime())) {
                 return MessageResponse.error("Start time must be before end time");
             }
 
-            // Validate date is not in the past
-            if (request.getSlotDate().isBefore(LocalDate.now())) {
-                return MessageResponse.error("Cannot update availability for past dates");
-            }
-
             // Check for overlapping slots (excluding current slot)
             List<DoctorAvailabilitySlot> existingSlots = availabilitySlotRepository
                     .findByDoctorUserAndSlotDate(slot.getDoctorUser(), request.getSlotDate());
-            
+
             boolean hasOverlap = existingSlots.stream()
-                    .filter(existingSlot -> !existingSlot.getAvailabilitySlotId().equals(slotId))
-                    .anyMatch(existingSlot -> 
-                        (request.getStartTime().isBefore(existingSlot.getEndTime()) && 
-                         request.getEndTime().isAfter(existingSlot.getStartTime())));
-            
+                    .filter(s -> !s.getAvailabilitySlotId().equals(slotId))
+                    .anyMatch(s -> isTimeOverlapping(request.getStartTime(), request.getEndTime(), 
+                                                   s.getStartTime(), s.getEndTime()));
+
             if (hasOverlap) {
-                return MessageResponse.error("This time slot overlaps with existing availability");
+                return MessageResponse.error("Updated time slot overlaps with existing availability");
             }
 
             // Update slot
@@ -214,12 +182,75 @@ public class DoctorAvailabilityService {
 
             availabilitySlotRepository.save(slot);
 
-            logger.info("Availability slot {} updated by doctor {}", slotId, doctorUserId);
+            logger.info("Availability slot {} updated successfully", slotId);
             return MessageResponse.success("Availability slot updated successfully!");
 
         } catch (Exception e) {
             logger.error("Error updating availability slot: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to update availability slot: " + e.getMessage());
         }
+    }
+
+    /**
+     * Delete availability slot
+     */
+    @Transactional
+    public MessageResponse deleteAvailabilitySlot(Integer slotId, Integer doctorUserId) {
+        try {
+            Optional<DoctorAvailabilitySlot> slotOpt = availabilitySlotRepository.findById(slotId);
+            if (slotOpt.isEmpty()) {
+                return MessageResponse.error("Availability slot not found");
+            }
+
+            DoctorAvailabilitySlot slot = slotOpt.get();
+
+            // Verify ownership
+            if (!slot.getDoctorUser().getUserId().equals(doctorUserId)) {
+                return MessageResponse.error("You don't have permission to delete this slot");
+            }
+
+            // Cannot delete booked slots
+            if (slot.getIsBooked()) {
+                return MessageResponse.error("Cannot delete a booked slot. Cancel the appointment first.");
+            }
+
+            availabilitySlotRepository.delete(slot);
+
+            logger.info("Availability slot {} deleted successfully", slotId);
+            return MessageResponse.success("Availability slot deleted successfully!");
+
+        } catch (Exception e) {
+            logger.error("Error deleting availability slot: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to delete availability slot: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get all available slots for booking (across all doctors)
+     */
+    @Transactional(readOnly = true)
+    public List<DoctorAvailabilitySlot> getAllAvailableSlots() {
+        return availabilitySlotRepository.findByIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(LocalDate.now());
+    }
+
+    /**
+     * Get available slots for a specific doctor on or after today
+     */
+    @Transactional(readOnly = true)
+    public List<DoctorAvailabilitySlot> getDoctorFutureAvailableSlots(Integer doctorUserId) {
+        Optional<User> doctorOpt = userRepository.findById(doctorUserId);
+        if (doctorOpt.isEmpty()) {
+            throw new RuntimeException("Doctor not found");
+        }
+
+        return availabilitySlotRepository.findByDoctorUserAndIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(
+                doctorOpt.get(), LocalDate.now());
+    }
+
+    /**
+     * Check if two time ranges overlap
+     */
+    private boolean isTimeOverlapping(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
+        return start1.isBefore(end2) && start2.isBefore(end1);
     }
 }

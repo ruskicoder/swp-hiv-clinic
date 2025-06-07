@@ -1,6 +1,10 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 /**
@@ -8,6 +12,9 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "PatientRecords")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PatientRecord {
 
     @Id
@@ -42,135 +49,41 @@ public class PatientRecord {
     @Column(name = "EmergencyPhone", length = 20)
     private String emergencyPhone;
 
+    @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
+    private String profileImageBase64;
+
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt;
 
     @Column(name = "UpdatedAt")
     private LocalDateTime updatedAt;
 
-    @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
-    private String profileImageBase64;
-
-    // Constructors
-    public PatientRecord() {}
-
+    /**
+     * Constructor with patient user ID
+     */
     public PatientRecord(Integer patientUserID) {
         this.patientUserID = patientUserID;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.medicalHistory = "";
+        this.allergies = "";
+        this.currentMedications = "";
+        this.notes = "";
+        this.bloodType = "";
+        this.emergencyContact = "";
+        this.emergencyPhone = "";
     }
 
-    // Getters and Setters
-    public Integer getRecordID() {
-        return recordID;
-    }
-
-    public void setRecordID(Integer recordID) {
-        this.recordID = recordID;
-    }
-
-    public Integer getPatientUserID() {
-        return patientUserID;
-    }
-
-    public void setPatientUserID(Integer patientUserID) {
-        this.patientUserID = patientUserID;
-    }
-
-    public Integer getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(Integer appointmentId) {
-        this.appointmentId = appointmentId;
-    }
-
-    public String getMedicalHistory() {
-        return medicalHistory;
-    }
-
-    public void setMedicalHistory(String medicalHistory) {
-        this.medicalHistory = medicalHistory;
-    }
-
-    public String getAllergies() {
-        return allergies;
-    }
-
-    public void setAllergies(String allergies) {
-        this.allergies = allergies;
-    }
-
-    public String getCurrentMedications() {
-        return currentMedications;
-    }
-
-    public void setCurrentMedications(String currentMedications) {
-        this.currentMedications = currentMedications;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public String getBloodType() {
-        return bloodType;
-    }
-
-    public void setBloodType(String bloodType) {
-        this.bloodType = bloodType;
-    }
-
-    public String getEmergencyContact() {
-        return emergencyContact;
-    }
-
-    public void setEmergencyContact(String emergencyContact) {
-        this.emergencyContact = emergencyContact;
-    }
-
-    public String getEmergencyPhone() {
-        return emergencyPhone;
-    }
-
-    public void setEmergencyPhone(String emergencyPhone) {
-        this.emergencyPhone = emergencyPhone;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getProfileImageBase64() {
-        return profileImageBase64;
-    }
-
-    public void setProfileImageBase64(String profileImageBase64) {
-        this.profileImageBase64 = profileImageBase64;
-    }
-
+    /**
+     * Set timestamps before persisting
+     */
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * Update timestamp before updating
+     */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();

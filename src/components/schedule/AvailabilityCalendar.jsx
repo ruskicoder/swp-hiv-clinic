@@ -1,175 +1,318 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AvailabilityCalendar.css';
 
-const AvailabilityCalendar = ({ onSlotSelect, existingSlots = [] }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const AvailabilityCalendar = ({ 
+  slots = [], 
+  onSlotSelect, 
+  onDateSelect,
+  viewMode = 'month',
+  userRole = 'doctor',
+  currentUserId
+}) => {
+  // Ensure currentDate is always a valid Date object
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [currentView, setCurrentView] = useState(viewMode);
+  const [loading, setLoading] = useState(false);
 
-  const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-
-    const days = [];
-    
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
+  // Helper function to ensure date is valid
+  const ensureValidDate = (date) => {
+    if (!date) return new Date();
+    if (date instanceof Date && !isNaN(date)) return date;
+    try {
+      const parsedDate = new Date(date);
+      return isNaN(parsedDate) ? new Date() : parsedDate;
+    } catch {
+      return new Date();
     }
-    
-    // Add all days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayDate = new Date(year, month, day);
-      // Ensure time is set to noon to avoid timezone issues
-      dayDate.setHours(12, 0, 0, 0);
-      days.push(dayDate);
-    }
-    
-    return days;
   };
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  // Process slots to ensure valid dates
+  const processedSlots = slots.map(slot => ({
+    ...slot,
+    slotDate: ensureValidDate(slot.slotDate)
+  }));
+
+  // Get slots for a specific date - improved date comparison
+  const getDateSlots = (date) => {
+    if (!date) return [];
+    const targetDate = ensureValidDate(date);
+    const targetDateStr = targetDate.toISOString().split('T')[0];
+    
+    return processedSlots.filter(slot => {
+      const slotDate = ensureValidDate(slot.slotDate);
+      return slotDate.toISOString().split('T')[0] === targetDateStr;
     });
   };
 
+  // Handle date click with validated date
+  const handleDateClick = (date) => {
+    const validDate = ensureValidDate(date);
+    if (isDateDisabled(validDate)) return;
+    
+    const dateSlots = getDateSlots(validDate);
+    if (onDateSelect) {
+      onDateSelect(validDate, {
+        dateSlots,
+        hasBooked: dateSlots.some(slot => slot.isBooked),
+        hasAvailable: dateSlots.some(slot => !slot.isBooked)
+      });
+    }
+  };
+
+  // Updated isDateDisabled function with proper date validation
   const isDateDisabled = (date) => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return true;
+    }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-    return compareDate < today;
+    return date.getTime() < today.getTime();
   };
 
-  const getDateSlots = (date) => {
-    // Format date consistently as YYYY-MM-DD in local timezone
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const dateString = `${year}-${month}-${day}`;
-    
-    return existingSlots.filter(slot => {
-      // Handle both date string formats and ensure consistent comparison
-      let slotDateString;
-      if (slot.slotDate instanceof Date) {
-        const slotYear = slot.slotDate.getFullYear();
-        const slotMonth = String(slot.slotDate.getMonth() + 1).padStart(2, '0');
-        const slotDay = String(slot.slotDate.getDate()).padStart(2, '0');
-        slotDateString = `${slotYear}-${slotMonth}-${slotDay}`;
-      } else if (typeof slot.slotDate === 'string') {
-        // Extract just the date part if it's a datetime string
-        slotDateString = slot.slotDate.split('T')[0];
-      } else {
-        return false;
-      }
-      
-      return slotDateString === dateString;
-    });
-  };
+  // Render month view
+  const renderMonthView = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-  const handleDateClick = (date) => {
-    if (isDateDisabled(date)) return;
-    
-    const dateSlots = getDateSlots(date);
-    onSlotSelect(date, dateSlots);
-  };
-
-  const goToPreviousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-  };
-
-  const goToNextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  };
-
-  const goToToday = () => {
+    const days = [];
     const today = new Date();
-    today.setHours(12, 0, 0, 0);
-    setCurrentDate(today);
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 42; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      
+      const isCurrentMonth = date.getMonth() === month;
+      const isToday = date.toISOString().split('T')[0] === today.toISOString().split('T')[0];
+      const isPast = date < today;
+      
+      const dateSlots = getDateSlots(date);
+      
+      days.push(
+        <div
+          key={date.toISOString()}
+          className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} 
+                     ${isToday ? 'today' : ''} ${isPast ? 'past' : ''}`}
+          onClick={() => !isPast && handleDateClick(date)}
+        >
+          <div className="day-number">{date.getDate()}</div>
+          {dateSlots.length > 0 && (
+            <div className="day-slots">
+              {dateSlots.filter(slot => !slot.isBooked).length > 0 && (
+                <div className="slot-indicator available">
+                  {dateSlots.filter(slot => !slot.isBooked).length}
+                </div>
+              )}
+              {dateSlots.filter(slot => slot.isBooked).length > 0 && (
+                <div className="slot-indicator booked">
+                  {dateSlots.filter(slot => slot.isBooked).length}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="month-view">
+        <div className="calendar-weekdays">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="weekday">{day}</div>
+          ))}
+        </div>
+        <div className="calendar-days">
+          {days}
+        </div>
+      </div>
+    );
   };
 
-  const formatMonthYear = () => {
-    return currentDate.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric'
-    });
+  // Render week view
+  const renderWeekView = () => {
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+
+    const days = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      
+      const isToday = date.getTime() === today.getTime();
+      const isPast = date < today;
+      const dateSlots = getDateSlots(date);
+
+      days.push(
+        <div 
+          key={date.toISOString()} // Use proper unique key
+          className={`week-day ${isToday ? 'today' : ''} ${isPast ? 'past' : ''}`}
+        >
+          <div className="week-day-header">
+            <div className="day-name">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+            <div className="day-number">{date.getDate()}</div>
+          </div>
+          <div className="week-day-slots" onClick={() => !isPast && handleDateClick(date)}>
+            {dateSlots.map((slot, index) => (
+              <div
+                key={index}
+                className={`week-slot ${slot.isBooked ? 'booked' : 'available'}`}
+                title={`${slot.startTime} - ${slot.endTime} ${slot.isBooked ? '(Booked)' : '(Available)'}`}
+              >
+                {slot.startTime} - {slot.endTime}
+                {slot.isBooked && userRole === 'patient' && (
+                  <span className="slot-status"> (Booked)</span>
+                )}
+              </div>
+            ))}
+            {dateSlots.length === 0 && !isPast && userRole === 'doctor' && (
+              <div className="no-slots" onClick={() => handleDateClick(date)}>
+                Click to add slots
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="week-view">
+        {days}
+      </div>
+    );
   };
 
-  const days = getDaysInMonth(currentDate);
+  // Add navigation functions
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  const navigateDate = (direction) => {
+    const newDate = new Date(currentDate);
+    switch(currentView) {
+      case 'week':
+        newDate.setDate(currentDate.getDate() + (direction * 7));
+        break;
+      case 'month':
+        newDate.setMonth(currentDate.getMonth() + direction);
+        break;
+      default:
+        newDate.setMonth(currentDate.getMonth() + direction);
+    }
+    setCurrentDate(newDate);
+  };
+
+  const changeMonth = (monthIndex) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(monthIndex);
+    setCurrentDate(newDate);
+  };
+
+  const changeYear = (year) => {
+    const newDate = new Date(currentDate);
+    newDate.setFullYear(year);
+    setCurrentDate(newDate);
+  };
+
+  // Generate year options
+  const currentYear = new Date().getFullYear();
+  const yearOptions = [];
+  for (let year = currentYear - 2; year <= currentYear + 5; year++) {
+    yearOptions.push(year);
+  }
+
+  // Month names
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
   return (
     <div className="availability-calendar">
+      {/* Calendar Header */}
       <div className="calendar-header">
-        <button className="nav-btn" onClick={goToPreviousMonth}>
-          ‹
-        </button>
-        <h3 className="month-year">{formatMonthYear()}</h3>
-        <button className="nav-btn" onClick={goToNextMonth}>
-          ›
-        </button>
-      </div>
-      
-      <button className="today-btn" onClick={goToToday}>
-        Today
-      </button>
-
-      <div className="calendar-grid">
-        <div className="weekdays">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="weekday">
-              {day}
-            </div>
-          ))}
+        <div className="calendar-navigation">
+          <div className="nav-buttons">
+            <button className="nav-btn" onClick={() => navigateDate(-1)}>‹</button>
+            <button className="today-btn" onClick={goToToday}>Today</button>
+            <button className="nav-btn" onClick={() => navigateDate(1)}>›</button>
+          </div>
+          
+          <div className="date-selectors">
+            <select 
+              value={currentDate.getMonth()} 
+              onChange={(e) => changeMonth(parseInt(e.target.value))}
+              className="month-selector"
+            >
+              {monthNames.map((month, index) => (
+                <option key={index} value={index}>{month}</option>
+              ))}
+            </select>
+            
+            <select 
+              value={currentDate.getFullYear()} 
+              onChange={(e) => changeYear(parseInt(e.target.value))}
+              className="year-selector"
+            >
+              {yearOptions.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
         </div>
-        
-        <div className="days-grid">
-          {days.map((date, index) => {
-            if (!date) {
-              return <div key={index} className="empty-day"></div>;
-            }
 
-            const dateSlots = getDateSlots(date);
-            const hasAvailable = dateSlots.some(slot => !slot.isBooked);
-            const hasBooked = dateSlots.some(slot => slot.isBooked);
-            const isDisabled = isDateDisabled(date);
-
-            return (
-              <div
-                key={index}
-                className={`day-cell ${isDisabled ? 'disabled' : ''} ${
-                  dateSlots.length > 0 ? 'has-slots' : ''
-                } ${hasAvailable ? 'has-available' : ''} ${hasBooked ? 'has-booked' : ''}`}
-                onClick={() => handleDateClick(date)}
-                title={isDisabled ? 'Past date' : formatDate(date)}
-              >
-                <span className="day-number">{date.getDate()}</span>
-                {dateSlots.length > 0 && (
-                  <div className="slot-indicators">
-                    {hasAvailable && <div className="indicator available"></div>}
-                    {hasBooked && <div className="indicator booked"></div>}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="calendar-controls">
+          <div className="view-mode-buttons">
+            <button 
+              className={`view-button ${currentView === 'month' ? 'active' : ''}`}
+              onClick={() => setCurrentView('month')}
+            >
+              Month
+            </button>
+            <button 
+              className={`view-button ${currentView === 'week' ? 'active' : ''}`}
+              onClick={() => setCurrentView('week')}
+            >
+              Week
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Calendar Content */}
+      <div className="calendar-content">
+        {loading ? (
+          <div className="calendar-loading">Loading...</div>
+        ) : (
+          <>
+            {currentView === 'month' && renderMonthView()}
+            {currentView === 'week' && renderWeekView()}
+          </>
+        )}
+      </div>
+
+      {/* Legend */}
       <div className="calendar-legend">
         <div className="legend-item">
-          <div className="legend-indicator available"></div>
+          <div className="legend-color available"></div>
           <span>Available Slots</span>
         </div>
         <div className="legend-item">
-          <div className="legend-indicator booked"></div>
+          <div className="legend-color booked"></div>
           <span>Booked Slots</span>
         </div>
+        {userRole === 'doctor' && (
+          <div className="legend-item">
+            <div className="legend-color no-slots"></div>
+            <span>No Slots (Click to add)</span>
+          </div>
+        )}
       </div>
     </div>
   );

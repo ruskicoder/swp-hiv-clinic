@@ -307,18 +307,18 @@ public class AppointmentService {
             return MessageResponse.success("Appointment cancelled successfully!");
 
         } catch (Exception e) {
-            logger.error("Error cancelling appointment: {}", e.getMessage(), e);
+            logger.error("Error cancelling appointment {}: {}", appointmentId, e.getMessage(), e);
             return MessageResponse.error("Failed to cancel appointment: " + e.getMessage());
         }
     }
 
     /**
-     * Update appointment status with enhanced functionality for doctors
+     * Update appointment status (for doctors)
      */
     @Transactional
-    public MessageResponse updateAppointmentStatus(Integer appointmentId, Integer doctorUserId, 
-                                                 String status, String notes, Boolean scheduleRecheck, 
-                                                 String recheckDateTime, Integer durationMinutes) {
+    public MessageResponse updateAppointmentStatus(Integer appointmentId, Integer doctorUserId, String status, 
+                                                 String notes, Boolean scheduleRecheck, String recheckDateTime, 
+                                                 Integer durationMinutes) {
         try {
             Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
             if (appointmentOpt.isEmpty()) {
@@ -327,46 +327,38 @@ public class AppointmentService {
 
             Appointment appointment = appointmentOpt.get();
 
-            // Check if user has permission to update (must be the doctor)
+            // Check if doctor has permission
             if (!appointment.getDoctorUser().getUserId().equals(doctorUserId)) {
                 return MessageResponse.error("You don't have permission to update this appointment");
             }
 
-            // Update appointment status and notes
+            // Update appointment details
             appointment.setStatus(status);
-            if (notes != null && !notes.trim().isEmpty()) {
-                appointment.setAppointmentNotes(notes);
-            }
+            appointment.setAppointmentNotes(notes);
             if (durationMinutes != null) {
                 appointment.setDurationMinutes(durationMinutes);
             }
-            appointment.setUpdatedAt(LocalDateTime.now());
 
             appointmentRepository.save(appointment);
 
-            // Schedule re-check if requested
-            if (scheduleRecheck != null && scheduleRecheck && recheckDateTime != null) {
+            // Handle recheck scheduling if requested
+            if (Boolean.TRUE.equals(scheduleRecheck) && recheckDateTime != null) {
                 try {
                     LocalDateTime recheckTime = LocalDateTime.parse(recheckDateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                     
-                    // Create new appointment for re-check
                     Appointment recheckAppointment = new Appointment();
                     recheckAppointment.setPatientUser(appointment.getPatientUser());
                     recheckAppointment.setDoctorUser(appointment.getDoctorUser());
                     recheckAppointment.setAppointmentDateTime(recheckTime);
-                    recheckAppointment.setDurationMinutes(30); // Default duration for re-check
+                    recheckAppointment.setDurationMinutes(30);
                     recheckAppointment.setStatus("Scheduled");
-                    recheckAppointment.setAppointmentNotes("Re-check appointment scheduled by doctor");
+                    recheckAppointment.setAppointmentNotes("Follow-up appointment");
 
                     appointmentRepository.save(recheckAppointment);
-                    
-                    logger.info("Re-check appointment scheduled for patient {} with doctor {} at {}", 
-                               appointment.getPatientUser().getUsername(), 
-                               appointment.getDoctorUser().getUsername(), 
-                               recheckTime);
+                    logger.info("Recheck appointment scheduled for {}", recheckTime);
                 } catch (Exception e) {
-                    logger.error("Error scheduling re-check: {}", e.getMessage());
-                    return MessageResponse.error("Appointment updated but failed to schedule re-check: " + e.getMessage());
+                    logger.error("Error scheduling recheck appointment: {}", e.getMessage());
+                    return MessageResponse.error("Appointment updated but failed to schedule recheck: " + e.getMessage());
                 }
             }
 
@@ -385,25 +377,35 @@ public class AppointmentService {
     @Transactional(readOnly = true)
     public Map<String, Object> getPatientRecordForAppointment(Integer appointmentId, Integer doctorUserId) {
         try {
-            Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
+            logger.debug("Doctor {} accessing patient record for appointment {}", doctorUserId, appointmentId);
+            
+            // Find appointment with patient details
+            Optional<Appointment> appointmentOpt = appointmentRepository.findByIdWithPatient(appointmentId);
             if (appointmentOpt.isEmpty()) {
+                logger.warn("Appointment not found: {}", appointmentId);
                 throw new RuntimeException("Appointment not found");
             }
 
             Appointment appointment = appointmentOpt.get();
-
-            // Check if doctor has permission to access
+            
+            // Verify doctor has permission to access this appointment
             if (!appointment.getDoctorUser().getUserId().equals(doctorUserId)) {
-                throw new RuntimeException("Access denied");
+                logger.warn("Doctor {} attempted to access appointment {} belonging to doctor {}", 
+                    doctorUserId, appointmentId, appointment.getDoctorUser().getUserId());
+                throw new RuntimeException("Access denied: You don't have permission to access this appointment");
             }
 
             // Check if appointment is completed
             if ("Completed".equalsIgnoreCase(appointment.getStatus())) {
+                logger.warn("Attempted to access patient record for completed appointment: {}", appointmentId);
                 throw new RuntimeException("Cannot access patient record after appointment is completed");
             }
 
-            // Get patient record with explicit fetch
+            // Get patient user ID
             Integer patientUserId = appointment.getPatientUser().getUserId();
+            logger.debug("Fetching patient record for patient ID: {}", patientUserId);
+
+            // Try to find existing patient record
             Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(patientUserId);
             
             Map<String, Object> result = new HashMap<>();
@@ -413,14 +415,15 @@ public class AppointmentService {
             result.put("appointmentDateTime", appointment.getAppointmentDateTime());
             result.put("appointmentStatus", appointment.getStatus());
             result.put("appointmentNotes", appointment.getAppointmentNotes());
-            
+            result.put("durationMinutes", appointment.getDurationMinutes());
+
             // Add patient basic info
             User patient = appointment.getPatientUser();
             result.put("patientId", patient.getUserId());
             result.put("patientUsername", patient.getUsername());
             result.put("patientEmail", patient.getEmail());
 
-            // Add patient record if exists
+            // Add patient record if exists, otherwise create a new one
             if (recordOpt.isPresent()) {
                 PatientRecord record = recordOpt.get();
                 result.put("recordId", record.getRecordID());
@@ -432,12 +435,55 @@ public class AppointmentService {
                 result.put("emergencyContact", record.getEmergencyContact());
                 result.put("emergencyPhone", record.getEmergencyPhone());
                 result.put("profileImageBase64", record.getProfileImageBase64());
+                result.put("recordCreatedAt", record.getCreatedAt());
+                result.put("recordUpdatedAt", record.getUpdatedAt());
+                
+                logger.info("Successfully retrieved existing patient record for appointment {}", appointmentId);
+            } else {
+                // Create a new patient record if none exists
+                logger.info("No existing patient record found for patient {}, creating new record", patientUserId);
+                
+                PatientRecord newRecord = new PatientRecord();
+                newRecord.setPatientUserID(patientUserId);
+                newRecord.setAppointmentId(appointmentId);
+                newRecord.setMedicalHistory("");
+                newRecord.setAllergies("");
+                newRecord.setCurrentMedications("");
+                newRecord.setNotes("");
+                newRecord.setBloodType("");
+                newRecord.setEmergencyContact("");
+                newRecord.setEmergencyPhone("");
+                
+                // Save the new record
+                PatientRecord savedRecord = patientRecordRepository.save(newRecord);
+                
+                result.put("recordId", savedRecord.getRecordID());
+                result.put("medicalHistory", savedRecord.getMedicalHistory());
+                result.put("allergies", savedRecord.getAllergies());
+                result.put("currentMedications", savedRecord.getCurrentMedications());
+                result.put("notes", savedRecord.getNotes());
+                result.put("bloodType", savedRecord.getBloodType());
+                result.put("emergencyContact", savedRecord.getEmergencyContact());
+                result.put("emergencyPhone", savedRecord.getEmergencyPhone());
+                result.put("profileImageBase64", savedRecord.getProfileImageBase64());
+                result.put("recordCreatedAt", savedRecord.getCreatedAt());
+                result.put("recordUpdatedAt", savedRecord.getUpdatedAt());
+                
+                logger.info("Successfully created new patient record for appointment {}", appointmentId);
             }
 
+            // Add success flag
+            result.put("success", true);
+            result.put("message", "Patient record retrieved successfully");
+
             return result;
+
         } catch (Exception e) {
-            logger.error("Error getting patient record for appointment: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to get patient record: " + e.getMessage());
+            logger.error("Error retrieving patient record for appointment {}: {}", appointmentId, e.getMessage(), e);
+            Map<String, Object> errorResult = new HashMap<>();
+            errorResult.put("success", false);
+            errorResult.put("message", "Failed to load patient record: " + e.getMessage());
+            return errorResult;
         }
     }
 }

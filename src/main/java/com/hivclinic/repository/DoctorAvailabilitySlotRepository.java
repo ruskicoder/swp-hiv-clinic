@@ -11,45 +11,60 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Repository interface for DoctorAvailabilitySlot entity
+ * Repository for DoctorAvailabilitySlot entity
  */
 @Repository
 public interface DoctorAvailabilitySlotRepository extends JpaRepository<DoctorAvailabilitySlot, Integer> {
-    
+
     /**
-     * Find availability slots by doctor user
+     * Find all slots for a doctor ordered by date and time
      */
-    @Query("SELECT das FROM DoctorAvailabilitySlot das " +
-           "LEFT JOIN FETCH das.doctorUser du " +
-           "LEFT JOIN FETCH du.role " +
-           "WHERE das.doctorUser = :doctorUser " +
-           "ORDER BY das.slotDate ASC, das.startTime ASC")
-    List<DoctorAvailabilitySlot> findByDoctorUser(@Param("doctorUser") User doctorUser);
-    
+    List<DoctorAvailabilitySlot> findByDoctorUserOrderBySlotDateAscStartTimeAsc(User doctorUser);
+
     /**
-     * Find availability slots by doctor user and date
+     * Find available (not booked) slots for a doctor ordered by date and time
      */
-    @Query("SELECT das FROM DoctorAvailabilitySlot das " +
-           "LEFT JOIN FETCH das.doctorUser du " +
-           "LEFT JOIN FETCH du.role " +
-           "WHERE das.doctorUser = :doctorUser " +
-           "AND das.slotDate = :slotDate " +
-           "ORDER BY das.startTime ASC")
-    List<DoctorAvailabilitySlot> findByDoctorUserAndSlotDate(
-            @Param("doctorUser") User doctorUser, 
-            @Param("slotDate") LocalDate slotDate);
-    
+    List<DoctorAvailabilitySlot> findByDoctorUserAndIsBookedFalseOrderBySlotDateAscStartTimeAsc(User doctorUser);
+
     /**
-     * Find available slots for a doctor (not booked) from a specific date onwards
+     * Find slots for a doctor on a specific date ordered by start time
      */
-    @Query("SELECT das FROM DoctorAvailabilitySlot das " +
-           "LEFT JOIN FETCH das.doctorUser du " +
+    List<DoctorAvailabilitySlot> findByDoctorUserAndSlotDateOrderByStartTimeAsc(User doctorUser, LocalDate slotDate);
+
+    /**
+     * Find slots for a doctor on a specific date
+     */
+    List<DoctorAvailabilitySlot> findByDoctorUserAndSlotDate(User doctorUser, LocalDate slotDate);
+
+    /**
+     * Find all available slots from today onwards
+     */
+    List<DoctorAvailabilitySlot> findByIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(LocalDate fromDate);
+
+    /**
+     * Find available slots for a specific doctor from today onwards
+     */
+    List<DoctorAvailabilitySlot> findByDoctorUserAndIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(
+            User doctorUser, LocalDate fromDate);
+
+    /**
+     * Find slots for a doctor between dates
+     */
+    @Query("SELECT s FROM DoctorAvailabilitySlot s WHERE s.doctorUser = :doctorUser " +
+           "AND s.slotDate BETWEEN :startDate AND :endDate " +
+           "ORDER BY s.slotDate ASC, s.startTime ASC")
+    List<DoctorAvailabilitySlot> findByDoctorUserAndSlotDateBetween(
+            @Param("doctorUser") User doctorUser,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    /**
+     * Find available slots for all doctors on a specific date
+     */
+    @Query("SELECT s FROM DoctorAvailabilitySlot s " +
+           "LEFT JOIN FETCH s.doctorUser du " +
            "LEFT JOIN FETCH du.role " +
-           "WHERE das.doctorUser = :doctorUser " +
-           "AND das.slotDate >= :date " +
-           "AND das.isBooked = false " +
-           "ORDER BY das.slotDate ASC, das.startTime ASC")
-    List<DoctorAvailabilitySlot> findByDoctorUserAndSlotDateGreaterThanEqualAndIsBookedFalse(
-            @Param("doctorUser") User doctorUser, 
-            @Param("date") LocalDate date);
+           "WHERE s.slotDate = :slotDate AND s.isBooked = false " +
+           "ORDER BY s.startTime ASC")
+    List<DoctorAvailabilitySlot> findAvailableSlotsByDate(@Param("slotDate") LocalDate slotDate);
 }

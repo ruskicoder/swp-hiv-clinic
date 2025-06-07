@@ -4,176 +4,312 @@ import './TimeSlotModal.css';
 const TimeSlotModal = ({ 
   isOpen, 
   onClose, 
-  onSubmit, 
+  onSave, 
   selectedDate, 
-  initialData = null 
+  initialData = null,
+  existingSlots = []
 }) => {
   const [formData, setFormData] = useState({
-    startTime: '09:00',
-    endTime: '10:00',
-    duration: 30,
+    startTime: '',
+    endTime: '',
     notes: ''
   });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  const durationOptions = [
-    { value: 15, label: '15 minutes' },
-    { value: 30, label: '30 minutes' },
-    { value: 45, label: '45 minutes' },
-    { value: 60, label: '1 hour' },
-    { value: 90, label: '1.5 hours' },
-    { value: 120, label: '2 hours' }
-  ];
-
+  // Initialize form data when modal opens or initialData changes
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        startTime: initialData.startTime || '',
+        endTime: initialData.endTime || '',
+        notes: initialData.notes || ''
+      });
     } else {
       setFormData({
-        startTime: '09:00',
-        endTime: '10:00',
-        duration: 30,
+        startTime: '',
+        endTime: '',
         notes: ''
       });
     }
+    setErrors({});
   }, [initialData, isOpen]);
-
-  const handleChange = (field, value) => {
-    setFormData(prev => {
-      const updated = { ...prev, [field]: value };
-      
-      // Auto-calculate end time when start time or duration changes
-      if (field === 'startTime' || field === 'duration') {
-        const startTime = field === 'startTime' ? value : prev.startTime;
-        const duration = field === 'duration' ? parseInt(value) : prev.duration;
-        
-        if (startTime && duration) {
-          const [hours, minutes] = startTime.split(':').map(Number);
-          const startMinutes = hours * 60 + minutes;
-          const endMinutes = startMinutes + duration;
-          const endHours = Math.floor(endMinutes / 60);
-          const endMins = endMinutes % 60;
-          
-          updated.endTime = `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
-        }
-      }
-      
-      return updated;
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Format date consistently as YYYY-MM-DD in local timezone
-    let formattedDate = '';
-    if (selectedDate instanceof Date) {
-      const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-      formattedDate = `${year}-${month}-${day}`;
-    } else if (typeof selectedDate === 'string') {
-      formattedDate = selectedDate;
-    }
-
-    const slotData = {
-      slotDate: formattedDate,
-      startTime: formData.startTime,
-      endTime: formData.endTime,
-      duration: formData.duration,
-      notes: formData.notes
-    };
-
-    onSubmit(slotData);
-    onClose();
-  };
-
-  const formatSelectedDate = () => {
-    if (!selectedDate) return '';
-    return selectedDate.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   if (!isOpen) return null;
 
+  // Handle form input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  // Validate form data
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.startTime) {
+      newErrors.startTime = 'Start time is required';
+    }
+
+    if (!formData.endTime) {
+      newErrors.endTime = 'End time is required';
+    }
+
+    if (!selectedDate) {
+      newErrors.date = 'Date is required';
+    }
+
+    if (formData.startTime && formData.endTime) {
+      const start = new Date(`2000-01-01T${formData.startTime}`);
+      const end = new Date(`2000-01-01T${formData.endTime}`);
+      
+      if (start >= end) {
+        newErrors.endTime = 'End time must be after start time';
+      }
+
+      // Check for overlapping slots
+      const hasOverlap = existingSlots.some(slot => {
+        if (initialData && slot.availabilitySlotId === initialData.availabilitySlotId) {
+          return false;
+        }
+
+        const slotStart = new Date(`2000-01-01T${slot.startTime}`);
+        const slotEnd = new Date(`2000-01-01T${slot.endTime}`);
+        
+        return (start < slotEnd && slotStart < end);
+      });
+
+      if (hasOverlap) {
+        newErrors.startTime = 'This time slot overlaps with an existing slot';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Check if two time ranges overlap
+  const isTimeOverlapping = (start1, end1, start2, end2) => {
+    return start1 < end2 && start2 < end1;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const slotData = {
+        ...formData,
+        slotDate: selectedDate ? selectedDate.toISOString().split('T')[0] : null // Ensure proper date format
+      };
+
+      if (initialData?.availabilitySlotId) {
+        slotData.availabilitySlotId = initialData.availabilitySlotId;
+      }
+
+      await onSave(slotData);
+      onClose();
+    } catch (error) {
+      console.error('Error saving slot:', error);
+      setErrors(prev => ({
+        ...prev,
+        submit: error?.response?.data?.message || error.message || 'Failed to save slot. Please try again.'
+      }));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Generate time options (30-minute intervals)
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        const displayTime = formatTimeForDisplay(timeString);
+        options.push({ value: timeString, label: displayTime });
+      }
+    }
+    return options;
+  };
+
+  // Format time for display (12-hour format)
+  const formatTimeForDisplay = (timeString) => {
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  const timeOptions = generateTimeOptions();
+
+  // Helper function to calculate duration
+  const calculateDuration = (startTime, endTime) => {
+    const [startHours, startMinutes] = startTime.split(':').map(Number);
+    const [endHours, endMinutes] = endTime.split(':').map(Number);
+    
+    const startTotalMinutes = startHours * 60 + startMinutes;
+    const endTotalMinutes = endHours * 60 + endMinutes;
+    const durationMinutes = endTotalMinutes - startTotalMinutes;
+    
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes % 60;
+    
+    if (hours === 0) {
+      return `${minutes} minutes`;
+    } else if (minutes === 0) {
+      return `${hours} hour${hours > 1 ? 's' : ''}`;
+    } else {
+      return `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minutes`;
+    }
+  };
+
   return (
     <div className="time-modal-overlay" onClick={onClose}>
-      <div className="time-modal" onClick={e => e.stopPropagation()}>
+      <div className="time-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Modal Header */}
         <div className="modal-header">
-          <h4>Add Time Slot</h4>
+          <h4>
+            {initialData ? 'Edit Time Slot' : 'Add New Time Slot'}
+            <br />
+            <small>{selectedDate?.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            })}</small>
+          </h4>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
-        
-        <form onSubmit={handleSubmit} className="modal-content">
-          <div className="form-group">
-            <label>Selected Date:</label>
-            <input 
-              type="text" 
-              value={formatSelectedDate()} 
-              readOnly 
-              className="readonly-input"
-            />
-          </div>
-          
-          <div className="form-row">
+
+        {/* Modal Content */}
+        <div className="modal-content">
+          <form onSubmit={handleSubmit}>
+            {/* Error Message */}
+            {errors.submit && (
+              <div className="error-message">
+                {errors.submit}
+              </div>
+            )}
+
+            {/* Date Display */}
             <div className="form-group">
-              <label>Start Time:</label>
+              <label>Date</label>
               <input
-                type="time"
-                value={formData.startTime}
-                onChange={(e) => handleChange('startTime', e.target.value)}
-                required
+                type="text"
+                value={selectedDate?.toLocaleDateString() || ''}
+                readOnly
+                className="readonly-input"
               />
             </div>
-            
-            <div className="form-group">
-              <label>Duration:</label>
-              <select
-                value={formData.duration}
-                onChange={(e) => handleChange('duration', e.target.value)}
-                required
-              >
-                {durationOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+
+            {/* Time Selection */}
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="startTime">Start Time *</label>
+                <select
+                  id="startTime"
+                  name="startTime"
+                  value={formData.startTime}
+                  onChange={handleChange}
+                  className={errors.startTime ? 'error' : ''}
+                  required
+                >
+                  <option value="">Select start time</option>
+                  {timeOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.startTime && (
+                  <span className="field-error">{errors.startTime}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="endTime">End Time *</label>
+                <select
+                  id="endTime"
+                  name="endTime"
+                  value={formData.endTime}
+                  onChange={handleChange}
+                  className={errors.endTime ? 'error' : ''}
+                  required
+                >
+                  <option value="">Select end time</option>
+                  {timeOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.endTime && (
+                  <span className="field-error">{errors.endTime}</span>
+                )}
+              </div>
             </div>
-          </div>
-          
-          <div className="form-group">
-            <label>End Time:</label>
-            <input
-              type="time"
-              value={formData.endTime}
-              readOnly
-              className="readonly-input"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Notes (Optional):</label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => handleChange('notes', e.target.value)}
-              rows="3"
-              placeholder="Add any notes for this time slot..."
-            />
-          </div>
-          
-          <div className="modal-actions">
-            <button type="submit" className="btn-primary">
-              Add Time Slot
-            </button>
-            <button type="button" className="btn-secondary" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
-        </form>
+
+            {/* Notes */}
+            <div className="form-group">
+              <label htmlFor="notes">Notes (Optional)</label>
+              <textarea
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                placeholder="Add any notes about this time slot..."
+                rows="3"
+              />
+            </div>
+
+            {/* Duration Display */}
+            {formData.startTime && formData.endTime && formData.startTime < formData.endTime && (
+              <div className="duration-display">
+                <small>
+                  Duration: {calculateDuration(formData.startTime, formData.endTime)}
+                </small>
+              </div>
+            )}
+          </form>
+        </div>
+
+        {/* Modal Actions */}
+        <div className="modal-actions">
+          <button 
+            type="button"
+            className="btn-secondary"
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            className="btn-primary"
+            onClick={handleSubmit}
+            disabled={loading || !formData.startTime || !formData.endTime}
+          >
+            {loading ? 'Saving...' : (initialData ? 'Update Slot' : 'Add Slot')}
+          </button>
+        </div>
       </div>
     </div>
   );

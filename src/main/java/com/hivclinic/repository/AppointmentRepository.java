@@ -13,6 +13,7 @@ import java.util.Optional;
 
 /**
  * Repository interface for Appointment entity
+ * Provides data access operations for appointments with optimized queries
  */
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
