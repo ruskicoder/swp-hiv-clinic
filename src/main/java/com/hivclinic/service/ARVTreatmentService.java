@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +35,33 @@ public class ARVTreatmentService {
     private UserRepository userRepository;
 
     /**
+     * Check if patient exists
+     */
+    @Transactional(readOnly = true)
+    public boolean checkPatientExists(Integer patientUserId) {
+        if (patientUserId == null) return false;
+        Optional<User> user = userRepository.findById(patientUserId);
+        return user.isPresent() && user.get().getRole() != null 
+               && "Patient".equalsIgnoreCase(user.get().getRole().getRoleName());
+    }
+
+    /**
      * Get all ARV treatments for a patient
      */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getPatientTreatments(Integer patientUserId) {
         logger.debug("Fetching ARV treatments for patient ID: {}", patientUserId);
         
+        // Return empty list if patient doesn't exist
+        if (!checkPatientExists(patientUserId)) {
+            return List.of();
+        }
+        
         List<ARVTreatment> treatments = arvTreatmentRepository.findByPatientUserIDOrderByCreatedAtDesc(patientUserId);
+        
+        if (treatments.isEmpty()) {
+            return List.of(); // Return empty list if no treatments found
+        }
         
         return treatments.stream()
                 .map(this::mapTreatmentToResponse)
@@ -394,6 +415,27 @@ public class ARVTreatmentService {
         } catch (Exception e) {
             logger.error("Error deleting ARV treatment: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to delete ARV treatment: " + e.getMessage());
+        }
+    }
+
+    public List<ARVTreatment> getPatientTreatmentsRaw(Integer patientUserID) {
+        try {
+            logger.debug("Fetching ARV treatments for patient ID: {}", patientUserID);
+            List<ARVTreatment> treatments = arvTreatmentRepository.findByPatientUserIDOrderByCreatedAtDesc(patientUserID);
+            logger.debug("Found {} treatments for patient ID: {}", treatments.size(), patientUserID);
+            return treatments;
+        } catch (Exception e) {
+            logger.error("Error fetching ARV treatments for patient ID {}: {}", patientUserID, e.getMessage());
+            return Collections.emptyList();
+        }
+    }
+
+    public List<ARVTreatment> getActiveTreatments(Integer patientUserID) {
+        try {
+            return arvTreatmentRepository.findActiveByPatientUserID(patientUserID);
+        } catch (Exception e) {
+            logger.error("Error fetching active ARV treatments for patient ID {}: {}", patientUserID, e.getMessage());
+            return Collections.emptyList();
         }
     }
 }

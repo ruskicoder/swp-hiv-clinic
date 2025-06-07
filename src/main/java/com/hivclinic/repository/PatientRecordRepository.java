@@ -15,22 +15,42 @@ import java.util.Optional;
 public interface PatientRecordRepository extends JpaRepository<PatientRecord, Integer> {
     
     /**
-     * Find patient record by patient user ID
+     * Find patient record by patient user ID with complete user details
      */
-    @Query("SELECT pr FROM PatientRecord pr WHERE pr.patientUserID = :patientUserID")
+    @Query("SELECT pr FROM PatientRecord pr " +
+           "WHERE pr.patientUserID = :patientUserID")
     Optional<PatientRecord> findByPatientUserID(@Param("patientUserID") Integer patientUserID);
-    
+
     /**
      * Check if patient record exists for user
      */
-    @Query("SELECT COUNT(pr) > 0 FROM PatientRecord pr WHERE pr.patientUserID = :patientUserID")
+    @Query("SELECT CASE WHEN COUNT(pr) > 0 THEN true ELSE false END " +
+           "FROM PatientRecord pr WHERE pr.patientUserID = :patientUserID")
     boolean existsByPatientUserID(@Param("patientUserID") Integer patientUserID);
     
     /**
-     * Find patient record by appointment ID
+     * Find patient record by appointment ID with better error handling
+     * and comprehensive patient data
      */
     @Query("SELECT pr FROM PatientRecord pr " +
-           "JOIN Appointment a ON a.patientUser.id = pr.patientUserID " +
-           "WHERE a.appointmentId = :appointmentId")
+           "WHERE pr.appointmentId = :appointmentId")
     Optional<PatientRecord> findByAppointmentId(@Param("appointmentId") Integer appointmentId);
+
+    /**
+     * Find complete patient record by patient user ID with all related data
+     */
+    @Query(value = "SELECT pr FROM PatientRecord pr " +
+           "WHERE pr.patientUserID = :patientUserID")
+    Optional<PatientRecord> findCompleteRecordByPatientUserID(@Param("patientUserID") Integer patientUserID);
+
+
+    /**
+     * Find validated record by patient and appointment IDs
+     */
+    @Query("SELECT pr FROM PatientRecord pr " +
+           "WHERE pr.patientUserID = :patientUserID " +
+           "AND pr.appointmentId = :appointmentId")
+    Optional<PatientRecord> findValidatedRecord(
+            @Param("patientUserID") Integer patientUserID,
+            @Param("appointmentId") Integer appointmentId);
 }

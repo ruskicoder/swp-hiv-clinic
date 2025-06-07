@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,6 +58,11 @@ public class ARVTreatmentController {
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
         try {
             logger.debug("Doctor {} fetching ARV treatments for patient ID: {}", userPrincipal.getUsername(), patientId);
+            
+            // Check if patient exists first
+            if (!arvTreatmentService.checkPatientExists(patientId)) {
+                return ResponseEntity.ok(List.of()); // Return empty list instead of error
+            }
             
             var treatments = arvTreatmentService.getPatientTreatments(patientId);
             return ResponseEntity.ok(treatments);

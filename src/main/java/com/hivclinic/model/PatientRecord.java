@@ -18,6 +18,9 @@ public class PatientRecord {
     @Column(name = "PatientUserID", nullable = false)
     private Integer patientUserID;
 
+    @Column(name = "AppointmentId")
+    private Integer appointmentId;
+
     @Column(name = "MedicalHistory", columnDefinition = "NVARCHAR(MAX)")
     private String medicalHistory;
 
@@ -72,6 +75,14 @@ public class PatientRecord {
 
     public void setPatientUserID(Integer patientUserID) {
         this.patientUserID = patientUserID;
+    }
+
+    public Integer getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Integer appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
     public String getMedicalHistory() {

@@ -218,6 +218,23 @@
   margin-top: 0.25rem;
 }
 
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.loading-message p {
+  margin: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 900px) {
   .record-content {

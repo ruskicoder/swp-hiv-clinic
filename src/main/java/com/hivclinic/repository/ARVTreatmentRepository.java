@@ -17,13 +17,13 @@ public interface ARVTreatmentRepository extends JpaRepository<ARVTreatment, Inte
     /**
      * Find ARV treatments by patient user ID, ordered by creation date descending
      */
-    @Query("SELECT a FROM ARVTreatment a WHERE a.patientUserID = :patientUserID ORDER BY a.createdAt DESC")
+    @Query(value = "SELECT a FROM ARVTreatment a WHERE a.patientUserID = :patientUserID ORDER BY a.startDate DESC, a.createdAt DESC", nativeQuery = false)
     List<ARVTreatment> findByPatientUserIDOrderByCreatedAtDesc(@Param("patientUserID") Integer patientUserID);
     
     /**
      * Find active ARV treatments by patient user ID
      */
-    @Query("SELECT a FROM ARVTreatment a WHERE a.patientUserID = :patientUserID AND a.isActive = true ORDER BY a.createdAt DESC")
+    @Query(value = "SELECT a FROM ARVTreatment a WHERE a.patientUserID = :patientUserID AND a.isActive = true ORDER BY a.startDate DESC, a.createdAt DESC", nativeQuery = false)
     List<ARVTreatment> findActiveByPatientUserID(@Param("patientUserID") Integer patientUserID);
     
     /**

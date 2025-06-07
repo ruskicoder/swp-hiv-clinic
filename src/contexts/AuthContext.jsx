@@ -51,13 +51,10 @@ export const AuthProvider = ({ children }) => {
       
       if (response.token) {
         localStorage.setItem('token', response.token);
-        setUser({
-          id: response.userId,
-          username: response.username,
-          email: response.email,
-          role: response.role
-        });
-        return response;
+        // Fetch complete user profile after successful login
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+        return userData;
       } else {
         throw new Error('No token received from server');
       }
@@ -112,6 +109,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (userData) => {
+    setUser(prevUser => ({
+      ...prevUser,
+      ...userData
+    }));
+  };
+
   const value = {
     user,
     loading,
@@ -121,6 +125,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     clearError,
     refreshUser,
+    updateUser,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'Admin',
     isDoctor: user?.role === 'Doctor',

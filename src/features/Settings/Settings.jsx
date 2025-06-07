@@ -84,7 +84,6 @@ const Settings = () => {
     setError('');
     setMessage('');
 
-    // Only send updatable fields that are not empty strings
     const updatableFields = [
       'firstName',
       'lastName',
@@ -102,26 +101,15 @@ const Settings = () => {
     });
 
     try {
-      const response = await apiClient.put('/auth/profile', payload);
-      if (response.data.success) {
-        setMessage('Profile updated successfully!');
-        setIsEditing(false);
-        // Fetch updated user profile and update context
-        try {
-          const meRes = await apiClient.get('/auth/me');
-          if (updateUser && meRes.data) {
-            updateUser(meRes.data);
-          }
-        } catch (fetchError) {
-          // fallback: update context with local profileData if fetch fails
-          if (updateUser) {
-            updateUser({ ...user, ...profileData });
-          }
-        }
+      const updatedUser = await authService.updateProfile(payload);
+      if (updateUser) {
+        updateUser(updatedUser); // Update context with full user data
       }
+      setMessage('Profile updated successfully!');
+      setIsEditing(false);
     } catch (error) {
       console.error('Profile update error:', error);
-      setError(error.response?.data?.message || 'Failed to update profile');
+      setError(error.message || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -196,39 +184,16 @@ const Settings = () => {
     reader.onload = async (event) => {
       const base64String = event.target.result;
       setLoading(true);
-      setError('');
-      setMessage('');
       try {
         if (base64String && base64String.startsWith('data:image/')) {
-          const uploadRes = await apiClient.post('/auth/upload-image', { image: base64String });
-          if (uploadRes.data && uploadRes.data.success) {
-            setMessage('Profile image updated successfully!');
-          } else {
-            setError(uploadRes.data?.message || 'Failed to upload image');
+          const updatedUser = await authService.updateProfileImage(base64String);
+          if (updateUser) {
+            updateUser(updatedUser); // Update context with full user data
           }
-          // Always fetch latest profile after upload
-          try {
-            const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } });
-            if (updateUser && meRes.data) {
-              updateUser(meRes.data);
-              setProfileData(prev => ({
-                ...prev,
-                profileImageBase64: meRes.data.profileImageBase64 || ''
-              }));
-            }
-          } catch (fetchError) {
-            // fallback: update context and local state with uploaded image
-            if (updateUser) {
-              updateUser({ ...user, profileImageBase64: base64String });
-            }
-            setProfileData(prev => ({
-              ...prev,
-              profileImageBase64: base64String
-            }));
-          }
+          setMessage('Profile image updated successfully!');
         }
       } catch (err) {
-        setError(err?.response?.data?.message || 'Failed to upload image');
+        setError(err.message || 'Failed to upload image');
       } finally {
         setLoading(false);
       }

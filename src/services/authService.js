@@ -29,6 +29,13 @@ const authService = {
   getCurrentUser: async () => {
     try {
       const response = await apiClient.get('/auth/me');
+      if (!response.data) {
+        throw new Error('No profile data received');
+      }
+      // Ensure we have a complete profile
+      if (!response.data.username || !response.data.role) {
+        throw new Error('Incomplete profile data');
+      }
       return response.data;
     } catch (error) {
       console.error('Get user error:', error);
@@ -57,6 +64,34 @@ const authService = {
     } catch (error) {
       console.error('Check email error:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Failed to check email';
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Update user profile
+  updateProfile: async (userData) => {
+    try {
+      const response = await apiClient.put('/auth/profile', userData);
+      // Get latest profile data after update
+      const updatedUserResponse = await apiClient.get('/auth/me');
+      return updatedUserResponse.data;
+    } catch (error) {
+      console.error('Profile update error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Profile update failed';
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Update profile image
+  updateProfileImage: async (base64Image) => {
+    try {
+      const response = await apiClient.post('/auth/upload-image', { image: base64Image });
+      // Get latest profile data after update
+      const updatedUserResponse = await apiClient.get('/auth/me');
+      return updatedUserResponse.data;
+    } catch (error) {
+      console.error('Profile image update error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Profile image update failed';
       throw new Error(errorMessage);
     }
   }

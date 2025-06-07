@@ -136,34 +136,43 @@ const DoctorDashboard = () => {
   };
 
   const loadPatientRecord = async (appointment) => {
+    setSelectedAppointment(appointment);
+    setActiveTab('patient-record');
+    setError('');
+    
     try {
-      setSelectedAppointment(appointment);
-      setActiveTab('patient-record');
+      // First try loading via appointment endpoint
+      const recordResponse = await apiClient.get(`/appointments/${appointment.appointmentId}/patient-record`);
       
-      // First try to load using appointment ID
-      try {
-        const recordResponse = await apiClient.get(`/patient-records/appointment/${appointment.appointmentId}`);
-        setPatientRecord(recordResponse.data);
-      } catch (e) {
-        // Fallback to loading by patient ID if appointment method fails
-        const recordResponse = await apiClient.get(`/patient-records/patient/${appointment.patientUser.userId}`);
-        setPatientRecord(recordResponse.data);
+      if (!recordResponse.data || !recordResponse.data.success) {
+        throw new Error(recordResponse.data?.message || 'Failed to load patient record');
       }
-    } catch (error) {
-      console.error('Error loading patient record:', error);
-      setError('Failed to load patient record');
-      setPatientRecord(null);
-    }
-    // Always load ARV treatments for the patient, regardless of patient record load success
-    if (appointment?.patientUser?.userId) {
-      try {
+      
+      // Transform the response to match expected format
+      const transformedRecord = {
+        success: true,
+        patientUserID: recordResponse.data.patientId,
+        patientUsername: recordResponse.data.patientUsername,
+        patientName: recordResponse.data.patientName,
+        ...recordResponse.data
+      };
+      
+      setPatientRecord(transformedRecord);
+      
+      // Load ARV treatments in parallel
+      if (appointment?.patientUser?.userId) {
         const arvResponse = await apiClient.get(`/arv-treatments/patient/${appointment.patientUser.userId}`);
         setArvTreatments(arvResponse.data || []);
-      } catch (error) {
-        setArvTreatments([]);
       }
+      
+    } catch (error) {
+      console.error('Error loading patient record:', error);
+      setError(error.response?.data?.message || error.message || 'Failed to load patient record');
+      setPatientRecord(null);
+      setArvTreatments([]);
     }
-    // Initialize appointment update form
+    
+    // Initialize appointment update form regardless of record load success
     setAppointmentUpdateData({
       status: appointment.status || 'Scheduled',
       notes: appointment.appointmentNotes || '',
@@ -184,16 +193,23 @@ const DoctorDashboard = () => {
       };
 
       await apiClient.put(`/appointments/${selectedAppointment.appointmentId}/status`, updateData);
-      
-      // Reload appointments and go back to appointments view
+
+      // Defensive: reload appointments and reset state, even if backend returns empty or error
       await loadDashboardData();
       setActiveTab('appointments');
       setSelectedAppointment(null);
       setPatientRecord(null);
-      
+
     } catch (error) {
-      console.error('Error updating appointment:', error);
-      setError('Failed to update appointment status');
+      // Defensive: always catch and show error, never let it crash the UI
+      let msg = 'Failed to update appointment status';
+      if (error?.response?.data?.message) msg = error.response.data.message;
+      else if (error?.message) msg = error.message;
+      setError(msg);
+      // Optionally, reset state to avoid stuck UI
+      setActiveTab('appointments');
+      setSelectedAppointment(null);
+      setPatientRecord(null);
     }
   };
 
@@ -670,78 +686,80 @@ const DoctorDashboard = () => {
   }
 
   return (
-    <div className="doctor-dashboard">
-      <DashboardHeader 
-        user={user} 
-        onLogout={handleLogout}
-        title="Doctor Dashboard"
-      />
-      
-      <div className="dashboard-layout">
-        <div className="dashboard-sidebar">
-          <div className="sidebar-header">
-            <h1>Doctor Panel</h1>
-          </div>
-          
-          <nav className="dashboard-nav">
-            {navigationItems.map(item => (
-              <div key={item.id} className="nav-item">
-                <button
-                  className={`nav-button ${activeTab === item.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(item.id)}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  {item.label}
-                </button>
-              </div>
-            ))}
-          </nav>
-        </div>
-
-        <div className="dashboard-content">
-          {error && (
-            <div className="error-message">
-              {error}
-              <button onClick={() => setError('')} className="close-error">×</button>
+    <ErrorBoundary>
+      <div className="doctor-dashboard">
+        <DashboardHeader 
+          user={user} 
+          onLogout={handleLogout}
+          title="Doctor Dashboard"
+        />
+        
+        <div className="dashboard-layout">
+          <div className="dashboard-sidebar">
+            <div className="sidebar-header">
+              <h1>Doctor Panel</h1>
             </div>
-          )}
-          {renderContent()}
+            
+            <nav className="dashboard-nav">
+              {navigationItems.map(item => (
+                <div key={item.id} className="nav-item">
+                  <button
+                    className={`nav-button ${activeTab === item.id ? 'active' : ''}`}
+                    onClick={() => setActiveTab(item.id)}
+                  >
+                    <span className="nav-icon">{item.icon}</span>
+                    {item.label}
+                  </button>
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          <div className="dashboard-content">
+            {error && (
+              <div className="error-message">
+                {error}
+                <button onClick={() => setError('')} className="close-error">×</button>
+              </div>
+            )}
+            {renderContent()}
+          </div>
         </div>
+
+        <TimeSlotModal
+          isOpen={showTimeModal}
+          onClose={() => {
+            setShowTimeModal(false);
+            setSelectedDate(null);
+          }}
+          onSubmit={handleTimeSlotSubmit}
+          selectedDate={selectedDate}
+        />
+
+        <SlotManagementModal
+          isOpen={showSlotModal}
+          onClose={() => {
+            setShowSlotModal(false);
+            setSelectedDate(null);
+            setSelectedDateSlots([]);
+          }}
+          selectedDate={selectedDate}
+          existingSlots={selectedDateSlots}
+          onAddSlot={handleTimeSlotSubmit}
+          onDeleteSlot={handleDeleteSlot}
+        />
+
+        <ARVTreatmentModal
+          isOpen={showARVModal}
+          onClose={() => {
+            setShowARVModal(false);
+            setEditingARV(null);
+          }}
+          onSubmit={handleARVSubmit}
+          initialData={editingARV}
+        />
       </div>
-
-      <TimeSlotModal
-        isOpen={showTimeModal}
-        onClose={() => {
-          setShowTimeModal(false);
-          setSelectedDate(null);
-        }}
-        onSubmit={handleTimeSlotSubmit}
-        selectedDate={selectedDate}
-      />
-
-      <SlotManagementModal
-        isOpen={showSlotModal}
-        onClose={() => {
-          setShowSlotModal(false);
-          setSelectedDate(null);
-          setSelectedDateSlots([]);
-        }}
-        selectedDate={selectedDate}
-        existingSlots={selectedDateSlots}
-        onAddSlot={handleTimeSlotSubmit}
-        onDeleteSlot={handleDeleteSlot}
-      />
-
-      <ARVTreatmentModal
-        isOpen={showARVModal}
-        onClose={() => {
-          setShowARVModal(false);
-          setEditingARV(null);
-        }}
-        onSubmit={handleARVSubmit}
-        initialData={editingARV}
-      />
-    </div>
+    </ErrorBoundary>
   );
 };
 

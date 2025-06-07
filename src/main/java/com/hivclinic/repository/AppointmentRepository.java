@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for Appointment entity
@@ -74,4 +75,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
             @Param("doctorUser") User doctorUser, 
             @Param("startDateTime") LocalDateTime startDateTime, 
             @Param("endDateTime") LocalDateTime endDateTime);
+    
+    /**
+     * Find appointment by ID with patient data loaded
+     */
+    @Query("SELECT a FROM Appointment a " +
+           "LEFT JOIN FETCH a.patientUser pu " +
+           "LEFT JOIN FETCH pu.role " +
+           "WHERE a.appointmentId = :appointmentId")
+    Optional<Appointment> findByIdWithPatient(@Param("appointmentId") Integer appointmentId);
 }

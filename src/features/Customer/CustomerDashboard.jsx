@@ -162,23 +162,10 @@ const CustomerDashboard = () => {
   const handleUploadImage = async (base64Image) => {
     setError('');
     try {
-      await apiClient.post('/auth/upload-image', { image: base64Image });
-      // Always fetch latest profile after upload
-      try {
-        const meRes = await apiClient.get('/auth/me', { params: { t: Date.now() } });
-        if (meRes.data) {
-          setPatientRecord(prev => ({
-            ...prev,
-            profileImageBase64: meRes.data.profileImageBase64 || ''
-          }));
-        }
-      } catch (fetchError) {
-        // fallback: update local state with uploaded image
-        setPatientRecord(prev => ({
-          ...prev,
-          profileImageBase64: base64Image
-        }));
-      }
+      // Save image to patient record, not profile
+      await apiClient.post('/patient-records/upload-image', { image: base64Image });
+      // Always fetch latest patient record after upload
+      await loadPatientRecord();
     } catch (e) {
       setError('Failed to upload image');
       alert('Failed to upload image');

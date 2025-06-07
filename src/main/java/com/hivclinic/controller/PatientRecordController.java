@@ -2,6 +2,7 @@ package com.hivclinic.controller;
 
 import com.hivclinic.config.CustomUserDetailsService;
 import com.hivclinic.dto.response.MessageResponse;
+import com.hivclinic.model.PatientRecord;
 import com.hivclinic.service.PatientRecordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * REST Controller for patient record operations
@@ -32,18 +34,35 @@ public class PatientRecordController {
      * Get patient's own medical record
      */
     @GetMapping("/my-record")
-    @PreAuthorize("hasAuthority('ROLE_PATIENT')")  // Changed from hasRole('Patient')
+    @PreAuthorize("hasAuthority('ROLE_PATIENT')")
     public ResponseEntity<?> getMyRecord(@AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            logger.error("User principal is null - unauthorized access attempt");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(MessageResponse.error("Authentication required"));
+        }
+
         try {
-            logger.debug("Fetching medical record for patient: {}", userPrincipal.getUsername());
+            if (userPrincipal.getId() == null) {
+                logger.error("User ID is null for username: {}", userPrincipal.getUsername());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(MessageResponse.error("Invalid user ID"));
+            }
+
+            logger.info("Fetching medical record for patient ID: {}", userPrincipal.getId());
+            Map<String, Object> record = patientRecordService.getPatientRecordAsMap(userPrincipal.getId());
             
-            var record = patientRecordService.getPatientRecord(userPrincipal.getId());
+            if (!Boolean.TRUE.equals(record.get("success"))) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MessageResponse.error(record.get("message").toString()));
+            }
+
             return ResponseEntity.ok(record);
-            
+
         } catch (Exception e) {
-            logger.error("Error fetching patient record for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            logger.error("Error fetching patient record: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to fetch patient record: " + e.getMessage()));
+                .body(MessageResponse.error("Failed to fetch patient record: " + e.getMessage()));
         }
     }
 
@@ -65,7 +84,7 @@ public class PatientRecordController {
             }
 
             logger.info("Updating medical record for patient: {}", userPrincipal.getUsername());
-            MessageResponse response = patientRecordService.updatePatientRecord(userPrincipal.getId(), recordData);
+            MessageResponse response = patientRecordService.updatePatientRecordWithResponse(userPrincipal.getId(), recordData);
 
             if (response.isSuccess()) {
                 return ResponseEntity.ok(response);
@@ -92,8 +111,13 @@ public class PatientRecordController {
         try {
             logger.debug("Doctor {} fetching medical record for patient ID: {}", userPrincipal.getUsername(), patientId);
             
-            var record = patientRecordService.getPatientRecord(patientId);
-            return ResponseEntity.ok(record);
+            Optional<PatientRecord> recordOpt = patientRecordService.getPatientRecord(patientId);
+            if (recordOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MessageResponse.error("Patient record not found"));
+            }
+            
+            return ResponseEntity.ok(recordOpt.get());
             
         } catch (Exception e) {
             logger.error("Error fetching patient record for patient ID {}: {}", patientId, e.getMessage(), e);
@@ -114,7 +138,7 @@ public class PatientRecordController {
         try {
             logger.info("Doctor {} updating medical record for patient ID: {}", userPrincipal.getUsername(), patientId);
 
-            MessageResponse response = patientRecordService.updatePatientRecord(patientId, recordData);
+            MessageResponse response = patientRecordService.updatePatientRecordWithResponse(patientId, recordData);
 
             if (response.isSuccess()) {
                 return ResponseEntity.ok(response);
@@ -169,11 +193,21 @@ public class PatientRecordController {
             @PathVariable Integer appointmentId,
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
         try {
-            logger.debug("Doctor {} fetching patient record for appointment ID: {}", userPrincipal.getUsername(), appointmentId);
+            logger.debug("Doctor {} fetching patient record for appointment ID: {}", 
+                userPrincipal.getUsername(), appointmentId);
 
-            var record = patientRecordService.getPatientRecordForAppointment(appointmentId, userPrincipal.getId());
+            Map<String, Object> record = patientRecordService.getPatientRecordForAppointment(
+                appointmentId, userPrincipal.getId());
+
+            if (!Boolean.TRUE.equals(record.get("success"))) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(MessageResponse.error(record.get("message").toString()));
+            }
+
             return ResponseEntity.ok(record);
-
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(MessageResponse.error("Access denied: " + e.getMessage()));
         } catch (Exception e) {
             logger.error("Error fetching patient record for appointment ID {}: {}", appointmentId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
