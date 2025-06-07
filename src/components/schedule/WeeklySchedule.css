@@ -26,8 +26,8 @@
 }
 
 .nav-btn, .today-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(5, 150, 105, 0.2);
+  border: 1px solid rgba(5, 150, 105, 0.3);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -37,7 +37,7 @@
 }
 
 .nav-btn:hover, .today-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(5, 150, 105, 0.3);
   transform: translateY(-1px);
 }
 
@@ -66,7 +66,7 @@
 }
 
 .view-btn {
-  background: transparent;
+  background: #059669;
   border: none;
   color: white;
   padding: 0.5rem 1rem;
@@ -77,12 +77,12 @@
 }
 
 .view-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(5, 150, 105, 0.9);
 }
 
 .view-btn.active {
   background: white;
-  color: #2d5a27;
+  color: rgba(5, 150, 105, 0.9);
   font-weight: 600;
 }
 
