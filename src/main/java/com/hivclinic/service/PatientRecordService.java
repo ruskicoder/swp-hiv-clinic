@@ -34,9 +34,6 @@ public class PatientRecordService {
     private UserRepository userRepository;
 
     @Autowired
-    private ARVTreatmentService arvTreatmentService;
-
-    @Autowired
     private AppointmentRepository appointmentRepository;
 
     /**
@@ -70,57 +67,51 @@ public class PatientRecordService {
      */
     public Map<String, Object> getPatientRecordAsMap(Integer patientUserId) {
         try {
-            logger.debug("Fetching patient record for user ID: {}", patientUserId);
+            logger.debug("Fetching patient record for patient ID: {}", patientUserId);
             
-            // Check if user exists
-            Optional<User> userOpt = userRepository.findById(patientUserId);
-            if (userOpt.isEmpty()) {
-                return Map.of(
-                    "success", false,
-                    "message", "Patient not found"
-                );
-            }
-
-            // Get or create patient record
             Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(patientUserId);
-            PatientRecord record;
             
             if (recordOpt.isPresent()) {
-                record = recordOpt.get();
-                logger.debug("Found existing patient record for user ID: {}", patientUserId);
+                PatientRecord record = recordOpt.get();
+                Map<String, Object> response = mapRecordToResponse(record);
+                response.put("success", true);
+                response.put("message", "Patient record retrieved successfully");
+                return response;
             } else {
-                // Create new record if none exists
-                logger.info("Creating new patient record for user ID: {}", patientUserId);
-                record = new PatientRecord();
-                record.setPatientUserID(patientUserId);
-                record.setMedicalHistory("");
-                record.setAllergies("");
-                record.setCurrentMedications("");
-                record.setNotes("");
-                record.setBloodType("");
-                record.setEmergencyContact("");
-                record.setEmergencyPhone("");
-                record = patientRecordRepository.save(record);
+                // Create new patient record if none exists
+                logger.info("Creating new patient record for patient ID: {}", patientUserId);
+                PatientRecord newRecord = new PatientRecord();
+                newRecord.setPatientUserID(patientUserId);
+                newRecord.setMedicalHistory("");
+                newRecord.setAllergies("");
+                newRecord.setCurrentMedications("");
+                newRecord.setNotes("");
+                newRecord.setBloodType("");
+                newRecord.setEmergencyContact("");
+                newRecord.setEmergencyPhone("");
+                
+                PatientRecord savedRecord = patientRecordRepository.save(newRecord);
+                Map<String, Object> response = mapRecordToResponse(savedRecord);
+                response.put("success", true);
+                response.put("message", "New patient record created successfully");
+                return response;
             }
-
-            return mapRecordToResponse(record);
-
         } catch (Exception e) {
-            logger.error("Error fetching patient record as map: {}", e.getMessage(), e);
-            return Map.of(
-                "success", false,
-                "message", "Failed to fetch patient record: " + e.getMessage()
-            );
+            logger.error("Error getting patient record: {}", e.getMessage(), e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Failed to retrieve patient record: " + e.getMessage());
+            return errorResponse;
         }
     }
 
     /**
-     * Get patient record for a specific appointment
+     * Get patient record for appointment with doctor access control
      */
     public Map<String, Object> getPatientRecordForAppointment(Integer appointmentId, Integer doctorUserId) {
         try {
-            logger.debug("Fetching patient record for appointment {} by doctor {}", appointmentId, doctorUserId);
-            
+            logger.debug("Doctor {} fetching patient record for appointment {}", doctorUserId, appointmentId);
+
             // First verify the appointment exists and belongs to the doctor
             Optional<Appointment> appointmentOpt = appointmentRepository.findByIdWithPatient(appointmentId);
             if (appointmentOpt.isEmpty()) {
@@ -168,19 +159,30 @@ public class PatientRecordService {
 
             Map<String, Object> response = mapRecordToResponse(record);
 
-            // Add ARV treatments to response
-            List<Map<String, Object>> treatments = arvTreatmentService.getPatientTreatments(patientUserId);
-            response.put("arvTreatments", treatments);
+            // Add appointment details
+            response.put("appointmentId", appointment.getAppointmentId());
+            response.put("appointmentDateTime", appointment.getAppointmentDateTime());
+            response.put("appointmentStatus", appointment.getStatus());
 
+            // Add patient basic info
+            User patient = appointment.getPatientUser();
+            response.put("patientUsername", patient.getUsername());
+            response.put("patientEmail", patient.getEmail());
+
+            // Add empty ARV treatments list (since we removed the dependency)
+            response.put("arvTreatments", List.of());
+
+            response.put("success", true);
             return response;
 
         } catch (SecurityException e) {
-            throw e; // Re-throw security exceptions for proper handling
+            logger.warn("Security violation: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
-            logger.error("Error fetching patient record for appointment {}: {}", appointmentId, e.getMessage(), e);
+            logger.error("Error getting patient record for appointment {}: {}", appointmentId, e.getMessage(), e);
             return Map.of(
-                "success", false,
-                "message", "Failed to fetch patient record: " + e.getMessage()
+                    "success", false,
+                    "message", "Failed to retrieve patient record: " + e.getMessage()
             );
         }
     }
@@ -191,16 +193,17 @@ public class PatientRecordService {
     @Transactional
     public MessageResponse updatePatientRecordWithResponse(Integer patientUserId, Map<String, Object> recordData) {
         try {
-            logger.debug("Updating patient record for user ID: {}", patientUserId);
-            
-            // Get or create patient record
+            logger.debug("Updating patient record for patient ID: {}", patientUserId);
+
             Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(patientUserId);
             PatientRecord record;
-            
+
             if (recordOpt.isPresent()) {
                 record = recordOpt.get();
+                logger.debug("Updating existing patient record");
             } else {
                 // Create new record if none exists
+                logger.info("Creating new patient record for patient ID: {}", patientUserId);
                 record = new PatientRecord();
                 record.setPatientUserID(patientUserId);
             }
@@ -228,10 +231,9 @@ public class PatientRecordService {
                 record.setEmergencyPhone((String) recordData.get("emergencyPhone"));
             }
 
-            // Save the record
             patientRecordRepository.save(record);
-            
-            logger.info("Patient record updated successfully for user ID: {}", patientUserId);
+
+            logger.info("Patient record updated successfully for patient ID: {}", patientUserId);
             return MessageResponse.success("Patient record updated successfully!");
 
         } catch (Exception e) {
@@ -248,18 +250,28 @@ public class PatientRecordService {
         try {
             Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(patientUserId);
             PatientRecord record;
-            
+
             if (recordOpt.isPresent()) {
                 record = recordOpt.get();
             } else {
+                // Create new record if none exists
                 record = new PatientRecord();
                 record.setPatientUserID(patientUserId);
+                record.setMedicalHistory("");
+                record.setAllergies("");
+                record.setCurrentMedications("");
+                record.setNotes("");
+                record.setBloodType("");
+                record.setEmergencyContact("");
+                record.setEmergencyPhone("");
             }
 
             record.setProfileImageBase64(base64Image);
             patientRecordRepository.save(record);
 
+            logger.info("Profile image updated for patient ID: {}", patientUserId);
             return MessageResponse.success("Profile image updated successfully!");
+
         } catch (Exception e) {
             logger.error("Error updating profile image: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to update profile image: " + e.getMessage());
@@ -267,33 +279,38 @@ public class PatientRecordService {
     }
 
     /**
-     * Helper method to map PatientRecord to response map
+     * Map PatientRecord to response format
      */
     private Map<String, Object> mapRecordToResponse(PatientRecord record) {
         Map<String, Object> response = new HashMap<>();
-        
         response.put("success", true);
         response.put("message", "Patient record retrieved successfully");
-        response.put("recordId", record.getRecordId());  // Changed from getRecordID() to getRecordId()
+        response.put("recordId", record.getRecordID());
         response.put("patientUserId", record.getPatientUserID());
         response.put("appointmentId", record.getAppointmentId());
-        response.put("medicalHistory", record.getMedicalHistory() != null ? record.getMedicalHistory() : "");
-        response.put("allergies", record.getAllergies() != null ? record.getAllergies() : "");
-        response.put("currentMedications", record.getCurrentMedications() != null ? record.getCurrentMedications() : "");
-        response.put("notes", record.getNotes() != null ? record.getNotes() : "");
-        response.put("bloodType", record.getBloodType() != null ? record.getBloodType() : "");
-        response.put("emergencyContact", record.getEmergencyContact() != null ? record.getEmergencyContact() : "");
-        response.put("emergencyPhone", record.getEmergencyPhone() != null ? record.getEmergencyPhone() : "");
+        response.put("medicalHistory", record.getMedicalHistory());
+        response.put("allergies", record.getAllergies());
+        response.put("currentMedications", record.getCurrentMedications());
+        response.put("notes", record.getNotes());
+        response.put("bloodType", record.getBloodType());
+        response.put("emergencyContact", record.getEmergencyContact());
+        response.put("emergencyPhone", record.getEmergencyPhone());
         response.put("profileImageBase64", record.getProfileImageBase64());
         response.put("createdAt", record.getCreatedAt());
         response.put("updatedAt", record.getUpdatedAt());
 
-        // Add user details if available
+        // Add patient username and email if available
         if (record.getPatientUserID() != null) {
-            userRepository.findById(record.getPatientUserID()).ifPresent(user -> {
-                response.put("patientUsername", user.getUsername());
-                response.put("patientEmail", user.getEmail());
-            });
+            try {
+                Optional<User> userOpt = userRepository.findById(record.getPatientUserID());
+                if (userOpt.isPresent()) {
+                    User user = userOpt.get();
+                    response.put("patientUsername", user.getUsername());
+                    response.put("patientEmail", user.getEmail());
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to load user details for patient {}: {}", record.getPatientUserID(), e.getMessage());
+            }
         }
 
         return response;

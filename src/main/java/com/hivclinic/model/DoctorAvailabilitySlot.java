@@ -1,5 +1,6 @@
 package com.hivclinic.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
- * Entity representing a doctor's availability slot
+ * DoctorAvailabilitySlot entity for managing doctor availability
  */
 @Entity
 @Table(name = "DoctorAvailabilitySlots")
@@ -27,33 +28,37 @@ public class DoctorAvailabilitySlot {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DoctorUserID", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash", "availabilitySlots", "appointments"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private User doctorUser;
 
     @Column(name = "SlotDate", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate slotDate;
 
     @Column(name = "StartTime", nullable = false)
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime startTime;
 
     @Column(name = "EndTime", nullable = false)
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime endTime;
 
-    @Column(name = "IsBooked", nullable = false)
+    @Column(name = "IsBooked")
     private Boolean isBooked = false;
 
     @Column(name = "Notes", columnDefinition = "NVARCHAR(MAX)")
     private String notes;
 
-    @Column(name = "CreatedAt", nullable = false)
+    @Column(name = "CreatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
-    @Column(name = "UpdatedAt", nullable = false)
+    @Column(name = "UpdatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    // Transient field for appointment details (not persisted)
+    // Transient field for safe appointment details
     @Transient
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "availabilitySlot", "doctorUser"})
     private Appointment appointment;
 
     @PrePersist

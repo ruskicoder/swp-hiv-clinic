@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository for Appointment entity
+ * Repository interface for Appointment entity operations
  */
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
@@ -48,7 +48,23 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
             @Param("dateTime") LocalDateTime dateTime);
 
     /**
-     * Find appointments by doctor user with eager loading
+     * Find appointments by patient user within date range
+     */
+    @Query("SELECT a FROM Appointment a " +
+           "LEFT JOIN FETCH a.patientUser pu " +
+           "LEFT JOIN FETCH pu.role " +
+           "LEFT JOIN FETCH a.doctorUser du " +
+           "LEFT JOIN FETCH du.role " +
+           "WHERE a.patientUser = :patientUser " +
+           "AND a.appointmentDateTime BETWEEN :startDateTime AND :endDateTime " +
+           "ORDER BY a.appointmentDateTime ASC")
+    List<Appointment> findByPatientUserAndAppointmentDateTimeBetween(
+            @Param("patientUser") User patientUser,
+            @Param("startDateTime") LocalDateTime startDateTime,
+            @Param("endDateTime") LocalDateTime endDateTime);
+
+    /**
+     * Find appointments by doctor user
      */
     @Query("SELECT a FROM Appointment a " +
            "LEFT JOIN FETCH a.patientUser pu " +
@@ -68,7 +84,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
            "LEFT JOIN FETCH pu.role " +
            "LEFT JOIN FETCH a.doctorUser du " +
            "LEFT JOIN FETCH du.role " +
-           "LEFT JOIN FETCH a.availabilitySlot " +
            "WHERE a.doctorUser = :doctorUser " +
            "AND a.appointmentDateTime BETWEEN :startDateTime AND :endDateTime " +
            "ORDER BY a.appointmentDateTime ASC")

@@ -86,21 +86,19 @@ public class DoctorAvailabilityService {
             // Validate business hours (8 AM to 6 PM)
             LocalTime businessStart = LocalTime.of(8, 0);
             LocalTime businessEnd = LocalTime.of(18, 0);
-            
             if (request.getStartTime().isBefore(businessStart)) {
                 return MessageResponse.error("Start time cannot be before 8:00 AM");
             }
-            
             if (endTime.isAfter(businessEnd)) {
                 return MessageResponse.error("End time cannot be after 6:00 PM");
             }
 
-            // Validate duration constraints (15 minutes to 4 hours)
+            // Validate duration (15 minutes to 4 hours)
             if (request.getDurationMinutes() < 15) {
-                return MessageResponse.error("Minimum slot duration is 15 minutes");
+                return MessageResponse.error("Duration must be at least 15 minutes");
             }
-            if (request.getDurationMinutes() > 240) { // 4 hours
-                return MessageResponse.error("Maximum slot duration is 4 hours");
+            if (request.getDurationMinutes() > 240) {
+                return MessageResponse.error("Duration cannot exceed 4 hours");
             }
 
             // Check for overlapping slots
@@ -108,12 +106,9 @@ public class DoctorAvailabilityService {
                     .findByDoctorUserAndSlotDate(doctor, request.getSlotDate());
 
             for (DoctorAvailabilitySlot existingSlot : existingSlots) {
-                LocalTime existingStart = existingSlot.getStartTime();
-                LocalTime existingEnd = existingSlot.getEndTime();
-
-                if (isTimeOverlapping(request.getStartTime(), endTime, existingStart, existingEnd)) {
-                    return MessageResponse.error("Time slot overlaps with existing slot from " 
-                            + existingStart + " to " + existingEnd);
+                if (isTimeOverlapping(request.getStartTime(), endTime, 
+                        existingSlot.getStartTime(), existingSlot.getEndTime())) {
+                    return MessageResponse.error("This time slot overlaps with an existing slot");
                 }
             }
 
@@ -126,9 +121,11 @@ public class DoctorAvailabilityService {
             slot.setIsBooked(false);
             slot.setNotes(request.getNotes());
 
-            // Save the slot
-            DoctorAvailabilitySlot savedSlot = availabilitySlotRepository.save(slot);
-            return MessageResponse.success("Availability slot added successfully", savedSlot);
+            availabilitySlotRepository.save(slot);
+
+            logger.info("Availability slot created successfully for doctor: {} on date: {} from {} to {}", 
+                    doctor.getUsername(), request.getSlotDate(), request.getStartTime(), endTime);
+            return MessageResponse.success("Availability slot created successfully!");
 
         } catch (Exception e) {
             logger.error("Error creating availability slot for doctor {}: {}", doctorUserId, e.getMessage(), e);
@@ -264,14 +261,10 @@ public class DoctorAvailabilityService {
                     .findByDoctorUserAndSlotDate(slot.getDoctorUser(), request.getSlotDate());
 
             for (DoctorAvailabilitySlot existingSlot : existingSlots) {
-                if (!existingSlot.getAvailabilitySlotId().equals(slotId)) { // Exclude current slot
-                    LocalTime existingStart = existingSlot.getStartTime();
-                    LocalTime existingEnd = existingSlot.getEndTime();
-
-                    if (isTimeOverlapping(request.getStartTime(), endTime, existingStart, existingEnd)) {
-                        return MessageResponse.error("Time slot overlaps with existing slot from " 
-                                + existingStart + " to " + existingEnd);
-                    }
+                if (!existingSlot.getAvailabilitySlotId().equals(slotId) &&
+                    isTimeOverlapping(request.getStartTime(), endTime, 
+                            existingSlot.getStartTime(), existingSlot.getEndTime())) {
+                    return MessageResponse.error("This time slot overlaps with an existing slot");
                 }
             }
 

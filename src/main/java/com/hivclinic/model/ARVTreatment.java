@@ -1,14 +1,22 @@
 package com.hivclinic.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Entity representing an ARV treatment record
+ * ARVTreatment entity for storing ARV treatment records
  */
 @Entity
 @Table(name = "ARVTreatments")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ARVTreatment {
 
     @Id
@@ -29,9 +37,11 @@ public class ARVTreatment {
     private String regimen;
 
     @Column(name = "StartDate", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @Column(name = "EndDate")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     @Column(name = "Adherence")
@@ -47,127 +57,12 @@ public class ARVTreatment {
     private Boolean isActive = true;
 
     @Column(name = "CreatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Column(name = "UpdatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
-
-    // Constructors
-    public ARVTreatment() {}
-
-    public ARVTreatment(Integer patientUserID, String regimen, LocalDate startDate) {
-        this.patientUserID = patientUserID;
-        this.regimen = regimen;
-        this.startDate = startDate;
-        this.isActive = true;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    // Getters and Setters
-    public Integer getArvTreatmentID() {
-        return arvTreatmentID;
-    }
-
-    public void setArvTreatmentID(Integer arvTreatmentID) {
-        this.arvTreatmentID = arvTreatmentID;
-    }
-
-    public Integer getPatientUserID() {
-        return patientUserID;
-    }
-
-    public void setPatientUserID(Integer patientUserID) {
-        this.patientUserID = patientUserID;
-    }
-
-    public Integer getDoctorUserID() {
-        return doctorUserID;
-    }
-
-    public void setDoctorUserID(Integer doctorUserID) {
-        this.doctorUserID = doctorUserID;
-    }
-
-    public Integer getAppointmentID() {
-        return appointmentID;
-    }
-
-    public void setAppointmentID(Integer appointmentID) {
-        this.appointmentID = appointmentID;
-    }
-
-    public String getRegimen() {
-        return regimen;
-    }
-
-    public void setRegimen(String regimen) {
-        this.regimen = regimen;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getAdherence() {
-        return adherence;
-    }
-
-    public void setAdherence(String adherence) {
-        this.adherence = adherence;
-    }
-
-    public String getSideEffects() {
-        return sideEffects;
-    }
-
-    public void setSideEffects(String sideEffects) {
-        this.sideEffects = sideEffects;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
     @PrePersist
     protected void onCreate() {
@@ -178,5 +73,26 @@ public class ARVTreatment {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    // Getter methods for compatibility
+    public Integer getArvTreatmentID() {
+        return arvTreatmentID;
+    }
+
+    public Integer getPatientUserID() {
+        return patientUserID;
+    }
+
+    public Integer getDoctorUserID() {
+        return doctorUserID;
+    }
+
+    public Integer getAppointmentID() {
+        return appointmentID;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
     }
 }

@@ -1,19 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import TimeSlotModal from './TimeSlotModal';
+import { createBookingData, validateBookingData } from '../../utils/dateUtils';
 import './SlotManagementModal.css';
 
 /**
  * Modal for managing time slots - allows doctors to manage availability and patients to book slots
  */
-const SlotManagementModal = ({ 
-  isOpen, 
-  onClose, 
-  selectedDate, 
-  existingSlots = [], 
+const SlotManagementModal = ({
+  isOpen,
+  onClose,
+  selectedDate,
+  existingSlots = [],
   userRole = 'doctor',
   currentUserId,
-  doctorInfo = null,
-  onAddSlot, 
+  doctorInfo,
+  onAddSlot,
   onDeleteSlot,
   onBookSlot,
   onCancelBooking
@@ -24,7 +25,18 @@ const SlotManagementModal = ({
   const [showCancelBooking, setShowCancelBooking] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Process slots safely
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setShowAddModal(false);
+      setSelectedSlot(null);
+      setShowConfirmBooking(false);
+      setShowCancelBooking(false);
+      setLoading(false);
+    }
+  }, [isOpen]);
+
+  // Process slots with error handling
   const processedSlots = useMemo(() => {
     if (!Array.isArray(existingSlots)) {
       console.warn('existingSlots is not an array:', existingSlots);
@@ -32,31 +44,32 @@ const SlotManagementModal = ({
     }
 
     return existingSlots.filter(slot => {
-      if (!slot) {
-        console.warn('Invalid slot found:', slot);
+      if (!slot) return false;
+      
+      // Validate required properties
+      const hasRequiredProps = slot.availabilitySlotId && 
+                              (slot.slotDate || slot.date) && 
+                              (slot.startTime || slot.time);
+      
+      if (!hasRequiredProps) {
+        console.warn('Slot missing required properties:', slot);
         return false;
       }
-
-      // Ensure required properties exist
-      if (!slot.availabilitySlotId && !slot.slotId) {
-        console.warn('Slot missing ID:', slot);
-        return false;
-      }
-
+      
       return true;
     }).map(slot => ({
-      availabilitySlotId: slot.availabilitySlotId || slot.slotId,
-      startTime: slot.startTime || '00:00',
-      endTime: slot.endTime || '00:30',
+      ...slot,
+      // Normalize property names
+      availabilitySlotId: slot.availabilitySlotId || slot.id,
+      slotDate: slot.slotDate || slot.date,
+      startTime: slot.startTime || slot.time,
+      endTime: slot.endTime || slot.endTime,
       isBooked: Boolean(slot.isBooked),
-      notes: slot.notes || '',
-      appointment: slot.appointment || null,
-      slotDate: slot.slotDate,
-      doctorUser: slot.doctorUser || doctorInfo
+      durationMinutes: slot.durationMinutes || 30
     }));
-  }, [existingSlots, doctorInfo]);
+  }, [existingSlots]);
 
-  // Separate available and booked slots
+  // Filter slots by booking status
   const availableSlots = processedSlots.filter(slot => !slot.isBooked);
   const bookedSlots = processedSlots.filter(slot => slot.isBooked);
 
@@ -110,151 +123,120 @@ const SlotManagementModal = ({
 
   // Handle slot actions based on user role
   const handleSlotAction = (slot) => {
-    try {
-      console.log('Slot action triggered:', { slot, userRole, currentUserId });
-      
-      if (userRole === 'doctor') {
-        if (slot.isBooked) {
-          // Doctor viewing booked slot details
-          const patientName = slot.appointment?.patientUser?.username || 'Unknown Patient';
-          alert(`This slot is booked by: ${patientName}`);
-        } else {
-          // Doctor can delete available slots
-          handleDeleteSlot(slot.availabilitySlotId);
-        }
-      } else if (userRole === 'patient') {
-        if (slot.isBooked) {
-          if (isPatientOwnBooking(slot)) {
-            // Patient can cancel their own booking
-            setSelectedSlot(slot);
-            setShowCancelBooking(true);
-          } else {
-            // Slot booked by another patient
-            alert('This slot is already booked by another patient.');
-          }
-        } else {
-          // Patient can book available slots
-          setSelectedSlot(slot);
-          setShowConfirmBooking(true);
+    setSelectedSlot(slot);
+    
+    if (userRole === 'doctor') {
+      if (slot.isBooked) {
+        // Doctor viewing booked slot details
+        alert(`Booked by: ${slot.appointment?.patientUser?.username || 'Unknown'}`);
+      } else {
+        // Doctor can delete available slot
+        if (window.confirm('Delete this availability slot?')) {
+          handleDeleteSlot(slot);
         }
       }
-    } catch (error) {
-      console.error('Error handling slot action:', error);
-      alert('An error occurred. Please try again.');
-    }
-  };
-
-  // Handle slot deletion (doctors only)
-  const handleDeleteSlot = (slotId) => {
-    if (userRole !== 'doctor') {
-      alert('Only doctors can delete slots.');
-      return;
-    }
-
-    const confirmDelete = window.confirm('Are you sure you want to delete this availability slot?');
-    if (confirmDelete && onDeleteSlot) {
-      console.log('Deleting slot:', slotId);
-      onDeleteSlot(slotId);
-    }
-  };
-
-  // Handle booking confirmation (patients only)
-  const handleConfirmBooking = async () => {
-    if (!selectedSlot || userRole !== 'patient') return;
-
-    try {
-      setLoading(true);
-      
-      // Validate required fields
-      if (!selectedSlot.availabilitySlotId) {
-        throw new Error('Availability slot ID is missing');
-      }
-      
-      if (!selectedSlot.doctorUser?.userId && !doctorInfo?.userId) {
-        throw new Error('Doctor information is missing');
-      }
-
-      // Improved date formatting
-      let formattedDate;
-      if (selectedDate) {
-        // selectedDate should be in YYYY-MM-DD format
-        formattedDate = selectedDate;
-      } else if (selectedSlot.slotDate) {
-        if (selectedSlot.slotDate instanceof Date) {
-          formattedDate = selectedSlot.slotDate.toISOString().split('T')[0];
+    } else if (userRole === 'patient') {
+      if (slot.isBooked) {
+        if (isPatientOwnBooking(slot)) {
+          // Patient can cancel their own booking
+          setShowCancelBooking(true);
         } else {
-          formattedDate = selectedSlot.slotDate.includes('T') 
-            ? selectedSlot.slotDate.split('T')[0] 
-            : selectedSlot.slotDate;
+          alert('This slot is already booked by another patient.');
         }
       } else {
-        throw new Error('No date information available');
+        // Patient can book available slot
+        setShowConfirmBooking(true);
       }
+    }
+  };
 
-      // Ensure time format is correct
-      let startTime = selectedSlot.startTime;
-      if (startTime && !startTime.includes(':')) {
-        startTime = startTime.substring(0, 2) + ':' + startTime.substring(2);
-      }
-
-      const bookingData = {
-        availabilitySlotId: selectedSlot.availabilitySlotId,
-        doctorUserId: selectedSlot.doctorUser?.userId || doctorInfo?.userId,
-        appointmentDateTime: `${formattedDate}T${startTime}:00`,
-        durationMinutes: selectedSlot.durationMinutes || 30
-      };
-
-      console.log('Booking appointment with data:', bookingData);
-      
-      if (onBookSlot) {
-        const response = await onBookSlot(bookingData);
-        
-        // Handle response
-        if (response && response.success === false) {
-          throw new Error(response.message || 'Failed to book appointment');
-        }
-      }
-      
-      setShowConfirmBooking(false);
-      setSelectedSlot(null);
-      alert('Appointment booked successfully!');
-      
+  // Handle slot deletion
+  const handleDeleteSlot = async (slot) => {
+    if (!onDeleteSlot) return;
+    
+    try {
+      setLoading(true);
+      await onDeleteSlot(slot.availabilitySlotId);
     } catch (error) {
-      console.error('Error booking appointment:', error);
-      
-      let errorMessage = 'Failed to book appointment. Please try again.';
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      alert(errorMessage);
+      console.error('Error deleting slot:', error);
+      alert('Failed to delete slot. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle booking cancellation (patients only)
-  const handleCancelBooking = async () => {
-    if (!selectedSlot || userRole !== 'patient') return;
-
-    const reason = prompt('Please provide a reason for cancellation:');
-    if (!reason) return;
-
+  // Handle booking confirmation
+  const handleConfirmBooking = async () => {
+    if (!selectedSlot || !onBookSlot) return;
+    
     try {
       setLoading(true);
-      
-      if (onCancelBooking && selectedSlot.appointment) {
-        await onCancelBooking(selectedSlot.appointment.appointmentId, reason);
+
+      // Validate required fields
+      if (!selectedSlot.availabilitySlotId) {
+        throw new Error('Availability slot ID is missing');
       }
+      if (!selectedSlot.doctorUser?.userId && !doctorInfo?.userId) {
+        throw new Error('Doctor information is missing');
+      }
+
+      // Create properly formatted booking data
+      const slotDataForBooking = {
+        availabilitySlotId: selectedSlot.availabilitySlotId,
+        slotDate: selectedDate || selectedSlot.slotDate,
+        startTime: selectedSlot.startTime,
+        durationMinutes: selectedSlot.durationMinutes || 30
+      };
+
+      const doctorUserId = selectedSlot.doctorUser?.userId || doctorInfo?.userId;
+      const bookingData = createBookingData(slotDataForBooking, doctorUserId);
+
+      console.log('Booking appointment with data:', bookingData);
+
+      // Validate booking data
+      const validation = validateBookingData(bookingData);
+      if (!validation.isValid) {
+        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+      }
+
+      const response = await onBookSlot(bookingData);
       
-      setShowCancelBooking(false);
+      // Handle response
+      if (response && response.success === false) {
+        throw new Error(response.message || 'Failed to book appointment');
+      }
+
+      alert('Appointment booked successfully!');
+      setShowConfirmBooking(false);
       setSelectedSlot(null);
-      alert('Appointment cancelled successfully!');
+      
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      alert(`Booking failed: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle booking cancellation
+  const handleCancelBooking = async () => {
+    if (!selectedSlot || !onCancelBooking) return;
+    
+    try {
+      setLoading(true);
+      const reason = prompt('Please provide a reason for cancellation (optional):') || 'Patient cancellation';
+      
+      if (selectedSlot.appointment?.appointmentId) {
+        await onCancelBooking(selectedSlot.appointment.appointmentId, reason);
+        alert('Appointment cancelled successfully!');
+        setShowCancelBooking(false);
+        setSelectedSlot(null);
+      } else {
+        throw new Error('Appointment ID not found');
+      }
     } catch (error) {
       console.error('Error cancelling appointment:', error);
-      alert('Failed to cancel appointment. Please try again.');
+      alert(`Cancellation failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -262,32 +244,113 @@ const SlotManagementModal = ({
 
   // Handle adding new slot
   const handleAddNewSlot = () => {
-    if (userRole !== 'doctor') {
-      alert('Only doctors can add availability slots.');
-      return;
-    }
     setShowAddModal(true);
   };
 
   // Handle slot creation
-  const handleSlotCreated = (slotData) => {
-    if (onAddSlot) {
-      onAddSlot(slotData);
+  const handleSlotCreated = async (slotData) => {
+    try {
+      if (onAddSlot) {
+        await onAddSlot(slotData);
+      }
+      setShowAddModal(false);
+    } catch (error) {
+      console.error('Error creating slot:', error);
+      alert('Failed to create slot. Please try again.');
     }
-    setShowAddModal(false);
   };
 
-  if (!isOpen) return null;
+  // Render slot list
+  const renderSlotList = (slots, title, emptyMessage) => (
+    <div className="slot-section">
+      <h4 className="slot-section-title">{title}</h4>
+      {slots.length === 0 ? (
+        <p className="no-slots">{emptyMessage}</p>
+      ) : (
+        <div className="slots-list">
+          {slots.map(slot => (
+            <div key={slot.availabilitySlotId} className={`slot-item ${slot.isBooked ? 'booked' : 'available'}`}>
+              <div className="slot-info">
+                <span className="slot-time">
+                  {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                </span>
+                {userRole === 'doctor' && slot.appointment && (
+                  <span className="booked-indicator">
+                    Patient: {slot.appointment.patientUser?.username || 'Unknown'}
+                  </span>
+                )}
+                {userRole === 'patient' && isPatientOwnBooking(slot) && (
+                  <span className="own-booking">Your booking</span>
+                )}
+                {slot.notes && (
+                  <span className="slot-notes">{slot.notes}</span>
+                )}
+              </div>
+              <div className="slot-actions">
+                {userRole === 'doctor' ? (
+                  slot.isBooked ? (
+                    <button 
+                      className="btn-info-small"
+                      onClick={() => handleSlotAction(slot)}
+                    >
+                      View Details
+                    </button>
+                  ) : (
+                    <button 
+                      className="btn-danger-small"
+                      onClick={() => handleSlotAction(slot)}
+                    >
+                      Delete
+                    </button>
+                  )
+                ) : slot.isBooked ? (
+                  isPatientOwnBooking(slot) ? (
+                    <button 
+                      className="btn-warning-small"
+                      onClick={() => handleSlotAction(slot)}
+                    >
+                      Cancel
+                    </button>
+                  ) : (
+                    <button className="btn-secondary-small" disabled>
+                      Booked
+                    </button>
+                  )
+                ) : (
+                  <button 
+                    className="btn-primary-small"
+                    onClick={() => handleSlotAction(slot)}
+                  >
+                    Book
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  if (!isOpen || !selectedDate) return null;
 
   return (
     <div className="slot-modal-overlay">
       <div className="slot-modal">
+        {/* Modal Header */}
         <div className="modal-header">
-          <h3>Manage Slots - {formatDate(selectedDate)}</h3>
+          <div>
+            <h3>Manage Slots - {formatDate(selectedDate)}</h3>
+            {doctorInfo && (
+              <small>Dr. {doctorInfo.firstName} {doctorInfo.lastName}</small>
+            )}
+          </div>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
+        {/* Modal Content */}
         <div className="modal-content">
+          {/* Add Slot Button for Doctors */}
           {userRole === 'doctor' && (
             <div className="modal-actions">
               <button 
@@ -299,102 +362,18 @@ const SlotManagementModal = ({
             </div>
           )}
 
+          {/* Slot Sections */}
           <div className="slot-sections">
-            {/* Available Slots Section */}
-            <div className="slot-section">
-              <h4>Available Slots ({availableSlots.length})</h4>
-              {availableSlots.length === 0 ? (
-                <div className="no-slots">
-                  <p>No available slots for this date.</p>
-                </div>
-              ) : (
-                <div className="slots-list">
-                  {availableSlots.map(slot => (
-                    <div key={slot.availabilitySlotId} className="slot-item available">
-                      <div className="slot-info">
-                        <span className="slot-time">
-                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                        </span>
-                        {slot.notes && (
-                          <span className="slot-notes">{slot.notes}</span>
-                        )}
-                        {doctorInfo && userRole === 'patient' && (
-                          <span className="slot-doctor">
-                            Dr. {doctorInfo.firstName} {doctorInfo.lastName}
-                          </span>
-                        )}
-                      </div>
-                      <div className="slot-actions">
-                        {userRole === 'doctor' ? (
-                          <button 
-                            className="btn-danger-small"
-                            onClick={() => handleSlotAction(slot)}
-                          >
-                            Delete
-                          </button>
-                        ) : (
-                          <button 
-                            className="btn-primary-small"
-                            onClick={() => handleSlotAction(slot)}
-                          >
-                            Book
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Booked Slots Section */}
-            {bookedSlots.length > 0 && (
-              <div className="slot-section">
-                <h4>Booked Slots ({bookedSlots.length})</h4>
-                <div className="slots-list">
-                  {bookedSlots.map(slot => (
-                    <div key={slot.availabilitySlotId} className="slot-item booked">
-                      <div className="slot-info">
-                        <span className="slot-time">
-                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                        </span>
-                        {userRole === 'doctor' && slot.appointment && (
-                          <span className="booked-indicator">
-                            Patient: {slot.appointment.patientUser?.username || 'Unknown'}
-                          </span>
-                        )}
-                        {userRole === 'patient' && isPatientOwnBooking(slot) && (
-                          <span className="own-booking">Your booking</span>
-                        )}
-                        {slot.notes && (
-                          <span className="slot-notes">{slot.notes}</span>
-                        )}
-                      </div>
-                      <div className="slot-actions">
-                        {userRole === 'doctor' ? (
-                          <button 
-                            className="btn-info-small"
-                            onClick={() => handleSlotAction(slot)}
-                          >
-                            View Details
-                          </button>
-                        ) : isPatientOwnBooking(slot) ? (
-                          <button 
-                            className="btn-warning-small"
-                            onClick={() => handleSlotAction(slot)}
-                          >
-                            Cancel
-                          </button>
-                        ) : (
-                          <button className="btn-secondary-small" disabled>
-                            Booked
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {renderSlotList(
+              availableSlots, 
+              'Available Slots', 
+              'No available slots for this date'
+            )}
+            
+            {renderSlotList(
+              bookedSlots, 
+              'Booked Slots', 
+              'No booked slots for this date'
             )}
           </div>
         </div>

@@ -1,5 +1,6 @@
 package com.hivclinic.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Entity representing an appointment between a patient and doctor
+ * Appointment entity with improved date/time handling
  */
 @Entity
 @Table(name = "Appointments")
@@ -25,26 +26,27 @@ public class Appointment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PatientUserID", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash", "appointments"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private User patientUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DoctorUserID", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash", "appointments", "availabilitySlots"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private User doctorUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "AvailabilitySlotID")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "appointment", "doctorUser"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private DoctorAvailabilitySlot availabilitySlot;
 
     @Column(name = "AppointmentDateTime", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime appointmentDateTime;
 
     @Column(name = "DurationMinutes")
     private Integer durationMinutes = 30;
 
-    @Column(name = "Status", length = 50, columnDefinition = "VARCHAR(50) DEFAULT 'Scheduled'")
+    @Column(name = "Status", nullable = false, length = 50)
     private String status = "Scheduled";
 
     @Column(name = "PatientCancellationReason", columnDefinition = "NVARCHAR(MAX)")
@@ -53,14 +55,16 @@ public class Appointment {
     @Column(name = "DoctorCancellationReason", columnDefinition = "NVARCHAR(MAX)")
     private String doctorCancellationReason;
 
-    @Column(name = "CreatedAt", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "UpdatedAt", nullable = false)
-    private LocalDateTime updatedAt;
-
     @Column(name = "AppointmentNotes", columnDefinition = "NVARCHAR(MAX)")
     private String appointmentNotes;
+
+    @Column(name = "CreatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    @Column(name = "UpdatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {

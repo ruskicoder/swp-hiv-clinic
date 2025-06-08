@@ -10,105 +10,73 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
- * Custom deserializer for LocalDateTime to handle multiple date formats
+ * Enhanced LocalDateTime deserializer that supports multiple date/time formats
  */
 public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomLocalDateTimeDeserializer.class);
 
-    private static final List<DateTimeFormatter> FORMATTERS = Arrays.asList(
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"),
-            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-    );
+    // Supported date/time formats in order of preference
+    private static final DateTimeFormatter[] SUPPORTED_FORMATTERS = {
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"),
+        DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"),
+        DateTimeFormatter.ofPattern("yyyy/MM/dd'T'HH:mm:ss"),
+        DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"),
+        DateTimeFormatter.ofPattern("MM/dd/yyyy'T'HH:mm:ss"),
+        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"),
+        DateTimeFormatter.ofPattern("dd/MM/yyyy'T'HH:mm:ss")
+    };
 
     @Override
     public LocalDateTime deserialize(JsonParser parser, DeserializationContext context) throws IOException {
-        String dateString = parser.getText();
+        String dateTimeStr = parser.getText();
         
-        if (dateString == null || dateString.trim().isEmpty()) {
+        if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
             return null;
         }
 
-        // Clean up the date string - remove timezone info and extra text
-        dateString = cleanDateString(dateString);
+        // Clean the input string
+        String cleanDateTimeStr = dateTimeStr.trim();
         
-        logger.debug("Attempting to parse date string: {}", dateString);
+        // Remove timezone indicators for local parsing
+        if (cleanDateTimeStr.endsWith("Z")) {
+            cleanDateTimeStr = cleanDateTimeStr.substring(0, cleanDateTimeStr.length() - 1);
+        }
+        
+        // Remove timezone offset patterns like +00:00, -05:00, etc.
+        cleanDateTimeStr = cleanDateTimeStr.replaceAll("[+-]\\d{2}:\\d{2}$", "");
+        cleanDateTimeStr = cleanDateTimeStr.replaceAll("[+-]\\d{4}$", "");
+        
+        // Handle common variations
+        cleanDateTimeStr = cleanDateTimeStr.replace(" UTC", "").replace(" GMT", "");
 
-        // Try each formatter
-        for (DateTimeFormatter formatter : FORMATTERS) {
+        // Try each formatter until one works
+        for (DateTimeFormatter formatter : SUPPORTED_FORMATTERS) {
             try {
-                LocalDateTime result = LocalDateTime.parse(dateString, formatter);
-                logger.debug("Successfully parsed date: {} using formatter: {}", result, formatter);
+                LocalDateTime result = LocalDateTime.parse(cleanDateTimeStr, formatter);
+                logger.debug("Successfully parsed '{}' to {} using formatter {}", 
+                    dateTimeStr, result, formatter.toString());
                 return result;
             } catch (DateTimeParseException e) {
                 // Continue to next formatter
-                logger.debug("Failed to parse with formatter {}: {}", formatter, e.getMessage());
+                logger.trace("Failed to parse '{}' with formatter {}: {}", 
+                    cleanDateTimeStr, formatter.toString(), e.getMessage());
             }
         }
 
-        // If all formatters fail, throw an exception
-        logger.error("Unable to parse date string: {}", dateString);
-        throw new IOException("Unable to parse date: " + dateString);
-    }
-
-    private String cleanDateString(String dateString) {
-        // Remove common problematic patterns
-        dateString = dateString.trim();
+        // If all formatters fail, log error and throw exception
+        logger.error("Unable to parse date/time string: '{}'. Supported formats include: yyyy-MM-ddTHH:mm:ss, yyyy-MM-dd HH:mm:ss, ISO formats, etc.", 
+            dateTimeStr);
         
-        // Remove timezone information like "GMT+0700 (Indochina Time)"
-        if (dateString.contains("GMT")) {
-            int gmtIndex = dateString.indexOf("GMT");
-            dateString = dateString.substring(0, gmtIndex).trim();
-        }
-        
-        // Remove day names like "Sat Jun 28 2025"
-        if (dateString.matches("^[A-Za-z]{3}\\s+[A-Za-z]{3}\\s+\\d{1,2}\\s+\\d{4}.*")) {
-            // Extract just the time part if it exists
-            String[] parts = dateString.split("\\s+");
-            if (parts.length >= 5) {
-                // Try to reconstruct as YYYY-MM-DD format
-                String month = parts[1];
-                String day = parts[2];
-                String year = parts[3];
-                String time = parts[4];
-                
-                // Convert month name to number
-                int monthNum = getMonthNumber(month);
-                if (monthNum > 0) {
-                    dateString = String.format("%s-%02d-%02d", year, monthNum, Integer.parseInt(day));
-                    if (time.contains(":")) {
-                        dateString += "T" + time;
-                    }
-                }
-            }
-        }
-        
-        return dateString;
-    }
-
-    private int getMonthNumber(String monthName) {
-        switch (monthName.toLowerCase()) {
-            case "jan": return 1;
-            case "feb": return 2;
-            case "mar": return 3;
-            case "apr": return 4;
-            case "may": return 5;
-            case "jun": return 6;
-            case "jul": return 7;
-            case "aug": return 8;
-            case "sep": return 9;
-            case "oct": return 10;
-            case "nov": return 11;
-            case "dec": return 12;
-            default: return 0;
-        }
+        throw new IOException("Unable to parse date/time: " + dateTimeStr + 
+            ". Expected format: yyyy-MM-ddTHH:mm:ss, yyyy-MM-dd HH:mm:ss, or ISO date-time format");
     }
 }

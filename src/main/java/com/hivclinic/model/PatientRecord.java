@@ -1,14 +1,15 @@
 package com.hivclinic.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * Entity representing a patient's medical record
+ * PatientRecord entity for storing patient medical records
  */
 @Entity
 @Table(name = "PatientRecords")
@@ -53,47 +54,30 @@ public class PatientRecord {
     private String profileImageBase64;
 
     @Column(name = "CreatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Column(name = "UpdatedAt")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    /**
-     * Constructor with patient user ID
-     */
-    public PatientRecord(Integer patientUserID) {
-        this.patientUserID = patientUserID;
-        this.medicalHistory = "";
-        this.allergies = "";
-        this.currentMedications = "";
-        this.notes = "";
-        this.bloodType = "";
-        this.emergencyContact = "";
-        this.emergencyPhone = "";
-    }
-
-    /**
-     * Set timestamps before persisting
-     */
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
-    /**
-     * Update timestamp before updating
-     */
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 
-    public Integer getRecordId() {  // Changed from getRecordID() to getRecordId()
+    // Custom getter methods for compatibility
+    public Integer getRecordID() {
         return recordID;
     }
 
-    public void setRecordId(Integer recordId) {  // Added setter
-        this.recordID = recordId;
+    public void setRecordID(Integer recordID) {
+        this.recordID = recordID;
     }
 }
