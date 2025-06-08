@@ -1,20 +1,25 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import BackNavigation from '../../components/layout/BackNavigation';
 import apiClient from '../../services/apiClient';
-import authService from '../../services/authService'; // Add this import
+import authService from '../../services/authService'; // Changed from named import
 import { SafeText } from '../../utils/SafeComponents';
 import './Settings.css';
 
+/**
+ * Settings component for managing user profile, security, and notification preferences
+ */
 const Settings = () => {
   const { user, updateUser } = useAuth();
+  
+  // State management
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-
-  // Profile editing state
   const [isEditing, setIsEditing] = useState(false);
+
+  // Profile data state
   const [profileData, setProfileData] = useState({
     firstName: '',
     lastName: '',
@@ -23,23 +28,24 @@ const Settings = () => {
     dateOfBirth: '',
     address: '',
     bio: '',
-    profileImageBase64: '' // add this field
+    profileImageBase64: ''
   });
 
-  // Password change state
+  // Password data state
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
 
-  // Notification settings state
+  // Notification preferences state
   const [notifications, setNotifications] = useState({
     emailAppointments: true,
-    smsReminders: true,
+    smsReminders: false,
     marketingCommunications: false
   });
 
+  // Load user profile data
   useEffect(() => {
     if (user) {
       setProfileData({
@@ -55,6 +61,7 @@ const Settings = () => {
     }
   }, [user]);
 
+  // Handle profile form changes
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setProfileData(prev => ({
@@ -63,6 +70,7 @@ const Settings = () => {
     }));
   };
 
+  // Handle password form changes
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordData(prev => ({
@@ -71,6 +79,7 @@ const Settings = () => {
     }));
   };
 
+  // Handle notification changes
   const handleNotificationChange = (e) => {
     const { name, checked } = e.target;
     setNotifications(prev => ({
@@ -79,43 +88,33 @@ const Settings = () => {
     }));
   };
 
+  // Handle profile form submission
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setMessage('');
 
-    const updatableFields = [
-      'firstName',
-      'lastName',
-      'phoneNumber',
-      'dateOfBirth',
-      'address',
-      'bio'
-    ];
-    const payload = {};
-    updatableFields.forEach((key) => {
-      const value = profileData[key];
-      if (value !== undefined && String(value).trim() !== '') {
-        payload[key] = value;
-      }
-    });
-
     try {
-      const updatedUser = await authService.updateProfile(payload);
-      if (updateUser) {
-        updateUser(updatedUser); // Update context with full user data
+      const response = await authService.updateProfile(profileData);
+      
+      if (response.success) {
+        setMessage('Profile updated successfully!');
+        setIsEditing(false);
+        // Update user context
+        updateUser(profileData);
+      } else {
+        setError(response.message || 'Failed to update profile');
       }
-      setMessage('Profile updated successfully!');
-      setIsEditing(false);
     } catch (error) {
       console.error('Profile update error:', error);
-      setError(error.message || 'Failed to update profile');
+      setError(error.response?.data?.message || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle password form submission
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -156,6 +155,7 @@ const Settings = () => {
     }
   };
 
+  // Handle notification form submission
   const handleNotificationSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -175,76 +175,73 @@ const Settings = () => {
     }
   };
 
-  // Handle profile image upload (optional, separate from profile edit)
+  // Handle profile image upload
   const handleProfileImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setError('');
-    setMessage('');
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const base64String = event.target.result;
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size must be less than 5MB');
+      return;
+    }
+
+    try {
       setLoading(true);
-      try {
-        // Call the authService method instead of making direct API call
-        const updatedUser = await authService.updateProfileImage(base64String);
-        if (updateUser) {
-          updateUser(updatedUser);
+      setError('');
+
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64String = event.target.result;
+        
+        try {
+          const response = await authService.updateProfileImage(base64String);
+          
+          if (response.success) {
+            setMessage('Profile image updated successfully!');
+            setProfileData(prev => ({
+              ...prev,
+              profileImageBase64: base64String
+            }));
+            updateUser({ profileImageBase64: base64String });
+          } else {
+            setError(response.message || 'Failed to update profile image');
+          }
+        } catch (error) {
+          console.error('Profile image update error:', error);
+          setError('Failed to update profile image');
+        } finally {
+          setLoading(false);
         }
-        setMessage('Profile image updated successfully!');
-        setProfileData(prev => ({
-          ...prev,
-          profileImageBase64: updatedUser.profileImageBase64
-        }));
-      } catch (err) {
-        setError(err.message || 'Failed to upload image');
-      } finally {
-        setLoading(false);
-      }
-    };
-    reader.onerror = () => setError('Failed to read image file');
-    reader.readAsDataURL(file);
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('File reading error:', error);
+      setError('Failed to process image file');
+      setLoading(false);
+    }
   };
 
+  // Render profile settings
   const renderProfileSettings = () => (
     <div className="settings-section">
       <div className="section-header">
         <h3>Profile Information</h3>
         <button 
-          className="btn btn-outline"
+          className="btn btn-secondary"
           onClick={() => setIsEditing(!isEditing)}
+          disabled={loading}
         >
           {isEditing ? 'Cancel' : 'Edit Profile'}
         </button>
-      </div>
-
-      {/* Profile image display and upload */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-        <div style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', border: '2px solid #e2e8f0', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {profileData.profileImageBase64 ? (
-            <img
-              src={profileData.profileImageBase64}
-              alt="Profile"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <span style={{ color: '#9ca3af' }}>No Image</span>
-          )}
-        </div>
-        <div>
-          <input
-            type="file"
-            id="profileImageInput"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleProfileImageChange}
-            disabled={loading}
-          />
-          <label htmlFor="profileImageInput" className="btn btn-outline" style={{ cursor: loading ? 'not-allowed' : 'pointer' }}>
-            Upload Photo
-          </label>
-        </div>
       </div>
 
       {message && (
@@ -260,71 +257,106 @@ const Settings = () => {
       )}
 
       <form onSubmit={handleProfileSubmit} className="settings-form">
+        {/* Profile Image */}
+        <div className="form-group profile-image-group">
+          <label>Profile Picture</label>
+          <div className="profile-image-container">
+            {profileData.profileImageBase64 ? (
+              <img 
+                src={profileData.profileImageBase64} 
+                alt="Profile" 
+                className="profile-image-preview"
+              />
+            ) : (
+              <div className="profile-image-placeholder">
+                <span>No Image</span>
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImageChange}
+              disabled={loading}
+              className="profile-image-input"
+            />
+          </div>
+        </div>
+
+        {/* Basic Information */}
         <div className="form-row">
           <div className="form-group">
-            <label>First Name</label>
-            <input 
-              type="text" 
+            <label htmlFor="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
               name="firstName"
-              value={profileData.firstName} 
+              value={profileData.firstName}
               onChange={handleProfileChange}
-              disabled={!isEditing} 
+              disabled={!isEditing || loading}
+              required
             />
           </div>
           <div className="form-group">
-            <label>Last Name</label>
-            <input 
-              type="text" 
+            <label htmlFor="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
               name="lastName"
-              value={profileData.lastName} 
+              value={profileData.lastName}
               onChange={handleProfileChange}
-              disabled={!isEditing} 
+              disabled={!isEditing || loading}
+              required
             />
           </div>
         </div>
 
         <div className="form-group">
-          <label>Email</label>
-          <input 
-            type="email" 
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
             name="email"
-            value={profileData.email} 
-            onChange={handleProfileChange}
-            disabled // always disabled, not editable
+            value={profileData.email}
+            disabled={true} // Email should not be editable
+            className="disabled-input"
           />
+          <small className="form-help">Email cannot be changed</small>
         </div>
 
         <div className="form-group">
-          <label>Phone Number</label>
-          <input 
-            type="tel" 
+          <label htmlFor="phoneNumber">Phone Number</label>
+          <input
+            type="tel"
+            id="phoneNumber"
             name="phoneNumber"
-            value={profileData.phoneNumber} 
+            value={profileData.phoneNumber}
             onChange={handleProfileChange}
-            disabled={!isEditing} 
+            disabled={!isEditing || loading}
           />
         </div>
 
+        {/* Role-specific fields */}
         {user?.role === 'Patient' && (
           <>
             <div className="form-group">
-              <label>Date of Birth</label>
-              <input 
-                type="date" 
+              <label htmlFor="dateOfBirth">Date of Birth</label>
+              <input
+                type="date"
+                id="dateOfBirth"
                 name="dateOfBirth"
-                value={profileData.dateOfBirth} 
+                value={profileData.dateOfBirth}
                 onChange={handleProfileChange}
-                disabled={!isEditing} 
+                disabled={!isEditing || loading}
               />
             </div>
-
             <div className="form-group">
-              <label>Address</label>
-              <textarea 
+              <label htmlFor="address">Address</label>
+              <textarea
+                id="address"
                 name="address"
-                value={profileData.address} 
+                value={profileData.address}
                 onChange={handleProfileChange}
-                disabled={!isEditing}
+                disabled={!isEditing || loading}
                 rows="3"
               />
             </div>
@@ -333,39 +365,35 @@ const Settings = () => {
 
         {user?.role === 'Doctor' && (
           <div className="form-group">
-            <label>Biography</label>
-            <textarea 
+            <label htmlFor="bio">Bio</label>
+            <textarea
+              id="bio"
               name="bio"
-              value={profileData.bio} 
+              value={profileData.bio}
               onChange={handleProfileChange}
-              disabled={!isEditing}
+              disabled={!isEditing || loading}
               rows="4"
-              placeholder="Professional biography..."
+              placeholder="Tell us about yourself..."
             />
           </div>
         )}
 
-        <div className="form-group">
-          <label>Username</label>
-          <input type="text" value={user?.username || ''} disabled />
-          <small className="form-note">Username cannot be changed</small>
-        </div>
-
-        <div className="form-group">
-          <label>Role</label>
-          <input type="text" value={user?.role || ''} disabled />
-          <small className="form-note">Role is managed by administrators</small>
-        </div>
-
         {isEditing && (
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : 'Save Changes'}
-          </button>
+          <div className="form-actions">
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         )}
       </form>
     </div>
   );
 
+  // Render security settings
   const renderSecuritySettings = () => (
     <div className="settings-section">
       <h3>Security Settings</h3>
@@ -383,46 +411,56 @@ const Settings = () => {
       )}
 
       <form onSubmit={handlePasswordSubmit} className="settings-form">
-        <h4>Change Password</h4>
-        
         <div className="form-group">
-          <label>Current Password</label>
-          <input 
-            type="password" 
+          <label htmlFor="currentPassword">Current Password</label>
+          <input
+            type="password"
+            id="currentPassword"
             name="currentPassword"
             value={passwordData.currentPassword}
             onChange={handlePasswordChange}
+            disabled={loading}
             required
           />
         </div>
 
         <div className="form-group">
-          <label>New Password</label>
-          <input 
-            type="password" 
+          <label htmlFor="newPassword">New Password</label>
+          <input
+            type="password"
+            id="newPassword"
             name="newPassword"
             value={passwordData.newPassword}
             onChange={handlePasswordChange}
+            disabled={loading}
             required
             minLength="6"
           />
+          <small className="form-help">Password must be at least 6 characters</small>
         </div>
 
         <div className="form-group">
-          <label>Confirm New Password</label>
-          <input 
-            type="password" 
+          <label htmlFor="confirmPassword">Confirm New Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
             name="confirmPassword"
             value={passwordData.confirmPassword}
             onChange={handlePasswordChange}
+            disabled={loading}
             required
-            minLength="6"
           />
         </div>
 
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Changing...' : 'Change Password'}
-        </button>
+        <div className="form-actions">
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? 'Changing...' : 'Change Password'}
+          </button>
+        </div>
       </form>
 
       <div className="security-info">
@@ -443,13 +481,14 @@ const Settings = () => {
     </div>
   );
 
+  // Render notification settings
   const renderNotificationSettings = () => (
     <div className="settings-section">
       <h3>Notification Preferences</h3>
 
       {message && (
         <div className="success-message">
-                    <SafeText>{message}</SafeText>
+          <SafeText>{message}</SafeText>
         </div>
       )}
 
@@ -460,101 +499,87 @@ const Settings = () => {
       )}
 
       <form onSubmit={handleNotificationSubmit} className="settings-form">
-        <div className="setting-item">
-          <label className="setting-label">
-            <input 
-              type="checkbox" 
+        <div className="form-group checkbox-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
               name="emailAppointments"
               checked={notifications.emailAppointments}
               onChange={handleNotificationChange}
+              disabled={loading}
             />
-            Email notifications for appointments
+            <span className="checkbox-text">Email notifications for appointments</span>
           </label>
-          <small className="setting-description">
-            Receive email confirmations and reminders for your appointments
-          </small>
         </div>
 
-        <div className="setting-item">
-          <label className="setting-label">
-            <input 
-              type="checkbox" 
+        <div className="form-group checkbox-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
               name="smsReminders"
               checked={notifications.smsReminders}
               onChange={handleNotificationChange}
+              disabled={loading}
             />
-            SMS notifications for reminders
+            <span className="checkbox-text">SMS reminders</span>
           </label>
-          <small className="setting-description">
-            Get text message reminders before your appointments
-          </small>
         </div>
 
-        <div className="setting-item">
-          <label className="setting-label">
-            <input 
-              type="checkbox" 
+        <div className="form-group checkbox-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
               name="marketingCommunications"
               checked={notifications.marketingCommunications}
               onChange={handleNotificationChange}
+              disabled={loading}
             />
-            Marketing communications
+            <span className="checkbox-text">Marketing communications</span>
           </label>
-          <small className="setting-description">
-            Receive updates about new features and health tips
-          </small>
         </div>
 
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Saving...' : 'Save Preferences'}
-        </button>
+        <div className="form-actions">
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : 'Save Preferences'}
+          </button>
+        </div>
       </form>
     </div>
   );
 
   return (
     <div className="settings-container">
+      <BackNavigation />
+      
       <div className="settings-header">
-        <BackNavigation />
         <h1>Settings</h1>
-        <p>Manage your account preferences and settings</p>
+        <p>Manage your account preferences</p>
       </div>
 
       <div className="settings-content">
         <div className="settings-sidebar">
           <nav className="settings-nav">
-            <button 
-              className={`settings-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
+            <button
+              className={`nav-button ${activeTab === 'profile' ? 'active' : ''}`}
               onClick={() => setActiveTab('profile')}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
-              </svg>
-              Profile
+              👤 Profile
             </button>
-            
-            <button 
-              className={`settings-nav-item ${activeTab === 'security' ? 'active' : ''}`}
+            <button
+              className={`nav-button ${activeTab === 'security' ? 'active' : ''}`}
               onClick={() => setActiveTab('security')}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2"/>
-                <circle cx="12" cy="16" r="1" stroke="currentColor" strokeWidth="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Security
+              🔒 Security
             </button>
-            
-            <button 
-              className={`settings-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
+            <button
+              className={`nav-button ${activeTab === 'notifications' ? 'active' : ''}`}
               onClick={() => setActiveTab('notifications')}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Notifications
+              🔔 Notifications
             </button>
           </nav>
         </div>
@@ -570,4 +595,3 @@ const Settings = () => {
 };
 
 export default Settings;
-

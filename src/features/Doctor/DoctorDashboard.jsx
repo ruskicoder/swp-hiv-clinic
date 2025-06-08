@@ -626,8 +626,7 @@ const DoctorDashboard = () => {
       <div className="dashboard-layout">
         <div className="dashboard-sidebar">
           <div className="sidebar-header">
-            <h1>Doctor Portal</h1>
-            <p>Manage your practice</p>
+            <h1>Navigation</h1>
           </div>
 
           <nav className="dashboard-nav">

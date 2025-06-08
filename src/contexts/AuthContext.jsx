@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from '../services/authService';
+import authService from '../services/authService';
 
 /**
  * Authentication Context for managing user authentication state
+ * Provides login, logout, and user state management across the application
  */
 const AuthContext = createContext(null);
 
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Initialize auth state
+  // Check for existing token on app load
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -28,7 +29,7 @@ export const AuthProvider = ({ children }) => {
         
         if (token) {
           try {
-            // Verify token is still valid
+            // Verify token is still valid by getting user profile
             const userProfile = await authService.getUserProfile();
             setUser(userProfile);
           } catch (error) {
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /**
-   * Login function
+   * Login function that authenticates user and stores token
    */
   const login = async (credentials) => {
     try {
@@ -59,13 +60,18 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.login(credentials);
       
       if (response.success) {
+        // Store token
         localStorage.setItem('token', response.token);
+        
+        // Set user data
         setUser({
           id: response.id,
+          userId: response.id, // Add userId for compatibility
           username: response.username,
           email: response.email,
           role: response.role
         });
+        
         return { success: true };
       } else {
         setError(response.message || 'Login failed');
@@ -82,7 +88,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Register function
+   * Register function for new user registration
    */
   const register = async (userData) => {
     try {
@@ -108,7 +114,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Logout function
+   * Logout function that clears user state and token
    */
   const logout = () => {
     try {
@@ -121,7 +127,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
-   * Update user data
+   * Update user profile data
    */
   const updateUser = (userData) => {
     setUser(prevUser => ({
