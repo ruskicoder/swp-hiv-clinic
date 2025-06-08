@@ -1,330 +1,438 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import SlotManagementModal from './SlotManagementModal';
 import './UnifiedCalendar.css';
 
-const UnifiedCalendar = ({ 
-  slots = [], 
-  userRole = 'doctor', 
-  currentUserId, 
+/**
+ * Unified calendar component for managing doctor availability and patient bookings
+ */
+const UnifiedCalendar = ({
+  slots = [],
+  userRole = 'doctor',
+  currentUserId,
   doctorInfo = null,
-  onSlotAction,
+  onAddSlot,
+  onDeleteSlot,
   onBookSlot,
   onCancelBooking,
-  onAddSlot,
-  onDeleteSlot
+  onDateSelect,
+  onSlotSelect
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState('month'); // 'year', 'month', 'week'
+  const [viewMode, setViewMode] = useState('month');
   const [selectedDate, setSelectedDate] = useState(null);
   const [showSlotModal, setShowSlotModal] = useState(false);
   const [selectedDateSlots, setSelectedDateSlots] = useState([]);
 
-  // Ensure valid date handling
-  const ensureValidDate = (date) => {
-    if (!date) return new Date();
-    if (date instanceof Date && !isNaN(date)) return date;
+  // Process slot date safely without timezone conversion
+  const processSlotDate = (dateValue) => {
+    if (!dateValue) return null;
+    
     try {
-      const parsedDate = new Date(date);
-      return isNaN(parsedDate) ? new Date() : parsedDate;
-    } catch {
-      return new Date();
+      if (dateValue instanceof Date) {
+        return dateValue;
+      }
+      
+      if (typeof dateValue === 'string') {
+        // Handle ISO date strings
+        if (dateValue.includes('T')) {
+          return new Date(dateValue);
+        }
+        // Handle date-only strings (YYYY-MM-DD) - create date at noon to avoid timezone issues
+        const [year, month, day] = dateValue.split('-').map(Number);
+        return new Date(year, month - 1, day, 12, 0, 0);
+      }
+      
+      if (Array.isArray(dateValue) && dateValue.length >= 3) {
+        // Handle [year, month, day] format
+        return new Date(dateValue[0], dateValue[1] - 1, dateValue[2], 12, 0, 0);
+      }
+      
+      return new Date(dateValue);
+    } catch (error) {
+      console.warn('Error processing slot date:', dateValue, error);
+      return null;
     }
   };
 
-  // Process slots to ensure valid dates
-  const processedSlots = slots.map(slot => ({
-    ...slot,
-    slotDate: ensureValidDate(slot.slotDate)
-  }));
+  // Format date to YYYY-MM-DD string without timezone conversion
+  const formatDateToString = (date) => {
+    if (!date) return '';
+    
+    try {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Error formatting date to string:', error);
+      return '';
+    }
+  };
+
+  // Process slots with error handling
+  const processedSlots = useMemo(() => {
+    if (!Array.isArray(slots)) {
+      console.warn('Slots is not an array:', slots);
+      return [];
+    }
+
+    return slots.filter(slot => {
+      if (!slot) return false;
+      
+      const slotDate = processSlotDate(slot.slotDate);
+      if (!slotDate || isNaN(slotDate.getTime())) {
+        console.warn('Invalid slot date:', slot);
+        return false;
+      }
+      
+      return true;
+    }).map(slot => {
+      const slotDate = processSlotDate(slot.slotDate);
+      
+      return {
+        ...slot,
+        slotDate: slotDate,
+        availabilitySlotId: slot.availabilitySlotId || slot.slotId || slot.id,
+        startTime: slot.startTime || '00:00',
+        endTime: slot.endTime || '00:30',
+        isBooked: Boolean(slot.isBooked),
+        notes: slot.notes || '',
+        appointment: slot.appointment || null
+      };
+    });
+  }, [slots]);
 
   // Get slots for a specific date
   const getDateSlots = (date) => {
     if (!date) return [];
-    const targetDate = ensureValidDate(date);
-    const targetDateStr = targetDate.toISOString().split('T')[0];
+    
+    const targetDateStr = formatDateToString(date);
     
     return processedSlots.filter(slot => {
-      const slotDate = ensureValidDate(slot.slotDate);
-      return slotDate.toISOString().split('T')[0] === targetDateStr;
+      if (!slot.slotDate) return false;
+      
+      const slotDateStr = formatDateToString(slot.slotDate);
+      return slotDateStr === targetDateStr;
     });
   };
 
   // Handle date click
   const handleDateClick = (date) => {
-    const validDate = ensureValidDate(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    console.log('Date clicked:', date, 'User role:', userRole);
     
-    // Don't allow selection of past dates
-    if (validDate < today) return;
+    const dateSlots = getDateSlots(date);
+    const formattedDate = formatDateToString(date);
     
-    const dateSlots = getDateSlots(validDate);
-    setSelectedDate(validDate);
+    console.log('Setting selected date:', { date, formattedDate, dateSlots });
+    
+    setSelectedDate(formattedDate);
     setSelectedDateSlots(dateSlots);
     setShowSlotModal(true);
+    
+    if (onDateSelect) {
+      onDateSelect(date, dateSlots);
+    }
   };
 
-  // Navigation functions
+  // Handle slot click
+  const handleSlotClick = (slot) => {
+    console.log('Slot clicked:', slot, 'User role:', userRole);
+    
+    if (onSlotSelect) {
+      onSlotSelect(slot);
+    }
+  };
+
+  // Handle adding new slot
+  const handleAddSlot = async (slotData) => {
+    try {
+      console.log('Adding slot with data:', slotData);
+      
+      // Ensure the date is in the correct format
+      const formattedSlotData = {
+        ...slotData,
+        slotDate: slotData.slotDate // Keep as YYYY-MM-DD string
+      };
+      
+      if (onAddSlot) {
+        await onAddSlot(formattedSlotData);
+      }
+      setShowSlotModal(false);
+    } catch (error) {
+      console.error('Error adding slot:', error);
+      alert('Failed to add slot. Please try again.');
+    }
+  };
+
+  // Handle slot creation
+  const handleSlotCreated = (slotData) => {
+    handleAddSlot(slotData);
+  };
+
+  // Navigate dates
   const navigateDate = (direction) => {
     const newDate = new Date(currentDate);
     
     switch (viewMode) {
       case 'year':
-        newDate.setFullYear(currentDate.getFullYear() + direction);
+        newDate.setFullYear(newDate.getFullYear() + direction);
         break;
       case 'month':
-        newDate.setMonth(currentDate.getMonth() + direction);
+        newDate.setMonth(newDate.getMonth() + direction);
         break;
       case 'week':
-        newDate.setDate(currentDate.getDate() + (direction * 7));
+        newDate.setDate(newDate.getDate() + (direction * 7));
         break;
+      default:
+        newDate.setDate(newDate.getDate() + direction);
     }
     
-    newDate.setHours(12, 0, 0, 0); // Prevent timezone issues
     setCurrentDate(newDate);
   };
 
-  const goToToday = () => {
-    const today = new Date();
-    today.setHours(12, 0, 0, 0);
-    setCurrentDate(today);
+  // Format current period
+  const formatCurrentPeriod = () => {
+    const options = {
+      year: viewMode === 'year' ? 'numeric' : 'numeric',
+      month: viewMode !== 'year' ? 'long' : undefined
+    };
+    
+    return currentDate.toLocaleDateString('en-US', options);
   };
 
-  // Year view rendering
+  // Render year view
   const renderYearView = () => {
-    const year = currentDate.getFullYear();
     const months = [];
+    const year = currentDate.getFullYear();
     
     for (let month = 0; month < 12; month++) {
-      const monthDate = new Date(year, month, 1);
+      const monthDate = new Date(year, month, 1, 12, 0, 0);
       const monthSlots = processedSlots.filter(slot => {
-        const slotDate = ensureValidDate(slot.slotDate);
+        const slotDate = slot.slotDate;
         return slotDate.getFullYear() === year && slotDate.getMonth() === month;
       });
       
+      const availableCount = monthSlots.filter(slot => !slot.isBooked).length;
+      const bookedCount = monthSlots.filter(slot => slot.isBooked).length;
+      
       months.push(
-        <div key={month} className="year-month" onClick={() => {
-          setCurrentDate(monthDate);
-          setViewMode('month');
-        }}>
-          <div className="month-name">
-            {monthDate.toLocaleDateString('en-US', { month: 'long' })}
-          </div>
+        <div 
+          key={month} 
+          className="year-month"
+          onClick={() => {
+            setCurrentDate(monthDate);
+            setViewMode('month');
+          }}
+        >
+          <h4>{monthDate.toLocaleDateString('en-US', { month: 'long' })}</h4>
           <div className="month-stats">
-            <span className="available-count">
-              {monthSlots.filter(slot => !slot.isBooked).length} available
-            </span>
-            <span className="booked-count">
-              {monthSlots.filter(slot => slot.isBooked).length} booked
-            </span>
+            <span className="available-count">{availableCount} available</span>
+            <span className="booked-count">{bookedCount} booked</span>
           </div>
         </div>
       );
     }
     
-    return <div className="year-grid">{months}</div>;
+    return <div className="year-view">{months}</div>;
   };
 
-  // Month view rendering
+  // Render month view
   const renderMonthView = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    const firstDay = new Date(year, month, 1, 12, 0, 0);
+    const lastDay = new Date(year, month + 1, 0, 12, 0, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
+    const days = [];
+    const currentDateObj = new Date(startDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const days = [];
+    // Add day headers
+    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    days.push(
+      <div key="headers" className="calendar-headers">
+        {dayHeaders.map(day => (
+          <div key={day} className="calendar-header">{day}</div>
+        ))}
+      </div>
+    );
     
-    for (let i = 0; i < 42; i++) {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
+    // Add calendar days
+    const calendarDays = [];
+    for (let week = 0; week < 6; week++) {
+      const weekDays = [];
       
-      const isCurrentMonth = date.getMonth() === month;
-      const isToday = date.toISOString().split('T')[0] === today.toISOString().split('T')[0];
-      const isPast = date < today;
+      for (let day = 0; day < 7; day++) {
+        const date = new Date(currentDateObj);
+        date.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
+        
+        const isCurrentMonth = date.getMonth() === month;
+        const isToday = formatDateToString(date) === formatDateToString(today);
+        const isPast = date < today;
+        
+        const daySlots = getDateSlots(date);
+        const availableSlots = daySlots.filter(slot => !slot.isBooked);
+        const bookedSlots = daySlots.filter(slot => slot.isBooked);
+        
+        weekDays.push(
+          <div
+            key={formatDateToString(date)}
+            className={`calendar-day ${isCurrentMonth ? 'current-month' : 'other-month'} ${
+              isToday ? 'today' : ''
+            } ${isPast ? 'past' : ''} ${daySlots.length > 0 ? 'has-slots' : ''}`}
+            onClick={() => !isPast && handleDateClick(date)}
+          >
+            <span className="day-number">{date.getDate()}</span>
+            {daySlots.length > 0 && (
+              <div className="day-slots">
+                {availableSlots.length > 0 && (
+                  <span className="available-indicator">{availableSlots.length}</span>
+                )}
+                {bookedSlots.length > 0 && (
+                  <span className="booked-indicator">{bookedSlots.length}</span>
+                )}
+              </div>
+            )}
+          </div>
+        );
+        
+        currentDateObj.setDate(currentDateObj.getDate() + 1);
+      }
       
-      const dateSlots = getDateSlots(date);
-      const availableSlots = dateSlots.filter(slot => !slot.isBooked);
-      const bookedSlots = dateSlots.filter(slot => slot.isBooked);
-      
-      days.push(
-        <div
-          key={date.toISOString()}
-          className={`calendar-day ${!isCurrentMonth ? 'other-month' : ''} 
-                     ${isToday ? 'today' : ''} ${isPast ? 'past' : ''}`}
-          onClick={() => !isPast && handleDateClick(date)}
-        >
-          <div className="day-number">{date.getDate()}</div>
-          {dateSlots.length > 0 && (
-            <div className="day-slots">
-              {availableSlots.length > 0 && (
-                <div className="slot-indicator available">
-                  {availableSlots.length}
-                </div>
-              )}
-              {bookedSlots.length > 0 && (
-                <div className="slot-indicator booked">
-                  {bookedSlots.length}
-                </div>
-              )}
-            </div>
-          )}
-          {dateSlots.length === 0 && !isPast && userRole === 'doctor' && (
-            <div className="add-slots-hint">+</div>
-          )}
+      calendarDays.push(
+        <div key={week} className="calendar-week">
+          {weekDays}
         </div>
       );
+      
+      if (currentDateObj > lastDay) break;
     }
     
-    return <div className="month-grid">{days}</div>;
+    days.push(
+      <div key="calendar" className="calendar-grid">
+        {calendarDays}
+      </div>
+    );
+    
+    return <div className="month-view">{days}</div>;
   };
 
-  // Week view rendering
+  // Render week view
   const renderWeekView = () => {
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
     startOfWeek.setHours(12, 0, 0, 0);
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const timeSlots = [];
-    for (let hour = 8; hour < 18; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        timeSlots.push(timeStr);
-      }
-    }
-    
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
-      
-      const isToday = date.toISOString().split('T')[0] === today.toISOString().split('T')[0];
-      const isPast = date < today;
-      const dateSlots = getDateSlots(date);
-      
-      weekDays.push(
-        <div key={date.toISOString()} className={`week-day ${isToday ? 'today' : ''} ${isPast ? 'past' : ''}`}>
-          <div className="week-day-header" onClick={() => !isPast && handleDateClick(date)}>
-            <div className="day-name">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-            <div className="day-number">{date.getDate()}</div>
-          </div>
-          <div className="week-day-slots">
-            {timeSlots.map(time => {
-              const slotData = dateSlots.find(slot => slot.startTime === time + ':00');
-              return (
-                <div
-                  key={time}
-                  className={`week-slot ${slotData ? (slotData.isBooked ? 'booked' : 'available') : 'empty'}`}
-                  onClick={() => !isPast && handleDateClick(date)}
-                  title={slotData ? `${time} - ${slotData.endTime} ${slotData.isBooked ? '(Booked)' : '(Available)'}` : `${time} - Click to add`}
-                >
-                  {slotData && (
-                    <div className="slot-content">
-                      <div className="slot-time">{time}</div>
-                      <div className="slot-status">
-                        {slotData.isBooked ? 'Booked' : 'Available'}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            {dateSlots.length === 0 && !isPast && userRole === 'doctor' && (
-              <div className="no-slots" onClick={() => handleDateClick(date)}>
-                Click to add slots
-              </div>
-            )}
-          </div>
-        </div>
-      );
+      date.setHours(12, 0, 0, 0);
+      weekDays.push(date);
     }
     
-    return <div className="week-grid">{weekDays}</div>;
-  };
-
-  // Format current period display
-  const formatCurrentPeriod = () => {
-    switch (viewMode) {
-      case 'year':
-        return currentDate.getFullYear().toString();
-      case 'month':
-        return currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      case 'week':
-        const startOfWeek = new Date(currentDate);
-        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 6);
-        return `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-      default:
-        return '';
+    const timeSlots = [];
+    for (let hour = 8; hour < 18; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        timeSlots.push(timeString);
+      }
     }
+    
+    return (
+      <div className="week-view">
+        <div className="week-header">
+          {weekDays.map(date => (
+            <div key={formatDateToString(date)} className="week-day-header">
+              <span className="day-name">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+              <span className="day-date">{date.getDate()}</span>
+            </div>
+          ))}
+        </div>
+        
+        <div className="week-grid">
+          <div className="time-column">
+            {timeSlots.map(time => (
+              <div key={time} className="time-slot-label">{time}</div>
+            ))}
+          </div>
+          
+          {weekDays.map(date => (
+            <div key={formatDateToString(date)} className="week-day-column">
+              {timeSlots.map(time => {
+                const daySlots = getDateSlots(date);
+                const slotAtTime = daySlots.find(slot => 
+                  slot.startTime && slot.startTime.substring(0, 5) === time
+                );
+                
+                return (
+                  <div
+                    key={`${formatDateToString(date)}-${time}`}
+                    className={`week-time-slot ${slotAtTime ? (slotAtTime.isBooked ? 'booked' : 'available') : 'empty'}`}
+                    onClick={() => {
+                      if (slotAtTime) {
+                        handleSlotClick(slotAtTime);
+                      } else {
+                        handleDateClick(date);
+                      }
+                    }}
+                  >
+                    {slotAtTime && (
+                      <div className="slot-content">
+                        {slotAtTime.isBooked ? 'Booked' : 'Available'}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className="unified-calendar">
-      {/* Calendar Header */}
       <div className="calendar-header">
         <div className="calendar-navigation">
-          <div className="nav-buttons">
-            <button className="nav-btn" onClick={() => navigateDate(-1)}>
-              &#8249;
+          <button onClick={() => navigateDate(-1)}>‹</button>
+          <h3>{formatCurrentPeriod()}</h3>
+          <button onClick={() => navigateDate(1)}>›</button>
+        </div>
+        
+        <div className="calendar-controls">
+          <button onClick={() => setCurrentDate(new Date())}>Today</button>
+          <div className="view-mode-buttons">
+            <button 
+              className={viewMode === 'year' ? 'active' : ''}
+              onClick={() => setViewMode('year')}
+            >
+              Year
             </button>
-            <button className="today-btn" onClick={goToToday}>
-              Today
+            <button 
+              className={viewMode === 'month' ? 'active' : ''}
+              onClick={() => setViewMode('month')}
+            >
+              Month
             </button>
-            <button className="nav-btn" onClick={() => navigateDate(1)}>
-              &#8250;
+            <button 
+              className={viewMode === 'week' ? 'active' : ''}
+              onClick={() => setViewMode('week')}
+            >
+              Week
             </button>
-          </div>
-          
-          <div className="current-period">
-            <h3>{formatCurrentPeriod()}</h3>
-          </div>
-          
-          <div className="view-selector">
-            {['year', 'month', 'week'].map(mode => (
-              <button
-                key={mode}
-                className={`view-btn ${viewMode === mode ? 'active' : ''}`}
-                onClick={() => setViewMode(mode)}
-              >
-                {mode.charAt(0).toUpperCase() + mode.slice(1)}
-              </button>
-            ))}
           </div>
         </div>
       </div>
 
-      {/* Calendar Content */}
       <div className="calendar-content">
         {viewMode === 'year' && renderYearView()}
         {viewMode === 'month' && renderMonthView()}
         {viewMode === 'week' && renderWeekView()}
-      </div>
-
-      {/* Legend */}
-      <div className="calendar-legend">
-        <div className="legend-item">
-          <div className="legend-color available"></div>
-          <span>Available</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-color booked"></div>
-          <span>Booked</span>
-        </div>
-        {userRole === 'doctor' && (
-          <div className="legend-item">
-            <div className="legend-color empty"></div>
-            <span>No slots</span>
-          </div>
-        )}
       </div>
 
       {/* Slot Management Modal */}
@@ -337,7 +445,7 @@ const UnifiedCalendar = ({
           userRole={userRole}
           currentUserId={currentUserId}
           doctorInfo={doctorInfo}
-          onAddSlot={onAddSlot}
+          onAddSlot={handleAddSlot}
           onDeleteSlot={onDeleteSlot}
           onBookSlot={onBookSlot}
           onCancelBooking={onCancelBooking}

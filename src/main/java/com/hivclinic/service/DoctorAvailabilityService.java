@@ -2,8 +2,10 @@ package com.hivclinic.service;
 
 import com.hivclinic.dto.request.DoctorAvailabilityRequest;
 import com.hivclinic.dto.response.MessageResponse;
+import com.hivclinic.model.Appointment;
 import com.hivclinic.model.DoctorAvailabilitySlot;
 import com.hivclinic.model.User;
+import com.hivclinic.repository.AppointmentRepository;
 import com.hivclinic.repository.DoctorAvailabilitySlotRepository;
 import com.hivclinic.repository.UserRepository;
 import org.slf4j.Logger;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service for managing doctor availability slots
+ * Service for managing doctor availability slots with proper serialization handling
  */
 @Service
 public class DoctorAvailabilityService {
@@ -32,98 +34,142 @@ public class DoctorAvailabilityService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
     /**
-     * Create a new availability slot
+     * Create a new availability slot for a doctor
      */
     @Transactional
     public MessageResponse createAvailabilitySlot(DoctorAvailabilityRequest request, Integer doctorUserId) {
         try {
-            logger.debug("Creating availability slot for doctor {}", doctorUserId);
-            
-            // Validate request
-            if (request == null || doctorUserId == null) {
-                return MessageResponse.error("Invalid request data");
-            }
+            logger.info("Creating availability slot for doctor ID: {} on date: {}", doctorUserId, request.getSlotDate());
 
             // Validate doctor exists
             Optional<User> doctorOpt = userRepository.findById(doctorUserId);
             if (doctorOpt.isEmpty()) {
+                logger.error("Doctor not found with ID: {}", doctorUserId);
                 return MessageResponse.error("Doctor not found");
             }
 
-            // Validate required fields
-            if (request.getSlotDate() == null || request.getStartTime() == null || request.getDurationMinutes() == null) {
-                return MessageResponse.error("Missing required fields: date, start time, and duration are required");
+            User doctor = doctorOpt.get();
+            if (!"Doctor".equalsIgnoreCase(doctor.getRole().getRoleName())) {
+                logger.error("User {} is not a doctor", doctorUserId);
+                return MessageResponse.error("User is not a doctor");
             }
 
-            // Calculate end time
-            LocalTime startTime = request.getStartTime();
-            LocalTime endTime = startTime.plusMinutes(request.getDurationMinutes());
+            // Validate required fields
+            if (request.getSlotDate() == null) {
+                return MessageResponse.error("Slot date is required");
+            }
+            if (request.getStartTime() == null) {
+                return MessageResponse.error("Start time is required");
+            }
+            if (request.getDurationMinutes() == null) {
+                return MessageResponse.error("Duration is required");
+            }
+
+            // Validate slot date is not in the past
+            LocalDate today = LocalDate.now();
+            if (request.getSlotDate().isBefore(today)) {
+                return MessageResponse.error("Cannot create slots for past dates");
+            }
+
+            // Calculate end time from start time and duration
+            LocalTime endTime = request.getStartTime().plusMinutes(request.getDurationMinutes());
 
             // Validate time range
-            if (startTime.isAfter(endTime) || startTime.equals(endTime)) {
-                return MessageResponse.error("Invalid time range");
+            if (request.getStartTime().isAfter(endTime) || request.getStartTime().equals(endTime)) {
+                return MessageResponse.error("Start time must be before end time");
             }
 
-            // Business hours validation (8 AM to 6 PM)
+            // Validate business hours (8 AM to 6 PM)
             LocalTime businessStart = LocalTime.of(8, 0);
             LocalTime businessEnd = LocalTime.of(18, 0);
             
-            if (startTime.isBefore(businessStart) || endTime.isAfter(businessEnd)) {
-                return MessageResponse.error("Time slot must be between 8:00 AM and 6:00 PM");
+            if (request.getStartTime().isBefore(businessStart)) {
+                return MessageResponse.error("Start time cannot be before 8:00 AM");
+            }
+            
+            if (endTime.isAfter(businessEnd)) {
+                return MessageResponse.error("End time cannot be after 6:00 PM");
             }
 
-            // Check for overlaps with existing slots
+            // Validate duration constraints (15 minutes to 4 hours)
+            if (request.getDurationMinutes() < 15) {
+                return MessageResponse.error("Minimum slot duration is 15 minutes");
+            }
+            if (request.getDurationMinutes() > 240) { // 4 hours
+                return MessageResponse.error("Maximum slot duration is 4 hours");
+            }
+
+            // Check for overlapping slots
             List<DoctorAvailabilitySlot> existingSlots = availabilitySlotRepository
-                .findByDoctorUserAndSlotDate(doctorOpt.get(), request.getSlotDate());
+                    .findByDoctorUserAndSlotDate(doctor, request.getSlotDate());
 
-            boolean hasOverlap = existingSlots.stream()
-                .anyMatch(slot -> {
-                    LocalTime slotStart = slot.getStartTime();
-                    LocalTime slotEnd = slot.getEndTime();
-                    return startTime.isBefore(slotEnd) && slotStart.isBefore(endTime);
-                });
+            for (DoctorAvailabilitySlot existingSlot : existingSlots) {
+                LocalTime existingStart = existingSlot.getStartTime();
+                LocalTime existingEnd = existingSlot.getEndTime();
 
-            if (hasOverlap) {
-                return MessageResponse.error("Time slot overlaps with existing slots");
+                if (isTimeOverlapping(request.getStartTime(), endTime, existingStart, existingEnd)) {
+                    return MessageResponse.error("Time slot overlaps with existing slot from " 
+                            + existingStart + " to " + existingEnd);
+                }
             }
 
-            // Create new slot
+            // Create new availability slot
             DoctorAvailabilitySlot slot = new DoctorAvailabilitySlot();
-            slot.setDoctorUser(doctorOpt.get());
+            slot.setDoctorUser(doctor);
             slot.setSlotDate(request.getSlotDate());
-            slot.setStartTime(startTime);
+            slot.setStartTime(request.getStartTime());
             slot.setEndTime(endTime);
-            slot.setDurationMinutes(request.getDurationMinutes());
             slot.setIsBooked(false);
             slot.setNotes(request.getNotes());
-            
-            availabilitySlotRepository.save(slot);
-            
-            logger.info("Time slot created successfully for doctor: {}", doctorUserId);
-            return MessageResponse.success("Time slot created successfully");
+
+            // Save the slot
+            DoctorAvailabilitySlot savedSlot = availabilitySlotRepository.save(slot);
+
+            logger.info("Availability slot created successfully for doctor: {} on date: {} from {} to {} (duration: {} minutes)", 
+                    doctor.getUsername(), request.getSlotDate(), request.getStartTime(), 
+                    endTime, request.getDurationMinutes());
+
+            return MessageResponse.success("Availability slot created successfully!");
 
         } catch (Exception e) {
-            logger.error("Error creating availability slot", e);
-            return MessageResponse.error("Failed to create time slot: " + e.getMessage());
+            logger.error("Error creating availability slot for doctor {}: {}", doctorUserId, e.getMessage(), e);
+            return MessageResponse.error("Failed to create availability slot: " + e.getMessage());
         }
     }
 
     /**
-     * Get doctor's availability slots
+     * Get all availability slots for a doctor with safe serialization
      */
     @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailability(Integer doctorUserId) {
-        Optional<User> doctorOpt = userRepository.findById(doctorUserId);
-        if (doctorOpt.isEmpty()) {
-            throw new RuntimeException("Doctor not found");
-        }
+        try {
+            Optional<User> doctorOpt = userRepository.findById(doctorUserId);
+            if (doctorOpt.isEmpty()) {
+                logger.warn("Doctor not found with ID: {}", doctorUserId);
+                return Collections.emptyList();
+            }
 
-        return availabilitySlotRepository.findByDoctorUserOrderBySlotDateAscStartTimeAsc(doctorOpt.get());
+            List<DoctorAvailabilitySlot> slots = availabilitySlotRepository
+                    .findByDoctorUserOrderBySlotDateAscStartTimeAsc(doctorOpt.get());
+
+            // Safely populate appointment details for booked slots
+            safePopulateAppointmentDetails(slots);
+
+            logger.debug("Retrieved {} availability slots for doctor ID: {}", slots.size(), doctorUserId);
+            return slots;
+
+        } catch (Exception e) {
+            logger.error("Error retrieving availability for doctor {}: {}", doctorUserId, e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
-     * Get doctor's available slots (not booked)
+     * Get available slots for a doctor
      */
     @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailableSlots(Integer doctorUserId) {
@@ -136,7 +182,7 @@ public class DoctorAvailabilityService {
     }
 
     /**
-     * Get doctor's availability by date
+     * Get doctor's availability by date with appointment details
      */
     @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailabilityByDate(Integer doctorUserId, LocalDate date) {
@@ -145,7 +191,12 @@ public class DoctorAvailabilityService {
             throw new RuntimeException("Doctor not found");
         }
 
-        return availabilitySlotRepository.findByDoctorUserAndSlotDateOrderByStartTimeAsc(doctorOpt.get(), date);
+        List<DoctorAvailabilitySlot> slots = availabilitySlotRepository.findByDoctorUserAndSlotDateOrderByStartTimeAsc(doctorOpt.get(), date);
+        
+        // Safely populate appointment details for booked slots
+        safePopulateAppointmentDetails(slots);
+        
+        return slots;
     }
 
     /**
@@ -163,13 +214,11 @@ public class DoctorAvailabilityService {
     public List<DoctorAvailabilitySlot> getDoctorFutureAvailableSlots(Integer doctorUserId) {
         Optional<User> doctorOpt = userRepository.findById(doctorUserId);
         if (doctorOpt.isEmpty()) {
-            return Collections.emptyList();
+            throw new RuntimeException("Doctor not found");
         }
 
-        LocalDate today = LocalDate.now();
-        return availabilitySlotRepository
-            .findByDoctorUserAndIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(
-                doctorOpt.get(), today);
+        return availabilitySlotRepository.findByDoctorUserAndIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(
+                doctorOpt.get(), LocalDate.now());
     }
 
     /**
@@ -211,7 +260,6 @@ public class DoctorAvailabilityService {
             // Validate business hours
             LocalTime businessStart = LocalTime.of(8, 0);
             LocalTime businessEnd = LocalTime.of(18, 0);
-            
             if (request.getStartTime().isBefore(businessStart) || endTime.isAfter(businessEnd)) {
                 return MessageResponse.error("Slots must be between 8:00 AM and 6:00 PM");
             }
@@ -220,31 +268,32 @@ public class DoctorAvailabilityService {
             List<DoctorAvailabilitySlot> existingSlots = availabilitySlotRepository
                     .findByDoctorUserAndSlotDate(slot.getDoctorUser(), request.getSlotDate());
 
-            boolean hasOverlap = existingSlots.stream()
-                    .filter(s -> !s.getAvailabilitySlotId().equals(slotId))
-                    .anyMatch(s -> isTimeOverlapping(request.getStartTime(), endTime, 
-                                                   s.getStartTime(), s.getEndTime()));
+            for (DoctorAvailabilitySlot existingSlot : existingSlots) {
+                if (!existingSlot.getAvailabilitySlotId().equals(slotId)) { // Exclude current slot
+                    LocalTime existingStart = existingSlot.getStartTime();
+                    LocalTime existingEnd = existingSlot.getEndTime();
 
-            if (hasOverlap) {
-                return MessageResponse.error("Updated time slot overlaps with existing availability");
+                    if (isTimeOverlapping(request.getStartTime(), endTime, existingStart, existingEnd)) {
+                        return MessageResponse.error("Time slot overlaps with existing slot from " 
+                                + existingStart + " to " + existingEnd);
+                    }
+                }
             }
 
             // Update slot
             slot.setSlotDate(request.getSlotDate());
             slot.setStartTime(request.getStartTime());
             slot.setEndTime(endTime);
-            slot.setNotes(request.getNotes() != null ? request.getNotes() : "");
+            slot.setNotes(request.getNotes());
 
             availabilitySlotRepository.save(slot);
 
-            logger.info("Availability slot updated for doctor: {} on date: {} from {} to {}", 
-                        slot.getDoctorUser().getUsername(), request.getSlotDate(), 
-                        request.getStartTime(), endTime);
-
+            logger.info("Availability slot updated successfully for doctor: {} on date: {} from {} to {}", 
+                    slot.getDoctorUser().getUsername(), request.getSlotDate(), request.getStartTime(), endTime);
             return MessageResponse.success("Availability slot updated successfully!");
 
         } catch (Exception e) {
-            logger.error("Error updating availability slot: {}", e.getMessage(), e);
+            logger.error("Error updating availability slot {}: {}", slotId, e.getMessage(), e);
             return MessageResponse.error("Failed to update availability slot: " + e.getMessage());
         }
     }
@@ -274,22 +323,59 @@ public class DoctorAvailabilityService {
 
             availabilitySlotRepository.delete(slot);
 
-            logger.info("Availability slot deleted for doctor: {} on date: {} from {} to {}", 
-                        slot.getDoctorUser().getUsername(), slot.getSlotDate(), 
-                        slot.getStartTime(), slot.getEndTime());
-
+            logger.info("Availability slot deleted successfully for doctor: {} on date: {} from {} to {}", 
+                    slot.getDoctorUser().getUsername(), slot.getSlotDate(), slot.getStartTime(), slot.getEndTime());
             return MessageResponse.success("Availability slot deleted successfully!");
 
         } catch (Exception e) {
-            logger.error("Error deleting availability slot: {}", e.getMessage(), e);
+            logger.error("Error deleting availability slot {}: {}", slotId, e.getMessage(), e);
             return MessageResponse.error("Failed to delete availability slot: " + e.getMessage());
         }
     }
 
     /**
-     * Check if two time ranges overlap
+     * Helper method to check if two time ranges overlap
      */
     private boolean isTimeOverlapping(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
         return start1.isBefore(end2) && start2.isBefore(end1);
+    }
+
+    /**
+     * Safely populate appointment details for booked slots to prevent circular references
+     */
+    private void safePopulateAppointmentDetails(List<DoctorAvailabilitySlot> slots) {
+        for (DoctorAvailabilitySlot slot : slots) {
+            if (slot.getIsBooked()) {
+                try {
+                    // Find the appointment for this slot
+                    List<Appointment> appointments = appointmentRepository.findByAvailabilitySlot(slot);
+                    if (!appointments.isEmpty()) {
+                        // Get the most recent appointment for this slot
+                        Appointment appointment = appointments.get(0);
+                        
+                        // Create a safe copy to avoid circular references
+                        Appointment safeAppointment = new Appointment();
+                        safeAppointment.setAppointmentId(appointment.getAppointmentId());
+                        safeAppointment.setAppointmentDateTime(appointment.getAppointmentDateTime());
+                        safeAppointment.setStatus(appointment.getStatus());
+                        safeAppointment.setDurationMinutes(appointment.getDurationMinutes());
+                        
+                        // Set patient user with minimal info
+                        if (appointment.getPatientUser() != null) {
+                            User safePatientUser = new User();
+                            safePatientUser.setUserId(appointment.getPatientUser().getUserId());
+                            safePatientUser.setUsername(appointment.getPatientUser().getUsername());
+                            safePatientUser.setEmail(appointment.getPatientUser().getEmail());
+                            safeAppointment.setPatientUser(safePatientUser);
+                        }
+                        
+                        slot.setAppointment(safeAppointment);
+                    }
+                } catch (Exception e) {
+                    logger.warn("Error populating appointment details for slot {}: {}", slot.getAvailabilitySlotId(), e.getMessage());
+                    // Continue without appointment details if there's an error
+                }
+            }
+        }
     }
 }

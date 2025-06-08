@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import TimeSlotModal from './TimeSlotModal';
 import './SlotManagementModal.css';
 
+/**
+ * Modal for managing time slots - allows doctors to manage availability and patients to book slots
+ */
 const SlotManagementModal = ({ 
   isOpen, 
   onClose, 
@@ -21,77 +24,161 @@ const SlotManagementModal = ({
   const [showCancelBooking, setShowCancelBooking] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  if (!isOpen || !selectedDate) return null;
+  // Process slots safely
+  const processedSlots = useMemo(() => {
+    if (!Array.isArray(existingSlots)) {
+      console.warn('existingSlots is not an array:', existingSlots);
+      return [];
+    }
 
-  const availableSlots = existingSlots.filter(slot => !slot.isBooked);
-  const bookedSlots = existingSlots.filter(slot => slot.isBooked);
+    return existingSlots.filter(slot => {
+      if (!slot) {
+        console.warn('Invalid slot found:', slot);
+        return false;
+      }
 
-  // Check if patient owns a booking
+      // Ensure required properties exist
+      if (!slot.availabilitySlotId && !slot.slotId) {
+        console.warn('Slot missing ID:', slot);
+        return false;
+      }
+
+      return true;
+    }).map(slot => ({
+      availabilitySlotId: slot.availabilitySlotId || slot.slotId,
+      startTime: slot.startTime || '00:00',
+      endTime: slot.endTime || '00:30',
+      isBooked: Boolean(slot.isBooked),
+      notes: slot.notes || '',
+      appointment: slot.appointment || null,
+      slotDate: slot.slotDate,
+      doctorUser: slot.doctorUser || doctorInfo
+    }));
+  }, [existingSlots, doctorInfo]);
+
+  // Separate available and booked slots
+  const availableSlots = processedSlots.filter(slot => !slot.isBooked);
+  const bookedSlots = processedSlots.filter(slot => slot.isBooked);
+
+  // Format time for display
+  const formatTime = (timeString) => {
+    if (!timeString) return 'N/A';
+    try {
+      // Handle different time formats
+      if (timeString.includes(':')) {
+        const [hours, minutes] = timeString.split(':');
+        const hour = parseInt(hours, 10);
+        const min = parseInt(minutes, 10);
+        const period = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+        return `${displayHour}:${min.toString().padStart(2, '0')} ${period}`;
+      }
+      return timeString;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return timeString;
+    }
+  };
+
+  // Format date for display
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    try {
+      const dateObj = new Date(date);
+      return dateObj.toLocaleDateString();
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return date.toString();
+    }
+  };
+
+  // Check if patient owns the booking
   const isPatientOwnBooking = (slot) => {
-    return userRole === 'patient' && 
-           slot.appointment && 
-           slot.appointment.patientUser && 
-           slot.appointment.patientUser.userId === currentUserId;
+    if (userRole !== 'patient' || !slot.appointment) return false;
+    
+    try {
+      const patientUser = slot.appointment.patientUser;
+      if (!patientUser) return false;
+      
+      const patientId = patientUser.userId || patientUser.id || patientUser.userID;
+      return patientId === currentUserId;
+    } catch (error) {
+      console.warn('Error checking patient booking ownership:', error);
+      return false;
+    }
   };
 
   // Handle slot actions based on user role
   const handleSlotAction = (slot) => {
-    if (userRole === 'doctor') {
-      if (slot.isBooked) {
-        // Doctor viewing booked slot details
-        alert(`This slot is booked by: ${slot.appointment?.patientUser?.username || 'Unknown Patient'}`);
-      } else {
-        // Doctor can delete available slots
-        handleDeleteSlot(slot.availabilitySlotId);
-      }
-    } else if (userRole === 'patient') {
-      if (slot.isBooked) {
-        if (isPatientOwnBooking(slot)) {
-          // Patient can cancel their own booking
-          setSelectedSlot(slot);
-          setShowCancelBooking(true);
+    try {
+      console.log('Slot action triggered:', { slot, userRole, currentUserId });
+      
+      if (userRole === 'doctor') {
+        if (slot.isBooked) {
+          // Doctor viewing booked slot details
+          const patientName = slot.appointment?.patientUser?.username || 'Unknown Patient';
+          alert(`This slot is booked by: ${patientName}`);
         } else {
-          // Slot booked by another patient
-          alert('This slot is already booked by another patient.');
+          // Doctor can delete available slots
+          handleDeleteSlot(slot.availabilitySlotId);
         }
-      } else {
-        // Patient can book available slots
-        setSelectedSlot(slot);
-        setShowConfirmBooking(true);
+      } else if (userRole === 'patient') {
+        if (slot.isBooked) {
+          if (isPatientOwnBooking(slot)) {
+            // Patient can cancel their own booking
+            setSelectedSlot(slot);
+            setShowCancelBooking(true);
+          } else {
+            // Slot booked by another patient
+            alert('This slot is already booked by another patient.');
+          }
+        } else {
+          // Patient can book available slots
+          setSelectedSlot(slot);
+          setShowConfirmBooking(true);
+        }
       }
+    } catch (error) {
+      console.error('Error handling slot action:', error);
+      alert('An error occurred. Please try again.');
     }
   };
 
   // Handle slot deletion (doctors only)
-  const handleDeleteSlot = async (slotId) => {
-    const slot = existingSlots.find(s => s.availabilitySlotId === slotId);
-    const confirmMessage = slot?.isBooked 
-      ? 'This slot is currently booked. Deleting it will cancel the appointment. Are you sure?'
-      : 'Are you sure you want to delete this availability slot?';
-    
-    if (window.confirm(confirmMessage)) {
-      try {
-        await onDeleteSlot(slotId);
-        onClose(); // Close modal after successful deletion
-      } catch (error) {
-        console.error('Error deleting slot:', error);
-        alert('Failed to delete slot. Please try again.');
-      }
+  const handleDeleteSlot = (slotId) => {
+    if (userRole !== 'doctor') {
+      alert('Only doctors can delete slots.');
+      return;
+    }
+
+    const confirmDelete = window.confirm('Are you sure you want to delete this availability slot?');
+    if (confirmDelete && onDeleteSlot) {
+      console.log('Deleting slot:', slotId);
+      onDeleteSlot(slotId);
     }
   };
 
   // Handle booking confirmation (patients only)
   const handleConfirmBooking = async () => {
-    if (!selectedSlot || !onBookSlot) return;
+    if (!selectedSlot || userRole !== 'patient') return;
 
-    setLoading(true);
     try {
-      await onBookSlot(selectedSlot);
+      setLoading(true);
+      
+      if (onBookSlot) {
+        await onBookSlot({
+          availabilitySlotId: selectedSlot.availabilitySlotId,
+          doctorUserId: selectedSlot.doctorUser?.userId || doctorInfo?.userId,
+          appointmentDateTime: `${selectedDate}T${selectedSlot.startTime}:00`,
+          durationMinutes: 30
+        });
+      }
+      
       setShowConfirmBooking(false);
       setSelectedSlot(null);
-      onClose(); // Close modal after successful booking
+      alert('Appointment booked successfully!');
     } catch (error) {
-      console.error('Booking failed:', error);
+      console.error('Error booking appointment:', error);
       alert('Failed to book appointment. Please try again.');
     } finally {
       setLoading(false);
@@ -100,18 +187,23 @@ const SlotManagementModal = ({
 
   // Handle booking cancellation (patients only)
   const handleCancelBooking = async () => {
-    if (!selectedSlot || !onCancelBooking) return;
+    if (!selectedSlot || userRole !== 'patient') return;
 
-    const reason = prompt('Please provide a reason for cancellation (optional):') || 'No reason provided';
-    
-    setLoading(true);
+    const reason = prompt('Please provide a reason for cancellation:');
+    if (!reason) return;
+
     try {
-      await onCancelBooking(selectedSlot.appointment.appointmentId, reason);
+      setLoading(true);
+      
+      if (onCancelBooking && selectedSlot.appointment) {
+        await onCancelBooking(selectedSlot.appointment.appointmentId, reason);
+      }
+      
       setShowCancelBooking(false);
       setSelectedSlot(null);
-      onClose(); // Close modal after successful cancellation
+      alert('Appointment cancelled successfully!');
     } catch (error) {
-      console.error('Cancellation failed:', error);
+      console.error('Error cancelling appointment:', error);
       alert('Failed to cancel appointment. Please try again.');
     } finally {
       setLoading(false);
@@ -119,66 +211,166 @@ const SlotManagementModal = ({
   };
 
   // Handle adding new slot
-  const handleAddSlot = async (slotData) => {
-    try {
-      await onAddSlot(slotData);
-      setShowAddModal(false);
-      // Don't close main modal, just refresh the view
-    } catch (error) {
-      console.error('Failed to add slot:', error);
-      throw error; // Re-throw to be handled by TimeSlotModal
+  const handleAddNewSlot = () => {
+    if (userRole !== 'doctor') {
+      alert('Only doctors can add availability slots.');
+      return;
     }
+    setShowAddModal(true);
   };
 
-  // Format time for display
-  const formatTime = (timeString) => {
-    if (!timeString) return '';
-    try {
-      const [hours, minutes] = timeString.split(':');
-      const date = new Date();
-      date.setHours(parseInt(hours), parseInt(minutes));
-      return date.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit',
-        hour12: true 
-      });
-    } catch (error) {
-      return timeString;
+  // Handle slot creation
+  const handleSlotCreated = (slotData) => {
+    if (onAddSlot) {
+      onAddSlot(slotData);
     }
+    setShowAddModal(false);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="slot-modal-overlay">
       <div className="slot-modal">
         <div className="modal-header">
-          <h3>
-            {userRole === 'doctor' ? 'Manage Availability' : 'Book Appointment'} - {selectedDate.toLocaleDateString()}
-          </h3>
+          <h3>Manage Slots - {formatDate(selectedDate)}</h3>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
         <div className="modal-content">
-          {showConfirmBooking ? (
-            /* Booking Confirmation */
-            <div className="booking-confirmation">
-              <h4>Confirm Appointment Booking</h4>
-              <div className="booking-details">
-                <p><strong>Date:</strong> {selectedDate.toLocaleDateString()}</p>
-                <p><strong>Time:</strong> {formatTime(selectedSlot?.startTime)} - {formatTime(selectedSlot?.endTime)}</p>
-                {doctorInfo && (
-                  <p><strong>Doctor:</strong> Dr. {doctorInfo.firstName} {doctorInfo.lastName}</p>
-                )}
+          {userRole === 'doctor' && (
+            <div className="modal-actions">
+              <button 
+                className="btn-primary"
+                onClick={handleAddNewSlot}
+              >
+                Add New Slot
+              </button>
+            </div>
+          )}
+
+          <div className="slot-sections">
+            {/* Available Slots Section */}
+            <div className="slot-section">
+              <h4>Available Slots ({availableSlots.length})</h4>
+              {availableSlots.length === 0 ? (
+                <div className="no-slots">
+                  <p>No available slots for this date.</p>
+                </div>
+              ) : (
+                <div className="slots-list">
+                  {availableSlots.map(slot => (
+                    <div key={slot.availabilitySlotId} className="slot-item available">
+                      <div className="slot-info">
+                        <span className="slot-time">
+                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                        </span>
+                        {slot.notes && (
+                          <span className="slot-notes">{slot.notes}</span>
+                        )}
+                        {doctorInfo && userRole === 'patient' && (
+                          <span className="slot-doctor">
+                            Dr. {doctorInfo.firstName} {doctorInfo.lastName}
+                          </span>
+                        )}
+                      </div>
+                      <div className="slot-actions">
+                        {userRole === 'doctor' ? (
+                          <button 
+                            className="btn-danger-small"
+                            onClick={() => handleSlotAction(slot)}
+                          >
+                            Delete
+                          </button>
+                        ) : (
+                          <button 
+                            className="btn-primary-small"
+                            onClick={() => handleSlotAction(slot)}
+                          >
+                            Book
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Booked Slots Section */}
+            {bookedSlots.length > 0 && (
+              <div className="slot-section">
+                <h4>Booked Slots ({bookedSlots.length})</h4>
+                <div className="slots-list">
+                  {bookedSlots.map(slot => (
+                    <div key={slot.availabilitySlotId} className="slot-item booked">
+                      <div className="slot-info">
+                        <span className="slot-time">
+                          {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
+                        </span>
+                        {userRole === 'doctor' && slot.appointment && (
+                          <span className="booked-indicator">
+                            Patient: {slot.appointment.patientUser?.username || 'Unknown'}
+                          </span>
+                        )}
+                        {userRole === 'patient' && isPatientOwnBooking(slot) && (
+                          <span className="own-booking">Your booking</span>
+                        )}
+                        {slot.notes && (
+                          <span className="slot-notes">{slot.notes}</span>
+                        )}
+                      </div>
+                      <div className="slot-actions">
+                        {userRole === 'doctor' ? (
+                          <button 
+                            className="btn-info-small"
+                            onClick={() => handleSlotAction(slot)}
+                          >
+                            View Details
+                          </button>
+                        ) : isPatientOwnBooking(slot) ? (
+                          <button 
+                            className="btn-warning-small"
+                            onClick={() => handleSlotAction(slot)}
+                          >
+                            Cancel
+                          </button>
+                        ) : (
+                          <button className="btn-secondary-small" disabled>
+                            Booked
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="booking-actions">
+            )}
+          </div>
+        </div>
+
+        {/* Booking Confirmation Modal */}
+        {showConfirmBooking && (
+          <div className="confirmation-modal">
+            <div className="confirmation-content">
+              <h4>Confirm Booking</h4>
+              <p>
+                Book appointment on {formatDate(selectedDate)} at{' '}
+                {formatTime(selectedSlot?.startTime)} - {formatTime(selectedSlot?.endTime)}?
+              </p>
+              {doctorInfo && (
+                <p>Doctor: Dr. {doctorInfo.firstName} {doctorInfo.lastName}</p>
+              )}
+              <div className="confirmation-actions">
                 <button 
-                  className="btn btn-primary"
+                  className="btn-primary"
                   onClick={handleConfirmBooking}
                   disabled={loading}
                 >
-                  {loading ? 'Booking...' : 'Confirm Booking'}
+                  {loading ? 'Booking...' : 'Confirm'}
                 </button>
                 <button 
-                  className="btn btn-secondary"
+                  className="btn-secondary"
                   onClick={() => setShowConfirmBooking(false)}
                   disabled={loading}
                 >
@@ -186,174 +378,48 @@ const SlotManagementModal = ({
                 </button>
               </div>
             </div>
-          ) : showCancelBooking ? (
-            /* Cancellation Confirmation */
-            <div className="cancellation-confirmation">
-              <h4>Cancel Appointment</h4>
-              <div className="booking-details">
-                <p><strong>Date:</strong> {selectedDate.toLocaleDateString()}</p>
-                <p><strong>Time:</strong> {formatTime(selectedSlot?.startTime)} - {formatTime(selectedSlot?.endTime)}</p>
-              </div>
-              <p>Are you sure you want to cancel this appointment?</p>
-              <div className="booking-actions">
+          </div>
+        )}
+
+        {/* Cancellation Confirmation Modal */}
+        {showCancelBooking && (
+          <div className="confirmation-modal">
+            <div className="confirmation-content">
+              <h4>Cancel Booking</h4>
+              <p>
+                Cancel your appointment on {formatDate(selectedDate)} at{' '}
+                {formatTime(selectedSlot?.startTime)} - {formatTime(selectedSlot?.endTime)}?
+              </p>
+              <div className="confirmation-actions">
                 <button 
-                  className="btn btn-danger"
+                  className="btn-warning"
                   onClick={handleCancelBooking}
                   disabled={loading}
                 >
-                  {loading ? 'Cancelling...' : 'Yes, Cancel'}
+                  {loading ? 'Cancelling...' : 'Cancel Booking'}
                 </button>
                 <button 
-                  className="btn btn-secondary"
+                  className="btn-secondary"
                   onClick={() => setShowCancelBooking(false)}
                   disabled={loading}
                 >
-                  No, Keep Appointment
+                  Keep Booking
                 </button>
               </div>
             </div>
-          ) : (
-            /* Slot List */
-            <div className="slot-sections">
-              {/* Available Slots */}
-              {availableSlots.length > 0 && (
-                <div className="slot-section">
-                  <h5 className="section-title available">Available Slots ({availableSlots.length})</h5>
-                  <div className="slots-list">
-                    {availableSlots.map(slot => (
-                      <div key={slot.availabilitySlotId} className="slot-item available">
-                        <div className="slot-info">
-                          <span className="slot-time">
-                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                          </span>
-                          {slot.notes && (
-                            <span className="slot-notes">{slot.notes}</span>
-                          )}
-                          {doctorInfo && userRole === 'patient' && (
-                            <span className="slot-doctor">
-                              Dr. {doctorInfo.firstName} {doctorInfo.lastName}
-                            </span>
-                          )}
-                        </div>
-                        <div className="slot-actions">
-                          {userRole === 'doctor' ? (
-                            <button 
-                              className="btn-danger-small"
-                              onClick={() => handleSlotAction(slot)}
-                            >
-                              Delete
-                            </button>
-                          ) : (
-                            <button 
-                              className="btn-primary-small"
-                              onClick={() => handleSlotAction(slot)}
-                            >
-                              Book
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Booked Slots */}
-              {bookedSlots.length > 0 && (
-                <div className="slot-section">
-                  <h5 className="section-title booked">Booked Slots ({bookedSlots.length})</h5>
-                  <div className="slots-list">
-                    {bookedSlots.map(slot => (
-                      <div key={slot.availabilitySlotId} className="slot-item booked">
-                        <div className="slot-info">
-                          <span className="slot-time">
-                            {formatTime(slot.startTime)} - {formatTime(slot.endTime)}
-                          </span>
-                          {userRole === 'doctor' && slot.appointment && (
-                            <span className="booked-indicator">
-                              Patient: {slot.appointment.patientUser?.username || 'Unknown'}
-                            </span>
-                          )}
-                          {userRole === 'patient' && isPatientOwnBooking(slot) && (
-                            <span className="own-booking">Your booking</span>
-                          )}
-                          {slot.notes && (
-                            <span className="slot-notes">{slot.notes}</span>
-                          )}
-                        </div>
-                        <div className="slot-actions">
-                          {userRole === 'doctor' ? (
-                            <button 
-                              className="btn-info-small"
-                              onClick={() => handleSlotAction(slot)}
-                            >
-                              View Details
-                            </button>
-                          ) : isPatientOwnBooking(slot) ? (
-                            <button 
-                              className="btn-warning-small"
-                              onClick={() => handleSlotAction(slot)}
-                            >
-                              Cancel
-                            </button>
-                          ) : (
-                            <button className="btn-secondary-small" disabled>
-                              Booked
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* No Slots Message */}
-              {existingSlots.length === 0 && (
-                <div className="no-slots">
-                  <p>
-                    {userRole === 'doctor' 
-                      ? 'No slots available for this date. Click "Add New Slot" to create availability.'
-                      : 'No slots available for this date. Please select another date.'
-                    }
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Modal Footer */}
-        {!showConfirmBooking && !showCancelBooking && (
-          <div className="modal-actions">
-            {userRole === 'doctor' && (
-              <button 
-                className="btn-primary"
-                onClick={() => setShowAddModal(true)}
-              >
-                Add New Slot
-              </button>
-            )}
-            <button 
-              className="btn-secondary" 
-              onClick={onClose}
-            >
-              Close
-            </button>
           </div>
         )}
-      </div>
 
-      {/* Time Slot Modal for adding new slots */}
-      {showAddModal && (
-        <TimeSlotModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSave={handleAddSlot}
-          selectedDate={selectedDate}
-          existingSlots={existingSlots}
-        />
-      )}
+        {/* Add Slot Modal */}
+        {showAddModal && (
+          <TimeSlotModal
+            isOpen={showAddModal}
+            onClose={() => setShowAddModal(false)}
+            selectedDate={selectedDate}
+            onSlotCreated={handleSlotCreated}
+          />
+        )}
+      </div>
     </div>
   );
 };

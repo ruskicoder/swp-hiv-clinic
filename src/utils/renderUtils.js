@@ -10,9 +10,9 @@ import React from 'react';
  * @param {string} fallback - Fallback value if the input is null/undefined
  * @returns {string} - Safe string representation
  */
-export const safeRender = (value, fallback = '') => {
+export const safeRender = (value) => {
   if (value === null || value === undefined) {
-    return fallback;
+    return '';
   }
   
   if (typeof value === 'object') {
@@ -20,8 +20,27 @@ export const safeRender = (value, fallback = '') => {
     if (value instanceof Date) {
       return value.toLocaleDateString();
     }
-    // For other objects, return fallback instead of trying to stringify
-    return fallback;
+    
+    // Handle arrays
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
+    
+    // For other objects, try to extract meaningful data
+    if (value.toString && typeof value.toString === 'function') {
+      const stringValue = value.toString();
+      if (stringValue !== '[object Object]') {
+        return stringValue;
+      }
+    }
+    
+    // Last resort: JSON stringify
+    try {
+      return JSON.stringify(value);
+    } catch (error) {
+      console.warn('Error stringifying object:', error);
+      return '[Complex Object]';
+    }
   }
   
   return String(value);
@@ -33,8 +52,8 @@ export const safeRender = (value, fallback = '') => {
  * @param {string} fallback - Fallback value if the input is null/undefined
  * @returns {string} - Formatted date string
  */
-export const safeDate = (dateValue, fallback = 'N/A') => {
-  if (!dateValue) return fallback;
+export const safeDate = (dateValue) => {
+  if (!dateValue) return '';
   
   try {
     let date;
@@ -42,33 +61,22 @@ export const safeDate = (dateValue, fallback = 'N/A') => {
     if (dateValue instanceof Date) {
       date = dateValue;
     } else if (typeof dateValue === 'string') {
-      // Handle date strings consistently
-      if (dateValue.includes('T')) {
-        // ISO datetime string - extract date part only
-        const datePart = dateValue.split('T')[0];
-        const [year, month, day] = datePart.split('-').map(Number);
-        date = new Date(year, month - 1, day); // month is 0-indexed
-      } else {
-        // Simple date string YYYY-MM-DD
-        const [year, month, day] = dateValue.split('-').map(Number);
-        date = new Date(year, month - 1, day); // month is 0-indexed
-      }
-    } else if (typeof dateValue === 'number') {
       date = new Date(dateValue);
+    } else if (Array.isArray(dateValue) && dateValue.length >= 3) {
+      // Handle [year, month, day] format
+      date = new Date(dateValue[0], dateValue[1] - 1, dateValue[2]);
     } else {
-      return fallback;
+      return safeRender(dateValue);
     }
     
-    if (isNaN(date.getTime())) return fallback;
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
     
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return date.toLocaleDateString();
   } catch (error) {
-    console.warn('Failed to parse date:', dateValue, error);
-    return fallback;
+    console.warn('Error formatting date:', dateValue, error);
+    return safeRender(dateValue);
   }
 };
 
@@ -78,34 +86,20 @@ export const safeDate = (dateValue, fallback = 'N/A') => {
  * @param {string} fallback - Fallback value if the input is null/undefined
  * @returns {string} - Formatted datetime string
  */
-export const safeDateTime = (dateTimeValue, fallback = 'N/A') => {
-  if (!dateTimeValue) return fallback;
+export const safeDateTime = (dateTimeValue) => {
+  if (!dateTimeValue) return '';
   
   try {
-    let date;
+    const date = new Date(dateTimeValue);
     
-    if (dateTimeValue instanceof Date) {
-      date = dateTimeValue;
-    } else if (typeof dateTimeValue === 'string') {
-      date = new Date(dateTimeValue);
-    } else if (typeof dateTimeValue === 'number') {
-      date = new Date(dateTimeValue);
-    } else {
-      return fallback;
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
     }
     
-    if (isNaN(date.getTime())) return fallback;
-    
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return date.toLocaleString();
   } catch (error) {
-    console.warn('Failed to parse datetime:', dateTimeValue, error);
-    return fallback;
+    console.warn('Error formatting datetime:', dateTimeValue, error);
+    return safeRender(dateTimeValue);
   }
 };
 
@@ -115,8 +109,8 @@ export const safeDateTime = (dateTimeValue, fallback = 'N/A') => {
  * @param {string} fallback - Fallback value if the input is null/undefined
  * @returns {string} - Formatted time string
  */
-export const safeTime = (timeValue, fallback = 'N/A') => {
-  if (!timeValue) return fallback;
+export const safeTime = (timeValue) => {
+  if (!timeValue) return '';
   
   try {
     // Handle time strings like "14:30:00" or "14:30"
@@ -157,10 +151,10 @@ export const safeTime = (timeValue, fallback = 'N/A') => {
       });
     }
     
-    return fallback;
+    return 'Invalid Time';
   } catch (error) {
-    console.warn('Failed to parse time:', timeValue, error);
-    return fallback;
+    console.warn('Error formatting time:', timeValue, error);
+    return safeRender(timeValue);
   }
 };
 
@@ -258,4 +252,14 @@ export default {
   safeRole,
   safeStatus,
   formatDuration
+};
+
+export const debugObject = (obj, label = 'Object') => {
+  console.group(`Debug: ${label}`);
+  console.log('Type:', typeof obj);
+  console.log('Value:', obj);
+  console.log('Constructor:', obj?.constructor?.name);
+  console.log('Keys:', obj && typeof obj === 'object' ? Object.keys(obj) : 'N/A');
+  console.groupEnd();
+  return obj;
 };

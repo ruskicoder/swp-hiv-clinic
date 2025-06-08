@@ -27,20 +27,43 @@ const AvailabilityCalendar = ({
   };
 
   // Process slots to ensure valid dates
-  const processedSlots = slots.map(slot => ({
-    ...slot,
-    slotDate: ensureValidDate(slot.slotDate)
-  }));
+  const processedSlots = React.useMemo(() => {
+    return slots.map(slot => {
+      try {
+        const slotDate = slot.slotDate instanceof Date ? 
+          slot.slotDate : 
+          new Date(slot.slotDate);
+        
+        return {
+          ...slot,
+          slotDate,
+          startTime: slot.startTime || '00:00',
+          endTime: slot.endTime || '00:00',
+          isBooked: Boolean(slot.isBooked)
+        };
+      } catch (error) {
+        console.error('Error processing slot:', error, slot);
+        return null;
+      }
+    }).filter(Boolean);
+  }, [slots]);
 
   // Get slots for a specific date - improved date comparison
   const getDateSlots = (date) => {
     if (!date) return [];
     const targetDate = ensureValidDate(date);
-    const targetDateStr = targetDate.toISOString().split('T')[0];
     
     return processedSlots.filter(slot => {
-      const slotDate = ensureValidDate(slot.slotDate);
-      return slotDate.toISOString().split('T')[0] === targetDateStr;
+      try {
+        const slotDate = slot.slotDate instanceof Date ? 
+          slot.slotDate : 
+          new Date(slot.slotDate);
+          
+        return slotDate.toDateString() === targetDate.toDateString();
+      } catch (error) {
+        console.error('Error comparing dates:', error, slot);
+        return false;
+      }
     });
   };
 

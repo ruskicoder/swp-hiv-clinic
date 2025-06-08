@@ -1,21 +1,24 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import AppRouter from './routes/AppRouter';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
-import './components/ErrorBoundary.css';
 
+/**
+ * Main App component that sets up the application structure
+ * with routing, authentication context, and error boundaries
+ */
 function App() {
   return (
     <ErrorBoundary>
-        <div className="App">
-        <Router>
-          <AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <div className="App">
             <AppRouter />
-          </AuthProvider>
-      </Router>
-      </div>
+          </div>
+        </AuthProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }

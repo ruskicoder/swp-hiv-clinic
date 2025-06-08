@@ -255,10 +255,16 @@
   background: #e3f2fd;
   border: 1px solid #2196f3;
   border-radius: 4px;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem;
   font-size: 12px;
   text-align: center;
   transition: all 0.2s;
+  cursor: pointer;
+}
+
+.week-slot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .week-slot.available {
@@ -271,11 +277,6 @@
   background: #f8d7da;
   border-color: #dc3545;
   color: #721c24;
-}
-
-.week-slot:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .slot-status {

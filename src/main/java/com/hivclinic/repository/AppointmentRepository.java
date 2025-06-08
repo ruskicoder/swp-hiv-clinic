@@ -1,6 +1,7 @@
 package com.hivclinic.repository;
 
 import com.hivclinic.model.Appointment;
+import com.hivclinic.model.DoctorAvailabilitySlot;
 import com.hivclinic.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,14 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository interface for Appointment entity
- * Provides data access operations for appointments with optimized queries
+ * Repository for Appointment entity
  */
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
-    
+
     /**
-     * Find appointments by patient user
+     * Find appointments by patient user with eager loading
      */
     @Query("SELECT a FROM Appointment a " +
            "LEFT JOIN FETCH a.patientUser pu " +
@@ -30,9 +30,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
            "WHERE a.patientUser = :patientUser " +
            "ORDER BY a.appointmentDateTime DESC")
     List<Appointment> findByPatientUser(@Param("patientUser") User patientUser);
-    
+
     /**
-     * Find appointments by patient user after a specific date
+     * Find upcoming appointments by patient user
      */
     @Query("SELECT a FROM Appointment a " +
            "LEFT JOIN FETCH a.patientUser pu " +
@@ -46,9 +46,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     List<Appointment> findByPatientUserAndAppointmentDateTimeAfter(
             @Param("patientUser") User patientUser, 
             @Param("dateTime") LocalDateTime dateTime);
-    
+
     /**
-     * Find appointments by doctor user
+     * Find appointments by doctor user with eager loading
      */
     @Query("SELECT a FROM Appointment a " +
            "LEFT JOIN FETCH a.patientUser pu " +
@@ -59,7 +59,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
            "WHERE a.doctorUser = :doctorUser " +
            "ORDER BY a.appointmentDateTime DESC")
     List<Appointment> findByDoctorUser(@Param("doctorUser") User doctorUser);
-    
+
     /**
      * Find appointments by doctor user within date range
      */
@@ -73,16 +73,26 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
            "AND a.appointmentDateTime BETWEEN :startDateTime AND :endDateTime " +
            "ORDER BY a.appointmentDateTime ASC")
     List<Appointment> findByDoctorUserAndAppointmentDateTimeBetween(
-            @Param("doctorUser") User doctorUser, 
-            @Param("startDateTime") LocalDateTime startDateTime, 
+            @Param("doctorUser") User doctorUser,
+            @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime);
-    
+
     /**
-     * Find appointment by ID with patient data loaded
+     * Find appointment by ID with patient details
      */
     @Query("SELECT a FROM Appointment a " +
            "LEFT JOIN FETCH a.patientUser pu " +
            "LEFT JOIN FETCH pu.role " +
            "WHERE a.appointmentId = :appointmentId")
     Optional<Appointment> findByIdWithPatient(@Param("appointmentId") Integer appointmentId);
+
+    /**
+     * Find appointments by availability slot
+     */
+    @Query("SELECT a FROM Appointment a " +
+           "LEFT JOIN FETCH a.patientUser pu " +
+           "LEFT JOIN FETCH pu.role " +
+           "WHERE a.availabilitySlot = :availabilitySlot " +
+           "ORDER BY a.appointmentDateTime DESC")
+    List<Appointment> findByAvailabilitySlot(@Param("availabilitySlot") DoctorAvailabilitySlot availabilitySlot);
 }

@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing appointment status change history
+ */
 @Entity
 @Table(name = "AppointmentStatusHistory")
 @Data
@@ -25,13 +29,13 @@ public class AppointmentStatusHistory {
     @Column(name = "OldStatus", length = 50)
     private String oldStatus;
 
-    @Column(name = "NewStatus", nullable = false, length = 50)
+    @Column(name = "NewStatus", length = 50, nullable = false)
     private String newStatus;
 
     @Column(name = "ChangeReason", columnDefinition = "NVARCHAR(MAX)")
     private String changeReason;
 
-    @Column(name = "ChangedAt", columnDefinition = "DATETIME2 DEFAULT GETDATE()", updatable = false)
+    @Column(name = "ChangedAt", nullable = false)
     private LocalDateTime changedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,6 +44,8 @@ public class AppointmentStatusHistory {
 
     @PrePersist
     protected void onCreate() {
-        changedAt = LocalDateTime.now();
+        if (changedAt == null) {
+            changedAt = LocalDateTime.now();
+        }
     }
 }

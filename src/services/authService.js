@@ -1,100 +1,91 @@
 import apiClient from './apiClient';
 
-const authService = {
-  // Login user
-  login: async (credentials) => {
+/**
+ * Authentication service
+ */
+export const authService = {
+  /**
+   * Login user
+   */
+  async login(credentials) {
     try {
       const response = await apiClient.post('/auth/login', credentials);
-      return response.data;
+      return {
+        success: true,
+        token: response.data.token,
+        id: response.data.id,
+        username: response.data.username,
+        email: response.data.email,
+        role: response.data.role
+      };
     } catch (error) {
-      console.error('Login error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
-      throw new Error(errorMessage);
+      console.error('Login service error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Login failed'
+      };
     }
   },
 
-  // Register user
-  register: async (userData) => {
+  /**
+   * Register new user
+   */
+  async register(userData) {
     try {
       const response = await apiClient.post('/auth/register', userData);
+      return {
+        success: true,
+        message: response.data.message || 'Registration successful'
+      };
+    } catch (error) {
+      console.error('Registration service error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Registration failed'
+      };
+    }
+  },
+
+  /**
+   * Get user profile
+   */
+  async getUserProfile() {
+    try {
+      const response = await apiClient.get('/auth/profile');
       return response.data;
     } catch (error) {
-      console.error('Registration error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
-      throw new Error(errorMessage);
+      console.error('Get profile error:', error);
+      throw error;
     }
   },
 
-  // Get current user profile
-  getCurrentUser: async () => {
+  /**
+   * Update user profile
+   */
+  async updateProfile(profileData) {
     try {
-      const response = await apiClient.get('/auth/me');
-      if (!response.data) {
-        throw new Error('No profile data received');
-      }
-      // Ensure we have a complete profile
-      if (!response.data.username || !response.data.role) {
-        throw new Error('Incomplete profile data');
-      }
-      return response.data;
+      const response = await apiClient.put('/auth/profile', profileData);
+      return {
+        success: true,
+        data: response.data
+      };
     } catch (error) {
-      console.error('Get user error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to get user profile';
-      throw new Error(errorMessage);
+      console.error('Update profile error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Profile update failed'
+      };
     }
   },
 
-  // Check username availability
-  checkUsername: async (username) => {
+  /**
+   * Logout user
+   */
+  logout() {
     try {
-      const response = await apiClient.get(`/auth/check-username?username=${username}`);
-      return response.data;
+      localStorage.removeItem('token');
     } catch (error) {
-      console.error('Check username error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to check username';
-      throw new Error(errorMessage);
-    }
-  },
-
-  // Check email availability
-  checkEmail: async (email) => {
-    try {
-      const response = await apiClient.get(`/auth/check-email?email=${email}`);
-      return response.data;
-    } catch (error) {
-      console.error('Check email error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to check email';
-      throw new Error(errorMessage);
-    }
-  },
-
-  // Update user profile
-  updateProfile: async (userData) => {
-    try {
-      const response = await apiClient.put('/auth/profile', userData);
-      // Get latest profile data after update
-      const updatedUserResponse = await apiClient.get('/auth/me');
-      return updatedUserResponse.data;
-    } catch (error) {
-      console.error('Profile update error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Profile update failed';
-      throw new Error(errorMessage);
-    }
-  },
-
-  // Update profile image
-  updateProfileImage: async (base64Image) => {
-    try {
-      const response = await apiClient.post('/auth/upload-image', { image: base64Image });
-      // Get latest profile data after update
-      const updatedUserResponse = await apiClient.get('/auth/me');
-      return updatedUserResponse.data;
-    } catch (error) {
-      console.error('Profile image update error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Profile image update failed';
-      throw new Error(errorMessage);
+      console.error('Logout error:', error);
     }
   }
 };
-
-export default authService;

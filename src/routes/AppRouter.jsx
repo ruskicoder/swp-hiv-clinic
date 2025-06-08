@@ -1,32 +1,41 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ErrorBoundary from '../components/ErrorBoundary';
 
-// Import components
-import Home from '../features/Website/Home';
-import Login from '../features/auth/Login';
-import Register from '../features/auth/Register';
-import CustomerDashboard from '../features/Customer/CustomerDashboard';
-import DoctorDashboard from '../features/Doctor/DoctorDashboard';
-import AdminDashboard from '../features/Admin/AdminDashboard';
-import Settings from '../features/Settings/Settings';
-// Protected Route Component
+// Lazy load components to improve performance
+const Home = React.lazy(() => import('../features/Website/Home'));
+const Login = React.lazy(() => import('../features/auth/Login'));
+const Register = React.lazy(() => import('../features/auth/Register'));
+const CustomerDashboard = React.lazy(() => import('../features/Customer/CustomerDashboard'));
+const DoctorDashboard = React.lazy(() => import('../features/Doctor/DoctorDashboard'));
+const AdminDashboard = React.lazy(() => import('../features/Admin/AdminDashboard'));
+const Settings = React.lazy(() => import('../features/Settings/Settings'));
+
+/**
+ * Loading component for lazy-loaded routes
+ */
+const LoadingSpinner = () => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '100vh',
+    fontSize: '18px',
+    color: '#666'
+  }}>
+    Loading...
+  </div>
+);
+
+/**
+ * Protected Route component
+ */
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '1.2rem',
-        color: '#666'
-      }}>
-        Loading...
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) {
@@ -37,30 +46,26 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return (
+    <ErrorBoundary>
+      <React.Suspense fallback={<LoadingSpinner />}>
+        {children}
+      </React.Suspense>
+    </ErrorBoundary>
+  );
 };
 
-// Public Route Component (redirect if already logged in)
+/**
+ * Public Route component
+ */
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '1.2rem',
-        color: '#666'
-      }}>
-        Loading...
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (user) {
-    // Redirect based on user role
     switch (user.role) {
       case 'Admin':
         return <Navigate to="/admin" replace />;
@@ -73,16 +78,33 @@ const PublicRoute = ({ children }) => {
     }
   }
 
-  return children;
+  return (
+    <ErrorBoundary>
+      <React.Suspense fallback={<LoadingSpinner />}>
+        {children}
+      </React.Suspense>
+    </ErrorBoundary>
+  );
 };
 
+/**
+ * Main App Router component
+ */
 const AppRouter = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Home />} />
+      <Route 
+        path="/" 
+        element={
+          <ErrorBoundary>
+            <React.Suspense fallback={<LoadingSpinner />}>
+              <Home />
+            </React.Suspense>
+          </ErrorBoundary>
+        } 
+      />
       
-      {/* Auth Routes */}
       <Route 
         path="/login" 
         element={
@@ -91,6 +113,7 @@ const AppRouter = () => {
           </PublicRoute>
         } 
       />
+      
       <Route 
         path="/register" 
         element={
@@ -127,8 +150,7 @@ const AppRouter = () => {
           </ProtectedRoute>
         } 
       />
-
-      {/* Settings Route - Available to all authenticated users */}
+      
       <Route 
         path="/settings" 
         element={

@@ -1,113 +1,142 @@
 import React, { useState, useEffect } from 'react';
 import './TimeSlotModal.css';
 
+/**
+ * Modal for creating new time slots
+ */
 const TimeSlotModal = ({ 
   isOpen, 
   onClose, 
-  onSave, 
+  onSlotCreated, 
   selectedDate, 
-  existingSlots = [],
-  initialData = null 
+  existingSlots = [] 
 }) => {
   const [formData, setFormData] = useState({
-    startTime: '',
+    slotDate: '',
+    startTime: '09:00',
     durationMinutes: 30,
     notes: ''
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Duration options in minutes
-  const durationOptions = [
-    { value: 15, label: '15 minutes' },
-    { value: 30, label: '30 minutes' },
-    { value: 45, label: '45 minutes' },
-    { value: 60, label: '1 hour' },
-    { value: 90, label: '1.5 hours' },
-    { value: 120, label: '2 hours' }
-  ];
-
+  // Initialize form data when modal opens
   useEffect(() => {
-    if (isOpen) {
-      if (initialData) {
-        // Calculate duration from existing slot
-        const start = new Date(`2000-01-01T${initialData.startTime}`);
-        const end = new Date(`2000-01-01T${initialData.endTime}`);
-        const durationMinutes = (end - start) / (1000 * 60);
-        
-        setFormData({
-          startTime: initialData.startTime || '',
-          durationMinutes: durationMinutes || 30,
-          notes: initialData.notes || ''
-        });
-      } else {
-        setFormData({
-          startTime: '',
-          durationMinutes: 30,
-          notes: ''
-        });
-      }
-      setErrors({});
+    if (isOpen && selectedDate) {
+      // Ensure we format the date correctly for the date input
+      const formattedDate = formatDateForInput(selectedDate);
+      console.log('Setting slot date:', { selectedDate, formattedDate });
+      
+      setFormData(prev => ({
+        ...prev,
+        slotDate: formattedDate
+      }));
     }
-  }, [isOpen, initialData]);
+  }, [isOpen, selectedDate]);
 
-  const calculateEndTime = (startTime, durationMinutes) => {
-    if (!startTime || !durationMinutes) return '';
+  // Format date for HTML date input (YYYY-MM-DD)
+  const formatDateForInput = (date) => {
+    if (!date) return '';
     
-    const [hours, minutes] = startTime.split(':').map(Number);
-    const startDate = new Date();
-    startDate.setHours(hours, minutes, 0, 0);
-    
-    const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
-    
-    return endDate.toTimeString().slice(0, 5);
+    try {
+      let dateObj;
+      
+      if (typeof date === 'string') {
+        // If it's already in YYYY-MM-DD format, use it directly
+        if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return date;
+        }
+        // Parse ISO string
+        dateObj = new Date(date);
+      } else if (date instanceof Date) {
+        dateObj = date;
+      } else {
+        console.warn('Invalid date format:', date);
+        return '';
+      }
+
+      // Ensure we get the local date without timezone conversion
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Error formatting date:', error, date);
+      return '';
+    }
   };
 
+  // Handle form input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'durationMinutes' ? parseInt(value, 10) : value
+    }));
+
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  // Validate form data
   const validateForm = () => {
     const newErrors = {};
+
+    // Validate required fields
+    if (!formData.slotDate) {
+      newErrors.slotDate = 'Date is required';
+    }
 
     if (!formData.startTime) {
       newErrors.startTime = 'Start time is required';
     }
 
+    if (!formData.durationMinutes || formData.durationMinutes < 15) {
+      newErrors.durationMinutes = 'Duration must be at least 15 minutes';
+    }
+
+    if (formData.durationMinutes > 240) {
+      newErrors.durationMinutes = 'Duration cannot exceed 4 hours';
+    }
+
     // Validate business hours (8 AM to 6 PM)
     if (formData.startTime) {
       const [hours, minutes] = formData.startTime.split(':').map(Number);
-      const startDate = new Date();
-      startDate.setHours(hours, minutes, 0);
-
-      const endDate = new Date(startDate.getTime() + formData.durationMinutes * 60000);
-      const endHour = endDate.getHours();
-      const endMinutes = endDate.getMinutes();
-
-      if (hours < 8 || hours >= 18 || (hours === 17 && minutes > 30)) {
-        newErrors.startTime = 'Slots must start between 8:00 AM and 5:30 PM';
+      const startMinutes = hours * 60 + minutes;
+      const endMinutes = startMinutes + formData.durationMinutes;
+      
+      if (startMinutes < 8 * 60) { // Before 8 AM
+        newErrors.startTime = 'Start time cannot be before 8:00 AM';
       }
-
-      if (endHour > 18 || (endHour === 18 && endMinutes > 0)) {
-        newErrors.durationMinutes = 'Slot cannot extend beyond 6:00 PM';
+      
+      if (endMinutes > 18 * 60) { // After 6 PM
+        newErrors.startTime = 'End time cannot be after 6:00 PM';
       }
     }
 
     // Check for overlapping slots
-    if (formData.startTime && formData.durationMinutes) {
-      const [hours, minutes] = formData.startTime.split(':').map(Number);
-      const startDate = new Date();
-      startDate.setHours(hours, minutes, 0);
-      const endDate = new Date(startDate.getTime() + formData.durationMinutes * 60000);
+    if (formData.slotDate && formData.startTime && Array.isArray(existingSlots)) {
+      const newStartTime = formData.startTime;
+      const newEndMinutes = formData.startTime.split(':').map(Number).reduce((h, m) => h * 60 + m) + formData.durationMinutes;
+      const newEndTime = `${Math.floor(newEndMinutes / 60).toString().padStart(2, '0')}:${(newEndMinutes % 60).toString().padStart(2, '0')}`;
 
       const hasOverlap = existingSlots.some(slot => {
-        if (initialData && slot.availabilitySlotId === initialData.availabilitySlotId) {
-          return false;
-        }
+        // Only check slots on the same date
+        const slotDateStr = formatDateForInput(slot.slotDate);
+        if (slotDateStr !== formData.slotDate) return false;
 
-        const slotStart = new Date();
-        const [slotHours, slotMinutes] = slot.startTime.split(':').map(Number);
-        slotStart.setHours(slotHours, slotMinutes, 0);
+        const existingStart = slot.startTime;
+        const existingEnd = slot.endTime;
 
-        const slotEnd = new Date(slotStart.getTime() + slot.durationMinutes * 60000);
-
-        return startDate < slotEnd && slotStart < endDate;
+        // Check for time overlap
+        return (newStartTime < existingEnd && newEndTime > existingStart);
       });
 
       if (hasOverlap) {
@@ -119,54 +148,43 @@ const TimeSlotModal = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'durationMinutes' ? parseInt(value) : value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm() || loading) {
+    if (!validateForm()) {
       return;
     }
 
-    setLoading(true);
-    
     try {
-      // Format the data properly
-      const formattedData = {
-        slotDate: selectedDate instanceof Date 
-          ? selectedDate.toISOString().split('T')[0] 
-          : selectedDate,
-        startTime: formData.startTime + ':00', // Ensure seconds are included
-        durationMinutes: parseInt(formData.durationMinutes),
+      setLoading(true);
+      
+      // Prepare slot data with proper date formatting
+      const slotData = {
+        slotDate: formData.slotDate, // Keep as YYYY-MM-DD string
+        startTime: formData.startTime,
+        durationMinutes: formData.durationMinutes,
         notes: formData.notes || ''
       };
 
-      const result = await onSave(formattedData);
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to save time slot');
+      console.log('Submitting slot data:', slotData);
+
+      if (onSlotCreated) {
+        await onSlotCreated(slotData);
       }
-      onClose();
+
+      // Reset form (keep the date)
+      setFormData(prev => ({
+        slotDate: prev.slotDate,
+        startTime: '09:00',
+        durationMinutes: 30,
+        notes: ''
+      }));
+      setErrors({});
       
     } catch (error) {
-      console.error('Error saving time slot:', error);
-      setErrors(prev => ({ 
-        ...prev,
-        submit: error?.message || 'Failed to save time slot' 
-      }));
+      console.error('Error creating slot:', error);
+      setErrors({ submit: 'Failed to create slot. Please try again.' });
     } finally {
       setLoading(false);
     }
@@ -174,16 +192,14 @@ const TimeSlotModal = ({
 
   if (!isOpen) return null;
 
-  const endTime = calculateEndTime(formData.startTime, formData.durationMinutes);
-
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
+    <div className="time-slot-modal-overlay">
+      <div className="time-slot-modal">
         <div className="modal-header">
-          <h3>{initialData ? 'Edit Time Slot' : 'Add Time Slot'}</h3>
+          <h3>Add New Time Slot</h3>
           <button 
             type="button" 
-            className="modal-close" 
+            className="close-btn" 
             onClick={onClose}
             disabled={loading}
           >
@@ -191,110 +207,92 @@ const TimeSlotModal = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="time-slot-form">
+        <form onSubmit={handleSubmit} className="slot-form">
           <div className="form-group">
-            <label htmlFor="selectedDate">Date:</label>
+            <label htmlFor="slotDate">Date:</label>
             <input
-              type="text"
-              id="selectedDate"
-              value={selectedDate instanceof Date 
-                ? selectedDate.toLocaleDateString() 
-                : selectedDate || ''}
-              disabled
-              className="form-control"
+              type="date"
+              id="slotDate"
+              name="slotDate"
+              value={formData.slotDate}
+              onChange={handleChange}
+              required
+              disabled={loading}
             />
+            {errors.slotDate && <div className="error">{errors.slotDate}</div>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="startTime">Start Time: *</label>
+            <label htmlFor="startTime">Start Time:</label>
             <input
               type="time"
               id="startTime"
               name="startTime"
               value={formData.startTime}
               onChange={handleChange}
-              className={`form-control ${errors.startTime ? 'error' : ''}`}
               min="08:00"
               max="17:30"
-              step="300" // 5-minute intervals
+              step="900" // 15 minute intervals
               required
               disabled={loading}
             />
-            {errors.startTime && (
-              <span className="error-message">{errors.startTime}</span>
-            )}
+            {errors.startTime && <div className="error">{errors.startTime}</div>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="durationMinutes">Duration: *</label>
+            <label htmlFor="durationMinutes">Duration:</label>
             <select
               id="durationMinutes"
               name="durationMinutes"
               value={formData.durationMinutes}
               onChange={handleChange}
-              className={`form-control ${errors.durationMinutes ? 'error' : ''}`}
               required
               disabled={loading}
             >
-              <option value="">Select duration</option>
-              {durationOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
+              <option value={15}>15 minutes</option>
+              <option value={30}>30 minutes</option>
+              <option value={45}>45 minutes</option>
+              <option value={60}>1 hour</option>
+              <option value={90}>1.5 hours</option>
+              <option value={120}>2 hours</option>
+              <option value={180}>3 hours</option>
+              <option value={240}>4 hours</option>
             </select>
-            {errors.durationMinutes && (
-              <span className="error-message">{errors.durationMinutes}</span>
-            )}
+            {errors.durationMinutes && <div className="error">{errors.durationMinutes}</div>}
           </div>
 
-          {formData.startTime && formData.durationMinutes && (
-            <div className="form-group">
-              <label>Calculated End Time:</label>
-              <input
-                type="text"
-                value={endTime ? `${endTime}` : ''}
-                disabled
-                className="form-control calculated-time"
-              />
-            </div>
-          )}
-
           <div className="form-group">
-            <label htmlFor="notes">Notes:</label>
+            <label htmlFor="notes">Notes (optional):</label>
             <textarea
               id="notes"
               name="notes"
               value={formData.notes}
               onChange={handleChange}
-              className="form-control"
               rows="3"
-              placeholder="Optional notes about this time slot..."
+              placeholder="Add any notes for this time slot..."
               disabled={loading}
             />
           </div>
 
           {errors.submit && (
-            <div className="error-message submit-error">
-              {errors.submit}
-            </div>
+            <div className="error-message">{errors.submit}</div>
           )}
 
-          <div className="modal-actions">
+          <div className="form-actions">
+            <button 
+              type="submit" 
+              className="btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Creating...' : 'Create Slot'}
+            </button>
             <button 
               type="button" 
-              className="btn btn-secondary" 
+              className="btn-secondary"
               onClick={onClose}
               disabled={loading}
             >
               Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="btn btn-primary"
-              disabled={loading}
-            >
-              {loading ? 'Saving...' : (initialData ? 'Update Slot' : 'Add Slot')}
             </button>
           </div>
         </form>

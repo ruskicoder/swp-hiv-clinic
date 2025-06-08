@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import BackNavigation from '../../components/layout/BackNavigation';
 import apiClient from '../../services/apiClient';
+import authService from '../../services/authService'; // Add this import
 import { SafeText } from '../../utils/SafeComponents';
 import './Settings.css';
 
@@ -180,18 +181,22 @@ const Settings = () => {
     if (!file) return;
     setError('');
     setMessage('');
-    const reader = new window.FileReader();
+
+    const reader = new FileReader();
     reader.onload = async (event) => {
       const base64String = event.target.result;
       setLoading(true);
       try {
-        if (base64String && base64String.startsWith('data:image/')) {
-          const updatedUser = await authService.updateProfileImage(base64String);
-          if (updateUser) {
-            updateUser(updatedUser); // Update context with full user data
-          }
-          setMessage('Profile image updated successfully!');
+        // Call the authService method instead of making direct API call
+        const updatedUser = await authService.updateProfileImage(base64String);
+        if (updateUser) {
+          updateUser(updatedUser);
         }
+        setMessage('Profile image updated successfully!');
+        setProfileData(prev => ({
+          ...prev,
+          profileImageBase64: updatedUser.profileImageBase64
+        }));
       } catch (err) {
         setError(err.message || 'Failed to upload image');
       } finally {

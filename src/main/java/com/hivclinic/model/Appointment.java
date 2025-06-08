@@ -9,14 +9,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Entity representing appointments in the system
+ * Entity representing an appointment between a patient and doctor
  */
 @Entity
 @Table(name = "Appointments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Appointment {
 
     @Id
@@ -26,26 +25,26 @@ public class Appointment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PatientUserID", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash", "appointments"})
     private User patientUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DoctorUserID", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash", "appointments", "availabilitySlots"})
     private User doctorUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "AvailabilitySlotID")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "appointment", "doctorUser"})
     private DoctorAvailabilitySlot availabilitySlot;
 
     @Column(name = "AppointmentDateTime", nullable = false)
     private LocalDateTime appointmentDateTime;
 
-    @Column(name = "DurationMinutes", columnDefinition = "INT DEFAULT 30")
+    @Column(name = "DurationMinutes")
     private Integer durationMinutes = 30;
 
-    @Column(name = "Status", nullable = false, length = 50, columnDefinition = "VARCHAR(50) DEFAULT 'Scheduled'")
+    @Column(name = "Status", length = 50, columnDefinition = "VARCHAR(50) DEFAULT 'Scheduled'")
     private String status = "Scheduled";
 
     @Column(name = "PatientCancellationReason", columnDefinition = "NVARCHAR(MAX)")
@@ -54,10 +53,10 @@ public class Appointment {
     @Column(name = "DoctorCancellationReason", columnDefinition = "NVARCHAR(MAX)")
     private String doctorCancellationReason;
 
-    @Column(name = "CreatedAt", columnDefinition = "DATETIME2 DEFAULT GETDATE()", updatable = false)
+    @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "UpdatedAt", columnDefinition = "DATETIME2 DEFAULT GETDATE()")
+    @Column(name = "UpdatedAt", nullable = false)
     private LocalDateTime updatedAt;
 
     @Column(name = "AppointmentNotes", columnDefinition = "NVARCHAR(MAX)")

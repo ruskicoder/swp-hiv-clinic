@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import authService from '../services/authService';
+import { authService } from '../services/authService';
 
-const AuthContext = createContext();
+/**
+ * Authentication Context for managing user authentication state
+ */
+const AuthContext = createContext(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -16,32 +19,38 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Initialize authentication state
+  // Initialize auth state
   useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        
+        if (token) {
+          try {
+            // Verify token is still valid
+            const userProfile = await authService.getUserProfile();
+            setUser(userProfile);
+          } catch (error) {
+            console.error('Token validation failed:', error);
+            localStorage.removeItem('token');
+            setUser(null);
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setError('Failed to initialize authentication');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     initializeAuth();
   }, []);
 
-  const initializeAuth = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const token = localStorage.getItem('token');
-      if (token) {
-        // Verify token and get user data
-        const userData = await authService.getCurrentUser();
-        setUser(userData);
-      }
-    } catch (error) {
-      console.error('Auth initialization failed:', error);
-      // Clear invalid token
-    localStorage.removeItem('token');
-    setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  /**
+   * Login function
+   */
   const login = async (credentials) => {
     try {
       setLoading(true);
@@ -49,40 +58,58 @@ export const AuthProvider = ({ children }) => {
       
       const response = await authService.login(credentials);
       
-      if (response.token) {
+      if (response.success) {
         localStorage.setItem('token', response.token);
-        // Fetch complete user profile after successful login
-        const userData = await authService.getCurrentUser();
-        setUser(userData);
-        return userData;
+        setUser({
+          id: response.id,
+          username: response.username,
+          email: response.email,
+          role: response.role
+        });
+        return { success: true };
       } else {
-        throw new Error('No token received from server');
+        setError(response.message || 'Login failed');
+        return { success: false, message: response.message };
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      setError(error.message || 'Login failed');
-      throw error;
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Register function
+   */
   const register = async (userData) => {
     try {
       setLoading(true);
       setError(null);
       
       const response = await authService.register(userData);
-      return response;
+      
+      if (response.success) {
+        return { success: true, message: response.message };
+      } else {
+        setError(response.message || 'Registration failed');
+        return { success: false, message: response.message };
+      }
     } catch (error) {
-      console.error('Registration failed:', error);
-      setError(error.message || 'Registration failed');
-      throw error;
+      console.error('Registration error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+      setError(errorMessage);
+      return { success: false, message: errorMessage };
     } finally {
       setLoading(false);
     }
-};
+  };
 
+  /**
+   * Logout function
+   */
   const logout = () => {
     try {
       localStorage.removeItem('token');
@@ -93,22 +120,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const clearError = () => {
-    setError(null);
-  };
-
-  const refreshUser = async () => {
-    try {
-      const userData = await authService.getCurrentUser();
-      setUser(userData);
-      return userData;
-    } catch (error) {
-      console.error('Failed to refresh user data:', error);
-      logout();
-      throw error;
-    }
-  };
-
+  /**
+   * Update user data
+   */
   const updateUser = (userData) => {
     setUser(prevUser => ({
       ...prevUser,
@@ -123,13 +137,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    clearError,
-    refreshUser,
     updateUser,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === 'Admin',
-    isDoctor: user?.role === 'Doctor',
-    isPatient: user?.role === 'Patient'
+    isAuthenticated: !!user
   };
 
   return (

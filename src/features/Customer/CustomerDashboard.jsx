@@ -25,6 +25,49 @@ const CustomerDashboard = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [doctorSlots, setDoctorSlots] = useState([]);
 
+  // Helper function to format date for API
+  const formatDateTimeForAPI = (date, time) => {
+    try {
+      // Ensure we have valid date and time
+      if (!date || !time) {
+        throw new Error('Date and time are required');
+      }
+
+      let dateStr;
+      if (date instanceof Date) {
+        // Format date as YYYY-MM-DD
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        dateStr = `${year}-${month}-${day}`;
+      } else if (typeof date === 'string') {
+        // Assume it's already in YYYY-MM-DD format or convert it
+        const dateObj = new Date(date);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        dateStr = `${year}-${month}-${day}`;
+      } else {
+        throw new Error('Invalid date format');
+      }
+
+      // Ensure time is in HH:mm:ss format
+      let timeStr = time;
+      if (time.length === 5) { // HH:mm format
+        timeStr = time + ':00';
+      }
+
+      // Combine date and time in ISO format
+      const dateTimeStr = `${dateStr}T${timeStr}`;
+      
+      console.log('Formatted datetime for API:', dateTimeStr);
+      return dateTimeStr;
+    } catch (error) {
+      console.error('Error formatting date/time:', error);
+      throw new Error('Failed to format date/time for API');
+    }
+  };
+
   // Load dashboard data
   const loadDashboardData = async () => {
     try {
@@ -94,23 +137,40 @@ const CustomerDashboard = () => {
   // Handle appointment booking
   const handleBookSlot = async (slot) => {
     try {
-      if (!selectedDoctor || !slot) return;
+      if (!selectedDoctor || !slot) {
+        throw new Error('Missing required booking information');
+      }
 
-      const response = await apiClient.post('/appointments/book', {
+      console.log('Booking slot:', slot);
+      console.log('Selected doctor:', selectedDoctor);
+
+      // Format the appointment date/time properly
+      const appointmentDateTime = formatDateTimeForAPI(slot.slotDate, slot.startTime);
+
+      const bookingData = {
         doctorUserId: selectedDoctor.userId,
         availabilitySlotId: slot.availabilitySlotId,
-        appointmentDateTime: `${slot.slotDate}T${slot.startTime}`
-      });
+        appointmentDateTime: appointmentDateTime,
+        durationMinutes: slot.durationMinutes || 30
+      };
 
-      if (response.data.success) {
-        alert('Appointment booked successfully!');
-        await loadDashboardData();
-        await loadDoctorSlots(selectedDoctor.userId);
-        setActiveTab('appointments');
+      console.log('Sending booking data:', bookingData);
+
+      const response = await apiClient.post('/appointments/book', bookingData);
+
+      if (!response.data || !response.data.success) {
+        throw new Error(response.data?.message || 'Failed to book appointment');
       }
+
+      alert('Appointment booked successfully!');
+      await loadDashboardData();
+      await loadDoctorSlots(selectedDoctor.userId);
+      setActiveTab('appointments');
+      return { success: true };
+
     } catch (error) {
       console.error('Error booking appointment:', error);
-      throw new Error('Failed to book appointment. Please try again.');
+      throw new Error(error.response?.data?.message || error.message || 'Failed to book appointment');
     }
   };
 

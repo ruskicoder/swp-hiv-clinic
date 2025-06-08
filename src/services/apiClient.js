@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-// Create axios instance with base configuration
+/**
+ * API client configuration with interceptors
+ */
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080/api',
   timeout: 10000,
@@ -9,61 +11,52 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error('Error setting auth token:', error);
     }
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => {
-    console.error('Request Error:', error);
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor to handle common errors and data formatting
+// Response interceptor
 apiClient.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response.status, response.config.url);
-    
-    // Log response data for debugging
-    if (response.data) {
-      console.log('Response Data:', response.data);
-    }
     return response;
   },
   (error) => {
-    console.error('Response Error:', error);
+    console.error('API Error:', error);
     
-    // Handle 401 Unauthorized - redirect to login
+    // Handle authentication errors
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-      return Promise.reject(new Error('Session expired. Please login again.'));
-    }
-    
-    // Handle 403 Forbidden
-    if (error.response?.status === 403) {
-      return Promise.reject(new Error('Access denied. You do not have permission to perform this action.'));
+      try {
+        localStorage.removeItem('token');
+        // Only redirect if we're not already on login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      } catch (e) {
+        console.error('Error handling 401:', e);
+      }
     }
     
     // Handle network errors
     if (!error.response) {
-      return Promise.reject(new Error('Network error. Please check your connection and try again.'));
+      console.error('Network error - server may be down');
     }
     
-    // Handle other errors
-    const errorMessage = error.response?.data?.message || 
-                        error.response?.data?.error || 
-                        error.message || 
-                        'An unexpected error occurred';
-    
-    return Promise.reject(new Error(errorMessage));
+    return Promise.reject(error);
   }
 );
 

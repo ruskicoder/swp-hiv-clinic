@@ -9,20 +9,15 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 /**
- * Entity representing doctor availability slots
+ * Entity representing a doctor's availability slot
  */
 @Entity
-@Table(name = "DoctorAvailabilitySlots", 
-       uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"DoctorUserID", "SlotDate", "StartTime"})
-})
+@Table(name = "DoctorAvailabilitySlots")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DoctorAvailabilitySlot {
 
     @Id
@@ -32,7 +27,7 @@ public class DoctorAvailabilitySlot {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DoctorUserID", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash", "availabilitySlots", "appointments"})
     private User doctorUser;
 
     @Column(name = "SlotDate", nullable = false)
@@ -44,50 +39,31 @@ public class DoctorAvailabilitySlot {
     @Column(name = "EndTime", nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "DurationMinutes", nullable = false)
-    private Integer durationMinutes = 30;
-
-    public void setDurationMinutes(Integer durationMinutes) {
-        this.durationMinutes = durationMinutes;
-        if (this.startTime != null && durationMinutes != null) {
-            this.endTime = this.startTime.plusMinutes(durationMinutes);
-        }
-    }
-
-    @Column(name = "IsBooked", columnDefinition = "BIT DEFAULT 0")
+    @Column(name = "IsBooked", nullable = false)
     private Boolean isBooked = false;
 
     @Column(name = "Notes", columnDefinition = "NVARCHAR(MAX)")
     private String notes;
 
-    @Column(name = "CreatedAt", columnDefinition = "DATETIME2 DEFAULT GETDATE()", updatable = false)
+    @Column(name = "CreatedAt", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "UpdatedAt", columnDefinition = "DATETIME2 DEFAULT GETDATE()")
+    @Column(name = "UpdatedAt", nullable = false)
     private LocalDateTime updatedAt;
+
+    // Transient field for appointment details (not persisted)
+    @Transient
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "availabilitySlot", "doctorUser"})
+    private Appointment appointment;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (startTime != null && durationMinutes != null && endTime == null) {
-            endTime = startTime.plusMinutes(durationMinutes);
-        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    @Transient // This field won't be persisted
-    public Integer getDurationMinutes() {
-        if (startTime == null || endTime == null) {
-            return 0;
-        }
-        return (int) ChronoUnit.MINUTES.between(
-            LocalTime.parse(startTime.toString()), 
-            LocalTime.parse(endTime.toString())
-        );
     }
 }

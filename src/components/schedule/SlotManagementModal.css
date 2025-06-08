@@ -1,3 +1,4 @@
+/* Slot Management Modal Styles */
 .slot-modal-overlay {
   position: fixed;
   top: 0;
@@ -7,48 +8,48 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
   padding: 1rem;
+}
+/* Slot Management Modal Styles */
+.slot-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .slot-modal {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  width: 100%;
-  max-width: 600px;
+  width: 90%;
+  max-width: 800px;
   max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  animation: modalSlideIn 0.3s ease-out;
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  color: white;
-  padding: 1.5rem;
-  border-radius: 12px 12px 0 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+  border-radius: 12px 12px 0 0;
 }
 
 .modal-header h3 {
   margin: 0;
+  color: #1f2937;
   font-size: 1.25rem;
   font-weight: 600;
 }
@@ -56,99 +57,47 @@
 .close-btn {
   background: none;
   border: none;
-  color: white;
   font-size: 1.5rem;
   cursor: pointer;
+  color: #6b7280;
   padding: 0.25rem;
   border-radius: 4px;
-  transition: background-color 0.2s ease;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #f3f4f6;
+  color: #374151;
 }
 
 .modal-content {
   padding: 1.5rem;
-  overflow-y: auto;
-  flex: 1;
 }
 
-/* Booking/Cancellation Confirmation */
-.booking-confirmation,
-.cancellation-confirmation {
-  text-align: center;
-}
-
-.booking-confirmation h4,
-.cancellation-confirmation h4 {
-  margin: 0 0 1rem 0;
-  color: #374151;
-  font-size: 1.1rem;
-}
-
-.booking-details {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
-  text-align: left;
-}
-
-.booking-details p {
-  margin: 0.5rem 0;
-  color: #6b7280;
-}
-
-.booking-details strong {
-  color: #374151;
-}
-
-.booking-actions {
+.modal-actions {
+  margin-bottom: 1.5rem;
   display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 1.5rem;
+  justify-content: flex-end;
 }
 
-/* Slot Sections */
 .slot-sections {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .slot-section {
-  margin-bottom: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
 }
 
-.section-title {
-  font-size: 1rem;
+.slot-section h4 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin-bottom: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.section-title::before {
-  content: '';
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.section-title.available::before {
-  background: #10b981;
-}
-
-.section-title.booked::before {
-  background: #ef4444;
 }
 
 .slots-list {
@@ -163,60 +112,62 @@
   align-items: center;
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid;
+  border: 1px solid #e5e7eb;
+  background: white;
   transition: all 0.2s ease;
 }
 
+.slot-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
 .slot-item.available {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  border-left: 4px solid #10b981;
 }
 
 .slot-item.booked {
-  background: #fef2f2;
-  border-color: #fecaca;
-}
-
-.slot-item:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #f59e0b;
+  background: #fffbeb;
 }
 
 .slot-info {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  flex: 1;
 }
 
 .slot-time {
   font-weight: 600;
-  color: #374151;
+  color: #1f2937;
   font-size: 1rem;
 }
 
 .slot-notes {
-  font-style: italic;
+  font-size: 0.875rem;
   color: #6b7280;
-  font-size: 0.9rem;
+  font-style: italic;
 }
 
 .slot-doctor {
+  font-size: 0.875rem;
   color: #059669;
   font-weight: 500;
-  font-size: 0.9rem;
 }
 
 .booked-indicator {
-  color: #dc2626;
+  font-size: 0.875rem;
+  color: #d97706;
   font-weight: 500;
-  font-size: 0.9rem;
 }
 
 .own-booking {
+  font-size: 0.875rem;
   color: #059669;
   font-weight: 600;
-  font-size: 0.9rem;
+  background: #d1fae5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
 }
 
 .slot-actions {
@@ -224,76 +175,94 @@
   gap: 0.5rem;
 }
 
-/* Action Buttons */
-.btn-primary-small,
-.btn-secondary-small,
-.btn-danger-small,
-.btn-warning-small,
-.btn-info-small {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-primary-small {
-  background: #059669;
+/* Button Styles */
+.btn-primary, .btn-primary-small {
+  background: #10b981;
   color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
-.btn-primary-small:hover {
-  background: #047857;
+.btn-primary:hover, .btn-primary-small:hover {
+  background: #059669;
   transform: translateY(-1px);
 }
 
-.btn-secondary-small {
+.btn-secondary, .btn-secondary-small {
   background: #6b7280;
   color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
-.btn-secondary-small:hover:not(:disabled) {
+.btn-secondary:hover, .btn-secondary-small:hover:not(:disabled) {
   background: #4b5563;
   transform: translateY(-1px);
 }
 
-.btn-secondary-small:disabled {
+.btn-secondary:disabled, .btn-secondary-small:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
-.btn-danger-small {
+.btn-danger, .btn-danger-small {
   background: #dc2626;
   color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
-.btn-danger-small:hover {
+.btn-danger:hover, .btn-danger-small:hover {
   background: #b91c1c;
   transform: translateY(-1px);
 }
 
-.btn-warning-small {
+.btn-warning, .btn-warning-small {
   background: #f59e0b;
   color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
-.btn-warning-small:hover {
+.btn-warning:hover, .btn-warning-small:hover {
   background: #d97706;
   transform: translateY(-1px);
 }
 
-.btn-info-small {
+.btn-info, .btn-info-small {
   background: #3b82f6;
   color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
-.btn-info-small:hover {
+.btn-info:hover, .btn-info-small:hover {
   background: #2563eb;
   transform: translateY(-1px);
 }
@@ -313,100 +282,59 @@
   font-size: 1rem;
 }
 
-/* Modal Actions */
-.modal-actions {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
+/* Confirmation Modal */
+.confirmation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  background: #f8f9fa;
-  border-radius: 0 0 12px 12px;
-}
-
-.btn-primary,
-.btn-secondary,
-.btn-danger {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  min-width: 120px;
+  align-items: center;
+  z-index: 1100;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  color: white;
+.confirmation-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #047857 0%, #065f46 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+.confirmation-content h4 {
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
-.btn-secondary {
-  background: #6b7280;
-  color: white;
+.confirmation-content p {
+  margin: 0 0 1.5rem 0;
+  color: #6b7280;
+  line-height: 1.5;
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background: #4b5563;
-  transform: translateY(-1px);
-}
-
-.btn-danger {
-  background: #dc2626;
-  color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: #b91c1c;
-  transform: translateY(-1px);
-}
-
-.btn-primary:disabled,
-.btn-secondary:disabled,
-.btn-danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+.confirmation-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .slot-modal-overlay {
-    padding: 0.5rem;
-  }
-  
   .slot-modal {
-    max-width: 100%;
-    max-height: 95vh;
-  }
-  
-  .modal-header {
-    padding: 1rem;
-  }
-  
-  .modal-header h3 {
-    font-size: 1.1rem;
-  }
-  
-  .modal-content {
-    padding: 1rem;
+    width: 95%;
+    margin: 1rem;
   }
   
   .slot-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 1rem;
   }
   
   .slot-actions {
@@ -414,55 +342,29 @@
     justify-content: flex-end;
   }
   
-  .booking-actions {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .modal-actions {
-    padding: 1rem;
+  .confirmation-actions {
     flex-direction: column;
   }
   
-  .btn-primary,
-  .btn-secondary,
-  .btn-danger {
+  .confirmation-actions button {
     width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .slot-modal {
-    border-radius: 8px;
-  }
-  
   .modal-header {
-    padding: 0.75rem;
-    border-radius: 8px 8px 0 0;
-  }
-  
-  .modal-header h3 {
-    font-size: 1rem;
+    padding: 1rem;
   }
   
   .modal-content {
-    padding: 0.75rem;
+    padding: 1rem;
   }
   
-  .slot-item {
-    padding: 0.75rem;
+  .slot-sections {
+    gap: 1rem;
   }
   
-  .slot-actions {
-    gap: 0.25rem;
-  }
-  
-  .btn-primary-small,
-  .btn-secondary-small,
-  .btn-danger-small,
-  .btn-warning-small,
-  .btn-info-small {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.8rem;
+  .slot-section {
+    padding: 1rem;
   }
 }

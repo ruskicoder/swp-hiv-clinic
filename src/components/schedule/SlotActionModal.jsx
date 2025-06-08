@@ -98,17 +98,24 @@ const SlotActionModal = ({
       const formattedData = {
         doctorUserId: selectedSlot.doctorUser.userId,
         availabilitySlotId: selectedSlot.availabilitySlotId,
-        appointmentDateTime: `${selectedSlot.slotDate}T${selectedSlot.startTime}`,
-        durationMinutes: selectedSlot.durationMinutes
+        appointmentDateTime: selectedSlot.slotDate instanceof Date 
+          ? `${selectedSlot.slotDate.toISOString().split('T')[0]}T${selectedSlot.startTime}`
+          : `${selectedSlot.slotDate}T${selectedSlot.startTime}`,
+        durationMinutes: parseInt(selectedSlot.durationMinutes)
       };
 
-      await onBookSlot(formattedData);
+      const response = await onBookSlot(formattedData);
+      
+      if (!response || response.error) {
+        throw new Error(response?.error || 'Failed to book appointment');
+      }
+
       setShowConfirmBooking(false);
       setSelectedSlot(null);
       onClose();
     } catch (error) {
       console.error('Booking failed:', error);
-      alert('Failed to book appointment. Please try again.');
+      alert(error.message || 'Failed to book appointment. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -206,6 +213,26 @@ const SlotActionModal = ({
     date.setMinutes(date.getMinutes() + minutes);
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
+
+  const processedSlots = React.useMemo(() => {
+    if (!Array.isArray(existingSlots)) {
+      console.error('existingSlots is not an array:', existingSlots);
+      return [];
+    }
+
+    return existingSlots
+      .filter(slot => slot && typeof slot === 'object')
+      .map(slot => ({
+        availabilitySlotId: slot.availabilitySlotId,
+        slotDate: slot.slotDate,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        isBooked: Boolean(slot.isBooked),
+        notes: slot.notes || '',
+        appointment: slot.appointment,
+        doctorUser: slot.doctorUser
+      }));
+  }, [existingSlots]);
 
   // Render slot list
   const renderSlotList = (slots, title, emptyMessage) => (
