@@ -95,27 +95,72 @@ const SlotActionModal = ({
 
     setLoading(true);
     try {
-      const formattedData = {
-        doctorUserId: selectedSlot.doctorUser.userId,
-        availabilitySlotId: selectedSlot.availabilitySlotId,
-        appointmentDateTime: selectedSlot.slotDate instanceof Date 
-          ? `${selectedSlot.slotDate.toISOString().split('T')[0]}T${selectedSlot.startTime}`
-          : `${selectedSlot.slotDate}T${selectedSlot.startTime}`,
-        durationMinutes: parseInt(selectedSlot.durationMinutes)
-      };
-
-      const response = await onBookSlot(formattedData);
+      // Validate required fields
+      if (!selectedSlot.availabilitySlotId) {
+        throw new Error('Availability slot ID is missing');
+      }
       
-      if (!response || response.error) {
-        throw new Error(response?.error || 'Failed to book appointment');
+      if (!selectedSlot.doctorUser?.userId && !doctorInfo?.userId) {
+        throw new Error('Doctor information is missing');
       }
 
+      // Improved date formatting
+      let slotDate;
+      if (selectedSlot.slotDate instanceof Date) {
+        slotDate = selectedSlot.slotDate.toISOString().split('T')[0];
+      } else if (typeof selectedSlot.slotDate === 'string') {
+        // Handle different string formats
+        slotDate = selectedSlot.slotDate.includes('T') 
+          ? selectedSlot.slotDate.split('T')[0] 
+          : selectedSlot.slotDate;
+      } else {
+        throw new Error('Invalid slot date format');
+      }
+
+      // Ensure time format is correct (HH:mm)
+      let startTime = selectedSlot.startTime;
+      if (startTime && !startTime.includes(':')) {
+        // If time is in format like "0900", convert to "09:00"
+        startTime = startTime.substring(0, 2) + ':' + startTime.substring(2);
+      }
+
+      const formattedData = {
+        doctorUserId: selectedSlot.doctorUser?.userId || doctorInfo?.userId,
+        availabilitySlotId: selectedSlot.availabilitySlotId,
+        appointmentDateTime: `${slotDate}T${startTime}:00`,
+        durationMinutes: selectedSlot.durationMinutes || 30
+      };
+
+      console.log('Sending booking data:', formattedData);
+      
+      const response = await onBookSlot(formattedData);
+      
+      // Handle different response formats
+      if (response && typeof response === 'object') {
+        if (response.success === false || (response.data && response.data.success === false)) {
+          const errorMessage = response.message || response.data?.message || 'Failed to book appointment';
+          throw new Error(errorMessage);
+        }
+      }
+
+      alert('Appointment booked successfully!');
       setShowConfirmBooking(false);
       setSelectedSlot(null);
       onClose();
+      
     } catch (error) {
       console.error('Booking failed:', error);
-      alert(error.message || 'Failed to book appointment. Please try again.');
+      
+      // Extract meaningful error message
+      let errorMessage = 'Failed to book appointment. Please try again.';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -335,7 +380,7 @@ const SlotActionModal = ({
           {/* Modal Content */}
           <div className="modal-content">
             {!showConfirmBooking && !showCancelBooking ? (
-              <>
+              <div>
                 {/* Available Slots */}
                 {renderSlotList(
                   availableSlots, 
@@ -351,7 +396,7 @@ const SlotActionModal = ({
                   'Booked Slots', 
                   'No booked slots.'
                 )}
-              </>
+              </div>
             ) : showConfirmBooking ? (
               /* Booking Confirmation */
               <div className="booking-confirmation">

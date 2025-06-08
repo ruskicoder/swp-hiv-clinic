@@ -450,7 +450,7 @@ public class AppointmentService {
 
             if (recordOpt.isPresent()) {
                 PatientRecord record = recordOpt.get();
-                result.put("recordId", record.getRecordID());
+                result.put("recordId", record.getRecordId());
                 result.put("medicalHistory", record.getMedicalHistory());
                 result.put("allergies", record.getAllergies());
                 result.put("currentMedications", record.getCurrentMedications());
@@ -477,7 +477,7 @@ public class AppointmentService {
                 
                 PatientRecord savedRecord = patientRecordRepository.save(newRecord);
                 
-                result.put("recordId", savedRecord.getRecordID());
+                result.put("recordId", savedRecord.getRecordId());
                 result.put("medicalHistory", "");
                 result.put("allergies", "");
                 result.put("currentMedications", "");

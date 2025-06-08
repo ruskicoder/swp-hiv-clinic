@@ -88,4 +88,12 @@ public class PatientRecord {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    public Integer getRecordId() {  // Changed from getRecordID() to getRecordId()
+        return recordID;
+    }
+
+    public void setRecordId(Integer recordId) {  // Added setter
+        this.recordID = recordId;
+    }
 }

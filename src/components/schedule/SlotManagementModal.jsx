@@ -165,21 +165,71 @@ const SlotManagementModal = ({
     try {
       setLoading(true);
       
+      // Validate required fields
+      if (!selectedSlot.availabilitySlotId) {
+        throw new Error('Availability slot ID is missing');
+      }
+      
+      if (!selectedSlot.doctorUser?.userId && !doctorInfo?.userId) {
+        throw new Error('Doctor information is missing');
+      }
+
+      // Improved date formatting
+      let formattedDate;
+      if (selectedDate) {
+        // selectedDate should be in YYYY-MM-DD format
+        formattedDate = selectedDate;
+      } else if (selectedSlot.slotDate) {
+        if (selectedSlot.slotDate instanceof Date) {
+          formattedDate = selectedSlot.slotDate.toISOString().split('T')[0];
+        } else {
+          formattedDate = selectedSlot.slotDate.includes('T') 
+            ? selectedSlot.slotDate.split('T')[0] 
+            : selectedSlot.slotDate;
+        }
+      } else {
+        throw new Error('No date information available');
+      }
+
+      // Ensure time format is correct
+      let startTime = selectedSlot.startTime;
+      if (startTime && !startTime.includes(':')) {
+        startTime = startTime.substring(0, 2) + ':' + startTime.substring(2);
+      }
+
+      const bookingData = {
+        availabilitySlotId: selectedSlot.availabilitySlotId,
+        doctorUserId: selectedSlot.doctorUser?.userId || doctorInfo?.userId,
+        appointmentDateTime: `${formattedDate}T${startTime}:00`,
+        durationMinutes: selectedSlot.durationMinutes || 30
+      };
+
+      console.log('Booking appointment with data:', bookingData);
+      
       if (onBookSlot) {
-        await onBookSlot({
-          availabilitySlotId: selectedSlot.availabilitySlotId,
-          doctorUserId: selectedSlot.doctorUser?.userId || doctorInfo?.userId,
-          appointmentDateTime: `${selectedDate}T${selectedSlot.startTime}:00`,
-          durationMinutes: 30
-        });
+        const response = await onBookSlot(bookingData);
+        
+        // Handle response
+        if (response && response.success === false) {
+          throw new Error(response.message || 'Failed to book appointment');
+        }
       }
       
       setShowConfirmBooking(false);
       setSelectedSlot(null);
       alert('Appointment booked successfully!');
+      
     } catch (error) {
       console.error('Error booking appointment:', error);
-      alert('Failed to book appointment. Please try again.');
+      
+      let errorMessage = 'Failed to book appointment. Please try again.';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

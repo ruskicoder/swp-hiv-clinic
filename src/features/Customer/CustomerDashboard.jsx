@@ -138,39 +138,61 @@ const CustomerDashboard = () => {
   const handleBookSlot = async (slot) => {
     try {
       if (!selectedDoctor || !slot) {
-        throw new Error('Missing required booking information');
+        throw new Error('Missing doctor or slot information');
       }
 
-      console.log('Booking slot:', slot);
-      console.log('Selected doctor:', selectedDoctor);
+      // Validate slot data
+      if (!slot.availabilitySlotId) {
+        throw new Error('Invalid slot: missing availability slot ID');
+      }
 
-      // Format the appointment date/time properly
-      const appointmentDateTime = formatDateTimeForAPI(slot.slotDate, slot.startTime);
-
+      const formattedDateTime = formatDateTimeForAPI(slot.slotDate, slot.startTime);
+      
       const bookingData = {
         doctorUserId: selectedDoctor.userId,
         availabilitySlotId: slot.availabilitySlotId,
-        appointmentDateTime: appointmentDateTime,
+        appointmentDateTime: formattedDateTime,
         durationMinutes: slot.durationMinutes || 30
       };
 
-      console.log('Sending booking data:', bookingData);
+      console.log('Booking slot with data:', bookingData);
 
       const response = await apiClient.post('/appointments/book', bookingData);
 
-      if (!response.data || !response.data.success) {
-        throw new Error(response.data?.message || 'Failed to book appointment');
+      // Improved response handling
+      if (response.data) {
+        if (response.data.success === false) {
+          throw new Error(response.data.message || 'Failed to book appointment');
+        }
+        
+        // Check if response indicates success
+        if (response.data.success === true || response.status === 200) {
+          alert('Appointment booked successfully!');
+          await loadDashboardData();
+          if (selectedDoctor) {
+            await loadDoctorSlots(selectedDoctor.userId);
+          }
+          setActiveTab('appointments');
+          return { success: true };
+        }
       }
 
-      alert('Appointment booked successfully!');
-      await loadDashboardData();
-      await loadDoctorSlots(selectedDoctor.userId);
-      setActiveTab('appointments');
-      return { success: true };
+      // If we get here, something unexpected happened
+      throw new Error('Unexpected response format');
 
     } catch (error) {
-      console.error('Error booking appointment:', error);
-      throw new Error(error.response?.data?.message || error.message || 'Failed to book appointment');
+      console.error('Error booking appointment:', error.response || error);
+      
+      // Extract meaningful error message
+      let errorMessage = 'Failed to book appointment. Please try again.';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      throw new Error(errorMessage);
     }
   };
 
@@ -247,49 +269,44 @@ const CustomerDashboard = () => {
   ];
 
   // Render overview
-  const renderOverview = () => {
-    const upcomingAppointments = appointments.filter(apt => 
-      new Date(apt.appointmentDateTime) > new Date() && apt.status === 'Scheduled'
-    );
-
-    return (
-      <div className="overview-content">
-        <div className="stats-grid">
-          <div className="stat-card">
-            <h3>{appointments.length}</h3>
-            <p>Total Appointments</p>
-          </div>
-          <div className="stat-card">
-            <h3>{upcomingAppointments.length}</h3>
-            <p>Upcoming Appointments</p>
-          </div>
-          <div className="stat-card">
-            <h3>{arvTreatments.length}</h3>
-            <p>ARV Treatments</p>
-          </div>
+  const renderOverview = () => (
+    <div className="overview-content">
+      <h2>Overview</h2>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <h3>{appointments.length}</h3>
+          <p>Total Appointments</p>
         </div>
-
-        <div className="recent-appointments">
-          <h3>Upcoming Appointments</h3>
-          {upcomingAppointments.length > 0 ? (
-            <div className="appointments-list">
-              {upcomingAppointments.slice(0, 3).map(appointment => (
-                <div key={appointment.appointmentId} className="appointment-item">
-                  <div className="appointment-info">
-                    <p><strong>Doctor:</strong> Dr. {appointment.doctorUser?.firstName} {appointment.doctorUser?.lastName}</p>
-                    <p><strong>Date:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
-                    <p><strong>Status:</strong> {appointment.status}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>No upcoming appointments. <button className="link-btn" onClick={() => setActiveTab('doctors')}>Book an appointment</button></p>
-          )}
+        <div className="stat-card">
+          <h3>{appointments.filter(apt => new Date(apt.appointmentDateTime) > new Date() && apt.status === 'Scheduled').length}</h3>
+          <p>Upcoming Appointments</p>
+        </div>
+        <div className="stat-card">
+          <h3>{arvTreatments.length}</h3>
+          <p>ARV Treatments</p>
         </div>
       </div>
-    );
-  };
+
+      <div className="recent-appointments">
+        <h3>Upcoming Appointments</h3>
+        {appointments.filter(apt => new Date(apt.appointmentDateTime) > new Date() && apt.status === 'Scheduled').length > 0 ? (
+          <div className="appointments-list">
+            {appointments.filter(apt => new Date(apt.appointmentDateTime) > new Date() && apt.status === 'Scheduled').slice(0, 3).map(appointment => (
+              <div key={appointment.appointmentId} className="appointment-item">
+                <div className="appointment-info">
+                  <p><strong>Doctor:</strong> Dr. {appointment.doctorUser?.firstName} {appointment.doctorUser?.lastName}</p>
+                  <p><strong>Date:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
+                  <p><strong>Status:</strong> {appointment.status}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No upcoming appointments. <button className="link-btn" onClick={() => setActiveTab('doctors')}>Book an appointment</button></p>
+        )}
+      </div>
+    </div>
+  );
 
   // Render appointments
   const renderAppointments = () => (
@@ -490,9 +507,9 @@ const CustomerDashboard = () => {
         onLogout={handleLogout}
         title="Patient Dashboard"
       />
-
+      
       <div className="dashboard-layout">
-        <div className="dashboard-sidebar">
+        <aside className="dashboard-sidebar">
           <nav className="dashboard-nav">
             {navigationItems.map(item => (
               <button
@@ -505,20 +522,19 @@ const CustomerDashboard = () => {
               </button>
             ))}
           </nav>
-        </div>
+        </aside>
 
-        <div className="dashboard-main">
+        <main className="dashboard-main">
           {error && (
             <div className="error-banner">
               <p>{error}</p>
               <button onClick={() => setError('')}>×</button>
             </div>
           )}
-
           <ErrorBoundary>
             {renderContent()}
           </ErrorBoundary>
-        </div>
+        </main>
       </div>
     </div>
   );

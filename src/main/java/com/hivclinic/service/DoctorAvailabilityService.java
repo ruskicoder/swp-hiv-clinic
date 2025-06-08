@@ -128,12 +128,7 @@ public class DoctorAvailabilityService {
 
             // Save the slot
             DoctorAvailabilitySlot savedSlot = availabilitySlotRepository.save(slot);
-
-            logger.info("Availability slot created successfully for doctor: {} on date: {} from {} to {} (duration: {} minutes)", 
-                    doctor.getUsername(), request.getSlotDate(), request.getStartTime(), 
-                    endTime, request.getDurationMinutes());
-
-            return MessageResponse.success("Availability slot created successfully!");
+            return MessageResponse.success("Availability slot added successfully", savedSlot);
 
         } catch (Exception e) {
             logger.error("Error creating availability slot for doctor {}: {}", doctorUserId, e.getMessage(), e);

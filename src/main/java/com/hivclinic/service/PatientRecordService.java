@@ -274,7 +274,7 @@ public class PatientRecordService {
         
         response.put("success", true);
         response.put("message", "Patient record retrieved successfully");
-        response.put("recordId", record.getRecordID());
+        response.put("recordId", record.getRecordId());  // Changed from getRecordID() to getRecordId()
         response.put("patientUserId", record.getPatientUserID());
         response.put("appointmentId", record.getAppointmentId());
         response.put("medicalHistory", record.getMedicalHistory() != null ? record.getMedicalHistory() : "");
