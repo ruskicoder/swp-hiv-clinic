@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { SafeText } from '../utils/SafeComponents';
 import './PatientRecordSection.css';
+import { useAuth } from '../contexts/AuthContext';
+
+// Utility functions for data masking
+const maskName = (name) => {
+  if (!name) return '';
+  const parts = name.split(' ');
+  return parts.map(part => `${part[0]}${'*'.repeat(part.length - 1)}`).join(' ');
+};
+
+const maskPhoneNumber = (phone) => {
+  if (!phone) return '';
+  return `***-***-${phone.slice(-4)}`;
+};
 
 const PatientRecordSection = ({
   record = {},
@@ -9,6 +22,7 @@ const PatientRecordSection = ({
   loading = false,
   isEditable = true
 }) => {
+  const { user } = useAuth();
   // Initialize form data with empty strings
   const [formData, setFormData] = useState({
     medicalHistory: '',
@@ -19,6 +33,15 @@ const PatientRecordSection = ({
     emergencyContact: '',
     emergencyPhone: ''
   });
+
+  // Enhanced privacy mode logic
+  const isAdmin = user?.role?.roleName === 'Admin';
+  const isDoctor = user?.role?.roleName === 'Doctor';
+  const isPatient = user?.role?.roleName === 'Patient';
+  const isPrivateMode = record?.isPrivate;
+  const canViewFullData = isAdmin || isPatient || !isPrivateMode;
+  const canViewSensitiveData = isAdmin || isPatient;
+  const canViewImages = !isPrivateMode || canViewSensitiveData;
 
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -38,13 +61,11 @@ const PatientRecordSection = ({
   useEffect(() => {
     console.debug('Updating form data with record:', record);
     
-    // Check for error in record
     if (record?.error) {
       setError(record.error);
       return;
     }
 
-    // Enhanced validation for record data
     const hasValidRecord = record && (
       record.success === true || 
       record.patientUserId || 
@@ -52,7 +73,6 @@ const PatientRecordSection = ({
       record.recordId ||
       record.patientId ||
       record.patientUsername ||
-      // Check if it's a valid record object with at least some medical data
       (typeof record === 'object' && (
         record.medicalHistory !== undefined ||
         record.allergies !== undefined ||
@@ -65,17 +85,22 @@ const PatientRecordSection = ({
     );
 
     if (hasValidRecord) {
-      setFormData({
-        medicalHistory: record.medicalHistory || '',
-        allergies: record.allergies || '',
-        currentMedications: record.currentMedications || '',
-        notes: record.notes || '',
-        bloodType: record.bloodType || '',
-        emergencyContact: record.emergencyContact || '',
-        emergencyPhone: record.emergencyPhone || ''
-      });
+      // Apply privacy masking based on user role and privacy mode
+      const maskedData = {
+        medicalHistory: canViewFullData ? record.medicalHistory : '[Private Medical History]',
+        allergies: canViewFullData ? record.allergies : '[Private Allergies]',
+        currentMedications: canViewFullData ? record.currentMedications : '[Private Medications]',
+        notes: canViewFullData ? record.notes : '[Private Notes]',
+        bloodType: canViewFullData ? record.bloodType : '[Private]',
+        emergencyContact: canViewSensitiveData ? record.emergencyContact : 
+                         record.emergencyContact ? maskName(record.emergencyContact) : '',
+        emergencyPhone: canViewSensitiveData ? record.emergencyPhone :
+                       record.emergencyPhone ? maskPhoneNumber(record.emergencyPhone) : ''
+      };
+      
+      setFormData(maskedData);
       setError('');
-      console.debug('Form data updated successfully');
+      console.debug('Form data updated successfully with privacy settings');
     } else {
       console.debug('No valid record data provided, using empty form');
       setFormData({
@@ -88,22 +113,26 @@ const PatientRecordSection = ({
         emergencyPhone: ''
       });
     }
-  }, [record]);
+  }, [record, canViewFullData, canViewSensitiveData]);
 
-  // Helper to get patient name for header
+  // Helper to get patient name for header with privacy masking
   const getPatientName = () => {
     if (!record) return 'Patient';
-    // Try to use patientName, then patientUsername, then fallback
-    return (
-      record.patientName ||
+    
+    if (!canViewSensitiveData && isPrivateMode) {
+      return 'Private Patient';
+    }
+
+    const fullName = record.patientName ||
       (record.patientFirstName && record.patientLastName
         ? `${record.patientFirstName} ${record.patientLastName}`
         : null) ||
       record.patientUsername ||
       record.firstName ||
       record.username ||
-      'Patient'
-    );
+      'Patient';
+
+    return isPrivateMode && !canViewSensitiveData ? maskName(fullName) : fullName;
   };
 
   const handleChange = (e) => {
@@ -269,16 +298,27 @@ const PatientRecordSection = ({
       record.emergencyPhone !== undefined
     ))
   );
-
   return (
     <div className="patient-record-section">
       <div className="record-header">
         <h3>
           {loading ? 'Loading...' : 
            record?.error ? 'Error Loading Record' :
-           hasValidRecord ? `${getPatientName()} Medical Record` :
+           hasValidRecord ? (
+             isPrivateMode ? 
+               'Private Medical Record' : 
+               `${getPatientName()} Medical Record`
+           ) :
            'Patient Medical Record'}
         </h3>
+        {isPrivateMode && user?.role?.roleName === 'Doctor' && (
+          <div className="privacy-notice">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/>
+            </svg>
+            <span>This patient has enabled private mode. Some information is hidden.</span>
+          </div>
+        )}
         {error && (
           <div className="error-banner">
             {error}
@@ -301,11 +341,20 @@ const PatientRecordSection = ({
           <div className="profile-image-section">
             <div className="profile-image-container">
               {record?.profileImageBase64 ? (
-                <img
-                  src={record.profileImageBase64}
-                  alt="Profile"
-                  className="profile-image"
-                />
+                canViewImages ? (
+                  <img
+                    src={record.profileImageBase64}
+                    alt="Profile"
+                    className="profile-image"
+                  />
+                ) : (
+                  <div className="profile-placeholder private">
+                    <svg viewBox="0 0 24 24" width="48" height="48">
+                      <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/>
+                    </svg>
+                    <span>Private Image</span>
+                  </div>
+                )
               ) : (
                 <div className="profile-placeholder">
                   <span>No Image</span>
@@ -313,28 +362,46 @@ const PatientRecordSection = ({
               )}
             </div>
             <div className="image-upload">
-              <input
-                type="file"
-                id="profileImage"
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
-                disabled={uploading}
-              />
-              <label 
-                htmlFor="profileImage" 
-                className="upload-btn" 
-                style={{ 
-                  opacity: uploading ? 0.6 : 1, 
-                  pointerEvents: uploading ? 'none' : 'auto' 
-                }}
-              >
-                {uploading ? 'Uploading...' : 'Upload Photo'}
-              </label>
-              {uploadError && <div className="error-message">{uploadError}</div>}
-              {uploadSuccess && <div className="success-message">{uploadSuccess}</div>}
+              {(canViewImages || !record?.profileImageBase64) && (
+                <>
+                  <input
+                    type="file"
+                    id="profileImage"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    style={{ display: 'none' }}
+                    disabled={uploading}
+                  />
+                  <label 
+                    htmlFor="profileImage" 
+                    className="upload-btn" 
+                    style={{ 
+                      opacity: uploading ? 0.6 : 1, 
+                      pointerEvents: uploading ? 'none' : 'auto' 
+                    }}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload Photo'}
+                  </label>
+                  {uploadError && <div className="error-message">{uploadError}</div>}
+                  {uploadSuccess && <div className="success-message">{uploadSuccess}</div>}
+                </>
+              )}
             </div>
           </div>
+
+          {/* Private Mode Banner */}
+          {isPrivateMode && (
+            <div className={`privacy-banner ${canViewSensitiveData ? 'admin' : 'restricted'}`}>
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/>
+              </svg>
+              <span>
+                {canViewSensitiveData 
+                  ? "You have full access to this private record"
+                  : "This record is in private mode. Some information is hidden."}
+              </span>
+            </div>
+          )}
 
           {/* Medical Information Form */}
           <form id="patient-record-form" onSubmit={handleSubmit} className="record-form">
@@ -493,6 +560,73 @@ const PatientRecordSection = ({
               </div>
             )}
           </form>
+
+          {/* Private Data Warning */}
+          {isPrivateMode && (
+            <div className="private-data-warning">
+              <strong>Warning:</strong> This record contains private data.
+              {user?.role?.roleName !== 'Admin' && (
+                <>
+                  {' '}
+                  As a non-admin user, you have limited access to this data.
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Record Display for Non-Editable Fields */}
+          {!isEditable && (
+            <div className="record-display">
+              <div className="display-group">
+                <strong>Medical History:</strong>
+                <div className="display-content">
+                  <SafeText value={formData.medicalHistory} />
+                </div>
+              </div>
+
+              <div className="display-group">
+                <strong>Allergies:</strong>
+                <div className="display-content">
+                  <SafeText value={formData.allergies} />
+                </div>
+              </div>
+
+              <div className="display-group">
+                <strong>Current Medications:</strong>
+                <div className="display-content">
+                  <SafeText value={formData.currentMedications} />
+                </div>
+              </div>
+
+              <div className="display-group">
+                <strong>Additional Notes:</strong>
+                <div className="display-content">
+                  <SafeText value={formData.notes} />
+                </div>
+              </div>
+
+              <div className="display-group">
+                <strong>Blood Type:</strong>
+                <div className="display-content">
+                  <SafeText value={formData.bloodType} />
+                </div>
+              </div>
+
+              <div className="display-group">
+                <strong>Emergency Contact:</strong>
+                <div className="display-content">
+                  <SafeText value={formData.emergencyContact} />
+                </div>
+              </div>
+
+              <div className="display-group">
+                <strong>Emergency Phone:</strong>
+                <div className="display-content">
+                  <SafeText value={formData.emergencyPhone} />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

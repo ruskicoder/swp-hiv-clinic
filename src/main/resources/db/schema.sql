@@ -64,6 +64,7 @@ CREATE TABLE PatientProfiles (
     PhoneNumber NVARCHAR(20) NULL,
     Address NVARCHAR(MAX) NULL,
     ProfileImageBase64 NVARCHAR(MAX) NULL,
+    IsPrivate BIT DEFAULT 0, -- New column for private mode
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
@@ -221,6 +222,18 @@ IF NOT EXISTS (
 BEGIN
     ALTER TABLE DoctorAvailabilitySlots
     ADD DurationMinutes INT NOT NULL DEFAULT 30;
+END
+GO
+
+-- Add IsPrivate column to PatientRecords if it doesn't exist
+IF NOT EXISTS (
+    SELECT * FROM sys.columns 
+    WHERE object_id = OBJECT_ID('PatientRecords')
+    AND name = 'IsPrivate'
+)
+BEGIN
+    ALTER TABLE PatientRecords
+    ADD IsPrivate BIT NOT NULL DEFAULT 0;
 END
 GO
 
