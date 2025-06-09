@@ -1,9 +1,34 @@
 import { useAuth } from '../../contexts/AuthContext';
 import UserProfileDropdown from './UserProfileDropdown';
+import { useState, useEffect } from 'react';
 import './DashboardHeader.css';
 
 const DashboardHeader = ({ title, subtitle }) => {
   const { user } = useAuth();
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDateTime = (date) => {
+    const timeString = date.toLocaleTimeString('en-GB', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    const dateString = date.toLocaleDateString('en-GB', { 
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: '2-digit'
+    });
+    return `${dateString} ${timeString}`;
+  };
 
   return (
     <div className="dashboard-header">
@@ -26,6 +51,7 @@ const DashboardHeader = ({ title, subtitle }) => {
           <span className="dashboard-header-titles">
             {title && <h1 className="dashboard-title">{title}</h1>}
             {subtitle && <p className="dashboard-subtitle">{subtitle}</p>}
+            <p className="dashboard-clock">{formatDateTime(currentDateTime)}</p>
           </span>
         </div>
         

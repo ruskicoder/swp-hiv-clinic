@@ -68,12 +68,14 @@ export const safeDate = (dateValue) => {
     } else {
       return safeRender(dateValue);
     }
-    
-    if (isNaN(date.getTime())) {
+      if (isNaN(date.getTime())) {
       return 'Invalid Date';
     }
-    
-    return date.toLocaleDateString();
+      // Format as dd/mm/yyyy
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   } catch (error) {
     console.warn('Error formatting date:', dateValue, error);
     return safeRender(dateValue);
@@ -96,7 +98,13 @@ export const safeDateTime = (dateTimeValue) => {
       return 'Invalid Date';
     }
     
-    return date.toLocaleString();
+    // Format as dd/mm/yyyy HH:mm
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
   } catch (error) {
     console.warn('Error formatting datetime:', dateTimeValue, error);
     return safeRender(dateTimeValue);
