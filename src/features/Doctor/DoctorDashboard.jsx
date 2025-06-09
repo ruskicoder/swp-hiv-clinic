@@ -335,57 +335,49 @@ const DoctorDashboard = () => {
     // Ensure availabilitySlots is an array before using filter
     const safeAvailabilitySlots = Array.isArray(availabilitySlots) ? availabilitySlots : [];
     const safeAppointments = Array.isArray(appointments) ? appointments : [];
-    
-    // Get today's date at midnight for comparison
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    // Filter and sort today's appointments
-    const todaysAppointments = safeAppointments
-      .filter(apt => {
-        const aptDate = new Date(apt.appointmentDateTime);
-        const aptMidnight = new Date(aptDate);
-        aptMidnight.setHours(0, 0, 0, 0);
-        return aptMidnight.getTime() === today.getTime();
-      })
-      .sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime));
 
     return (
       <ErrorBoundary>
         <div className="overview-content">
           <div className="content-header">
             <h2>Dashboard Overview</h2>
-            <p>Welcome back, Dr. {doctorName}</p>
+            <p>Welcome, Dr. {doctorName}</p>
           </div>
 
           <div className="stats-grid">
-            <div className="stat-card">
-              <h3>Today's Appointments</h3>
-              <p className="stat-number">{todaysAppointments.length}</p>
-            </div>
             <div className="stat-card">
               <h3>Total Appointments</h3>
               <p className="stat-number">{safeAppointments.length}</p>
             </div>
             <div className="stat-card">
               <h3>Available Slots</h3>
+              <p className="stat-number">{safeAvailabilitySlots.filter(slot => !slot.isBooked).length}</p>
+            </div>
+            <div className="stat-card">
+              <h3>Booked Slots</h3>
+              <p className="stat-number">{safeAvailabilitySlots.filter(slot => slot.isBooked).length}</p>
+            </div>
+            <div className="stat-card">
+              <h3>Today's Appointments</h3>
               <p className="stat-number">
-                {safeAvailabilitySlots.filter(slot => !slot.isBooked).length}
+                {safeAppointments.filter(apt => {
+                  try {
+                    const today = new Date().toDateString();
+                    const aptDate = new Date(apt.appointmentDateTime).toDateString();
+                    return today === aptDate;
+                  } catch (error) {
+                    return false;
+                  }
+                }).length}
               </p>
             </div>
           </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
           <div className="recent-appointments">
-            <h3>Today's Appointments</h3>
-            {todaysAppointments.length > 0 ? (
+            <h3>Recent Appointments</h3>
+            {safeAppointments.length > 0 ? (
               <div className="appointments-list">
-                {todaysAppointments.map(appointment => (
+                {safeAppointments.slice(0, 5).map(appointment => (
                   <div key={appointment.appointmentId} className="appointment-card">
                     <div className="appointment-header">
                       <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
@@ -394,19 +386,15 @@ const DoctorDashboard = () => {
                       </span>
                     </div>
                     <div className="appointment-details">
-                      <p><strong>Time:</strong> {safeTime(appointment.appointmentDateTime)}</p>
+                      <p><strong>Date:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
                       <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
-                      <p><strong>Patient Email:</strong> {safeRender(appointment.patientUser?.email)}</p>
-                      {appointment.appointmentNotes && (
-                        <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
-                      )}
                     </div>
                     <div className="appointment-actions">
                       <button 
                         className="btn-primary"
                         onClick={() => loadPatientRecord(appointment)}
                       >
-                        View Patient Record
+                        View Record
                       </button>
                     </div>
                   </div>
@@ -414,7 +402,7 @@ const DoctorDashboard = () => {
               </div>
             ) : (
               <div className="no-data">
-                <p>No appointments scheduled for today.</p>
+                <p>No appointments found.</p>
               </div>
             )}
           </div>
@@ -425,24 +413,7 @@ const DoctorDashboard = () => {
 
   // Render appointments section
   const renderAppointments = () => {
-    // Convert status to numeric priority for sorting
-    const getStatusPriority = (status) => {
-      switch (status?.toLowerCase()) {
-        case 'in progress': return 1;
-        case 'scheduled': return 2;
-        case 'completed': return 3;
-        default: return 4;
-      }
-    };
-
-    // Sort appointments by status priority and then by date
-    const sortedAppointments = Array.isArray(appointments) 
-      ? [...appointments].sort((a, b) => {
-          const priorityDiff = getStatusPriority(a.status) - getStatusPriority(b.status);
-          if (priorityDiff !== 0) return priorityDiff;
-          return new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime);
-        })
-      : [];
+    const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
     return (
       <ErrorBoundary>
@@ -452,15 +423,9 @@ const DoctorDashboard = () => {
             <p>Manage your scheduled appointments</p>
           </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          {sortedAppointments.length > 0 ? (
+          {safeAppointments.length > 0 ? (
             <div className="appointments-list">
-              {sortedAppointments.map(appointment => (
+              {safeAppointments.map(appointment => (
                 <div key={appointment.appointmentId} className="appointment-card">
                   <div className="appointment-header">
                     <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
@@ -469,7 +434,7 @@ const DoctorDashboard = () => {
                     </span>
                   </div>
                   <div className="appointment-details">
-                    <p><strong>Date:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
+                    <p><strong>Date & Time:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
                     <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
                     <p><strong>Patient Email:</strong> {safeRender(appointment.patientUser?.email)}</p>
                     {appointment.appointmentNotes && (
