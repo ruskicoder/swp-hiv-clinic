@@ -45,20 +45,49 @@ const Settings = () => {
     marketingCommunications: false
   });
 
-  // Load user profile data
+  // Add useEffect for initial style loading
   useEffect(() => {
-    if (user) {
-      setProfileData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        phoneNumber: user.phoneNumber || '',
-        email: user.email || '',
-        dateOfBirth: user.dateOfBirth || '',
-        address: user.address || '',
-        bio: user.bio || '',
-        profileImageBase64: user.profileImageBase64 || ''
-      });
-    }
+    // Force a repaint to ensure styles are applied correctly
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // Trigger reflow
+    document.body.style.display = '';
+
+    // Clean up
+    return () => {
+      document.body.style.display = '';
+    };
+  }, []);
+
+  // Add loading state handling
+  useEffect(() => {
+    document.documentElement.style.visibility = loading ? 'hidden' : 'visible';
+    return () => {
+      document.documentElement.style.visibility = 'visible';
+    };
+  }, [loading]);
+
+  // Modify the existing user profile loading effect
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (user) {
+        setLoading(true);
+        try {
+          setProfileData({
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
+            phoneNumber: user.phoneNumber || '',
+            email: user.email || '',
+            dateOfBirth: user.dateOfBirth || '',
+            address: user.address || '',
+            bio: user.bio || '',
+            profileImageBase64: user.profileImageBase64 || ''
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    loadUserProfile();
   }, [user]);
 
   // Handle profile form changes
@@ -552,7 +581,7 @@ const Settings = () => {
   );
 
   return (
-    <div className="settings-container">
+    <div className="settings-container" style={{ opacity: loading ? 0 : 1 }}>
       <BackNavigation />
       
       <div className="settings-header">

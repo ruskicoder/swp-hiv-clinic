@@ -47,15 +47,26 @@ const authService = {
   },
 
   /**
-   * Get current user profile
+   * Get current user profile with better error handling
    */
   async getUserProfile() {
     try {
       const response = await apiClient.get('/auth/me');
-      return response.data;
+      
+      // Transform the response to ensure consistent data structure
+      return {
+        ...response.data,
+        firstName: response.data.firstName || '',
+        lastName: response.data.lastName || '',
+        phoneNumber: response.data.phoneNumber || '',
+        dateOfBirth: response.data.dateOfBirth || '',
+        address: response.data.address || '',
+        profileImageBase64: response.data.profileImageBase64 || '',
+        role: response.data.role || 'Patient' // Default to Patient if not specified
+      };
     } catch (error) {
       console.error('Get profile error:', error);
-      throw error;
+      throw new Error('Failed to load user profile');
     }
   },
 

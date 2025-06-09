@@ -63,13 +63,23 @@ export const AuthProvider = ({ children }) => {
         // Store token
         localStorage.setItem('token', response.token);
         
-        // Set user data
+        // Load full profile data after successful login
+        const profileResponse = await authService.getUserProfile();
+        
+        // Set user data with combined login and profile info
         setUser({
           id: response.id,
-          userId: response.id, // Add userId for compatibility
+          userId: response.id,  
           username: response.username,
           email: response.email,
-          role: response.role
+          role: response.role,
+          // Add profile data
+          firstName: profileResponse.firstName || '',
+          lastName: profileResponse.lastName || '',
+          phoneNumber: profileResponse.phoneNumber || '',
+          dateOfBirth: profileResponse.dateOfBirth || '',
+          address: profileResponse.address || '',
+          profileImageBase64: profileResponse.profileImageBase64 || ''
         });
         
         return { success: true };
