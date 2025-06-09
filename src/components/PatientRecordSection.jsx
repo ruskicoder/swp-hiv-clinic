@@ -228,7 +228,7 @@ const PatientRecordSection = ({
         const reader = new FileReader();
         reader.onload = (e) => img.src = e.target.result;
         reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file); 
       })
       .then(async (base64) => {
         try {
