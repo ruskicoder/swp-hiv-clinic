@@ -162,25 +162,43 @@ public class PatientRecordController {
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
             @RequestBody Map<String, String> imageData) {
         try {
-            logger.info("Uploading profile image for patient: {}", userPrincipal.getUsername());
+            logger.info("Processing image upload request for user: {}", userPrincipal.getUsername());
             
-            String base64Image = imageData.get("image");
-            if (base64Image == null || base64Image.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(MessageResponse.error("Image data is required"));
+            if (userPrincipal == null || userPrincipal.getId() == null) {
+                logger.error("User principal or ID is null");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(MessageResponse.error("Authentication required"));
             }
             
-            try {
-                patientRecordService.updateProfileImage(userPrincipal.getId(), base64Image);
-                return ResponseEntity.ok(MessageResponse.success("Profile image uploaded successfully"));
-            } catch (Exception ex) {
-                logger.error("Error in service while uploading profile image for user {}: {}", userPrincipal.getUsername(), ex.getMessage(), ex);
-                return ResponseEntity.badRequest().body(MessageResponse.error("Failed to upload profile image: " + ex.getMessage()));
+            String base64Image = imageData.get("imageData");
+            if (base64Image == null || base64Image.trim().isEmpty()) {
+                logger.error("Image data is missing from request");
+                return ResponseEntity.badRequest()
+                    .body(MessageResponse.error("Image data is required"));
+            }
+
+            // Basic validation of base64 image format
+            if (!base64Image.startsWith("data:image/")) {
+                logger.error("Invalid image format received");
+                return ResponseEntity.badRequest()
+                    .body(MessageResponse.error("Invalid image format. Must be a valid base64 image data URL."));
+            }
+            
+            MessageResponse response = patientRecordService.updateProfileImage(userPrincipal.getId(), base64Image);
+            
+            if (response.isSuccess()) {
+                logger.info("Image upload successful for user: {}", userPrincipal.getUsername());
+                return ResponseEntity.ok(response);
+            } else {
+                logger.warn("Image upload failed for user {}: {}", userPrincipal.getUsername(), response.getMessage());
+                return ResponseEntity.badRequest().body(response);
             }
             
         } catch (Exception e) {
-            logger.error("Error uploading profile image for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            logger.error("Error processing image upload for user {}: {}", 
+                userPrincipal.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to upload profile image: " + e.getMessage()));
+                .body(MessageResponse.error("Failed to upload image: " + e.getMessage()));
         }
     }
 

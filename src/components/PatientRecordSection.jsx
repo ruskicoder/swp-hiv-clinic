@@ -143,84 +143,109 @@ const PatientRecordSection = ({
       setError(error.message || 'Failed to save patient record');
     }
   };
-
   const handleImageUpload = async (e) => {
+    if (!onImageUpload) {
+      console.error('No onImageUpload function provided to PatientRecordSection');
+      setUploadError('Image upload is not available');
+      return;
+    }
+
     const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setUploadError('Please select a valid image file');
+    if (!file) {
+      console.debug('No file selected');
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError('Image size must be less than 5MB');
-      return;
-    }
-
+    // Clear previous states
     setUploading(true);
     setUploadError('');
     setUploadSuccess('');
 
     try {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Please select a valid image file');
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        throw new Error('Image size must be less than 5MB');
+      }
+
+      console.debug('Processing image:', {
+        type: file.type,
+        size: `${(file.size / 1024 / 1024).toFixed(2)}MB`
+      });
+
       // Create canvas for image resizing
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
 
-      img.onload = async () => {
-        // Calculate new dimensions (max 512x512)
-        const maxSize = 512;
-        let { width, height } = img;
-        
-        if (width > height) {
-          if (width > maxSize) {
-            height = (height * maxSize) / width;
-            width = maxSize;
+      // Handle image loading
+      await new Promise((resolve, reject) => {
+        img.onload = () => {
+          try {
+            // Calculate new dimensions (max 512x512)
+            const maxDimension = 512;
+            let { width, height } = img;
+            
+            if (width > height) {
+              if (width > maxDimension) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              }
+            } else {
+              if (height > maxDimension) {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Draw and compress image
+            ctx.drawImage(img, 0, 0, width, height);
+            const base64 = canvas.toDataURL('image/jpeg', 0.8);
+
+            console.debug('Image processed:', {
+              originalSize: `${(file.size / 1024).toFixed(2)}KB`,
+              newSize: `${(base64.length / 1024).toFixed(2)}KB`,
+              dimensions: `${width}x${height}`
+            });
+
+            resolve(base64);
+          } catch (err) {
+            reject(new Error('Failed to process image: ' + err.message));
           }
-        } else {
-          if (height > maxSize) {
-            width = (width * maxSize) / height;
-            height = maxSize;
-          }
-        }
+        };
 
-        canvas.width = width;
-        canvas.height = height;
+        img.onerror = () => reject(new Error('Failed to load image'));
 
-        // Draw and compress image
-        ctx.drawImage(img, 0, 0, width, height);
-        const base64 = canvas.toDataURL('image/jpeg', 0.8);
-
+        // Read file as data URL
+        const reader = new FileReader();
+        reader.onload = (e) => img.src = e.target.result;
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      })
+      .then(async (base64) => {
         try {
+          // Call the parent's onImageUpload function
           await onImageUpload(base64);
           setUploadSuccess('Image uploaded successfully!');
           setTimeout(() => setUploadSuccess(''), 3000);
-        } catch (error) {
-          console.error('Upload error:', error);
-          setUploadError('Failed to upload image');
-        } finally {
-          setUploading(false);
+        } catch (uploadError) {
+          console.error('Failed to upload image:', uploadError);
+          throw uploadError;
         }
-      };
-
-      img.onerror = () => {
-        setUploadError('Failed to process image');
-        setUploading(false);
-      };
-
-      // Read file as data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      });
 
     } catch (error) {
-      console.error('Image processing error:', error);
-      setUploadError('Failed to process image');
+      console.error('Image upload error:', error);
+      setUploadError(error.message || 'Failed to upload image');
+    } finally {
       setUploading(false);
     }
   };

@@ -172,19 +172,35 @@ const CustomerDashboard = () => {
   };
 
   // Handle uploading image
-  const handleUploadImage = async (imageData) => {
+  const handleUploadImage = async (base64Image) => {
     try {
-      const response = await apiClient.post('/patient-records/upload-image', imageData);
-      if (response.data && response.data.success !== false) {
-        alert('Image uploaded successfully!');
+      console.debug('Starting image upload with data:', {
+        dataLength: base64Image?.length,
+        dataStart: base64Image?.substring(0, 50) + '...'
+      });
+      
+      const response = await apiClient.post('/patient-records/upload-image', {
+        imageData: base64Image
+      });
+      
+      console.debug('Image upload response:', {
+        success: response.data?.success,
+        message: response.data?.message
+      });
+
+      if (response.data?.success) {
         await loadPatientRecord();
+        return true;
       } else {
         throw new Error(response.data?.message || 'Failed to upload image');
       }
     } catch (err) {
-      console.error('Error uploading image:', err);
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to upload image';
-      alert(`Upload failed: ${errorMessage}`);
+      console.error('Error uploading image:', {
+        message: err.message,
+        responseData: err.response?.data,
+        status: err.response?.status
+      });
+      throw new Error(err.response?.data?.message || err.message || 'Failed to upload image');
     }
   };
 
@@ -420,12 +436,10 @@ const CustomerDashboard = () => {
         <div className="content-header">
           <h2>My Medical Record</h2>
           <p>View and update your medical information</p>
-        </div>
-
-        <PatientRecordSection
+        </div>        <PatientRecordSection
           record={patientRecord}
           onSave={handleSavePatientRecord}
-          onUploadImage={handleUploadImage}
+          onImageUpload={handleUploadImage}
           isEditable={true}
         />
 

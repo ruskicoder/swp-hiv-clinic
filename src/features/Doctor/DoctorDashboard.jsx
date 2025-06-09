@@ -184,25 +184,31 @@ const DoctorDashboard = () => {
     }
   };
 
-  // Handle image upload
-  const handleUploadImage = async (imageData) => {
+  // Handle image upload 
+  const handleUploadImage = async (base64Image) => {
     try {
-      if (!selectedAppointment) return;
+      if (!selectedAppointment) {
+        throw new Error('No appointment selected');
+      }
       
-      const response = await apiClient.post('/patient-records/upload-image', {
+      console.debug('Uploading image for patient:', {
         patientId: selectedAppointment.patientUser.userId,
-        imageData: imageData
+        dataLength: base64Image?.length
       });
       
-      if (response.data.success) {
-        alert('Image uploaded successfully!');
-        loadPatientRecord(selectedAppointment); // Reload record
+      const response = await apiClient.post('/patient-records/upload-image', {
+        imageData: base64Image
+      });
+      
+      if (response.data?.success) {
+        await loadPatientRecord(selectedAppointment);
+        return true;
       } else {
-        alert(response.data.message || 'Failed to upload image');
+        throw new Error(response.data?.message || 'Failed to upload image');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Failed to upload image');
+      throw error;
     }
   };
 

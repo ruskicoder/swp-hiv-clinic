@@ -244,17 +244,37 @@ public class PatientRecordService {
 
     /**
      * Update profile image
-     */
+     */    
     @Transactional
     public MessageResponse updateProfileImage(Integer patientUserId, String base64Image) {
         try {
+            logger.debug("Processing image upload for patient ID: {}", patientUserId);
+            
+            if (patientUserId == null) {
+                logger.error("Patient ID is null");
+                return MessageResponse.error("Patient ID is required");
+            }
+
+            if (base64Image == null || base64Image.trim().isEmpty()) {
+                logger.error("Image data is empty");
+                return MessageResponse.error("Image data is required");
+            }
+
+            // Validate base64 format
+            if (!base64Image.startsWith("data:image/")) {
+                logger.error("Invalid image format provided");
+                return MessageResponse.error("Invalid image format. Must be a data URL (data:image/...)");
+            }
+
             Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(patientUserId);
             PatientRecord record;
 
             if (recordOpt.isPresent()) {
                 record = recordOpt.get();
+                logger.debug("Updating existing patient record image");
             } else {
                 // Create new record if none exists
+                logger.info("Creating new patient record for image upload");
                 record = new PatientRecord();
                 record.setPatientUserID(patientUserId);
                 record.setMedicalHistory("");
@@ -266,10 +286,11 @@ public class PatientRecordService {
                 record.setEmergencyPhone("");
             }
 
+            // Store the image
             record.setProfileImageBase64(base64Image);
             patientRecordRepository.save(record);
-
-            logger.info("Profile image updated for patient ID: {}", patientUserId);
+            
+            logger.info("Profile image successfully updated for patient ID: {}", patientUserId);
             return MessageResponse.success("Profile image updated successfully!");
 
         } catch (Exception e) {
