@@ -523,8 +523,10 @@ public class AppointmentService {
 
             // Check if appointment is completed
             if ("Completed".equalsIgnoreCase(appointment.getStatus())) {
-                logger.warn("Attempted to access patient record for completed appointment: {}", appointmentId);
-                throw new RuntimeException("Cannot access patient record after appointment is completed");
+                Map<String, Object> completedResult = new HashMap<>();
+                completedResult.put("success", false);
+                completedResult.put("message", "Patient record is not available for completed appointments");
+                return completedResult;
             }
 
             // Get patient user ID

@@ -17,6 +17,11 @@ const DoctorDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Format doctor's name
+  const doctorName = user?.firstName 
+    ? `${user.firstName} ${user.lastName || ''}`
+    : user?.username || 'Doctor';
+
   // State management
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
@@ -107,7 +112,20 @@ const DoctorDashboard = () => {
         durationMinutes: appointment.durationMinutes || 30
       });
 
+      if (appointment.status === 'Completed') {
+        setPatientRecord(null);
+        setArvTreatments([]);
+        return;
+      }
+
       const recordRes = await apiClient.get(`/appointments/${appointment.appointmentId}/patient-record`);
+      if (!recordRes.data.success) {
+        console.warn('Failed to load patient record:', recordRes.data.message);
+        setPatientRecord(null);
+        setArvTreatments([]);
+        return;
+      }
+
       setPatientRecord(recordRes.data);
 
       const arvRes = await apiClient.get(`/arv-treatments/patient/${appointment.patientUser.userId}`);
@@ -324,7 +342,7 @@ const DoctorDashboard = () => {
         <div className="overview-content">
           <div className="content-header">
             <h2>Dashboard Overview</h2>
-            <p>Welcome back, Dr. {safeRender(user?.username)}</p>
+            <p>Welcome, Dr. {doctorName}</p>
           </div>
 
           <div className="stats-grid">
@@ -394,7 +412,7 @@ const DoctorDashboard = () => {
     );
   };
 
-  // Render appointments
+  // Render appointments section
   const renderAppointments = () => {
     const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
@@ -425,12 +443,14 @@ const DoctorDashboard = () => {
                     )}
                   </div>
                   <div className="appointment-actions">
-                    <button 
-                      className="btn-primary"
-                      onClick={() => loadPatientRecord(appointment)}
-                    >
-                      View Patient Record
-                    </button>
+                    {appointment.status !== 'Completed' && (
+                      <button 
+                        className="btn-primary"
+                        onClick={() => loadPatientRecord(appointment)}
+                      >
+                        View Patient Record
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -635,7 +655,7 @@ const DoctorDashboard = () => {
     <div className="doctor-dashboard">
       <DashboardHeader 
         title="Doctor Dashboard"
-        subtitle={`Welcome, Dr. ${user?.username || 'Doctor'}`}
+        subtitle={`Welcome, Dr. ${doctorName}`}
       />
 
       <div className="dashboard-layout">
