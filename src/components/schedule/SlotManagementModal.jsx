@@ -24,6 +24,7 @@ const SlotManagementModal = ({
   const [showConfirmBooking, setShowConfirmBooking] = useState(false);
   const [showCancelBooking, setShowCancelBooking] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -250,13 +251,28 @@ const SlotManagementModal = ({
   // Handle slot creation
   const handleSlotCreated = async (slotData) => {
     try {
-      if (onAddSlot) {
-        await onAddSlot(slotData);
+      if (!onAddSlot) throw new Error('Add slot handler not provided');
+      
+      setLoading(true);
+      setError(null);
+
+      const response = await onAddSlot(slotData);
+      
+      if (!response || response.error) {
+        throw new Error(response?.error || 'Failed to create slot');
       }
+
       setShowAddModal(false);
+      return { success: true };
+      
     } catch (error) {
-      console.error('Error creating slot:', error);
-      alert('Failed to create slot. Please try again.');
+      console.error('Failed to create slot:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Failed to create slot'
+      };
+    } finally {
+      setLoading(false);
     }
   };
 

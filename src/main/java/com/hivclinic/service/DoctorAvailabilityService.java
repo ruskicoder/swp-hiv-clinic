@@ -15,14 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service for managing doctor availability slots with proper serialization handling
- */
 @Service
 public class DoctorAvailabilityService {
 
@@ -43,76 +41,42 @@ public class DoctorAvailabilityService {
     @Transactional
     public MessageResponse createAvailabilitySlot(DoctorAvailabilityRequest request, Integer doctorUserId) {
         try {
-            logger.info("Creating availability slot for doctor ID: {} on date: {}", doctorUserId, request.getSlotDate());
+            logger.info("Creating availability slot. Request: {}, Doctor ID: {}", request, doctorUserId);
 
-            // Validate doctor exists
-            Optional<User> doctorOpt = userRepository.findById(doctorUserId);
-            if (doctorOpt.isEmpty()) {
-                logger.error("Doctor not found with ID: {}", doctorUserId);
-                return MessageResponse.error("Doctor not found");
+            // Basic validation
+            if (request == null || request.getSlotDate() == null || request.getStartTime() == null) {
+                logger.error("Invalid request data: {}", request);
+                return MessageResponse.error("Invalid request data");
             }
 
-            User doctor = doctorOpt.get();
+            // Find doctor with eager loading
+            User doctor = userRepository.findById(doctorUserId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
             if (!"Doctor".equalsIgnoreCase(doctor.getRole().getRoleName())) {
                 logger.error("User {} is not a doctor", doctorUserId);
                 return MessageResponse.error("User is not a doctor");
             }
 
-            // Validate required fields
-            if (request.getSlotDate() == null) {
-                return MessageResponse.error("Slot date is required");
-            }
-            if (request.getStartTime() == null) {
-                return MessageResponse.error("Start time is required");
-            }
-            if (request.getDurationMinutes() == null) {
-                return MessageResponse.error("Duration is required");
-            }
-
-            // Validate slot date is not in the past
-            LocalDate today = LocalDate.now();
-            if (request.getSlotDate().isBefore(today)) {
-                return MessageResponse.error("Cannot create slots for past dates");
-            }
-
-            // Calculate end time from start time and duration
+            // Calculate end time
             LocalTime endTime = request.getStartTime().plusMinutes(request.getDurationMinutes());
 
-            // Validate time range
-            if (request.getStartTime().isAfter(endTime) || request.getStartTime().equals(endTime)) {
-                return MessageResponse.error("Start time must be before end time");
-            }
-
-            // Validate business hours (8 AM to 6 PM)
+            // Business hours validation
             LocalTime businessStart = LocalTime.of(8, 0);
             LocalTime businessEnd = LocalTime.of(18, 0);
-            if (request.getStartTime().isBefore(businessStart)) {
-                return MessageResponse.error("Start time cannot be before 8:00 AM");
-            }
-            if (endTime.isAfter(businessEnd)) {
-                return MessageResponse.error("End time cannot be after 6:00 PM");
+            if (request.getStartTime().isBefore(businessStart) || endTime.isAfter(businessEnd)) {
+                return MessageResponse.error("Slots must be between 8:00 AM and 6:00 PM");
             }
 
-            // Validate duration (15 minutes to 4 hours)
-            if (request.getDurationMinutes() < 15) {
-                return MessageResponse.error("Duration must be at least 15 minutes");
-            }
-            if (request.getDurationMinutes() > 240) {
-                return MessageResponse.error("Duration cannot exceed 4 hours");
-            }
-
-            // Check for overlapping slots
-            List<DoctorAvailabilitySlot> existingSlots = availabilitySlotRepository
-                    .findByDoctorUserAndSlotDate(doctor, request.getSlotDate());
-
-            for (DoctorAvailabilitySlot existingSlot : existingSlots) {
-                if (isTimeOverlapping(request.getStartTime(), endTime, 
-                        existingSlot.getStartTime(), existingSlot.getEndTime())) {
-                    return MessageResponse.error("This time slot overlaps with an existing slot");
-                }
+            // Check for overlaps using repository method
+            List<DoctorAvailabilitySlot> overlappingSlots = availabilitySlotRepository
+                .findOverlappingSlots(doctor, request.getSlotDate(), request.getStartTime(), endTime);
+                
+            if (!overlappingSlots.isEmpty()) {
+                return MessageResponse.error("This time slot overlaps with existing slot(s)");
             }
 
-            // Create new availability slot
+            // Create and save slot
             DoctorAvailabilitySlot slot = new DoctorAvailabilitySlot();
             slot.setDoctorUser(doctor);
             slot.setSlotDate(request.getSlotDate());
@@ -120,16 +84,17 @@ public class DoctorAvailabilityService {
             slot.setEndTime(endTime);
             slot.setIsBooked(false);
             slot.setNotes(request.getNotes());
+            slot.setCreatedAt(LocalDateTime.now());
+            slot.setUpdatedAt(LocalDateTime.now());
 
-            availabilitySlotRepository.save(slot);
+            DoctorAvailabilitySlot savedSlot = availabilitySlotRepository.saveAndFlush(slot);
+            logger.info("Successfully created slot ID: {}", savedSlot.getAvailabilitySlotId());
 
-            logger.info("Availability slot created successfully for doctor: {} on date: {} from {} to {}", 
-                    doctor.getUsername(), request.getSlotDate(), request.getStartTime(), endTime);
-            return MessageResponse.success("Availability slot created successfully!");
-
+            return MessageResponse.success("Availability slot created successfully");
+            
         } catch (Exception e) {
-            logger.error("Error creating availability slot for doctor {}: {}", doctorUserId, e.getMessage(), e);
-            return MessageResponse.error("Failed to create availability slot: " + e.getMessage());
+            logger.error("Error creating availability slot: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to create availability slot: " + e.getMessage());
         }
     }
 
@@ -165,12 +130,18 @@ public class DoctorAvailabilityService {
      */
     @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailableSlots(Integer doctorUserId) {
-        Optional<User> doctorOpt = userRepository.findById(doctorUserId);
-        if (doctorOpt.isEmpty()) {
-            throw new RuntimeException("Doctor not found");
-        }
+        try {
+            Optional<User> doctorOpt = userRepository.findById(doctorUserId);
+            if (doctorOpt.isEmpty()) {
+                logger.warn("Doctor not found with ID: {}", doctorUserId);
+                return Collections.emptyList();
+            }
 
-        return availabilitySlotRepository.findByDoctorUserAndIsBookedFalseOrderBySlotDateAscStartTimeAsc(doctorOpt.get());
+            return availabilitySlotRepository.findByDoctorUserAndIsBookedFalseOrderBySlotDateAscStartTimeAsc(doctorOpt.get());
+        } catch (Exception e) {
+            logger.error("Error retrieving available slots for doctor {}: {}", doctorUserId, e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -178,17 +149,24 @@ public class DoctorAvailabilityService {
      */
     @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorAvailabilityByDate(Integer doctorUserId, LocalDate date) {
-        Optional<User> doctorOpt = userRepository.findById(doctorUserId);
-        if (doctorOpt.isEmpty()) {
-            throw new RuntimeException("Doctor not found");
-        }
+        try {
+            Optional<User> doctorOpt = userRepository.findById(doctorUserId);
+            if (doctorOpt.isEmpty()) {
+                logger.warn("Doctor not found with ID: {}", doctorUserId);
+                return Collections.emptyList();
+            }
 
-        List<DoctorAvailabilitySlot> slots = availabilitySlotRepository.findByDoctorUserAndSlotDateOrderByStartTimeAsc(doctorOpt.get(), date);
-        
-        // Safely populate appointment details for booked slots
-        safePopulateAppointmentDetails(slots);
-        
-        return slots;
+            List<DoctorAvailabilitySlot> slots = availabilitySlotRepository
+                    .findByDoctorUserAndSlotDateOrderByStartTimeAsc(doctorOpt.get(), date);
+            
+            // Safely populate appointment details for booked slots
+            safePopulateAppointmentDetails(slots);
+            
+            return slots;
+        } catch (Exception e) {
+            logger.error("Error retrieving availability by date for doctor {}: {}", doctorUserId, e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -196,7 +174,12 @@ public class DoctorAvailabilityService {
      */
     @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getAllAvailableSlots() {
-        return availabilitySlotRepository.findByIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(LocalDate.now());
+        try {
+            return availabilitySlotRepository.findByIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(LocalDate.now());
+        } catch (Exception e) {
+            logger.error("Error retrieving all available slots: {}", e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -204,13 +187,19 @@ public class DoctorAvailabilityService {
      */
     @Transactional(readOnly = true)
     public List<DoctorAvailabilitySlot> getDoctorFutureAvailableSlots(Integer doctorUserId) {
-        Optional<User> doctorOpt = userRepository.findById(doctorUserId);
-        if (doctorOpt.isEmpty()) {
-            throw new RuntimeException("Doctor not found");
-        }
+        try {
+            Optional<User> doctorOpt = userRepository.findById(doctorUserId);
+            if (doctorOpt.isEmpty()) {
+                logger.warn("Doctor not found with ID: {}", doctorUserId);
+                return Collections.emptyList();
+            }
 
-        return availabilitySlotRepository.findByDoctorUserAndIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(
-                doctorOpt.get(), LocalDate.now());
+            return availabilitySlotRepository.findByDoctorUserAndIsBookedFalseAndSlotDateGreaterThanEqualOrderBySlotDateAscStartTimeAsc(
+                    doctorOpt.get(), LocalDate.now());
+        } catch (Exception e) {
+            logger.error("Error retrieving future available slots for doctor {}: {}", doctorUserId, e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -237,8 +226,8 @@ public class DoctorAvailabilityService {
             }
 
             // Validate required fields
-            if (request.getDurationMinutes() == null) {
-                return MessageResponse.error("Duration is required");
+            if (request.getDurationMinutes() == null || request.getDurationMinutes() <= 0) {
+                return MessageResponse.error("Duration is required and must be positive");
             }
 
             // Calculate end time from start time and duration
@@ -256,12 +245,17 @@ public class DoctorAvailabilityService {
                 return MessageResponse.error("Slots must be between 8:00 AM and 6:00 PM");
             }
 
+            // Validate duration (15 minutes to 4 hours)
+            if (request.getDurationMinutes() < 15 || request.getDurationMinutes() > 240) {
+                return MessageResponse.error("Duration must be between 15 minutes and 4 hours");
+            }
+
             // Check for overlapping slots (excluding current slot)
             List<DoctorAvailabilitySlot> existingSlots = availabilitySlotRepository
-                    .findByDoctorUserAndSlotDate(slot.getDoctorUser(), request.getSlotDate());
+                    .findByDoctorUserAndSlotDateOrderByStartTimeAsc(slot.getDoctorUser(), request.getSlotDate());
 
             for (DoctorAvailabilitySlot existingSlot : existingSlots) {
-                if (!existingSlot.getAvailabilitySlotId().equals(slotId) &&
+                if (!existingSlot.getAvailabilitySlotId().equals(slotId) && 
                     isTimeOverlapping(request.getStartTime(), endTime, 
                             existingSlot.getStartTime(), existingSlot.getEndTime())) {
                     return MessageResponse.error("This time slot overlaps with an existing slot");

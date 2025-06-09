@@ -151,6 +151,7 @@ const TimeSlotModal = ({
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
     
     if (!validateForm()) {
       return;
@@ -159,34 +160,31 @@ const TimeSlotModal = ({
     try {
       setLoading(true);
       
-      // Prepare slot data with proper date formatting
       const slotData = {
-        slotDate: formData.slotDate, // Keep as YYYY-MM-DD string
-        startTime: formData.startTime,
-        durationMinutes: formData.durationMinutes,
+        slotDate: formData.slotDate,
+        startTime: formData.startTime.includes(':') ? 
+          formData.startTime + ':00' : 
+          formData.startTime.replace(/^(\d{2})(\d{2})$/, '$1:$2:00'),
+        durationMinutes: parseInt(formData.durationMinutes),
         notes: formData.notes || ''
       };
 
       console.log('Submitting slot data:', slotData);
-
-      if (onSlotCreated) {
-        await onSlotCreated(slotData);
+      
+      const result = await onSlotCreated(slotData);
+      
+      if (result?.error || result?.success === false) {
+        throw new Error(result.error || 'Failed to create slot');
       }
-
-      // Reset form (keep the date)
-      setFormData(prev => ({
-        slotDate: prev.slotDate,
-        startTime: '09:00',
-        durationMinutes: 30,
-        notes: ''
-      }));
-      setErrors({});
+      
+      onClose();
       
     } catch (error) {
       console.error('Error creating slot:', error);
-      setErrors({ submit: 'Failed to create slot. Please try again.' });
-    } finally {
-      setLoading(false);
+      setErrors({ 
+        submit: error.message || 'Failed to create slot. Please try again.' 
+      });
+      setLoading(false); // Important: Reset loading state on error
     }
   };
 

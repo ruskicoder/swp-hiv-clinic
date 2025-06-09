@@ -148,19 +148,23 @@ const UnifiedCalendar = ({
     try {
       console.log('Adding slot with data:', slotData);
       
-      // Ensure the date is in the correct format
+      if (!onAddSlot) {
+        throw new Error('Add slot handler not provided');
+      }
+      
       const formattedSlotData = {
         ...slotData,
-        slotDate: slotData.slotDate // Keep as YYYY-MM-DD string
+        slotDate: slotData.slotDate, // Already in YYYY-MM-DD format
+        startTime: slotData.startTime, // Already in HH:mm:ss format
+        durationMinutes: parseInt(slotData.durationMinutes)
       };
       
-      if (onAddSlot) {
-        await onAddSlot(formattedSlotData);
-      }
+      await onAddSlot(formattedSlotData);
       setShowSlotModal(false);
+      return true;
     } catch (error) {
       console.error('Error adding slot:', error);
-      alert('Failed to add slot. Please try again.');
+      throw new Error(error.message || 'Failed to add slot. Please try again.');
     }
   };
 

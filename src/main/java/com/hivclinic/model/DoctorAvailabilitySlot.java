@@ -37,10 +37,12 @@ public class DoctorAvailabilitySlot {
 
     @Column(name = "StartTime", nullable = false)
     @JsonFormat(pattern = "HH:mm:ss")
+    @Temporal(TemporalType.TIME)
     private LocalTime startTime;
 
     @Column(name = "EndTime", nullable = false)
     @JsonFormat(pattern = "HH:mm:ss")
+    @Temporal(TemporalType.TIME)
     private LocalTime endTime;
 
     @Column(name = "IsBooked")

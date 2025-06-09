@@ -5,7 +5,7 @@ import axios from 'axios';
  */
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080/api',
-  timeout: 10000,
+  timeout: 0, // Remove timeout restriction
   headers: {
     'Content-Type': 'application/json',
   },
@@ -32,12 +32,19 @@ apiClient.interceptors.request.use(
 
 // Response interceptor
 apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     console.error('API Error:', error);
     
+    // Add detailed error logging
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('Request error:', error.request);
+    }
+
     // Handle authentication errors
     if (error.response?.status === 401) {
       try {

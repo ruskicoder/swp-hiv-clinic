@@ -413,3 +413,62 @@ export const normalizeTimeFormat = (timeStr) => {
 
   throw new Error(`Unable to normalize time format: ${timeStr}`);
 };
+
+/**
+ * Format availability slot data for API requests
+ * @param {Object} slotData - The slot data object
+ * @returns {Object} - Formatted slot data for API
+ */
+export const formatSlotData = (slotData) => {
+  try {
+    if (!slotData.slotDate || !slotData.startTime) {
+      throw new Error('Slot date and start time are required');
+    }
+
+    // Ensure proper date format (YYYY-MM-DD)
+    let formattedDate = slotData.slotDate;
+    if (slotData.slotDate instanceof Date) {
+      formattedDate = slotData.slotDate.toISOString().split('T')[0];
+    }
+
+    // Ensure time format (HH:mm:ss)
+    let startTime = slotData.startTime;
+    if (!startTime.includes(':')) {
+      startTime = `${startTime.substring(0, 2)}:${startTime.substring(2)}:00`;
+    } else if (!startTime.endsWith(':00')) {
+      startTime = `${startTime}:00`;
+    }
+
+    return {
+      slotDate: formattedDate,
+      startTime: startTime,
+      durationMinutes: slotData.durationMinutes || 30,
+      notes: slotData.notes || ''
+    };
+  } catch (error) {
+    console.error('Error formatting slot data:', error);
+    throw error;
+  }
+};
+
+export const formatTimeForAPI = (time) => {
+  if (!time) return null;
+  // Ensure time is in HH:mm:ss format
+  return time.includes(':') ? 
+    (time.length === 5 ? `${time}:00` : time) : 
+    `${time.substring(0, 2)}:${time.substring(2, 4)}:00`;
+};
+
+export const formatDateForAPI = (date) => {
+  if (!date) return null;
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return date;
+  }
+  try {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return null;
+  }
+};
