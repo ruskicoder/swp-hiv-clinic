@@ -27,7 +27,25 @@ apiClient.interceptors.request.use(
 
 // Response interceptor
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Handle successful responses
+    if (response.config.method !== 'get') {
+      // For non-GET requests, check if we need to trigger a refresh
+      const needsRefresh = [
+        '/doctors/availability',
+        '/appointments',
+        '/patient-records'
+      ].some(path => response.config.url.includes(path));
+
+      if (needsRefresh) {
+        // Emit custom event for components to reload data
+        window.dispatchEvent(new CustomEvent('dataUpdated', {
+          detail: { path: response.config.url }
+        }));
+      }
+    }
+    return response;
+  },
   (error) => {
     console.error('API Error:', error);
     

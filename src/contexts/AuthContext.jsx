@@ -140,10 +140,19 @@ export const AuthProvider = ({ children }) => {
    * Update user profile data
    */
   const updateUser = (userData) => {
-    setUser(prevUser => ({
-      ...prevUser,
-      ...userData
-    }));
+    setUser(prevUser => {
+      const updatedUser = {
+        ...prevUser,
+        ...userData
+      };
+      // Persist user data if needed
+      try {
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error('Error saving user data:', error);
+      }
+      return updatedUser;
+    });
   };
 
   const value = {

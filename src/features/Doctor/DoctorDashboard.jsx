@@ -123,24 +123,23 @@ const DoctorDashboard = () => {
   // Handle slot addition
   const handleAddSlot = async (slotData) => {
     try {
-      const formattedSlotData = {
+      const response = await apiClient.post('/doctors/availability', {
         slotDate: slotData.slotDate,
         startTime: slotData.startTime,
         durationMinutes: parseInt(slotData.durationMinutes),
         notes: slotData.notes || ''
-      };
-
-      console.log('Creating slot with data:', formattedSlotData);
-      const response = await apiClient.post('/doctors/availability', formattedSlotData);
-
-      if (response?.data?.success) {
-        await loadDashboardData(); // Refresh data after success
+      });
+      
+      if (response.data.success) {
+        // Immediately update local state
+        const newSlot = response.data.data;
+        setAvailabilitySlots(prev => [...prev, newSlot]);
         return { success: true };
       }
       
-      throw new Error(response?.data?.message || 'Failed to add slot');
+      throw new Error(response.data.message || 'Failed to add slot');
     } catch (error) {
-      console.error('Slot creation error:', error.response || error);
+      console.error('Failed to add slot:', error);
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to add slot'

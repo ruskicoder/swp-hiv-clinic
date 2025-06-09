@@ -262,7 +262,11 @@ const SlotManagementModal = ({
         throw new Error(response?.error || 'Failed to create slot');
       }
 
-      setShowAddModal(false);
+      // Don't close modal if there's an error
+      if (response.success) {
+        setShowAddModal(false);
+      }
+      
       return { success: true };
       
     } catch (error) {

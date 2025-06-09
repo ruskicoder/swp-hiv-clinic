@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import BackNavigation from '../../components/layout/BackNavigation';
 import apiClient from '../../services/apiClient';
-import authService from '../../services/authService'; // Changed from named import
+import authService from '../../services/authService';
 import { SafeText } from '../../utils/SafeComponents';
 import './Settings.css';
 
@@ -18,6 +18,7 @@ const Settings = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Profile data state
   const [profileData, setProfileData] = useState({
@@ -45,6 +46,50 @@ const Settings = () => {
     marketingCommunications: false
   });
 
+  // Load user profile data on component mount
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        const response = await authService.getUserProfile();
+        
+        if (response) {
+          setProfileData({
+            firstName: response.firstName || '',
+            lastName: response.lastName || '',
+            phoneNumber: response.phoneNumber || '',
+            email: response.email || user.email || '',
+            dateOfBirth: response.dateOfBirth || '',
+            address: response.address || '',
+            bio: response.bio || '',
+            profileImageBase64: response.profileImageBase64 || ''
+          });
+        }
+      } catch (err) {
+        console.error('Error loading user profile:', err);
+        setError('Failed to load profile data');
+      } finally {
+        setLoading(false);
+        setIsInitialized(true);
+      }
+    };
+
+    loadUserProfile();
+  }, [user]);
+
+  // Clear messages after 5 seconds
+  useEffect(() => {
+    if (message || error) {
+      const timer = setTimeout(() => {
+        setMessage('');
+        setError('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message, error]);
+
   // Add useEffect for initial style loading
   useEffect(() => {
     // Force a repaint to ensure styles are applied correctly
@@ -65,30 +110,6 @@ const Settings = () => {
       document.documentElement.style.visibility = 'visible';
     };
   }, [loading]);
-
-  // Modify the existing user profile loading effect
-  useEffect(() => {
-    const loadUserProfile = async () => {
-      if (user) {
-        setLoading(true);
-        try {
-          setProfileData({
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
-            phoneNumber: user.phoneNumber || '',
-            email: user.email || '',
-            dateOfBirth: user.dateOfBirth || '',
-            address: user.address || '',
-            bio: user.bio || '',
-            profileImageBase64: user.profileImageBase64 || ''
-          });
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    loadUserProfile();
-  }, [user]);
 
   // Handle profile form changes
   const handleProfileChange = (e) => {
@@ -125,19 +146,33 @@ const Settings = () => {
     setMessage('');
 
     try {
-      const response = await authService.updateProfile(profileData);
-      
+      const response = await authService.updateProfile(
+        profileData.firstName,
+        profileData.lastName,
+        profileData.phoneNumber,
+        profileData.dateOfBirth,
+        profileData.address,
+        profileData.bio
+      );
+
       if (response.success) {
         setMessage('Profile updated successfully!');
         setIsEditing(false);
+        
         // Update user context
-        updateUser(profileData);
+        if (updateUser) {
+          updateUser({
+            ...user,
+            firstName: profileData.firstName,
+            lastName: profileData.lastName
+          });
+        }
       } else {
         setError(response.message || 'Failed to update profile');
       }
-    } catch (error) {
-      console.error('Profile update error:', error);
-      setError(error.response?.data?.message || 'Failed to update profile');
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError('Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -150,14 +185,15 @@ const Settings = () => {
     setError('');
     setMessage('');
 
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('New passwords do not match');
+    // Validate passwords
+    if (passwordData.newPassword.length < 6) {
+      setError('New password must be at least 6 characters long');
       setLoading(false);
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
-      setError('New password must be at least 6 characters');
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setError('New passwords do not match');
       setLoading(false);
       return;
     }
@@ -167,7 +203,7 @@ const Settings = () => {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword
       });
-      
+
       if (response.data.success) {
         setMessage('Password changed successfully!');
         setPasswordData({
@@ -175,10 +211,12 @@ const Settings = () => {
           newPassword: '',
           confirmPassword: ''
         });
+      } else {
+        setError(response.data.message || 'Failed to change password');
       }
-    } catch (error) {
-      console.error('Password change error:', error);
-      setError(error.response?.data?.message || 'Failed to change password');
+    } catch (err) {
+      console.error('Error changing password:', err);
+      setError('Failed to change password. Please check your current password.');
     } finally {
       setLoading(false);
     }
@@ -193,12 +231,15 @@ const Settings = () => {
 
     try {
       const response = await apiClient.put('/auth/notifications', notifications);
+      
       if (response.data.success) {
         setMessage('Notification preferences updated successfully!');
+      } else {
+        setError('Failed to update notification preferences');
       }
-    } catch (error) {
-      console.error('Notification update error:', error);
-      setError(error.response?.data?.message || 'Failed to update notification preferences');
+    } catch (err) {
+      console.error('Error updating notifications:', err);
+      setError('Failed to update notification preferences. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -221,40 +262,38 @@ const Settings = () => {
       return;
     }
 
-    try {
-      setLoading(true);
-      setError('');
+    setLoading(true);
+    setError('');
 
-      // Convert to base64
+    try {
       const reader = new FileReader();
       reader.onload = async (event) => {
-        const base64String = event.target.result;
+        const base64Image = event.target.result;
         
         try {
-          const response = await authService.updateProfileImage(base64String);
+          const response = await authService.updateProfileImage(base64Image);
           
           if (response.success) {
-            setMessage('Profile image updated successfully!');
             setProfileData(prev => ({
               ...prev,
-              profileImageBase64: base64String
+              profileImageBase64: base64Image
             }));
-            updateUser({ profileImageBase64: base64String });
+            setMessage('Profile image updated successfully!');
           } else {
             setError(response.message || 'Failed to update profile image');
           }
-        } catch (error) {
-          console.error('Profile image update error:', error);
-          setError('Failed to update profile image');
+        } catch (err) {
+          console.error('Error updating profile image:', err);
+          setError('Failed to update profile image. Please try again.');
         } finally {
           setLoading(false);
         }
       };
-
+      
       reader.readAsDataURL(file);
-    } catch (error) {
-      console.error('File reading error:', error);
-      setError('Failed to process image file');
+    } catch (err) {
+      console.error('Error reading file:', err);
+      setError('Failed to read image file');
       setLoading(false);
     }
   };
@@ -289,25 +328,41 @@ const Settings = () => {
         {/* Profile Image */}
         <div className="form-group profile-image-group">
           <label>Profile Picture</label>
-          <div className="profile-image-container">
-            {profileData.profileImageBase64 ? (
-              <img 
-                src={profileData.profileImageBase64} 
-                alt="Profile" 
-                className="profile-image-preview"
+          <div className="profile-image-section">
+            <div className="profile-image-container">
+              {profileData.profileImageBase64 ? (
+                <img 
+                  src={profileData.profileImageBase64} 
+                  alt="Profile" 
+                  className="profile-image-preview"
+                />
+              ) : (
+                <div className="profile-image-placeholder">
+                  <span>No Image</span>
+                </div>
+              )}
+            </div>
+            <div className="image-upload-controls">
+              <input
+                type="file"
+                id="profileImageInput"
+                accept="image/*"
+                onChange={handleProfileImageChange}
+                disabled={loading}
+                className="profile-image-input"
+                style={{ display: 'none' }}
               />
-            ) : (
-              <div className="profile-image-placeholder">
-                <span>No Image</span>
-              </div>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleProfileImageChange}
-              disabled={loading}
-              className="profile-image-input"
-            />
+              <label 
+                htmlFor="profileImageInput" 
+                className="upload-btn"
+                style={{ 
+                  opacity: loading ? 0.6 : 1, 
+                  pointerEvents: loading ? 'none' : 'auto' 
+                }}
+              >
+                {loading ? 'Uploading...' : 'Change Photo'}
+              </label>
+            </div>
           </div>
         </div>
 
@@ -339,32 +394,32 @@ const Settings = () => {
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={profileData.email}
-            disabled={true} // Email should not be editable
-            className="disabled-input"
-          />
-          <small className="form-help">Email cannot be changed</small>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={profileData.email}
+              onChange={handleProfileChange}
+              disabled={true} // Email should not be editable
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="phoneNumber">Phone Number</label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              value={profileData.phoneNumber}
+              onChange={handleProfileChange}
+              disabled={!isEditing || loading}
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="phoneNumber">Phone Number</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            name="phoneNumber"
-            value={profileData.phoneNumber}
-            onChange={handleProfileChange}
-            disabled={!isEditing || loading}
-          />
-        </div>
-
-        {/* Role-specific fields */}
+        {/* Patient-specific fields */}
         {user?.role === 'Patient' && (
           <>
             <div className="form-group">
@@ -387,11 +442,13 @@ const Settings = () => {
                 onChange={handleProfileChange}
                 disabled={!isEditing || loading}
                 rows="3"
+                placeholder="Enter your address..."
               />
             </div>
           </>
         )}
 
+        {/* Doctor-specific fields */}
         {user?.role === 'Doctor' && (
           <div className="form-group">
             <label htmlFor="bio">Bio</label>
@@ -580,8 +637,25 @@ const Settings = () => {
     </div>
   );
 
+  // Show loading state until component is initialized
+  if (!isInitialized) {
+    return (
+      <div className="settings-container">
+        <BackNavigation />
+        <div className="settings-header">
+          <h1>Settings</h1>
+          <p>Loading your preferences...</p>
+        </div>
+        <div className="loading">
+          <div className="loading-spinner"></div>
+          <p>Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="settings-container" style={{ opacity: loading ? 0 : 1 }}>
+    <div className="settings-container">
       <BackNavigation />
       
       <div className="settings-header">
