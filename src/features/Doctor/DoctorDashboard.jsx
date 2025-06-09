@@ -149,9 +149,8 @@ const DoctorDashboard = () => {
       });
       
       if (response.data.success) {
-        // Immediately update local state
-        const newSlot = response.data.data;
-        setAvailabilitySlots(prev => [...prev, newSlot]);
+        // Reload the entire availability data to ensure consistency
+        await loadDashboardData();
         return { success: true };
       }
       
