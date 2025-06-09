@@ -630,6 +630,70 @@
   transform: translateY(-1px);
 }
 
+/* Filter Buttons */
+.filter-button-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #1e293b;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.filter-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
+  background-color: #10b981;
+  border-color: #10b981;
+  opacity: 0.9;
+}
+
+.filter-btn.active {
+  background-color: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.filter-btn.scheduled:hover,
+.filter-btn.scheduled.active {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.filter-btn.in-progress:hover,
+.filter-btn.in-progress.active {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+  color: white;
+}
+
+.filter-btn.completed:hover,
+.filter-btn.completed.active {
+  background-color: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.filter-btn.cancelled:hover,
+.filter-btn.cancelled.active {
+  background-color: #ef4444;
+  border-color: #ef4444;
+  color: white;
+}
+
 /* Responsive Design */
 @media (max-width: 900px) {
   .dashboard-layout {

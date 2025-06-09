@@ -262,6 +262,9 @@ public class AppointmentService {
         
         List<Appointment> appointments = appointmentRepository.findByPatientUser(patientOpt.get());
         
+        // Auto-cancel overdue appointments
+        checkAndCancelOverdueAppointments(appointments);
+        
         // Force initialization of lazy-loaded entities to prevent serialization issues
         appointments.forEach(appointment -> {
             // Initialize lazy-loaded entities
@@ -306,6 +309,9 @@ public class AppointmentService {
         List<Appointment> appointments = appointmentRepository.findByPatientUserAndAppointmentDateTimeAfter(
                 patientOpt.get(), LocalDateTime.now());
         
+        // Auto-cancel overdue appointments (in case any slipped through)
+        checkAndCancelOverdueAppointments(appointments);
+        
         // Force initialization of lazy-loaded entities
         appointments.forEach(appointment -> {
             if (appointment.getPatientUser() != null) {
@@ -344,6 +350,9 @@ public class AppointmentService {
         }
         
         List<Appointment> appointments = appointmentRepository.findByDoctorUser(doctorOpt.get());
+        
+        // Auto-cancel overdue appointments
+        checkAndCancelOverdueAppointments(appointments);
         
         // Force initialization of lazy-loaded entities
         appointments.forEach(appointment -> {
@@ -620,5 +629,38 @@ public class AppointmentService {
         }
         
         return appointmentStatusHistoryRepository.findByAppointmentOrderByChangedAtDesc(appointmentOpt.get());
+    }
+
+    /**
+     * Auto-cancel overdue appointments
+     */
+    private void checkAndCancelOverdueAppointments(List<Appointment> appointments) {
+        LocalDateTime now = LocalDateTime.now();
+        appointments.forEach(appointment -> {
+            if (("Scheduled".equals(appointment.getStatus()) || "In Progress".equals(appointment.getStatus())) 
+                && appointment.getAppointmentDateTime().plusMinutes(appointment.getDurationMinutes()).isBefore(now)) {
+                String oldStatus = appointment.getStatus();
+                appointment.setStatus("Cancelled");
+                appointment.setDoctorCancellationReason("Auto-cancelled: Appointment time passed");
+                appointment = appointmentRepository.save(appointment);
+                
+                // Free up the availability slot if it was linked
+                if (appointment.getAvailabilitySlot() != null) {
+                    DoctorAvailabilitySlot slot = appointment.getAvailabilitySlot();
+                    slot.setIsBooked(false);
+                    availabilitySlotRepository.save(slot);
+                }
+                
+                createStatusHistory(
+                    appointment, 
+                    oldStatus, 
+                    "Cancelled", 
+                    "Auto-cancelled: Appointment time passed",
+                    null
+                );
+                logger.info("Auto-cancelled overdue appointment ID {} scheduled for {}", 
+                    appointment.getAppointmentId(), appointment.getAppointmentDateTime());
+            }
+        });
     }
 }

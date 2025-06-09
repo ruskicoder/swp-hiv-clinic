@@ -27,6 +27,8 @@ const DoctorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [appointments, setAppointments] = useState([]);
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('All');
   const [availabilitySlots, setAvailabilitySlots] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [patientRecord, setPatientRecord] = useState(null);
@@ -53,6 +55,22 @@ const DoctorDashboard = () => {
     loadDashboardData();
   }, []);
 
+  // Filter appointments when status filter or appointments change
+  useEffect(() => {
+    const filterAppointments = () => {
+      if (!Array.isArray(appointments)) return;
+      
+      if (statusFilter === 'All') {
+        setFilteredAppointments(appointments);
+      } else {
+        setFilteredAppointments(appointments.filter(apt => apt.status === statusFilter));
+      }
+    };
+
+    filterAppointments();
+  }, [statusFilter, appointments]);
+
+  // Load dashboard data
   const loadDashboardData = async () => {
     try {
       setLoading(true);
@@ -65,8 +83,12 @@ const DoctorDashboard = () => {
 
       // Handle appointments response
       if (appointmentsRes.status === 'fulfilled') {
-        const appointmentsData = appointmentsRes.value?.data;
+        let appointmentsData = appointmentsRes.value?.data;
         if (Array.isArray(appointmentsData)) {
+          // Sort appointments by date ascending
+          appointmentsData.sort((a, b) => 
+            new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime)
+          );
           setAppointments(appointmentsData);
         } else {
           console.warn('Appointments data is not an array:', appointmentsData);
@@ -110,15 +132,7 @@ const DoctorDashboard = () => {
         scheduleRecheck: false,
         recheckDateTime: '',
         durationMinutes: appointment.durationMinutes || 30
-      });
-
-      if (appointment.status === 'Completed') {
-        setPatientRecord(null);
-        setArvTreatments([]);
-        return;
-      }
-
-      const recordRes = await apiClient.get(`/appointments/${appointment.appointmentId}/patient-record`);
+      });      const recordRes = await apiClient.get(`/appointments/${appointment.appointmentId}/patient-record`);
       if (!recordRes.data.success) {
         console.warn('Failed to load patient record:', recordRes.data.message);
         setPatientRecord(null);
@@ -413,19 +427,48 @@ const DoctorDashboard = () => {
 
   // Render appointments section
   const renderAppointments = () => {
-    const safeAppointments = Array.isArray(appointments) ? appointments : [];
-
     return (
       <ErrorBoundary>
         <div className="appointments-content">
           <div className="content-header">
             <h2>My Appointments</h2>
             <p>Manage your scheduled appointments</p>
+          </div>          <div className="filter-button-group">
+            <button
+              className={`filter-btn ${statusFilter === 'All' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('All')}
+            >
+              All Appointments
+            </button>
+            <button
+              className={`filter-btn scheduled ${statusFilter === 'Scheduled' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Scheduled')}
+            >
+              Scheduled
+            </button>
+            <button
+              className={`filter-btn in-progress ${statusFilter === 'In Progress' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('In Progress')}
+            >
+              In Progress
+            </button>
+            <button
+              className={`filter-btn completed ${statusFilter === 'Completed' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Completed')}
+            >
+              Completed
+            </button>
+            <button
+              className={`filter-btn cancelled ${statusFilter === 'Cancelled' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Cancelled')}
+            >
+              Cancelled
+            </button>
           </div>
 
-          {safeAppointments.length > 0 ? (
+          {filteredAppointments.length > 0 ? (
             <div className="appointments-list">
-              {safeAppointments.map(appointment => (
+              {filteredAppointments.map(appointment => (
                 <div key={appointment.appointmentId} className="appointment-card">
                   <div className="appointment-header">
                     <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
@@ -440,16 +483,12 @@ const DoctorDashboard = () => {
                     {appointment.appointmentNotes && (
                       <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
                     )}
-                  </div>
-                  <div className="appointment-actions">
-                    {appointment.status !== 'Completed' && (
-                      <button 
-                        className="btn-primary"
-                        onClick={() => loadPatientRecord(appointment)}
-                      >
-                        View Patient Record
-                      </button>
-                    )}
+                  </div>                  <div className="appointment-actions">                    <button 
+                      className="btn-primary"
+                      onClick={() => loadPatientRecord(appointment)}
+                    >
+                      View Patient Record
+                    </button>
                   </div>
                 </div>
               ))}

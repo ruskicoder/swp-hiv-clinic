@@ -24,6 +24,7 @@ const CustomerDashboard = () => {
   const [arvTreatments, setArvTreatments] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [doctorSlots, setDoctorSlots] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('All');
 
   // Load dashboard data
   const loadDashboardData = async () => {
@@ -36,7 +37,8 @@ const CustomerDashboard = () => {
         apiClient.get('/doctors')
       ]);
 
-      setAppointments(appointmentsRes.data || []);
+      const updatedAppointments = updateOverdueAppointments(appointmentsRes.data || []);
+      setAppointments(updatedAppointments);
       setDoctors(doctorsRes.data || []);
     } catch (err) {
       console.error('Error loading dashboard data:', err);
@@ -210,6 +212,25 @@ const CustomerDashboard = () => {
     navigate('/');
   };
 
+  // Filter appointments based on status
+  const getFilteredAppointments = () => {
+    if (statusFilter === 'All') {
+      return appointments;
+    }
+    return appointments.filter(apt => apt.status === statusFilter);
+  };
+
+  // Check and update overdue appointments
+  const updateOverdueAppointments = (appointments) => {
+    const now = new Date();
+    return appointments.map(apt => {
+      if (apt.status === 'Scheduled' && new Date(apt.appointmentDateTime) < now) {
+        return { ...apt, status: 'Cancelled' };
+      }
+      return apt;
+    });
+  };
+
   // Load data on component mount
   useEffect(() => {
     loadDashboardData();
@@ -286,10 +307,42 @@ const CustomerDashboard = () => {
   // Render appointments section
   const renderAppointments = () => (
     <ErrorBoundary>
-      <div className="appointments-content">
-        <div className="content-header">
+      <div className="appointments-content">        <div className="content-header">
           <h2>My Appointments</h2>
           <p>View and manage your appointments</p>
+        </div>
+
+        <div className="filter-button-group">
+            <button
+              className={`filter-btn ${statusFilter === 'All' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('All')}
+            >
+              All Appointments
+            </button>
+            <button
+              className={`filter-btn scheduled ${statusFilter === 'Scheduled' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Scheduled')}
+            >
+              Scheduled
+            </button>
+            <button
+              className={`filter-btn in-progress ${statusFilter === 'In Progress' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('In Progress')}
+            >
+              In Progress
+            </button>
+            <button
+              className={`filter-btn completed ${statusFilter === 'Completed' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Completed')}
+            >
+              Completed
+            </button>
+            <button
+              className={`filter-btn cancelled ${statusFilter === 'Cancelled' ? 'active' : ''}`}
+              onClick={() => setStatusFilter('Cancelled')}
+            >
+              Cancelled
+            </button>
         </div>
 
         {error && (
@@ -302,48 +355,50 @@ const CustomerDashboard = () => {
         )}
 
         <div className="appointments-list">
-          {appointments?.length === 0 ? (
+          {getFilteredAppointments().length === 0 ? (
             <div className="no-data">
-              <p>No appointments found.</p>
+              <p>No {statusFilter !== 'All' ? statusFilter.toLowerCase() : ''} appointments found.</p>
               <button onClick={() => setActiveTab('doctors')} className="book-btn">
-                Book Your First Appointment
+                Book New Appointment
               </button>
             </div>
           ) : (
-            appointments.map(appointment => (
-              <div key={appointment.appointmentId} className="appointment-card">
-                <div className="appointment-header">
-                  <h4>Dr. {safeRender(appointment.doctorUser?.firstName)} {safeRender(appointment.doctorUser?.lastName)}</h4>
-                  <span className={`status ${appointment.status?.toLowerCase()}`}>
-                    {safeRender(appointment.status)}
-                  </span>
+            getFilteredAppointments()
+              .sort((a, b) => new Date(a.appointmentDateTime) - new Date(b.appointmentDateTime))
+              .map(appointment => (
+                <div key={appointment.appointmentId} className="appointment-card">
+                  <div className="appointment-header">
+                    <h4>Dr. {safeRender(appointment.doctorUser?.firstName)} {safeRender(appointment.doctorUser?.lastName)}</h4>
+                    <span className={`status ${appointment.status?.toLowerCase()}`}>
+                      {safeRender(appointment.status)}
+                    </span>
+                  </div>
+                  <div className="appointment-details">
+                    <p><strong>Date:</strong> {safeDate(appointment.appointmentDateTime)}</p>
+                    <p><strong>Time:</strong> {safeTime(appointment.appointmentDateTime)}</p>
+                    <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
+                    <p><strong>Specialty:</strong> {safeRender(appointment.doctorUser?.specialty)}</p>
+                    {appointment.appointmentNotes && (
+                      <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
+                    )}
+                  </div>
+                  <div className="appointment-actions">
+                    {appointment.status === 'Scheduled' && new Date(appointment.appointmentDateTime) > new Date() && (
+                      <button 
+                        onClick={() => {
+                          const reason = prompt('Please provide a reason for cancellation (optional):');
+                          if (reason !== null) {
+                            handleCancelBooking(appointment.appointmentId, reason);
+                          }
+                        }}
+                        className="cancel-btn"
+                        disabled={loading}
+                      >
+                        Cancel Appointment
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="appointment-details">
-                  <p><strong>Date:</strong> {safeDate(appointment.appointmentDateTime)}</p>
-                  <p><strong>Time:</strong> {safeTime(appointment.appointmentDateTime)}</p>
-                  <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
-                  <p><strong>Specialty:</strong> {safeRender(appointment.doctorUser?.specialty)}</p>
-                  {appointment.appointmentNotes && (
-                    <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
-                  )}
-                </div>
-                <div className="appointment-actions">
-                  {appointment.status === 'Scheduled' && new Date(appointment.appointmentDateTime) > new Date() && (
-                    <button 
-                      onClick={() => {
-                        const reason = prompt('Please provide a reason for cancellation (optional):');
-                        if (reason !== null) {
-                          handleCancelBooking(appointment.appointmentId, reason);
-                        }
-                      }}
-                      className="cancel-btn"
-                      disabled={loading}
-                    >
-                      Cancel Appointment
-                    </button>
-                  )}
-                </div>
-              </div>
             ))
           )}
         </div>
