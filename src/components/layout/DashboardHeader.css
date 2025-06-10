@@ -68,6 +68,42 @@
   flex-shrink: 0;
 }
 
+.privacy-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 2rem;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-toggle:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.privacy-toggle.active {
+  background: #10b981;
+  border-color: #059669;
+  color: white;
+}
+
+.privacy-toggle.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.privacy-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .dashboard-header {

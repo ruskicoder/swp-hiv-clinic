@@ -57,9 +57,9 @@ const DashboardHeader = ({ title, subtitle }) => {
       // Update UI state immediately for better user feedback
       setIsPrivate(newState);
         // Make API call
-      const response = await apiClient.post('/patients/privacy-settings', {
-        isPrivate: newState
-      });
+        const response = await apiClient.post('/patients/privacy-settings', {
+          isPrivate: newState
+        });
       
       if (!response.data?.success) {
         throw new Error(response.data?.message || 'Failed to update privacy settings');
@@ -127,16 +127,21 @@ const DashboardHeader = ({ title, subtitle }) => {
               aria-checked={isPrivate}
               type="button"
             >
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+              <span className="icon">
                 {isPrivate ? (
-                  <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6z"/>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0110 0v4"></path>
+                  </svg>
                 ) : (
-                  <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0110 0v4"></path>
+                    <line x1="12" y1="15" x2="12" y2="18"></line>
+                  </svg>
                 )}
-              </svg>
-              <span>
-                {isLoading ? 'Updating...' : (isPrivate ? 'Private Mode' : 'Public Mode')}
               </span>
+              {isPrivate ? 'Privacy On' : 'Privacy Off'}
             </button>
           )}
           <div className="system-datetime">

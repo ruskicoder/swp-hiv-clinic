@@ -47,6 +47,7 @@ const DoctorDashboard = () => {
     recheckDateTime: '',
     durationMinutes: 30
   });
+  const [showPrivacyAlert, setShowPrivacyAlert] = useState(false);
 
   // Load dashboard data
   useEffect(() => {
@@ -471,14 +472,22 @@ const DoctorDashboard = () => {
         {selectedAppointment ? (
           <>
             <div className="appointment-header">
-              <h3>Patient Record - {selectedAppointment.patientUser?.username}</h3>
+              <h3>Patient Record - {patientRecord?.isPrivate ? 'Anonymous' : selectedAppointment.patientUser?.username}</h3>
               <p>Appointment: {safeDateTime(selectedAppointment.appointmentDateTime)}</p>
             </div>
+
+            {patientRecord?.isPrivate && (
+              <div className="privacy-alert">
+                <i className="fas fa-lock"></i>
+                <p>This patient has enabled private mode. Some information will be hidden for privacy reasons.</p>
+              </div>
+            )}
 
             <PatientRecordSection
               record={patientRecord}
               onSave={handleSavePatientRecord}
               onImageUpload={handleUploadImage}
+              hideImage={patientRecord?.isPrivate}
             />
 
             {/* ARV Treatments Section */}

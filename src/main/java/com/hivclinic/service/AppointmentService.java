@@ -2,17 +2,9 @@ package com.hivclinic.service;
 
 import com.hivclinic.dto.request.AppointmentBookingRequest;
 import com.hivclinic.dto.response.MessageResponse;
-import com.hivclinic.model.Appointment;
-import com.hivclinic.model.AppointmentStatusHistory;
-import com.hivclinic.model.DoctorAvailabilitySlot;
-import com.hivclinic.model.PatientRecord;
-import com.hivclinic.model.User;
-import com.hivclinic.repository.AppointmentRepository;
-import com.hivclinic.repository.AppointmentStatusHistoryRepository;
-import com.hivclinic.repository.DoctorAvailabilitySlotRepository;
-import com.hivclinic.repository.DoctorProfileRepository;
-import com.hivclinic.repository.PatientRecordRepository;
-import com.hivclinic.repository.UserRepository;
+import com.hivclinic.model.*;
+import com.hivclinic.repository.*;
+import com.hivclinic.service.PatientPrivacyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +55,42 @@ public class AppointmentService {
 
     @Autowired
     private AppointmentStatusHistoryRepository appointmentStatusHistoryRepository;
+
+    @Autowired
+    private PatientPrivacyService patientPrivacyService;
+
+    /**
+     * Sanitize patient data based on privacy settings
+     */
+    private User sanitizePatientData(User patient) {
+        if (patientPrivacyService.getPrivacySettings(patient.getUserId())) {
+            // Create a copy with minimal info for private mode
+            User sanitized = new User();
+            sanitized.setUserId(patient.getUserId());
+            sanitized.setUsername("Anonymous");
+            sanitized.setEmail("private@example.com"); 
+            if (patient.getRole() != null) {
+                sanitized.setRole(patient.getRole());
+            }
+            return sanitized;
+        }
+        return patient;
+    }
+
+    /**
+     * Apply privacy filter to a list of appointments
+     */
+    private List<Appointment> applyPrivacyFilter(List<Appointment> appointments) {
+        if (appointments == null) return null;
+        
+        appointments.forEach(appointment -> {
+            if (appointment.getPatientUser() != null) {
+                appointment.setPatientUser(sanitizePatientData(appointment.getPatientUser()));
+            }
+        });
+        
+        return appointments;
+    }
 
     /**
      * Enhanced date/time parsing with comprehensive format support
@@ -262,19 +290,18 @@ public class AppointmentService {
         
         List<Appointment> appointments = appointmentRepository.findByPatientUser(patientOpt.get());
         
-        // Force initialization of lazy-loaded entities to prevent serialization issues
+        // Force initialization of lazy-loaded entities
         appointments.forEach(appointment -> {
-            // Initialize lazy-loaded entities
             if (appointment.getPatientUser() != null) {
-                appointment.getPatientUser().getUsername(); // Force initialization
+                appointment.getPatientUser().getUsername();
                 if (appointment.getPatientUser().getRole() != null) {
-                    appointment.getPatientUser().getRole().getRoleName(); // Force initialization
+                    appointment.getPatientUser().getRole().getRoleName();
                 }
             }
             if (appointment.getDoctorUser() != null) {
-                appointment.getDoctorUser().getUsername(); // Force initialization
+                appointment.getDoctorUser().getUsername();
                 if (appointment.getDoctorUser().getRole() != null) {
-                    appointment.getDoctorUser().getRole().getRoleName(); // Force initialization
+                    appointment.getDoctorUser().getRole().getRoleName();
                 }
                 // Attach doctor profile info for display
                 doctorProfileRepository.findByUser(appointment.getDoctorUser()).ifPresent(profile -> {
@@ -286,11 +313,11 @@ public class AppointmentService {
                 });
             }
             if (appointment.getAvailabilitySlot() != null) {
-                appointment.getAvailabilitySlot().getSlotDate(); // Force initialization
+                appointment.getAvailabilitySlot().getSlotDate();
             }
         });
         
-        return appointments;
+        return applyPrivacyFilter(appointments);
     }
 
     /**
@@ -330,7 +357,7 @@ public class AppointmentService {
             }
         });
         
-        return appointments;
+        return applyPrivacyFilter(appointments);
     }
 
     /**
@@ -364,7 +391,7 @@ public class AppointmentService {
             }
         });
         
-        return appointments;
+        return applyPrivacyFilter(appointments);
     }
 
     /**
@@ -529,24 +556,23 @@ public class AppointmentService {
                 return completedResult;
             }
 
-            // Get patient user ID
-            Integer patientUserId = appointment.getPatientUser().getUserId();
-            logger.debug("Fetching patient record for patient ID: {}", patientUserId);
+            // Get privacy settings for the patient
+            boolean isPrivate = patientPrivacyService.getPrivacySettings(appointment.getPatientUser().getUserId());
 
             // Try to find existing patient record
-            Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(patientUserId);
+            Optional<PatientRecord> recordOpt = patientRecordRepository.findByPatientUserID(appointment.getPatientUser().getUserId());
 
             Map<String, Object> result = new HashMap<>();
 
-            // Add appointment details with proper date/time formatting
+            // Add appointment details
             result.put("appointmentId", appointment.getAppointmentId());
             result.put("appointmentDateTime", appointment.getAppointmentDateTime());
             result.put("appointmentStatus", appointment.getStatus());
             result.put("appointmentNotes", appointment.getAppointmentNotes());
             result.put("durationMinutes", appointment.getDurationMinutes());
 
-            // Add patient basic info
-            User patient = appointment.getPatientUser();
+            // Add patient info with privacy check
+            User patient = sanitizePatientData(appointment.getPatientUser());
             result.put("patientId", patient.getUserId());
             result.put("patientUsername", patient.getUsername());
             result.put("patientEmail", patient.getEmail());
@@ -559,9 +585,9 @@ public class AppointmentService {
                 result.put("currentMedications", record.getCurrentMedications());
                 result.put("notes", record.getNotes());
                 result.put("bloodType", record.getBloodType());
-                result.put("emergencyContact", record.getEmergencyContact());
-                result.put("emergencyPhone", record.getEmergencyPhone());
-                result.put("profileImageBase64", record.getProfileImageBase64());
+                result.put("emergencyContact", isPrivate ? "Private" : record.getEmergencyContact());
+                result.put("emergencyPhone", isPrivate ? "Private" : record.getEmergencyPhone());
+                result.put("profileImageBase64", isPrivate ? null : record.getProfileImageBase64());
                 result.put("createdAt", record.getCreatedAt());
                 result.put("updatedAt", record.getUpdatedAt());
             } else {
@@ -580,6 +606,7 @@ public class AppointmentService {
             }
 
             result.put("success", true);
+            result.put("isPrivate", isPrivate);
             return result;
 
         } catch (Exception e) {

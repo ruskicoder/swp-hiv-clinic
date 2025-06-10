@@ -7,7 +7,8 @@ const PatientRecordSection = ({
   onSave,
   onImageUpload,
   loading = false,
-  isEditable = true
+  isEditable = true,
+  hideImage = false
 }) => {
   // Initialize form data with empty strings
   const [formData, setFormData] = useState({
@@ -272,6 +273,13 @@ const PatientRecordSection = ({
 
   return (
     <div className="patient-record-section">
+      {record?.isPrivate && (
+        <div className="privacy-alert">
+          <i className="fas fa-lock"></i>
+          <p>This patient has enabled private mode. Some information will be hidden for privacy reasons.</p>
+        </div>
+      )}
+
       <div className="record-header">
         <h3>
           {loading ? 'Loading...' : 
@@ -297,202 +305,219 @@ const PatientRecordSection = ({
         </div>
       ) : (
         <div className="record-content">
-          {/* Profile Image Section */}
-          <div className="profile-image-section">
-            <div className="profile-image-container">
-              {record?.profileImageBase64 ? (
-                <img
-                  src={record.profileImageBase64}
-                  alt="Profile"
-                  className="profile-image"
-                />
-              ) : (
-                <div className="profile-placeholder">
-                  <span>No Image</span>
+          {/* Profile Image Section - Only show if not hidden */}
+          {!hideImage && (
+            <div className="profile-image-section">
+              <div className="profile-image-container">
+                {record?.profileImageBase64 ? (
+                  <img
+                    src={record.profileImageBase64}
+                    alt="Profile"
+                    className="profile-image"
+                  />
+                ) : (
+                  <div className="profile-placeholder">
+                    <span>No Image</span>
+                  </div>
+                )}
+              </div>
+              {isEditable && (
+                <div className="image-upload">
+                  <input
+                    type="file"
+                    id="profileImage"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    style={{ display: 'none' }}
+                    disabled={uploading}
+                  />
+                  <label 
+                    htmlFor="profileImage" 
+                    className="upload-btn" 
+                    style={{ 
+                      opacity: uploading ? 0.6 : 1, 
+                      pointerEvents: uploading ? 'none' : 'auto' 
+                    }}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload Photo'}
+                  </label>
+                  {uploadError && <div className="error-message">{uploadError}</div>}
+                  {uploadSuccess && <div className="success-message">{uploadSuccess}</div>}
                 </div>
               )}
             </div>
-            <div className="image-upload">
-              <input
-                type="file"
-                id="profileImage"
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
-                disabled={uploading}
-              />
-              <label 
-                htmlFor="profileImage" 
-                className="upload-btn" 
-                style={{ 
-                  opacity: uploading ? 0.6 : 1, 
-                  pointerEvents: uploading ? 'none' : 'auto' 
-                }}
-              >
-                {uploading ? 'Uploading...' : 'Upload Photo'}
-              </label>
-              {uploadError && <div className="error-message">{uploadError}</div>}
-              {uploadSuccess && <div className="success-message">{uploadSuccess}</div>}
-            </div>
-          </div>
+          )}
 
-          {/* Medical Information Form */}
-          <form id="patient-record-form" onSubmit={handleSubmit} className="record-form">
-            <div className="form-grid">
-              <div className="form-group">
-                <label htmlFor="medicalHistory">Medical History</label>
-                {isEditable ? (
-                  <textarea
-                    id="medicalHistory"
-                    name="medicalHistory"
-                    value={formData.medicalHistory}
-                    onChange={handleChange}
-                    placeholder="Enter medical history..."
-                    rows="4"
-                  />
-                ) : (
-                  <div className="form-display">
-                    <SafeText value={formData.medicalHistory} />
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="allergies">Allergies</label>
-                {isEditable ? (
-                  <textarea
-                    id="allergies"
-                    name="allergies"
-                    value={formData.allergies}
-                    onChange={handleChange}
-                    placeholder="Enter known allergies..."
-                    rows="4"
-                  />
-                ) : (
-                  <div className="form-display">
-                    <SafeText value={formData.allergies} />
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="currentMedications">Current Medications</label>
-                {isEditable ? (
-                  <textarea
-                    id="currentMedications"
-                    name="currentMedications"
-                    value={formData.currentMedications}
-                    onChange={handleChange}
-                    placeholder="Enter current medications..."
-                    rows="4"
-                  />
-                ) : (
-                  <div className="form-display">
-                    <SafeText value={formData.currentMedications} />
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="notes">Additional Notes</label>
-                {isEditable ? (
-                  <textarea
-                    id="notes"
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleChange}
-                    placeholder="Enter additional notes..."
-                    rows="4"
-                  />
-                ) : (
-                  <div className="form-display">
-                    <SafeText value={formData.notes} />
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="bloodType">Blood Type</label>
-                {isEditable ? (
-                  <select
-                    id="bloodType"
-                    name="bloodType"
-                    value={formData.bloodType}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select blood type</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                  </select>
-                ) : (
-                  <div className="form-display">
-                    <SafeText value={formData.bloodType} />
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="emergencyContact">Emergency Contact</label>
-                {isEditable ? (
-                  <input
-                    type="text"
-                    id="emergencyContact"
-                    name="emergencyContact"
-                    value={formData.emergencyContact}
-                    onChange={handleChange}
-                    placeholder="Enter emergency contact name..."
-                  />
-                ) : (
-                  <div className="form-display">
-                    <SafeText value={formData.emergencyContact} />
-                  </div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="emergencyPhone">Emergency Phone</label>
-                {isEditable ? (
-                  <input
-                    type="tel"
-                    id="emergencyPhone"
-                    name="emergencyPhone"
-                    value={formData.emergencyPhone}
-                    onChange={handleChange}
-                    placeholder="Enter emergency phone number..."
-                  />
-                ) : (
-                  <div className="form-display">
-                    <SafeText value={formData.emergencyPhone} />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {isEditable && (
-              <div className="form-actions">
-                <button 
-                  type="submit" 
-                  className="btn-primary"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <span className="spinner"></span>
-                      Saving...
-                    </>
-                  ) : (
-                    'Save Record'
-                  )}
-                </button>
+          <div className="record-container">
+            {record?.isPrivate && (
+              <div className="privacy-alert">
+                <i className="fas fa-lock"></i>
+                <p>This patient has enabled private mode. Some information will be hidden for privacy reasons.</p>
               </div>
             )}
-          </form>
+
+            {/* Medical Information Form */}
+            <form id="patient-record-form" onSubmit={handleSubmit} className="record-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="medicalHistory">Medical History</label>
+                  {isEditable ? (
+                    <textarea
+                      id="medicalHistory"
+                      name="medicalHistory"
+                      value={formData.medicalHistory}
+                      onChange={handleChange}
+                      placeholder="Enter medical history..."
+                      rows="4"
+                    />
+                  ) : (
+                    <div className="form-display">
+                      <SafeText value={formData.medicalHistory} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="allergies">Allergies</label>
+                  {isEditable ? (
+                    <textarea
+                      id="allergies"
+                      name="allergies"
+                      value={formData.allergies}
+                      onChange={handleChange}
+                      placeholder="Enter known allergies..."
+                      rows="4"
+                    />
+                  ) : (
+                    <div className="form-display">
+                      <SafeText value={formData.allergies} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="currentMedications">Current Medications</label>
+                  {isEditable ? (
+                    <textarea
+                      id="currentMedications"
+                      name="currentMedications"
+                      value={formData.currentMedications}
+                      onChange={handleChange}
+                      placeholder="Enter current medications..."
+                      rows="4"
+                    />
+                  ) : (
+                    <div className="form-display">
+                      <SafeText value={formData.currentMedications} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="notes">Additional Notes</label>
+                  {isEditable ? (
+                    <textarea
+                      id="notes"
+                      name="notes"
+                      value={formData.notes}
+                      onChange={handleChange}
+                      placeholder="Enter additional notes..."
+                      rows="4"
+                    />
+                  ) : (
+                    <div className="form-display">
+                      <SafeText value={formData.notes} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="bloodType">Blood Type</label>
+                  {isEditable ? (
+                    <select
+                      id="bloodType"
+                      name="bloodType"
+                      value={formData.bloodType}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select blood type</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                    </select>
+                  ) : (
+                    <div className="form-display">
+                      <SafeText value={formData.bloodType} />
+                    </div>
+                  )}
+                </div>
+
+                {!record?.isPrivate && (
+                  <>
+                    <div className="form-group">
+                      <label htmlFor="emergencyContact">Emergency Contact</label>
+                      {isEditable ? (
+                        <input
+                          type="text"
+                          id="emergencyContact"
+                          name="emergencyContact"
+                          value={formData.emergencyContact}
+                          onChange={handleChange}
+                          placeholder="Enter emergency contact name..."
+                        />
+                      ) : (
+                        <div className="form-display">
+                          <SafeText value={formData.emergencyContact} />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="emergencyPhone">Emergency Phone</label>
+                      {isEditable ? (
+                        <input
+                          type="tel"
+                          id="emergencyPhone"
+                          name="emergencyPhone"
+                          value={formData.emergencyPhone}
+                          onChange={handleChange}
+                          placeholder="Enter emergency phone number..."
+                        />
+                      ) : (
+                        <div className="form-display">
+                          <SafeText value={formData.emergencyPhone} />
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {isEditable && (
+                  <div className="form-actions">
+                    <button 
+                      type="submit" 
+                      className="btn-primary"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="spinner"></span>
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Record'
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

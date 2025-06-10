@@ -630,6 +630,36 @@
   transform: translateY(-1px);
 }
 
+/* Privacy Alert */
+.privacy-alert {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.privacy-alert i {
+  font-size: 1.2rem;
+  color: #856404;
+}
+
+.privacy-alert p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.private-patient {
+  color: #856404;
+  font-style: italic;
+}
+
 /* Responsive Design */
 @media (max-width: 900px) {
   .dashboard-layout {
