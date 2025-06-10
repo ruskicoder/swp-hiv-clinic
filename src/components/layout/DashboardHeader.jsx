@@ -25,7 +25,7 @@ const DashboardHeader = ({ title, subtitle }) => {
     const loadPrivateMode = async () => {
       if (isPatient()) {
         try {
-          const response = await apiClient.get('/api/patients/privacy-settings');
+          const response = await apiClient.get('/patients/privacy-settings');
           const privacyState = response.data?.isPrivate ?? false;
           setIsPrivate(privacyState);
           localStorage.setItem('privateMode', JSON.stringify(privacyState));
@@ -56,9 +56,8 @@ const DashboardHeader = ({ title, subtitle }) => {
       
       // Update UI state immediately for better user feedback
       setIsPrivate(newState);
-      
-      // Make API call
-      const response = await apiClient.post('/api/patients/privacy-settings', {
+        // Make API call
+      const response = await apiClient.post('/patients/privacy-settings', {
         isPrivate: newState
       });
       
