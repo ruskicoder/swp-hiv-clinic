@@ -141,7 +141,7 @@ const DashboardHeader = ({ title, subtitle }) => {
                   </svg>
                 )}
               </span>
-              {isPrivate ? 'Privacy On' : 'Privacy Off'}
+              {isPrivate ? 'Anonymous' : 'Public'}
             </button>
           )}
           <div className="system-datetime">

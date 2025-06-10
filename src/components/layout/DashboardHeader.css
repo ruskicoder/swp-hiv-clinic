@@ -84,8 +84,9 @@
 }
 
 .privacy-toggle:hover {
+  color:#f3fdf7;
   background: #f9fafb;
-  border-color: #d1d5db;
+  border-color: #10b981;
 }
 
 .privacy-toggle.active {
