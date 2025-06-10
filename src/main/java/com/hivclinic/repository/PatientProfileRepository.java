@@ -12,14 +12,13 @@ import java.util.Optional;
  */
 @Repository
 public interface PatientProfileRepository extends JpaRepository<PatientProfile, Integer> {
-    
     /**
-     * Find patient profile by user
-     */
-    Optional<PatientProfile> findByUser(User user);
-    
-    /**
-     * Find patient profile by user ID
+     * Find patient profile by user ID using JPA's underscore notation for nested properties
      */
     Optional<PatientProfile> findByUser_UserId(Integer userId);
+
+    /**
+     * Find patient profile by user entity
+     */
+    Optional<PatientProfile> findByUser(User user);
 }

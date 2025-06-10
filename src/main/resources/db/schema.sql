@@ -64,7 +64,7 @@ CREATE TABLE PatientProfiles (
     PhoneNumber NVARCHAR(20) NULL,
     Address NVARCHAR(MAX) NULL,
     ProfileImageBase64 NVARCHAR(MAX) NULL,
-    IsPrivate BIT DEFAULT 0, -- New column for private mode
+    IsPrivate BIT NOT NULL DEFAULT 0,
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
@@ -225,16 +225,6 @@ BEGIN
 END
 GO
 
--- Add IsPrivate column to PatientRecords if it doesn't exist
-IF NOT EXISTS (
-    SELECT * FROM sys.columns 
-    WHERE object_id = OBJECT_ID('PatientRecords')
-    AND name = 'IsPrivate'
-)
-BEGIN
-    ALTER TABLE PatientRecords
-    ADD IsPrivate BIT NOT NULL DEFAULT 0;
-END
-GO
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PatientProfiles') AND name = 'IsPrivate') ALTER TABLE PatientProfiles ADD IsPrivate BIT NOT NULL DEFAULT 0;
 
 PRINT 'Database schema created successfully!';

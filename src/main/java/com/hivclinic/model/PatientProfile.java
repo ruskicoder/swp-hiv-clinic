@@ -44,4 +44,7 @@ public class PatientProfile {
     @Lob
     @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
     private String profileImageBase64;
+
+    @Column(name = "IsPrivate", nullable = false)
+    private boolean isPrivate = false;
 }
