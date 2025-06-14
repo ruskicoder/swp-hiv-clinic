@@ -1,13 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import AppRouter from './routes/AppRouter';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
-
-// Import enhanced components
-import EnhancedDoctorDashboard from './components/enhanced/EnhancedDoctorDashboard';
-import EnhancedHeader from './components/enhanced/EnhancedHeader';
 
 /**
  * Main App component that sets up the application structure
@@ -16,14 +12,13 @@ import EnhancedHeader from './components/enhanced/EnhancedHeader';
 function App() {
   return (
     <ErrorBoundary>
-      <Router>
+      <BrowserRouter>
         <AuthProvider>
-          <AppRouter 
-            EnhancedDoctorDashboard={EnhancedDoctorDashboard}
-            EnhancedHeader={EnhancedHeader}
-          />
+          <div className="App">
+            <AppRouter />
+          </div>
         </AuthProvider>
-      </Router>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }
