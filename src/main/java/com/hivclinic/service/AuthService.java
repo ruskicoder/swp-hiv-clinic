@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -107,20 +106,20 @@ public class AuthService {
 
     /**
      * Authenticate user and generate JWT token
-     */
-    public AuthResponse authenticateUser(LoginRequest loginRequest) {
+     */    public AuthResponse authenticateUser(LoginRequest loginRequest) {
         try {
-            // Authenticate user
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
-                            loginRequest.getPassword()
-                    )
+            var authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
             );
 
-            // Get user details from authentication
-            com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal = 
-                    (com.hivclinic.config.CustomUserDetailsService.UserPrincipal) authentication.getPrincipal();
+            var authentication = authenticationManager.authenticate(authenticationToken);
+
+            if (!(authentication.getPrincipal() instanceof com.hivclinic.config.CustomUserDetailsService.UserPrincipal)) {
+                throw new RuntimeException("Invalid authentication principal type");
+            }
+
+            var userPrincipal = (com.hivclinic.config.CustomUserDetailsService.UserPrincipal) authentication.getPrincipal();
 
             // Generate JWT token
             String jwt = jwtUtils.generateJwtToken(

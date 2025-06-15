@@ -4,7 +4,7 @@ import axios from 'axios';
  * API client configuration with interceptors
  */
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: '/api',
   timeout: 0, // Remove timeout restriction
   headers: {
     'Content-Type': 'application/json',

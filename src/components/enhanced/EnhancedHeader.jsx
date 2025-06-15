@@ -1,13 +1,13 @@
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@contexts/AuthContext';
 import { useEffect, useState } from 'react';
-import apiClient from '../../services/apiClient';
-import { GradientText } from '../../../react-bits/src/ts-default/components/text/GradientText';
-import { Aurora } from '../../../react-bits/src/ts-default/components/backgrounds/Aurora';
-import { SpotlightCard } from '../../../react-bits/src/ts-default/components/cards/SpotlightCard';
-import { GlassIcons } from '../../../react-bits/src/ts-default/components/icons/GlassIcons';
-import { TrueFocus } from '../../../react-bits/src/ts-default/components/text/TrueFocus';
+import apiClient from '@services/apiClient';
+import { GradientText } from '@tailwind/Components/text/GradientText';
+import { Aurora } from '@tailwind/Components/backgrounds/Aurora';
+import { SpotlightCard } from '@tailwind/Components/cards/SpotlightCard';
+import { GlassIcons } from '@tailwind/Components/icons/GlassIcons';
+import { TrueFocus } from '@tailwind/Components/text/TrueFocus';
 import { FiUser, FiClock, FiShield, FiSettings } from 'react-icons/fi';
-import '../layout/DashboardHeader.css';
+import '@components/layout/DashboardHeader.css';
 
 const EnhancedHeader = ({ title, subtitle }) => {
   const { user } = useAuth();
