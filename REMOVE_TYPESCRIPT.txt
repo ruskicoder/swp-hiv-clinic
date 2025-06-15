@@ -1,0 +1,1 @@
+Remove all .ts, .tsx, and .d.ts files from the project. Migrate any needed logic to .js or .jsx files in the appropriate folders (e.g., js-tailwind, js-default). Update imports in the rest of the project to use .js/.jsx files only. Remove any TypeScript-specific configuration from package.json, Vite, and other config files.

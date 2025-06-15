@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Components/SpotlightCard/SpotlightCard.jsx?raw';
 import css from '@content/Components/SpotlightCard/SpotlightCard.css?raw';
 import tailwind from '@tailwind/Components/SpotlightCard/SpotlightCard.jsx?raw';
-import tsCode from '@ts-default/Components/SpotlightCard/SpotlightCard.tsx?raw';
-import tsTailwind from '@ts-tailwind/Components/SpotlightCard/SpotlightCard.tsx?raw';
 
 export const spotlightCard = {
   ...(generateCliCommands('Components/SpotlightCard')),

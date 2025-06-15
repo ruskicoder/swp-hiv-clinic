@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/TextAnimations/RotatingText/RotatingText.jsx?raw';
 import css from '@content/TextAnimations/RotatingText/RotatingText.css?raw';
 import tailwind from '@tailwind/TextAnimations/RotatingText/RotatingText.jsx?raw';
-import tsCode from '@ts-default/TextAnimations/RotatingText/RotatingText.tsx?raw';
-import tsTailwind from '@ts-tailwind/TextAnimations/RotatingText/RotatingText.tsx?raw';
 
 
 export const rotatingText = {

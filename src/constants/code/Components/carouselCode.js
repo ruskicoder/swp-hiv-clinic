@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Components/Carousel/Carousel.jsx?raw';
 import css from '@content/Components/Carousel/Carousel.css?raw';
 import tailwind from '@tailwind/Components/Carousel/Carousel.jsx?raw';
-import tsCode from '@ts-default/Components/Carousel/Carousel.tsx?raw';
-import tsTailwind from '@ts-tailwind/Components/Carousel/Carousel.tsx?raw';
 
 export const carousel = {
   ...(generateCliCommands('Components/Carousel')),

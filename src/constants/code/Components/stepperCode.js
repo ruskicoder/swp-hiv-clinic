@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Components/Stepper/Stepper.jsx?raw';
 import css from '@content/Components/Stepper/Stepper.css?raw';
 import tailwind from '@tailwind/Components/Stepper/Stepper.jsx?raw';
-import tsCode from '@ts-default/Components/Stepper/Stepper.tsx?raw';
-import tsTailwind from '@ts-tailwind/Components/Stepper/Stepper.tsx?raw';
 
 export const stepper = {
   ...(generateCliCommands('Components/Stepper')),

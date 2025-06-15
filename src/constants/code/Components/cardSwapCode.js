@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Components/CardSwap/CardSwap.jsx?raw';
 import css from '@content/Components/CardSwap/CardSwap.css?raw';
 import tailwind from '@tailwind/Components/CardSwap/CardSwap.jsx?raw';
-import tsCode from '@ts-default/Components/CardSwap/CardSwap.tsx?raw';
-import tsTailwind from '@ts-tailwind/Components/CardSwap/CardSwap.tsx?raw';
 
 export const cardSwap = {
   ...(generateCliCommands('Components/CardSwap')),

@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Components/DecayCard/DecayCard.jsx?raw';
 import css from '@content/Components/DecayCard/DecayCard.css?raw';
 import tailwind from '@tailwind/Components/DecayCard/DecayCard.jsx?raw';
-import tsCode from '@ts-default/Components/DecayCard/DecayCard.tsx?raw';
-import tsTailwind from '@ts-tailwind/Components/DecayCard/DecayCard.tsx?raw';
 
 export const decayCard = {
   ...(generateCliCommands('Components/DecayCard')),

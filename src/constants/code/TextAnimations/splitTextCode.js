@@ -4,8 +4,6 @@ import { generateCliCommands } from '@/utils/utils';
 
 import code from '@content/TextAnimations/SplitText/SplitText.jsx?raw';
 import tailwind from '@tailwind/TextAnimations/SplitText/SplitText.jsx?raw';
-import tsCode from '@ts-default/TextAnimations/SplitText/SplitText.tsx?raw';
-import tsTailwind from '@ts-tailwind/TextAnimations/SplitText/SplitText.tsx?raw';
 
 export const splitText = {
   ...(generateCliCommands('TextAnimations/SplitText')),

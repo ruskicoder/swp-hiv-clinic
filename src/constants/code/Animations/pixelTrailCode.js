@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Animations/PixelTrail/PixelTrail.jsx?raw';
 import css from '@content/Animations/PixelTrail/PixelTrail.css?raw';
 import tailwind from '@tailwind/Animations/PixelTrail/PixelTrail.jsx?raw';
-import tsCode from '@ts-default/Animations/PixelTrail/PixelTrail.tsx?raw';
-import tsTailwind from '@ts-tailwind/Animations/PixelTrail/PixelTrail.tsx?raw';
 
 export const pixelTrail = {
   ...(generateCliCommands('Animations/PixelTrail')),

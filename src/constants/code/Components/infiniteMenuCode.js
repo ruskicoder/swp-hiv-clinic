@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Components/InfiniteMenu/InfiniteMenu.jsx?raw';
 import css from '@content/Components/InfiniteMenu/InfiniteMenu.css?raw';
 import tailwind from '@tailwind/Components/InfiniteMenu/InfiniteMenu.jsx?raw';
-import tsCode from '@ts-default/Components/InfiniteMenu/InfiniteMenu.tsx?raw';
-import tsTailwind from '@ts-tailwind/Components/InfiniteMenu/InfiniteMenu.tsx?raw';
 
 export const infiniteMenu = {
   ...(generateCliCommands('Components/InfiniteMenu')),

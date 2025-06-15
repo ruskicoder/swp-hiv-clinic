@@ -12,14 +12,6 @@ const registries = [
         registry: 'tailwind',
         description: 'This registry contains the JavaScript variant of the tailwind registry.',
     },
-    {
-        registry: 'ts/tailwind',
-        description: 'This registry contains the TypeScript variant of the default registry.',
-    },
-    {
-        registry: 'ts/default',
-        description: 'This registry contains the TypeScript variant of the tailwind registry.',
-    },
 ]
 
 const templateFileContent = fs.readFileSync(TEMPLATE_FILE_PATH).toString();

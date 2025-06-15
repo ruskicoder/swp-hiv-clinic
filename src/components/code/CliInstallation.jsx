@@ -4,14 +4,10 @@ import CodeHighlighter from "./CodeHighlighter";
 const CliInstallation = ({
   cliDefault,
   cliTailwind,
-  cliTsDefault,
-  cliTsTailwind,
 }) => {
   const installConfigs = [
     { title: "JS + CSS", code: cliDefault },
     { title: "JS + Tailwind", code: cliTailwind },
-    { title: "TS + CSS", code: cliTsDefault },
-    { title: "TS + Tailwind", code: cliTsTailwind },
   ].filter(({ code }) => code);
 
   return (
@@ -70,8 +66,6 @@ const CliInstallation = ({
             {[
               { label: "JavaScript (Default)", path: "default" },
               { label: "JavaScript (Tailwind)", path: "tailwind" },
-              { label: "TypeScript (Default)", path: "ts/default" },
-              { label: "TypeScript (Tailwind)", path: "ts/tailwind" },
             ].map(({ label, path }) => (
               <Box key={path} mb={4}>
                 <Text className="demo-extra-info">{label}</Text>

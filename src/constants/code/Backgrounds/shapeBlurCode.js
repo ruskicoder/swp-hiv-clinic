@@ -2,8 +2,6 @@ import { generateCliCommands } from '@/utils/utils';
 
 import code from '@content/Backgrounds/ShapeBlur/ShapeBlur.jsx?raw';
 import tailwind from '@tailwind/Backgrounds/ShapeBlur/ShapeBlur.jsx?raw';
-import tsCode from '@ts-default/Backgrounds/ShapeBlur/ShapeBlur.tsx?raw';
-import tsTailwind from '@ts-tailwind/Backgrounds/ShapeBlur/ShapeBlur.tsx?raw';
 
 export const shapeBlur = {
   ...(generateCliCommands('Backgrounds/ShapeBlur')),

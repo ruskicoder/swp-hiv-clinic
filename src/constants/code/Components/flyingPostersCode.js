@@ -3,8 +3,6 @@ import { generateCliCommands } from '@/utils/utils';
 import code from '@content/Components/FlyingPosters/FlyingPosters.jsx?raw';
 import css from '@content/Components/FlyingPosters/FlyingPosters.css?raw';
 import tailwind from '@tailwind/Components/FlyingPosters/FlyingPosters.jsx?raw';
-import tsCode from '@ts-default/Components/FlyingPosters/FlyingPosters.tsx?raw';
-import tsTailwind from '@ts-tailwind/Components/FlyingPosters/FlyingPosters.tsx?raw';
 
 export const flyingPosters = {
   ...(generateCliCommands('Components/FlyingPosters')),
