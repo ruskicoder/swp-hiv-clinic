@@ -1,18 +1,12 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Entity representing medical specialties
  */
 @Entity
 @Table(name = "Specialties")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Specialty {
 
     @Id
@@ -28,4 +22,28 @@ public class Specialty {
 
     @Column(name = "IsActive", columnDefinition = "BIT DEFAULT 1")
     private Boolean isActive = true;
+
+    public String getSpecialtyName() {
+        return specialtyName;
+    }
+
+    public void setSpecialtyName(String specialtyName) {
+        this.specialtyName = specialtyName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 }

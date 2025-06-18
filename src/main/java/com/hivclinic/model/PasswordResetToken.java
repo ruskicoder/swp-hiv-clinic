@@ -1,16 +1,10 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PasswordResetTokens")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PasswordResetToken {
 
     @Id
@@ -37,5 +31,53 @@ public class PasswordResetToken {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+    }
+
+    public Integer getTokenId() {
+        return tokenId;
+    }
+
+    public void setTokenId(Integer tokenId) {
+        this.tokenId = tokenId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public LocalDateTime getExpiryDateTime() {
+        return expiryDateTime;
+    }
+
+    public void setExpiryDateTime(LocalDateTime expiryDateTime) {
+        this.expiryDateTime = expiryDateTime;
+    }
+
+    public Boolean getIsUsed() {
+        return isUsed;
+    }
+
+    public void setIsUsed(Boolean isUsed) {
+        this.isUsed = isUsed;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -38,7 +38,7 @@ public class AuthController {
         try {
             logger.info("Registration attempt for username: {}", registerRequest.getUsername());
             
-            MessageResponse response = authService.registerUser(registerRequest);
+            MessageResponse response = authService.register(registerRequest);
             
             if (response.isSuccess()) {
                 logger.info("User registered successfully: {}", registerRequest.getUsername());

@@ -1,10 +1,6 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 
 /**
@@ -12,9 +8,6 @@ import java.time.LocalDate;
  */
 @Entity
 @Table(name = "PatientProfiles")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PatientProfile {
 
     @Id
@@ -47,4 +40,24 @@ public class PatientProfile {
 
     @Column(name = "IsPrivate", nullable = false)
     private boolean isPrivate = false;
+
+    // Add explicit getters and setters for all fields
+    public Integer getPatientProfileId() { return patientProfileId; }
+    public void setPatientProfileId(Integer id) { this.patientProfileId = id; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public java.time.LocalDate getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(java.time.LocalDate dob) { this.dateOfBirth = dob; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public String getProfileImageBase64() { return profileImageBase64; }
+    public void setProfileImageBase64(String img) { this.profileImageBase64 = img; }
+    public boolean getIsPrivate() { return isPrivate; }
+    public void setIsPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
 }

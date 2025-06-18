@@ -1,16 +1,10 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "LoginActivity")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class LoginActivity {
 
     @Id
@@ -40,5 +34,62 @@ public class LoginActivity {
     @PrePersist
     protected void onCreate() {
         attemptTime = LocalDateTime.now();
+    }
+
+    // Getters and Setters
+    public Long getLogId() {
+        return logId;
+    }
+
+    public void setLogId(Long logId) {
+        this.logId = logId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getUsernameAttempted() {
+        return usernameAttempted;
+    }
+
+    public void setUsernameAttempted(String usernameAttempted) {
+        this.usernameAttempted = usernameAttempted;
+    }
+
+    public LocalDateTime getAttemptTime() {
+        return attemptTime;
+    }
+
+    public void setAttemptTime(LocalDateTime attemptTime) {
+        this.attemptTime = attemptTime;
+    }
+
+    public Boolean getSuccess() {
+        return isSuccess;
+    }
+
+    public void setSuccess(Boolean success) {
+        isSuccess = success;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
     }
 }

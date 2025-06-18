@@ -3,9 +3,6 @@ package com.hivclinic.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -14,11 +11,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "Appointments")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Appointment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "AppointmentID")
@@ -66,6 +59,8 @@ public class Appointment {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
+    public Appointment() {}
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -75,5 +70,101 @@ public class Appointment {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public Integer getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Integer appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public User getPatientUser() {
+        return patientUser;
+    }
+
+    public void setPatientUser(User patientUser) {
+        this.patientUser = patientUser;
+    }
+
+    public User getDoctorUser() {
+        return doctorUser;
+    }
+
+    public void setDoctorUser(User doctorUser) {
+        this.doctorUser = doctorUser;
+    }
+
+    public DoctorAvailabilitySlot getAvailabilitySlot() {
+        return availabilitySlot;
+    }
+
+    public void setAvailabilitySlot(DoctorAvailabilitySlot availabilitySlot) {
+        this.availabilitySlot = availabilitySlot;
+    }
+
+    public LocalDateTime getAppointmentDateTime() {
+        return appointmentDateTime;
+    }
+
+    public void setAppointmentDateTime(LocalDateTime appointmentDateTime) {
+        this.appointmentDateTime = appointmentDateTime;
+    }
+
+    public Integer getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(Integer durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPatientCancellationReason() {
+        return patientCancellationReason;
+    }
+
+    public void setPatientCancellationReason(String reason) {
+        this.patientCancellationReason = reason;
+    }
+
+    public String getDoctorCancellationReason() {
+        return doctorCancellationReason;
+    }
+
+    public void setDoctorCancellationReason(String reason) {
+        this.doctorCancellationReason = reason;
+    }
+
+    public String getAppointmentNotes() {
+        return appointmentNotes;
+    }
+
+    public void setAppointmentNotes(String notes) {
+        this.appointmentNotes = notes;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

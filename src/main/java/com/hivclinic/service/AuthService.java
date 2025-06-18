@@ -6,13 +6,13 @@ import com.hivclinic.dto.request.RegisterRequest;
 import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
-import com.hivclinic.model.PatientProfile;
-import com.hivclinic.model.Role;
 import com.hivclinic.model.User;
-import com.hivclinic.repository.DoctorProfileRepository;
-import com.hivclinic.repository.PatientProfileRepository;
-import com.hivclinic.repository.RoleRepository;
+import com.hivclinic.model.Role;
+import com.hivclinic.model.PatientProfile;
 import com.hivclinic.repository.UserRepository;
+import com.hivclinic.repository.RoleRepository;
+import com.hivclinic.repository.PatientProfileRepository;
+import com.hivclinic.repository.DoctorProfileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,58 +49,51 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtUtils jwtUtils;
-
-    /**
+    private JwtUtils jwtUtils;    /**
      * Register a new user (Patient by default for MVP)
      */
     @Transactional
-    public MessageResponse registerUser(RegisterRequest registerRequest) {
+    public MessageResponse register(RegisterRequest registerRequest) {
         try {
-            // Check if username already exists
+            // Validate password match
+            if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+                return MessageResponse.error("Password and confirmation password do not match");
+            }
+            // Check if username exists
             if (userRepository.existsByUsername(registerRequest.getUsername())) {
-                return MessageResponse.error("Username is already taken!");
+                return MessageResponse.error("Username is already taken");
             }
-
-            // Check if email already exists
+            // Check if email exists
             if (userRepository.existsByEmail(registerRequest.getEmail())) {
-                return MessageResponse.error("Email is already in use!");
+                return MessageResponse.error("Email is already registered");
             }
-
-            // Get Patient role (default for registration)
-            Optional<Role> patientRoleOpt = roleRepository.findByRoleName("Patient");
-            if (patientRoleOpt.isEmpty()) {
-                logger.error("Patient role not found in database");
-                return MessageResponse.error("System error: Patient role not configured");
+            // Get patient role
+            Optional<Role> roleOptional = roleRepository.findByRoleName("PATIENT");
+            if (roleOptional.isEmpty()) {
+                return MessageResponse.error("Failed to create user: Role not found");
             }
-            Role patientRole = patientRoleOpt.get();
-
+            Role role = roleOptional.get();
             // Create new user
             User user = new User();
             user.setUsername(registerRequest.getUsername());
             user.setEmail(registerRequest.getEmail());
             user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
-            user.setRole(patientRole);
+            user.setRole(role);
             user.setIsActive(true);
-
-            // Save user
-            User savedUser = userRepository.save(user);
-
+            user.setCreatedAt(java.time.LocalDateTime.now());
+            user.setUpdatedAt(java.time.LocalDateTime.now());
+            user = userRepository.save(user);
             // Create patient profile
             PatientProfile patientProfile = new PatientProfile();
-            patientProfile.setUser(savedUser);
+            patientProfile.setUser(user);
             patientProfile.setFirstName(registerRequest.getFirstName());
             patientProfile.setLastName(registerRequest.getLastName());
             patientProfile.setPhoneNumber(registerRequest.getPhoneNumber());
-
-            // Save patient profile
             patientProfileRepository.save(patientProfile);
-
             logger.info("User registered successfully: {}", registerRequest.getUsername());
             return MessageResponse.success("User registered successfully!");
-
         } catch (Exception e) {
-            logger.error("Error during user registration: {}", e.getMessage(), e);
+            logger.error("Registration error: ", e);
             return MessageResponse.error("Registration failed: " + e.getMessage());
         }
     }
