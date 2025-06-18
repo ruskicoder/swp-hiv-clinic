@@ -38,6 +38,15 @@ public class AuthController {
         try {
             logger.info("Registration attempt for username: {}", registerRequest.getUsername());
             
+            // Validate password confirmation
+            if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+                logger.warn("Password confirmation mismatch for username: {}", registerRequest.getUsername());
+                return ResponseEntity.badRequest().body(MessageResponse.builder()
+                    .success(false)
+                    .message("Password and confirmation password do not match")
+                    .build());
+            }
+            
             MessageResponse response = authService.registerUser(registerRequest);
             
             if (response.isSuccess()) {
