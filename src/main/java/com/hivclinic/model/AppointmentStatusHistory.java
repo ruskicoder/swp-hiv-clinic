@@ -3,6 +3,9 @@ package com.hivclinic.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
@@ -10,6 +13,9 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "AppointmentStatusHistory")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AppointmentStatusHistory {
 
     @Id
@@ -45,61 +51,5 @@ public class AppointmentStatusHistory {
         if (changedAt == null) {
             changedAt = LocalDateTime.now();
         }
-    }
-
-    public Integer getStatusHistoryId() {
-        return statusHistoryId;
-    }
-
-    public void setStatusHistoryId(Integer statusHistoryId) {
-        this.statusHistoryId = statusHistoryId;
-    }
-
-    public Appointment getAppointment() {
-        return appointment;
-    }
-
-    public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
-    }
-
-    public String getOldStatus() {
-        return oldStatus;
-    }
-
-    public void setOldStatus(String oldStatus) {
-        this.oldStatus = oldStatus;
-    }
-
-    public String getNewStatus() {
-        return newStatus;
-    }
-
-    public void setNewStatus(String newStatus) {
-        this.newStatus = newStatus;
-    }
-
-    public String getChangeReason() {
-        return changeReason;
-    }
-
-    public void setChangeReason(String changeReason) {
-        this.changeReason = changeReason;
-    }
-
-    public LocalDateTime getChangedAt() {
-        return changedAt;
-    }
-
-    public void setChangedAt(LocalDateTime changedAt) {
-        this.changedAt = changedAt;
-    }
-
-    public User getChangedByUser() {
-        return changedByUser;
-    }
-
-    public void setChangedByUser(User changedByUser) {
-        this.changedByUser = changedByUser;
     }
 }

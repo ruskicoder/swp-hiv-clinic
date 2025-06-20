@@ -2,6 +2,10 @@ package com.hivclinic.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -9,6 +13,9 @@ import java.time.format.DateTimeParseException;
 /**
  * DTO for appointment booking requests with enhanced date/time parsing
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AppointmentBookingRequest {
 
     // Multiple formatters for flexible parsing
@@ -63,21 +70,5 @@ public class AppointmentBookingRequest {
         
         throw new IllegalArgumentException("Invalid datetime format: " + appointmentDateTime 
             + ". Expected format: yyyy-MM-ddTHH:mm:ss or similar ISO format");
-    }
-
-    public Integer getDoctorUserId() {
-        return doctorUserId;
-    }
-
-    public Integer getAvailabilitySlotId() {
-        return availabilitySlotId;
-    }
-
-    public Integer getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public String getAppointmentDateTime() {
-        return appointmentDateTime;
     }
 }

@@ -23,27 +23,15 @@ public class Specialty {
     @Column(name = "IsActive", columnDefinition = "BIT DEFAULT 1")
     private Boolean isActive = true;
 
-    public String getSpecialtyName() {
-        return specialtyName;
-    }
+    // Getters
+    public Integer getSpecialtyId() { return specialtyId; }
+    public String getSpecialtyName() { return specialtyName; }
+    public String getDescription() { return description; }
+    public Boolean getIsActive() { return isActive; }
 
-    public void setSpecialtyName(String specialtyName) {
-        this.specialtyName = specialtyName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
+    // Setters
+    public void setSpecialtyId(Integer specialtyId) { this.specialtyId = specialtyId; }
+    public void setSpecialtyName(String specialtyName) { this.specialtyName = specialtyName; }
+    public void setDescription(String description) { this.description = description; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 }

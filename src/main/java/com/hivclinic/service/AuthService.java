@@ -1,18 +1,21 @@
 package com.hivclinic.service;
 
+import com.hivclinic.exception.ResourceNotFoundException;
+
 import com.hivclinic.config.JwtUtils;
 import com.hivclinic.dto.request.LoginRequest;
 import com.hivclinic.dto.request.RegisterRequest;
 import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
-import com.hivclinic.model.User;
-import com.hivclinic.model.Role;
+import com.hivclinic.model.DoctorProfile;
 import com.hivclinic.model.PatientProfile;
-import com.hivclinic.repository.UserRepository;
-import com.hivclinic.repository.RoleRepository;
-import com.hivclinic.repository.PatientProfileRepository;
+import com.hivclinic.model.Role;
+import com.hivclinic.model.User;
 import com.hivclinic.repository.DoctorProfileRepository;
+import com.hivclinic.repository.PatientProfileRepository;
+import com.hivclinic.repository.RoleRepository;
+import com.hivclinic.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,51 +52,58 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtUtils jwtUtils;    /**
+    private JwtUtils jwtUtils;
+
+    /**
      * Register a new user (Patient by default for MVP)
      */
     @Transactional
-    public MessageResponse register(RegisterRequest registerRequest) {
+    public MessageResponse registerUser(RegisterRequest registerRequest) {
         try {
-            // Validate password match
-            if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
-                return MessageResponse.error("Password and confirmation password do not match");
-            }
-            // Check if username exists
+            // Check if username already exists
             if (userRepository.existsByUsername(registerRequest.getUsername())) {
-                return MessageResponse.error("Username is already taken");
+                return MessageResponse.error("Username is already taken!");
             }
-            // Check if email exists
+
+            // Check if email already exists
             if (userRepository.existsByEmail(registerRequest.getEmail())) {
-                return MessageResponse.error("Email is already registered");
+                return MessageResponse.error("Email is already in use!");
             }
-            // Get patient role
-            Optional<Role> roleOptional = roleRepository.findByRoleName("PATIENT");
-            if (roleOptional.isEmpty()) {
-                return MessageResponse.error("Failed to create user: Role not found");
+
+            // Get Patient role (default for registration)
+            Optional<Role> patientRoleOpt = roleRepository.findByRoleName("Patient");
+            if (patientRoleOpt.isEmpty()) {
+                logger.error("Patient role not found in database");
+                return MessageResponse.error("System error: Patient role not configured");
             }
-            Role role = roleOptional.get();
+            Role patientRole = patientRoleOpt.get();
+
             // Create new user
             User user = new User();
             user.setUsername(registerRequest.getUsername());
             user.setEmail(registerRequest.getEmail());
             user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
-            user.setRole(role);
+            user.setRole(patientRole);
             user.setIsActive(true);
-            user.setCreatedAt(java.time.LocalDateTime.now());
-            user.setUpdatedAt(java.time.LocalDateTime.now());
-            user = userRepository.save(user);
+
+            // Save user
+            User savedUser = userRepository.save(user);
+
             // Create patient profile
             PatientProfile patientProfile = new PatientProfile();
-            patientProfile.setUser(user);
+            patientProfile.setUser(savedUser);
             patientProfile.setFirstName(registerRequest.getFirstName());
             patientProfile.setLastName(registerRequest.getLastName());
             patientProfile.setPhoneNumber(registerRequest.getPhoneNumber());
+
+            // Save patient profile
             patientProfileRepository.save(patientProfile);
+
             logger.info("User registered successfully: {}", registerRequest.getUsername());
             return MessageResponse.success("User registered successfully!");
+
         } catch (Exception e) {
-            logger.error("Registration error: ", e);
+            logger.error("Error during user registration: {}", e.getMessage(), e);
             return MessageResponse.error("Registration failed: " + e.getMessage());
         }
     }
@@ -197,24 +207,32 @@ public class AuthService {
 
         // Doctor profile
         if ("Doctor".equalsIgnoreCase(role)) {
-            return doctorProfileRepository.findByUser(user)
-                .map(profile -> new UserProfileResponse(
-                    user.getUserId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    role,
-                    user.getIsActive(),
-                    user.getCreatedAt(),
-                    profile.getFirstName(),
-                    profile.getLastName(),
-                    profile.getPhoneNumber(),
-                    null, // dateOfBirth
-                    null, // address
-                    profile.getSpecialty() != null ? profile.getSpecialty().getSpecialtyName() : null,
-                    profile.getBio(),
-                    profile.getProfileImageBase64()
-                ))
-                .orElseThrow(() -> new RuntimeException("Doctor profile not found"));
+            var doctorProfile = doctorProfileRepository.findByUser(user)
+                .orElseGet(() -> {
+                    // Create default doctor profile if not exists
+                    DoctorProfile newProfile = new DoctorProfile();
+                    newProfile.setUser(user);
+                    newProfile.setFirstName(user.getUsername()); // Default to username
+                    newProfile.setLastName("");
+                    return doctorProfileRepository.save(newProfile);
+                });
+
+            return new UserProfileResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                role,
+                user.getIsActive(),
+                user.getCreatedAt(),
+                doctorProfile.getFirstName(),
+                doctorProfile.getLastName(),
+                doctorProfile.getPhoneNumber(),
+                null, // dateOfBirth
+                null, // address
+                doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
+                doctorProfile.getBio(),
+                doctorProfile.getProfileImageBase64()
+            );
         }
 
         // Admin or other roles: basic info only
@@ -314,5 +332,63 @@ public class AuthService {
             logger.error("Error updating profile image: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to update profile image: " + e.getMessage());
         }
+    }
+
+    /**
+     * Get user profile by User (for internal use, e.g., admin panel)
+     */
+    public UserProfileResponse getUserProfile(User user) {
+        String role = user.getRole().getRoleName();
+
+        // Doctor profile
+        if ("Doctor".equalsIgnoreCase(role)) {
+            var doctorProfile = doctorProfileRepository.findByUser(user)
+                .orElseGet(() -> {
+                    // Create default doctor profile if not exists
+                    DoctorProfile newProfile = new DoctorProfile();
+                    newProfile.setUser(user);
+                    newProfile.setFirstName(user.getUsername()); // Default to username
+                    newProfile.setLastName("");
+                    return doctorProfileRepository.save(newProfile);
+                });
+
+            return new UserProfileResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                role,
+                user.getIsActive(),
+                user.getCreatedAt(),
+                doctorProfile.getFirstName(),
+                doctorProfile.getLastName(),
+                doctorProfile.getPhoneNumber(),
+                null, // dateOfBirth
+                null, // address
+                doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
+                doctorProfile.getBio(),
+                doctorProfile.getProfileImageBase64()
+            );
+        }
+
+        // Patient profile
+        var patientProfile = patientProfileRepository.findByUser(user)
+            .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
+
+        return new UserProfileResponse(
+            user.getUserId(),
+            user.getUsername(),
+            user.getEmail(),
+            role,
+            user.getIsActive(),
+            user.getCreatedAt(),
+            patientProfile.getFirstName(),
+            patientProfile.getLastName(),
+            patientProfile.getPhoneNumber(),
+            patientProfile.getDateOfBirth(),
+            patientProfile.getAddress(),
+            null, // specialty (not applicable for patients)
+            null, // bio (not applicable for patients)
+            patientProfile.getProfileImageBase64()
+        );
     }
 }

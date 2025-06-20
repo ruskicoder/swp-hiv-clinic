@@ -17,11 +17,11 @@ public class Role {
     @Column(name = "RoleName", nullable = false, unique = true, length = 50)
     private String roleName;
 
-    public String getRoleName() {
-        return roleName;
-    }
+    // Getters
+    public Integer getRoleId() { return roleId; }
+    public String getRoleName() { return roleName; }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
+    // Setters
+    public void setRoleId(Integer roleId) { this.roleId = roleId; }
+    public void setRoleName(String roleName) { this.roleName = roleName; }
 }
