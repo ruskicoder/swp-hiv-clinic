@@ -26,4 +26,24 @@ public class ManagerController {
         stats.put("totalARVTreatments", managerService.getTotalARVTreatments());
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/patients")
+    public ResponseEntity<?> getAllPatients() {
+        try {
+            var patients = managerService.getAllPatients();
+            return ResponseEntity.ok(patients);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể tải danh sách bệnh nhân: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/doctors")
+    public ResponseEntity<?> getAllDoctors() {
+        try {
+            var doctors = managerService.getAllDoctors();
+            return ResponseEntity.ok(doctors);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể tải danh sách bác sĩ: " + e.getMessage());
+        }
+    }
 }
