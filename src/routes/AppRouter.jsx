@@ -11,6 +11,7 @@ const CustomerDashboard = React.lazy(() => import('../features/Customer/Customer
 const DoctorDashboard = React.lazy(() => import('../features/Doctor/DoctorDashboard'));
 const AdminDashboard = React.lazy(() => import('../features/Admin/AdminDashboard'));
 const Settings = React.lazy(() => import('../features/Settings/Settings'));
+const ManagerDashboard = React.lazy(() => import('../features/Manager/ManagerDashboard'));
 
 /**
  * Loading component for lazy-loaded routes
@@ -73,6 +74,8 @@ const PublicRoute = ({ children }) => {
         return <Navigate to="/doctor" replace />;
       case 'Patient':
         return <Navigate to="/customer" replace />;
+      case 'Manager':
+        return <Navigate to="/manager" replace />;
       default:
         return <Navigate to="/" replace />;
     }
@@ -147,6 +150,15 @@ const AppRouter = () => {
         element={
           <ProtectedRoute allowedRoles={['Admin']}>
             <AdminDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/manager" 
+        element={
+          <ProtectedRoute allowedRoles={['Manager']}>
+            <ManagerDashboard />
           </ProtectedRoute>
         } 
       />

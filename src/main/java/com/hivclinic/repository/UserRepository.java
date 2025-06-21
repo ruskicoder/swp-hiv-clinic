@@ -22,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      */
     @Query("SELECT u FROM User u JOIN FETCH u.role WHERE u.userId = :userId")
     Optional<User> findByUserIdWithRole(@Param("userId") Integer userId);
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.role r WHERE r.roleName = :roleName")
+    long countByRoleName(@Param("roleName") String roleName);
 }
