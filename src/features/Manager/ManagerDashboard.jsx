@@ -27,6 +27,8 @@ const ManagerDashboard = () => {
   const [schedules, setSchedules] = useState([]);
   const [schedulesLoading, setSchedulesLoading] = useState(true);
   const [schedulesError, setSchedulesError] = useState('');
+  const [patientSearch, setPatientSearch] = useState("");
+  const [doctorSearch, setDoctorSearch] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -98,6 +100,61 @@ const ManagerDashboard = () => {
     }
   }, [activeTab]);
 
+  // Search patients
+  const handlePatientSearch = async (e) => {
+    const value = e.target.value;
+    setPatientSearch(value);
+    if (value.trim() === "") {
+      // Reload all patients
+      setPatientsLoading(true);
+      try {
+        const res = await apiClient.get('/manager/patients');
+        setPatients(res.data);
+      } catch {
+        setPatientsError('Không thể tải danh sách bệnh nhân.');
+      } finally {
+        setPatientsLoading(false);
+      }
+      return;
+    }
+    setPatientsLoading(true);
+    try {
+      const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
+      setPatients(res.data);
+    } catch {
+      setPatientsError('Không thể tìm kiếm bệnh nhân.');
+    } finally {
+      setPatientsLoading(false);
+    }
+  };
+
+  // Search doctors
+  const handleDoctorSearch = async (e) => {
+    const value = e.target.value;
+    setDoctorSearch(value);
+    if (value.trim() === "") {
+      setDoctorsLoading(true);
+      try {
+        const res = await apiClient.get('/manager/doctors');
+        setDoctors(res.data);
+      } catch {
+        setDoctorsError('Không thể tải danh sách bác sĩ.');
+      } finally {
+        setDoctorsLoading(false);
+      }
+      return;
+    }
+    setDoctorsLoading(true);
+    try {
+      const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
+      setDoctors(res.data);
+    } catch {
+      setDoctorsError('Không thể tìm kiếm bác sĩ.');
+    } finally {
+      setDoctorsLoading(false);
+    }
+  };
+
   return (
     <div className="manager-dashboard" style={{ display: 'flex', minHeight: '80vh' }}>
       <aside className="manager-sidebar" style={{ minWidth: 220, background: '#f1f5f9', padding: '2rem 1rem', borderRadius: 12, marginRight: 32 }}>
@@ -161,6 +218,13 @@ const ManagerDashboard = () => {
           {activeTab === 'patients' && (
             <section className="patients-section">
               <h2>Danh sách bệnh nhân</h2>
+              <input
+                type="text"
+                placeholder="Tìm kiếm tên bệnh nhân..."
+                value={patientSearch}
+                onChange={handlePatientSearch}
+                style={{ marginBottom: 16, padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0', width: 300 }}
+              />
               {patientsLoading ? (
                 <div>Đang tải danh sách bệnh nhân...</div>
               ) : patientsError ? (
@@ -204,6 +268,13 @@ const ManagerDashboard = () => {
           {activeTab === 'doctors' && (
             <section className="doctors-section">
               <h2>Danh sách bác sĩ</h2>
+              <input
+                type="text"
+                placeholder="Tìm kiếm tên hoặc chuyên khoa..."
+                value={doctorSearch}
+                onChange={handleDoctorSearch}
+                style={{ marginBottom: 16, padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0', width: 300 }}
+              />
               {doctorsLoading ? (
                 <div>Đang tải danh sách bác sĩ...</div>
               ) : doctorsError ? (
@@ -257,8 +328,8 @@ const ManagerDashboard = () => {
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>PatientUserID</th>
-                        <th>DoctorUserID</th>
+                        <th>Bệnh nhân</th>
+                        <th>Bác sĩ</th>
                         <th>Regimen</th>
                         <th>StartDate</th>
                         <th>EndDate</th>
@@ -272,8 +343,8 @@ const ManagerDashboard = () => {
                       {arvTreatments.map((arv, idx) => (
                         <tr key={arv.arvTreatmentID || idx}>
                           <td>{arv.arvTreatmentID}</td>
-                          <td>{arv.patientUserID}</td>
-                          <td>{arv.doctorUserID}</td>
+                          <td>{arv.patientName || '-'}</td>
+                          <td>{arv.doctorName || '-'}</td>
                           <td>{arv.regimen}</td>
                           <td>{arv.startDate}</td>
                           <td>{arv.endDate || '-'}</td>
