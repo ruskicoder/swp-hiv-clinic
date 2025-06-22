@@ -17,6 +17,10 @@ public class ManagerService {
     private ARVTreatmentRepository arvTreatmentRepository;
     @Autowired
     private DoctorAvailabilitySlotRepository doctorAvailabilitySlotRepository;
+    @Autowired
+    private PatientProfileRepository patientProfileRepository;
+    @Autowired
+    private PatientRecordRepository patientRecordRepository;
 
     public long getTotalPatients() {
         return userRepository.countByRoleName("Patient");
@@ -85,7 +89,6 @@ public class ManagerService {
             map.put("notes", arv.getNotes());
             map.put("isActive", arv.getIsActive());
             // Lấy tên bệnh nhân
-            String patientName = "";
             if (arv.getPatientUserID() != null) {
                 userRepository.findById(arv.getPatientUserID()).ifPresent(u -> {
                     map.put("patientName", (u.getFirstName() != null ? u.getFirstName() : "") + " " + (u.getLastName() != null ? u.getLastName() : ""));
@@ -103,5 +106,25 @@ public class ManagerService {
             }
             return map;
         }).toList();
+    }
+
+    public java.util.Optional<com.hivclinic.model.PatientProfile> getPatientProfile(Integer userId) {
+        return patientProfileRepository.findByUser_UserId(userId);
+    }
+
+    public java.util.List<com.hivclinic.model.PatientRecord> getPatientRecords(Integer userId) {
+        return patientRecordRepository.findAll().stream()
+            .filter(r -> r.getPatientUserID() != null && r.getPatientUserID().equals(userId))
+            .toList();
+    }
+
+    public java.util.Optional<com.hivclinic.model.PatientProfile> getPatientProfileByUserId(Integer userId) {
+        return patientProfileRepository.findByUser_UserId(userId);
+    }
+
+    public java.util.List<com.hivclinic.model.PatientRecord> getPatientRecordsByUserId(Integer userId) {
+        return patientRecordRepository.findAll().stream()
+            .filter(r -> r.getPatientUserID() != null && r.getPatientUserID().equals(userId))
+            .toList();
     }
 }

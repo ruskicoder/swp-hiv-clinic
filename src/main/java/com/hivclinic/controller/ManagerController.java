@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
@@ -84,6 +85,57 @@ public class ManagerController {
             return ResponseEntity.ok(results);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Không thể tìm kiếm bác sĩ: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/patients/{userId}/profile")
+    public ResponseEntity<?> getPatientProfile(@PathVariable Integer userId) {
+        try {
+            var profileOpt = managerService.getPatientProfile(userId);
+            if (profileOpt.isEmpty()) {
+                return ResponseEntity.status(404).body("Không tìm thấy hồ sơ bệnh nhân");
+            }
+            var profile = profileOpt.get();
+            // Lấy thông tin user liên kết
+            var user = profile.getUser();
+            java.util.Map<String, Object> result = new java.util.HashMap<>();
+            result.put("username", user != null ? user.getUsername() : "");
+            result.put("email", user != null ? user.getEmail() : "");
+            result.put("firstName", profile.getFirstName());
+            result.put("lastName", profile.getLastName());
+            result.put("dateOfBirth", profile.getDateOfBirth());
+            result.put("gender", profile.getGender());
+            result.put("address", profile.getAddress());
+            result.put("phoneNumber", profile.getPhoneNumber());
+            result.put("isActive", user != null ? user.getIsActive() : null);
+            result.put("profileImageBase64", profile.getProfileImageBase64());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể lấy thông tin hồ sơ bệnh nhân: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/patients/{userId}/records")
+    public ResponseEntity<?> getPatientRecords(@PathVariable Integer userId) {
+        try {
+            var records = managerService.getPatientRecords(userId);
+            return ResponseEntity.ok(records);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể lấy thông tin hồ sơ bệnh án: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/patient-profile/{userId}")
+    public ResponseEntity<?> getPatientProfileAndRecords(@PathVariable Integer userId) {
+        try {
+            var profileOpt = managerService.getPatientProfileByUserId(userId);
+            var records = managerService.getPatientRecordsByUserId(userId);
+            java.util.Map<String, Object> result = new java.util.HashMap<>();
+            result.put("profile", profileOpt.orElse(null));
+            result.put("records", records);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể lấy thông tin chi tiết bệnh nhân: " + e.getMessage());
         }
     }
 }

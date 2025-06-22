@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import UserProfileDropdown from '../../components/layout/UserProfileDropdown';
 import './ManagerDashboard.css';
@@ -29,6 +30,7 @@ const ManagerDashboard = () => {
   const [schedulesError, setSchedulesError] = useState('');
   const [patientSearch, setPatientSearch] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -246,7 +248,14 @@ const ManagerDashboard = () => {
                     <tbody>
                       {patients.map((p, idx) => (
                         <tr key={p.userId || idx}>
-                          <td>{p.username}</td>
+                          <td>
+                            <span
+                              style={{ color: '#059669', cursor: 'pointer', textDecoration: 'underline' }}
+                              onClick={() => navigate(`/manager/patients/${p.userId}`)}
+                            >
+                              {p.username}
+                            </span>
+                          </td>
                           <td>{p.email}</td>
                           <td>{p.firstName}</td>
                           <td>{p.lastName}</td>

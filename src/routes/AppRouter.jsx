@@ -12,6 +12,7 @@ const DoctorDashboard = React.lazy(() => import('../features/Doctor/DoctorDashbo
 const AdminDashboard = React.lazy(() => import('../features/Admin/AdminDashboard'));
 const Settings = React.lazy(() => import('../features/Settings/Settings'));
 const ManagerDashboard = React.lazy(() => import('../features/Manager/ManagerDashboard'));
+const PatientDetail = React.lazy(() => import('../features/Manager/PatientDetail'));
 
 /**
  * Loading component for lazy-loaded routes
@@ -168,6 +169,15 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/manager/patients/:userId" 
+        element={
+          <ProtectedRoute allowedRoles={['Manager']}>
+            <PatientDetail />
           </ProtectedRoute>
         } 
       />
