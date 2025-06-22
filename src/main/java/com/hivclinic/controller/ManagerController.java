@@ -46,4 +46,24 @@ public class ManagerController {
             return ResponseEntity.status(500).body("Không thể tải danh sách bác sĩ: " + e.getMessage());
         }
     }
+
+    @GetMapping("/arv-treatments")
+    public ResponseEntity<?> getAllARVTreatments() {
+        try {
+            var arvTreatments = managerService.getAllARVTreatments();
+            return ResponseEntity.ok(arvTreatments);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể tải danh sách phác đồ ARV: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/schedules")
+    public ResponseEntity<?> getAllSchedules() {
+        try {
+            var schedules = managerService.getAllSchedules();
+            return ResponseEntity.ok(schedules);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể tải danh sách lịch làm việc: " + e.getMessage());
+        }
+    }
 }

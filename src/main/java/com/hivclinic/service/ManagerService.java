@@ -15,6 +15,8 @@ public class ManagerService {
     private AppointmentRepository appointmentRepository;
     @Autowired
     private ARVTreatmentRepository arvTreatmentRepository;
+    @Autowired
+    private DoctorAvailabilitySlotRepository doctorAvailabilitySlotRepository;
 
     public long getTotalPatients() {
         return userRepository.countByRoleName("Patient");
@@ -42,5 +44,13 @@ public class ManagerService {
         return userRepository.findAll().stream()
             .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
             .toList();
+    }
+
+    public List<com.hivclinic.model.ARVTreatment> getAllARVTreatments() {
+        return arvTreatmentRepository.findAll();
+    }
+
+    public List<com.hivclinic.model.DoctorAvailabilitySlot> getAllSchedules() {
+        return doctorAvailabilitySlotRepository.findAll();
     }
 }
