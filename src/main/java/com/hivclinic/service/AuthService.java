@@ -85,6 +85,13 @@ public class AuthService {
             user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
             user.setRole(patientRole);
             user.setIsActive(true);
+            // Set firstname and lastname in Users table
+            user.setFirstName(registerRequest.getFirstName());
+            user.setLastName(registerRequest.getLastName());
+            // No specialty for patient registration
+            // Set createdAt and updatedAt
+            user.setCreatedAt(java.time.LocalDateTime.now());
+            user.setUpdatedAt(java.time.LocalDateTime.now());
 
             // Save user
             User savedUser = userRepository.save(user);
