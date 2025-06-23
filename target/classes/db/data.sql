@@ -20,6 +20,12 @@ BEGIN
     PRINT 'Admin role created';
 END
 
+IF NOT EXISTS (SELECT * FROM Roles WHERE RoleName = 'Manager')
+BEGIN
+    INSERT INTO Roles (RoleName) VALUES ('Manager');
+    PRINT 'Manager role created';
+END
+
 -- Insert initial specialties
 IF NOT EXISTS (SELECT * FROM Specialties WHERE SpecialtyName = 'HIV/AIDS Specialist')
 BEGIN
@@ -40,6 +46,35 @@ BEGIN
     INSERT INTO Specialties (SpecialtyName, Description, IsActive) 
     VALUES ('Internal Medicine', 'Internal medicine physician', 1);
     PRINT 'Internal Medicine specialty created';
+END
+
+-- Insert default admin user (password: admin123)
+DECLARE @AdminRoleId INT;
+SELECT @AdminRoleId = RoleID FROM Roles WHERE RoleName = 'Admin';
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'admin')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
+VALUES ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@hivclinic.com', @AdminRoleId, 1);
+END
+
+-- Insert sample doctor user (password: doctor123)
+DECLARE @DoctorRoleId INT;
+DECLARE @SpecialtyId INT;
+DECLARE @DoctorUserId INT;
+
+SELECT @DoctorRoleId = RoleID FROM Roles WHERE RoleName = 'Doctor';
+SELECT @SpecialtyId = SpecialtyID FROM Specialties WHERE SpecialtyName = 'HIV/AIDS Specialist';
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'doctor1')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
+VALUES ('doctor1', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'doctor1@hivclinic.com', @DoctorRoleId, 1);
+
+SELECT @DoctorUserId = SCOPE_IDENTITY();
+
+INSERT INTO DoctorProfiles (UserID, FirstName, LastName, SpecialtyID, PhoneNumber, Bio)
+VALUES (@DoctorUserId, 'Dr. John', 'Smith', @SpecialtyId, '+1234567890', 'Experienced HIV/AIDS specialist with 10+ years of practice.');
 END
 
 -- Insert system settings

@@ -17,10 +17,12 @@ CREATE TABLE Roles (
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
 CREATE TABLE Users (
-    UserID INT IDENTITY(1,1) PRIMARY KEY,
-    Username NVARCHAR(255) NOT NULL UNIQUE,
+    UserID INT IDENTITY(1,1) PRIMARY KEY,    Username NVARCHAR(255) NOT NULL UNIQUE,
     PasswordHash NVARCHAR(255) NOT NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE,
+    FirstName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL,
+    Specialty NVARCHAR(255) NULL,
     RoleID INT NOT NULL FOREIGN KEY REFERENCES Roles(RoleID),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
@@ -56,7 +58,8 @@ CREATE TABLE PatientProfiles (
     DateOfBirth DATE,
     PhoneNumber NVARCHAR(20),
     Address NVARCHAR(MAX),
-    ProfileImageBase64 NVARCHAR(MAX)
+    ProfileImageBase64 NVARCHAR(MAX),
+    IsPrivate BIT NOT NULL DEFAULT 0
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
@@ -153,13 +156,14 @@ CREATE TABLE ARVTreatments (
     ARVTreatmentID INT IDENTITY(1,1) PRIMARY KEY,
     PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     DoctorUserID INT FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT FOREIGN KEY REFERENCES Appointments(AppointmentID),
     Regimen NVARCHAR(255) NOT NULL,
     StartDate DATE NOT NULL,
     EndDate DATE,
     Adherence NVARCHAR(255),
     SideEffects NVARCHAR(MAX),
     Notes NVARCHAR(MAX),
-    ProfileImageBase64 NVARCHAR(MAX),
+    IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
@@ -178,12 +182,6 @@ END
 IF NOT EXISTS (SELECT * FROM Roles WHERE RoleName = 'Admin')
 BEGIN
     INSERT INTO Roles (RoleName) VALUES ('Admin');
-END
-
--- Insert manager role if not exists
-IF NOT EXISTS (SELECT * FROM Roles WHERE RoleName = 'Manager')
-BEGIN
-    INSERT INTO Roles (RoleName) VALUES ('Manager');
 END
 
 -- Insert initial specialties
@@ -205,6 +203,35 @@ BEGIN
     VALUES ('Internal Medicine', 'Internal medicine physician', 1);
 END
 
+-- Insert default admin user (password: admin123)
+DECLARE @AdminRoleId INT;
+SELECT @AdminRoleId = RoleID FROM Roles WHERE RoleName = 'Admin';
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'admin')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
+    VALUES ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@hivclinic.com', @AdminRoleId, 1);
+END
+
+-- Insert sample doctor user (password: doctor123)
+DECLARE @DoctorRoleId INT;
+DECLARE @SpecialtyId INT;
+DECLARE @DoctorUserId INT;
+
+SELECT @DoctorRoleId = RoleID FROM Roles WHERE RoleName = 'Doctor';
+SELECT @SpecialtyId = SpecialtyID FROM Specialties WHERE SpecialtyName = 'HIV/AIDS Specialist';
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'doctor1')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
+    VALUES ('doctor1', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'doctor1@hivclinic.com', @DoctorRoleId, 1);
+    
+    SELECT @DoctorUserId = SCOPE_IDENTITY();
+    
+    INSERT INTO DoctorProfiles (UserID, FirstName, LastName, SpecialtyID, PhoneNumber, Bio)
+    VALUES (@DoctorUserId, 'Dr. John', 'Smith', @SpecialtyId, '+1234567890', 'Experienced HIV/AIDS specialist with 10+ years of practice.');
+END
+
 -- Insert system settings
 IF NOT EXISTS (SELECT * FROM SystemSettings WHERE SettingKey = 'DefaultAppointmentDurationMinutes')
 BEGIN
@@ -216,6 +243,13 @@ IF NOT EXISTS (SELECT * FROM SystemSettings WHERE SettingKey = 'MaxBookingLeadDa
 BEGIN
     INSERT INTO SystemSettings (SettingKey, SettingValue, Description)
     VALUES ('MaxBookingLeadDays', '30', 'Maximum number of days in advance that appointments can be booked');
+END
+
+-- Add IsPrivate column to existing PatientProfiles table if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PatientProfiles') AND name = 'IsPrivate')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD IsPrivate BIT NOT NULL DEFAULT 0;
 END
 
 GO

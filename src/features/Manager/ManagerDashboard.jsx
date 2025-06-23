@@ -305,7 +305,14 @@ const ManagerDashboard = () => {
                     <tbody>
                       {doctors.map((d, idx) => (
                         <tr key={d.userId || idx}>
-                          <td>{d.username}</td>
+                          <td>
+                            <span
+                              style={{ color: '#059669', cursor: 'pointer', textDecoration: 'underline' }}
+                              onClick={() => navigate(`/manager/doctors/${d.userId}`)}
+                            >
+                              {d.username}
+                            </span>
+                          </td>
                           <td>{d.email}</td>
                           <td>{d.firstName}</td>
                           <td>{d.lastName}</td>

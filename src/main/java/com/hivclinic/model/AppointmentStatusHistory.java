@@ -52,4 +52,24 @@ public class AppointmentStatusHistory {
             changedAt = LocalDateTime.now();
         }
     }
+
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+    }
+
+    public void setOldStatus(String oldStatus) {
+        this.oldStatus = oldStatus;
+    }
+
+    public void setNewStatus(String newStatus) {
+        this.newStatus = newStatus;
+    }
+
+    public void setChangeReason(String changeReason) {
+        this.changeReason = changeReason;
+    }
+
+    public void setChangedByUser(User changedByUser) {
+        this.changedByUser = changedByUser;
+    }
 }

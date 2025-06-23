@@ -127,4 +127,71 @@ public class ManagerService {
             .filter(r -> r.getPatientUserID() != null && r.getPatientUserID().equals(userId))
             .toList();
     }
+
+    public java.util.Optional<User> getDoctorById(Integer userId) {
+        return userRepository.findById(userId).filter(u -> u.getRole() != null && "Doctor".equalsIgnoreCase(u.getRole().getRoleName()));
+    }
+
+    public java.util.List<java.util.Map<String, Object>> getARVTreatmentsByDoctor(Integer doctorUserId) {
+        return arvTreatmentRepository.findAll().stream()
+            .filter(arv -> doctorUserId.equals(arv.getDoctorUserID()))
+            .map(arv -> {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("arvTreatmentID", arv.getArvTreatmentID());
+                map.put("regimen", arv.getRegimen());
+                map.put("startDate", arv.getStartDate());
+                map.put("endDate", arv.getEndDate());
+                map.put("notes", arv.getNotes());
+                // Lấy tên bệnh nhân
+                if (arv.getPatientUserID() != null) {
+                    userRepository.findById(arv.getPatientUserID()).ifPresent(u -> {
+                        map.put("patientName", (u.getFirstName() != null ? u.getFirstName() : "") + " " + (u.getLastName() != null ? u.getLastName() : ""));
+                    });
+                } else {
+                    map.put("patientName", "-");
+                }
+                return map;
+            }).toList();
+    }
+
+    public java.util.List<java.util.Map<String, Object>> getAppointmentsByDoctorUserId(Integer doctorUserId) {
+        return appointmentRepository.findAll().stream()
+            .filter(a -> a.getDoctorUser() != null && a.getDoctorUser().getUserId().equals(doctorUserId))
+            .map(a -> {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("appointmentId", a.getAppointmentId());
+                map.put("patientName", a.getPatientUser() != null ? a.getPatientUser().getFirstName() + " " + a.getPatientUser().getLastName() : "-");
+                map.put("dateTime", a.getAppointmentDateTime());
+                map.put("status", a.getStatus());
+                map.put("notes", a.getAppointmentNotes());
+                return map;
+            }).toList();
+    }
+
+    public java.util.List<java.util.Map<String, Object>> getDoctorSlotsByUserId(Integer doctorUserId) {
+        return doctorAvailabilitySlotRepository.findAll().stream()
+            .filter(s -> s.getDoctorUser() != null && s.getDoctorUser().getUserId().equals(doctorUserId))
+            .map(s -> {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("slotId", s.getAvailabilitySlotId());
+                map.put("date", s.getSlotDate());
+                map.put("startTime", s.getStartTime());
+                map.put("endTime", s.getEndTime());
+                map.put("status", s.getIsBooked() != null && s.getIsBooked() ? "Booked" : "Available");
+                if (s.getIsBooked() != null && s.getIsBooked()) {
+                    // Find the appointment for this slot
+                    var appointments = appointmentRepository.findByAvailabilitySlot(s);
+                    if (!appointments.isEmpty()) {
+                        var appointment = appointments.get(0); // Most recent
+                        var patient = appointment.getPatientUser();
+                        if (patient != null) {
+                            map.put("bookedByName", (patient.getFirstName() != null ? patient.getFirstName() : "") + " " + (patient.getLastName() != null ? patient.getLastName() : ""));
+                            map.put("bookedByUsername", patient.getUsername());
+                            map.put("bookedByEmail", patient.getEmail());
+                        }
+                    }
+                }
+                return map;
+            }).toList();
+    }
 }
