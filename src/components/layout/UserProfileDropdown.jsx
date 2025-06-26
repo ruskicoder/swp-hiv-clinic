@@ -45,6 +45,9 @@ const UserProfileDropdown = () => {
       case 'patient':
         navigate('/customer');
         break;
+      case 'manager':
+        navigate('/manager');
+        break;
       default:
         navigate('/');
     }

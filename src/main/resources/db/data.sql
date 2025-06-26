@@ -77,6 +77,16 @@ INSERT INTO DoctorProfiles (UserID, FirstName, LastName, SpecialtyID, PhoneNumbe
 VALUES (@DoctorUserId, 'Dr. John', 'Smith', @SpecialtyId, '+1234567890', 'Experienced HIV/AIDS specialist with 10+ years of practice.');
 END
 
+-- Insert default manager user (password: manager123)
+DECLARE @ManagerRoleId INT;
+SELECT @ManagerRoleId = RoleID FROM Roles WHERE RoleName = 'Manager';
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'manager')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
+    VALUES ('manager', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'manager@hivclinic.com', @ManagerRoleId, 1);
+END
+
 -- Insert system settings
 IF NOT EXISTS (SELECT * FROM SystemSettings WHERE SettingKey = 'DefaultAppointmentDurationMinutes')
 BEGIN

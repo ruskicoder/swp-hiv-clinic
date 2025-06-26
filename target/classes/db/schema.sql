@@ -216,30 +216,23 @@ GO
 -- Add DurationMinutes column to DoctorAvailabilitySlots if it doesn't exist
 IF NOT EXISTS (
     SELECT * FROM sys.columns 
-    WHERE object_id = OBJECT_ID('DoctorAvailabilitySlots')
-    AND name = 'DurationMinutes'
+    WHERE object_id = OBJECT_ID('DoctorAvailabilitySlots') AND name = 'DurationMinutes'
 )
 BEGIN
-    ALTER TABLE DoctorAvailabilitySlots
-    ADD DurationMinutes INT NOT NULL DEFAULT 30;
+    ALTER TABLE DoctorAvailabilitySlots ADD DurationMinutes INT NULL;
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PatientProfiles') AND name = 'IsPrivate') ALTER TABLE PatientProfiles ADD IsPrivate BIT NOT NULL DEFAULT 0;
-
--- Update PatientRecords table if AppointmentId column doesn't exist
-IF NOT EXISTS (
-    SELECT * 
-    FROM INFORMATION_SCHEMA.COLUMNS 
-    WHERE TABLE_NAME = 'PatientRecords' 
-    AND COLUMN_NAME = 'AppointmentId'
-)
+-- Update PatientRecords table to allow nullable appointment ID and set ON DELETE SET NULL constraint
+IF EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
 BEGIN
-    ALTER TABLE PatientRecords
-    ADD AppointmentId INT,
-    CONSTRAINT FK_PatientRecords_Appointments 
-    FOREIGN KEY (AppointmentId) 
-    REFERENCES Appointments(AppointmentID)
+    DECLARE @constraintName NVARCHAR(200);
+    SELECT @constraintName = name FROM sys.foreign_keys WHERE parent_object_id = OBJECT_ID('PatientRecords') AND referenced_object_id = OBJECT_ID('Appointments');
+    IF @constraintName IS NOT NULL
+    BEGIN
+        EXEC('ALTER TABLE PatientRecords DROP CONSTRAINT ' + @constraintName);
+    END
+    ALTER TABLE PatientRecords WITH NOCHECK ADD CONSTRAINT FK_PatientRecords_Appointments FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL;
 END
 GO
 

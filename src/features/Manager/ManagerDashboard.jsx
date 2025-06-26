@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
-import UserProfileDropdown from '../../components/layout/UserProfileDropdown';
+import DashboardHeader from '../../components/layout/DashboardHeader';
 import './ManagerDashboard.css';
 
 const SIDEBAR_OPTIONS = [
-  { key: 'patients', label: 'Quản lý bệnh nhân' },
-  { key: 'doctors', label: 'Quản lý bác sĩ' },
-  { key: 'arv', label: 'Quản lý phác đồ ARV' },
-  { key: 'schedules', label: 'Quản lý lịch làm việc' },
+  { key: 'overview', label: 'Overview' },
+  { key: 'patients', label: 'Patient Management' },
+  { key: 'doctors', label: 'Doctor Management' },
+  { key: 'arv', label: 'ARV Regimen Management' },
+  { key: 'schedules', label: 'Schedule Management' },
 ];
 
 const ManagerDashboard = () => {
-  const [activeTab, setActiveTab] = useState('patients');
+  const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -33,52 +34,58 @@ const ManagerDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStats = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const res = await apiClient.get('/manager/stats');
-        setStats(res.data);
-      } catch (err) {
-        setError('Không thể tải dữ liệu thống kê.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
-  }, []);
+    if (activeTab === 'overview') {
+      const fetchStats = async () => {
+        setLoading(true);
+        setError('');
+        try {
+          const res = await apiClient.get('/manager/stats');
+          setStats(res.data);
+        } catch (err) {
+          setError('Failed to load statistics.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchStats();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      setPatientsLoading(true);
-      setPatientsError('');
-      try {
-        const res = await apiClient.get('/manager/patients');
-        setPatients(res.data);
-      } catch (err) {
-        setPatientsError('Không thể tải danh sách bệnh nhân.');
-      } finally {
-        setPatientsLoading(false);
-      }
-    };
-    fetchPatients();
-  }, []);
+    if (activeTab === 'patients') {
+      const fetchPatients = async () => {
+        setPatientsLoading(true);
+        setPatientsError('');
+        try {
+          const res = await apiClient.get('/manager/patients');
+          setPatients(res.data);
+        } catch (err) {
+          setPatientsError('Failed to load patient list.');
+        } finally {
+          setPatientsLoading(false);
+        }
+      };
+      fetchPatients();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      setDoctorsLoading(true);
-      setDoctorsError('');
-      try {
-        const res = await apiClient.get('/manager/doctors');
-        setDoctors(res.data);
-      } catch (err) {
-        setDoctorsError('Không thể tải danh sách bác sĩ.');
-      } finally {
-        setDoctorsLoading(false);
-      }
-    };
-    fetchDoctors();
-  }, []);
+    if (activeTab === 'doctors') {
+      const fetchDoctors = async () => {
+        setDoctorsLoading(true);
+        setDoctorsError('');
+        try {
+          const res = await apiClient.get('/manager/doctors');
+          setDoctors(res.data);
+        } catch (err) {
+          setDoctorsError('Failed to load doctor list.');
+        } finally {
+          setDoctorsLoading(false);
+        }
+      };
+      fetchDoctors();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === 'arv') {
@@ -86,7 +93,7 @@ const ManagerDashboard = () => {
       setArvError('');
       apiClient.get('/manager/arv-treatments')
         .then(res => setArvTreatments(res.data))
-        .catch(() => setArvError('Không thể tải danh sách phác đồ ARV.'))
+        .catch(() => setArvError('Failed to load ARV regimens.'))
         .finally(() => setArvLoading(false));
     }
   }, [activeTab]);
@@ -97,7 +104,7 @@ const ManagerDashboard = () => {
       setSchedulesError('');
       apiClient.get('/manager/schedules')
         .then(res => setSchedules(res.data))
-        .catch(() => setSchedulesError('Không thể tải danh sách lịch làm việc.'))
+        .catch(() => setSchedulesError('Failed to load schedules.'))
         .finally(() => setSchedulesLoading(false));
     }
   }, [activeTab]);
@@ -107,13 +114,12 @@ const ManagerDashboard = () => {
     const value = e.target.value;
     setPatientSearch(value);
     if (value.trim() === "") {
-      // Reload all patients
       setPatientsLoading(true);
       try {
         const res = await apiClient.get('/manager/patients');
         setPatients(res.data);
       } catch {
-        setPatientsError('Không thể tải danh sách bệnh nhân.');
+        setPatientsError('Failed to load patient list.');
       } finally {
         setPatientsLoading(false);
       }
@@ -124,7 +130,7 @@ const ManagerDashboard = () => {
       const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
       setPatients(res.data);
     } catch {
-      setPatientsError('Không thể tìm kiếm bệnh nhân.');
+      setPatientsError('Failed to search patients.');
     } finally {
       setPatientsLoading(false);
     }
@@ -140,7 +146,7 @@ const ManagerDashboard = () => {
         const res = await apiClient.get('/manager/doctors');
         setDoctors(res.data);
       } catch {
-        setDoctorsError('Không thể tải danh sách bác sĩ.');
+        setDoctorsError('Failed to load doctor list.');
       } finally {
         setDoctorsLoading(false);
       }
@@ -151,84 +157,86 @@ const ManagerDashboard = () => {
       const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
       setDoctors(res.data);
     } catch {
-      setDoctorsError('Không thể tìm kiếm bác sĩ.');
+      setDoctorsError('Failed to search doctors.');
     } finally {
       setDoctorsLoading(false);
     }
   };
 
   return (
-    <div className="manager-dashboard" style={{ display: 'flex', minHeight: '80vh' }}>
-      <aside className="manager-sidebar" style={{ minWidth: 220, background: '#f1f5f9', padding: '2rem 1rem', borderRadius: 12, marginRight: 32 }}>
-        <div style={{ marginBottom: 32 }}>
-          <UserProfileDropdown />
-        </div>
-        <nav>
-          {SIDEBAR_OPTIONS.map(opt => (
-            <div
-              key={opt.key}
-              className={`sidebar-option${activeTab === opt.key ? ' active' : ''}`}
-              style={{
-                padding: '0.75rem 1rem',
-                marginBottom: 8,
-                borderRadius: 8,
-                background: activeTab === opt.key ? '#059669' : 'transparent',
-                color: activeTab === opt.key ? '#fff' : '#1e293b',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onClick={() => setActiveTab(opt.key)}
-            >
-              {opt.label}
+    <div>
+      <DashboardHeader title="Manager Dashboard" />
+      <div className="manager-dashboard" style={{ display: 'flex', minHeight: '80vh' }}>
+        <aside className="manager-sidebar" style={{ minWidth: 220, background: '#f1f5f9', padding: '2rem 1rem', borderRadius: 12, marginRight: 32 }}>
+          <nav>
+            {SIDEBAR_OPTIONS.map(opt => (
+              <div
+                key={opt.key}
+                className={`sidebar-option${activeTab === opt.key ? ' active' : ''}`}
+                style={{
+                  padding: '0.75rem 1rem',
+                  marginBottom: 8,
+                  borderRadius: 8,
+                  background: activeTab === opt.key ? '#059669' : 'transparent',
+                  color: activeTab === opt.key ? '#fff' : '#1e293b',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                onClick={() => setActiveTab(opt.key)}
+              >
+                {opt.label}
+              </div>
+            ))}
+          </nav>
+        </aside>
+        <main style={{ flex: 1 }}>
+          {activeTab === 'overview' && (
+            <div>
+              <div className="manager-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h1>Manager Dashboard</h1>
+                  <p>System overview</p>
+                </div>
+              </div>
+              {loading ? (
+                <div>Loading data...</div>
+              ) : error ? (
+                <div style={{ color: 'red' }}>{error}</div>
+              ) : (
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <h3>Total Patients</h3>
+                    <div className="stat-number">{stats.totalPatients}</div>
+                  </div>
+                  <div className="stat-card">
+                    <h3>Total Doctors</h3>
+                    <div className="stat-number">{stats.totalDoctors}</div>
+                  </div>
+                  <div className="stat-card">
+                    <h3>Total Appointments</h3>
+                    <div className="stat-number">{stats.totalAppointments}</div>
+                  </div>
+                  <div className="stat-card">
+                    <h3>Total ARV Regimens</h3>
+                    <div className="stat-number">{stats.totalARVTreatments}</div>
+                  </div>
+                </div>
+              )}
             </div>
-          ))}
-        </nav>
-      </aside>
-      <main style={{ flex: 1 }}>
-        <div className="manager-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h1>Manager Dashboard</h1>
-            <p>Giám sát tổng quan hệ thống</p>
-          </div>
-        </div>
-        {loading ? (
-          <div>Đang tải dữ liệu...</div>
-        ) : error ? (
-          <div style={{ color: 'red' }}>{error}</div>
-        ) : (
-          <div className="stats-grid">
-            <div className="stat-card">
-              <h3>Số bệnh nhân</h3>
-              <div className="stat-number">{stats.totalPatients}</div>
-            </div>
-            <div className="stat-card">
-              <h3>Số bác sĩ</h3>
-              <div className="stat-number">{stats.totalDoctors}</div>
-            </div>
-            <div className="stat-card">
-              <h3>Số cuộc hẹn</h3>
-              <div className="stat-number">{stats.totalAppointments}</div>
-            </div>
-            <div className="stat-card">
-              <h3>Tổng số ARV</h3>
-              <div className="stat-number">{stats.totalARVTreatments}</div>
-            </div>
-          </div>
-        )}
-        <div style={{ marginTop: 32 }}>
+          )}
           {activeTab === 'patients' && (
             <section className="patients-section">
-              <h2>Danh sách bệnh nhân</h2>
+              <h2>Patient List</h2>
               <input
                 type="text"
-                placeholder="Tìm kiếm tên bệnh nhân..."
+                placeholder="Search patient name..."
                 value={patientSearch}
                 onChange={handlePatientSearch}
                 style={{ marginBottom: 16, padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0', width: 300 }}
               />
               {patientsLoading ? (
-                <div>Đang tải danh sách bệnh nhân...</div>
+                <div>Loading patient list...</div>
               ) : patientsError ? (
                 <div style={{ color: 'red' }}>{patientsError}</div>
               ) : (
@@ -276,16 +284,16 @@ const ManagerDashboard = () => {
           )}
           {activeTab === 'doctors' && (
             <section className="doctors-section">
-              <h2>Danh sách bác sĩ</h2>
+              <h2>Doctor List</h2>
               <input
                 type="text"
-                placeholder="Tìm kiếm tên hoặc chuyên khoa..."
+                placeholder="Search name or specialty..."
                 value={doctorSearch}
                 onChange={handleDoctorSearch}
                 style={{ marginBottom: 16, padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0', width: 300 }}
               />
               {doctorsLoading ? (
-                <div>Đang tải danh sách bác sĩ...</div>
+                <div>Loading doctor list...</div>
               ) : doctorsError ? (
                 <div style={{ color: 'red' }}>{doctorsError}</div>
               ) : (
@@ -333,9 +341,9 @@ const ManagerDashboard = () => {
           )}
           {activeTab === 'arv' && (
             <section className="arv-section">
-              <h2>Danh sách phác đồ ARV</h2>
+              <h2>ARV Regimen List</h2>
               {arvLoading ? (
-                <div>Đang tải danh sách phác đồ ARV...</div>
+                <div>Loading ARV regimens...</div>
               ) : arvError ? (
                 <div style={{ color: 'red' }}>{arvError}</div>
               ) : (
@@ -344,13 +352,13 @@ const ManagerDashboard = () => {
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>Bệnh nhân</th>
-                        <th>Bác sĩ</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
                         <th>Regimen</th>
-                        <th>StartDate</th>
-                        <th>EndDate</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
                         <th>Adherence</th>
-                        <th>SideEffects</th>
+                        <th>Side Effects</th>
                         <th>Notes</th>
                         <th>Status</th>
                       </tr>
@@ -378,9 +386,9 @@ const ManagerDashboard = () => {
           )}
           {activeTab === 'schedules' && (
             <section className="schedules-section">
-              <h2>Danh sách lịch làm việc</h2>
+              <h2>Schedule List</h2>
               {schedulesLoading ? (
-                <div>Đang tải danh sách lịch làm việc...</div>
+                <div>Loading schedules...</div>
               ) : schedulesError ? (
                 <div style={{ color: 'red' }}>{schedulesError}</div>
               ) : (
@@ -389,12 +397,12 @@ const ManagerDashboard = () => {
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>DoctorUserID</th>
-                        <th>Ngày</th>
-                        <th>Bắt đầu</th>
-                        <th>Kết thúc</th>
-                        <th>Đã đặt?</th>
-                        <th>Ghi chú</th>
+                        <th>Doctor User ID</th>
+                        <th>Date</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Booked?</th>
+                        <th>Notes</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -405,7 +413,7 @@ const ManagerDashboard = () => {
                           <td>{s.slotDate}</td>
                           <td>{s.startTime}</td>
                           <td>{s.endTime}</td>
-                          <td>{s.isBooked ? 'Đã đặt' : 'Trống'}</td>
+                          <td>{s.isBooked ? 'Booked' : 'Available'}</td>
                           <td>{s.notes || '-'}</td>
                         </tr>
                       ))}
@@ -415,8 +423,8 @@ const ManagerDashboard = () => {
               )}
             </section>
           )}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

@@ -558,15 +558,15 @@ const [appointments, setAppointments] = useState([]);
     );
   }
 
+  // Use the same sidebar style as ManagerDashboard
   return (
     <div className="admin-dashboard">
       <DashboardHeader 
         title="Admin Portal"
       />
-      
       <div className="dashboard-layout">
-        {/* Vertical Sidebar */}
-        <div className="dashboard-sidebar">
+        {/* Sidebar styled like manager-dashboard */}
+        <div className="manager-sidebar">
           <div className="sidebar-header">
             <h1>Navigation</h1>
           </div>
@@ -574,7 +574,7 @@ const [appointments, setAppointments] = useState([]);
             {navigationItems.map(item => (
               <div key={item.id} className="nav-item">
                 <button
-                  className={`nav-button ${activeTab === item.id ? 'active' : ''}`}
+                  className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
                   onClick={() => setActiveTab(item.id)}
                 >
                   <span className="nav-icon">{item.icon}</span>
@@ -582,7 +582,6 @@ const [appointments, setAppointments] = useState([]);
                 </button>
               </div>
             ))}
-            {/* Remove logout button here */}
           </nav>
         </div>
         {/* Main Content */}
