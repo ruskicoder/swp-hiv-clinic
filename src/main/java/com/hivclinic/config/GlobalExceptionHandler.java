@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,26 @@ public class GlobalExceptionHandler {
         
         logger.warn("Validation error: {}", errors);
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String parameterName = ex.getName();
+        String invalidValue = ex.getValue() != null ? ex.getValue().toString() : "null";
+        String expectedType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown";
+        
+        String errorMessage;
+        if ("NaN".equals(invalidValue)) {
+            errorMessage = String.format("Invalid value for %s. Please select a valid option.", parameterName);
+        } else {
+            errorMessage = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s", 
+                    invalidValue, parameterName, expectedType);
+        }
+        
+        logger.warn("Type mismatch error - Parameter: {}, Value: {}, Expected Type: {}", 
+                parameterName, invalidValue, expectedType);
+        
+        return ResponseEntity.badRequest().body(MessageResponse.error(errorMessage));
     }
 
     @ExceptionHandler(BadCredentialsException.class)

@@ -75,24 +75,33 @@ public class ARVTreatment {
         updatedAt = LocalDateTime.now();
     }
 
-    // Getter methods for compatibility
-    public Integer getArvTreatmentID() {
-        return arvTreatmentID;
-    }
+    // Getters
+    public Integer getArvTreatmentID() { return arvTreatmentID; }
+    public Integer getPatientUserID() { return patientUserID; }
+    public Integer getDoctorUserID() { return doctorUserID; }
+    public Integer getAppointmentID() { return appointmentID; }
+    public String getRegimen() { return regimen; }
+    public LocalDate getStartDate() { return startDate; }
+    public LocalDate getEndDate() { return endDate; }
+    public String getAdherence() { return adherence; }
+    public String getSideEffects() { return sideEffects; }
+    public String getNotes() { return notes; }
+    public Boolean getIsActive() { return isActive; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    public Integer getPatientUserID() {
-        return patientUserID;
-    }
-
-    public Integer getDoctorUserID() {
-        return doctorUserID;
-    }
-
-    public Integer getAppointmentID() {
-        return appointmentID;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
+    // Setters
+    public void setArvTreatmentID(Integer arvTreatmentID) { this.arvTreatmentID = arvTreatmentID; }
+    public void setPatientUserID(Integer patientUserID) { this.patientUserID = patientUserID; }
+    public void setDoctorUserID(Integer doctorUserID) { this.doctorUserID = doctorUserID; }
+    public void setAppointmentID(Integer appointmentID) { this.appointmentID = appointmentID; }
+    public void setRegimen(String regimen) { this.regimen = regimen; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public void setAdherence(String adherence) { this.adherence = adherence; }
+    public void setSideEffects(String sideEffects) { this.sideEffects = sideEffects; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

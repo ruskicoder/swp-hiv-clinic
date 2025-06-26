@@ -17,10 +17,12 @@ CREATE TABLE Roles (
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
 CREATE TABLE Users (
-    UserID INT IDENTITY(1,1) PRIMARY KEY,
-    Username NVARCHAR(255) NOT NULL UNIQUE,
+    UserID INT IDENTITY(1,1) PRIMARY KEY,    Username NVARCHAR(255) NOT NULL UNIQUE,
     PasswordHash NVARCHAR(255) NOT NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE,
+    FirstName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL,
+    Specialty NVARCHAR(255) NULL,
     RoleID INT NOT NULL FOREIGN KEY REFERENCES Roles(RoleID),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
@@ -56,7 +58,8 @@ CREATE TABLE PatientProfiles (
     DateOfBirth DATE,
     PhoneNumber NVARCHAR(20),
     Address NVARCHAR(MAX),
-    ProfileImageBase64 NVARCHAR(MAX)
+    ProfileImageBase64 NVARCHAR(MAX),
+    IsPrivate BIT NOT NULL DEFAULT 0
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
@@ -153,13 +156,14 @@ CREATE TABLE ARVTreatments (
     ARVTreatmentID INT IDENTITY(1,1) PRIMARY KEY,
     PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     DoctorUserID INT FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT FOREIGN KEY REFERENCES Appointments(AppointmentID),
     Regimen NVARCHAR(255) NOT NULL,
     StartDate DATE NOT NULL,
     EndDate DATE,
     Adherence NVARCHAR(255),
     SideEffects NVARCHAR(MAX),
     Notes NVARCHAR(MAX),
-    ProfileImageBase64 NVARCHAR(MAX),
+    IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
@@ -239,6 +243,13 @@ IF NOT EXISTS (SELECT * FROM SystemSettings WHERE SettingKey = 'MaxBookingLeadDa
 BEGIN
     INSERT INTO SystemSettings (SettingKey, SettingValue, Description)
     VALUES ('MaxBookingLeadDays', '30', 'Maximum number of days in advance that appointments can be booked');
+END
+
+-- Add IsPrivate column to existing PatientProfiles table if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PatientProfiles') AND name = 'IsPrivate')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD IsPrivate BIT NOT NULL DEFAULT 0;
 END
 
 GO

@@ -11,6 +11,9 @@ const CustomerDashboard = React.lazy(() => import('../features/Customer/Customer
 const DoctorDashboard = React.lazy(() => import('../features/Doctor/DoctorDashboard'));
 const AdminDashboard = React.lazy(() => import('../features/Admin/AdminDashboard'));
 const Settings = React.lazy(() => import('../features/Settings/Settings'));
+const ManagerDashboard = React.lazy(() => import('../features/Manager/ManagerDashboard'));
+const PatientDetail = React.lazy(() => import('../features/Manager/PatientDetail'));
+const DoctorDetail = React.lazy(() => import('../features/Manager/DoctorDetail'));
 
 /**
  * Loading component for lazy-loaded routes
@@ -73,6 +76,8 @@ const PublicRoute = ({ children }) => {
         return <Navigate to="/doctor" replace />;
       case 'Patient':
         return <Navigate to="/customer" replace />;
+      case 'Manager':
+        return <Navigate to="/manager" replace />;
       default:
         return <Navigate to="/" replace />;
     }
@@ -152,10 +157,37 @@ const AppRouter = () => {
       />
       
       <Route 
+        path="/manager" 
+        element={
+          <ProtectedRoute allowedRoles={['Manager']}>
+            <ManagerDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
         path="/settings" 
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/manager/patients/:userId" 
+        element={
+          <ProtectedRoute allowedRoles={['Manager']}>
+            <PatientDetail />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/manager/doctors/:userId" 
+        element={
+          <ProtectedRoute allowedRoles={['Manager']}>
+            <DoctorDetail />
           </ProtectedRoute>
         } 
       />

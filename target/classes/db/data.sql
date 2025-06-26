@@ -20,6 +20,12 @@ BEGIN
     PRINT 'Admin role created';
 END
 
+IF NOT EXISTS (SELECT * FROM Roles WHERE RoleName = 'Manager')
+BEGIN
+    INSERT INTO Roles (RoleName) VALUES ('Manager');
+    PRINT 'Manager role created';
+END
+
 -- Insert initial specialties
 IF NOT EXISTS (SELECT * FROM Specialties WHERE SpecialtyName = 'HIV/AIDS Specialist')
 BEGIN

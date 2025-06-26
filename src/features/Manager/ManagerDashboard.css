@@ -1,0 +1,172 @@
+.manager-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  color: #1f2937;
+}
+
+.manager-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.manager-header h1 {
+  color: #059669;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #f0fdfa 60%, #e0f2fe 100%);
+  color: #059669;
+  border: 1px solid #e2e8f0;
+  padding: 1.1rem 1rem 1.1rem 1rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  min-width: 0;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 18px rgba(5, 150, 105, 0.13);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.stat-card h3 {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.stat-number {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #059669;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* Sidebar styles */
+.manager-sidebar {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 2rem 1rem;
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-option {
+  padding: 0.75rem 1rem;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar-option.active {
+  background: #059669;
+  color: #fff;
+}
+
+/* Table styles */
+.patients-table,
+.doctors-table,
+.arv-table,
+.schedules-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  margin-top: 1rem;
+}
+
+.patients-table th,
+.doctors-table th,
+.arv-table th,
+.schedules-table th {
+  background: #f0fdfa;
+  color: #059669;
+  font-weight: 700;
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.98rem;
+}
+
+.patients-table td,
+.doctors-table td,
+.arv-table td,
+.schedules-table td {
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.97rem;
+}
+
+.patients-table tr:last-child td,
+.doctors-table tr:last-child td,
+.arv-table tr:last-child td,
+.schedules-table tr:last-child td {
+  border-bottom: none;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  border-radius: 8px;
+  font-size: 0.85em;
+  font-weight: 600;
+  background: #e0f2fe;
+  color: #059669;
+}
+
+.status-badge.active {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.status-badge.inactive {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Section headings */
+.patients-section h2,
+.doctors-section h2,
+.arv-section h2,
+.schedules-section h2 {
+  color: #059669;
+  font-size: 1.3rem;
+  margin-bottom: 0.7rem;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .manager-dashboard {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .manager-sidebar {
+    margin-right: 0;
+    margin-bottom: 1.5rem;
+    min-width: 0;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.7rem;
+  }
+}

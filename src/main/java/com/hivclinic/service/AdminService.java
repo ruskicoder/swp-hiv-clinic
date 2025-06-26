@@ -83,6 +83,17 @@ public class AdminService {
             user.setPasswordHash(passwordEncoder.encode(password));
             user.setRole(doctorRole);
             user.setIsActive(true);
+            // Set firstname, lastname, and specialty in Users table
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            if (specialty != null) {
+                user.setSpecialty(specialty.getSpecialtyName());
+            } else {
+                user.setSpecialty(null);
+            }
+            // Set createdAt and updatedAt
+            user.setCreatedAt(java.time.LocalDateTime.now());
+            user.setUpdatedAt(java.time.LocalDateTime.now());
 
             // Save user
             User savedUser = userRepository.save(user);

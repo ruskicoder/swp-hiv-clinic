@@ -18,10 +18,12 @@ CREATE TABLE Roles (
 -- Users Table: Stores common information for all authenticated users
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
 CREATE TABLE Users (
-    UserID INT PRIMARY KEY IDENTITY(1,1),
-    Username VARCHAR(255) NOT NULL UNIQUE,
+    UserID INT PRIMARY KEY IDENTITY(1,1),    Username VARCHAR(255) NOT NULL UNIQUE,
     PasswordHash VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL UNIQUE,
+    FirstName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL,
+    Specialty NVARCHAR(255) NULL,
     RoleID INT NOT NULL,
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
@@ -178,21 +180,19 @@ CREATE TABLE PasswordResetTokens (
 -- ARVTreatments Table: Enhanced for better treatment management
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ARVTreatments' AND xtype='U')
 CREATE TABLE ARVTreatments (
-    PatientUserID INT NOT NULL,
-    DoctorUserID INT NULL,
-    AppointmentID INT NULL, -- Link to the appointment where this treatment was prescribed
+    ARVTreatmentID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    DoctorUserID INT FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT FOREIGN KEY REFERENCES Appointments(AppointmentID),
     Regimen NVARCHAR(255) NOT NULL,
     StartDate DATE NOT NULL,
-    EndDate DATE NULL, -- NULL means ongoing treatment
-    Adherence NVARCHAR(255) NULL, -- e.g., 'Good', 'Fair', 'Poor'
-    SideEffects NVARCHAR(MAX) NULL,
-    Notes NVARCHAR(MAX) NULL,
-    IsActive BIT DEFAULT 1, -- Whether this treatment is currently active
+    EndDate DATE,
+    Adherence NVARCHAR(255),
+    SideEffects NVARCHAR(MAX),
+    Notes NVARCHAR(MAX),
+    IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE SET NULL ON UPDATE NO ACTION,
-    FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL ON UPDATE NO ACTION
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
 
 -- Add AppointmentNotes column to Appointments table if not exists
@@ -226,5 +226,21 @@ END
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PatientProfiles') AND name = 'IsPrivate') ALTER TABLE PatientProfiles ADD IsPrivate BIT NOT NULL DEFAULT 0;
+
+-- Update PatientRecords table if AppointmentId column doesn't exist
+IF NOT EXISTS (
+    SELECT * 
+    FROM INFORMATION_SCHEMA.COLUMNS 
+    WHERE TABLE_NAME = 'PatientRecords' 
+    AND COLUMN_NAME = 'AppointmentId'
+)
+BEGIN
+    ALTER TABLE PatientRecords
+    ADD AppointmentId INT,
+    CONSTRAINT FK_PatientRecords_Appointments 
+    FOREIGN KEY (AppointmentId) 
+    REFERENCES Appointments(AppointmentID)
+END
+GO
 
 PRINT 'Database schema created successfully!';

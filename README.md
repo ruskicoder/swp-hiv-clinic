@@ -1,210 +1,129 @@
-# HIV Medical Treatment System
+# SWP HIV Clinic
 
-A comprehensive web application for managing HIV medical treatment with appointment booking functionality.
+A web application for managing HIV clinic operations.
 
-## Features
+## Project Setup
 
-- User authentication and role-based access control
-- Appointment booking and management
-- Doctor availability management
-- Patient and doctor profiles
-- Admin dashboard for system oversight
+1. **Clone the repository:**
 
-## Technology Stack
+   ```bash
+   git clone https://github.com/ruskicoder/swp-hiv-clinic.git
+   cd swp-hiv-clinic
+   ```
 
-### Backend
+2. **Install dependencies:**
 
-- Spring Boot 3.2.0
-- Spring Security with JWT authentication
-- Spring Data JPA
-- Microsoft SQL Server
-- Maven
+   ```bash
+   npm install
+   ```
 
-### Frontend
+   or
 
-- React 18
-- Vite
-- Axios for API communication
-- React Router for navigation
+   ```bash
+   yarn install
+   ```
 
----
+3. **Configure environment variables:**
+   - Copy `.env.example` to `.env` and update the values as needed.
 
-## Getting Started
+4. **Run database migrations (if applicable):**
 
-### Prerequisites
+   ```bash
+   npm run migrate
+   ```
 
-- Node.js (v16+ recommended)
-- npm (v8+ recommended)
-- Java 17+
-- Maven
-- Microsoft SQL Server (local or remote)
+5. **Start the development server:**
 
-### 1. Database Setup
+   ```bash
+   npm run dev
+   ```
 
-#### Windows
-- Run `setup-database.bat` and follow the prompts.
-- Or manually:
-  1. Start SQL Server.
-  2. Open SQL Server Management Studio.
-  3. Run `src/main/resources/db/schema.sql` and then `src/main/resources/db/data.sql`.
+   The app will be available at `http://localhost:4000` (or as configured).
 
-#### Linux/Mac
-- Run `./setup-database.sh` in the project root.
-- This will create the database, tables, and insert initial data.
+## API Documentation
 
-#### Test Database
-- Run `./test-database.sh` to verify database connectivity and data.
+### Base URL
 
-#### Default Accounts
-- **Admin:** username: `admin`, password: `admin123`
-- **Doctor:** username: `doctor1`, password: `doctor123`
-- **Patient:** username: `patient1`, password: `patient123`
-
-### 2. Backend Setup
-
-```bash
-cd d:/DATA/Github/swp-hiv-clinic
-mvn spring-boot:run
+```text
+http://localhost:4000/api
 ```
-- The backend will start at `http://localhost:8080/api`
-- Health check: [http://localhost:8080/api/health](http://localhost:8080/api/health)
 
-### 3. Frontend Setup
+### Example Endpoints
 
-```bash
-cd d:/DATA/Github/swp-hiv-clinic
-npm install
-npm run dev
-```
-- The frontend will start at [http://localhost:3000](http://localhost:3000)
+#### `GET /api/patients`
 
----
+- **Description:** Retrieve a list of all patients.
+- **Response:**
 
-## API Documentation for Frontend Developers
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "dob": "1990-01-01",
+      "status": "active"
+    }
+    // ...
+  ]
+  ```
 
-All endpoints are prefixed with `/api`.
+#### `POST /api/patients`
 
-### Authentication
-| Method | Endpoint                | Description                  |
-|--------|------------------------|------------------------------|
-| POST   | `/auth/login`          | User login                   |
-| POST   | `/auth/register`       | User registration            |
-| GET    | `/auth/check-username` | Check username availability  |
-| GET    | `/auth/check-email`    | Check email availability     |
-| GET    | `/auth/me`             | Get current user profile     |
-| PUT    | `/auth/profile`        | Update user profile          |
-| POST   | `/auth/profile-image`  | Update profile image         |
+- **Description:** Create a new patient record.
+- **Request Body:**
 
-### Patient Endpoints
-| Method | Endpoint                                      | Description                                 |
-|--------|-----------------------------------------------|---------------------------------------------|
-| GET    | `/appointments/patient/my-appointments`       | Get all patient appointments                |
-| GET    | `/appointments/patient/upcoming`              | Get upcoming appointments                   |
-| POST   | `/appointments/book`                          | Book an appointment                         |
-| PUT    | `/appointments/{appointmentId}/cancel`        | Cancel an appointment                       |
-| GET    | `/patient-records/my-record`                  | Get own medical record                      |
-| PUT    | `/patient-records/my-record`                  | Update own medical record                   |
-| POST   | `/patient-records/upload-image`               | Upload image to medical record              |
-| GET    | `/arv-treatments/my-treatments`               | Get own ARV treatment history               |
-| GET    | `/patients/privacy-settings`                  | Get privacy mode                            |
-| POST   | `/patients/privacy-settings`                  | Set privacy mode                            |
+  ```json
+  {
+    "name": "Jane Smith",
+    "dob": "1985-05-12",
+    "status": "active"
+  }
+  ```
 
-### Doctor Endpoints
-| Method | Endpoint                                         | Description                                 |
-|--------|--------------------------------------------------|---------------------------------------------|
-| GET    | `/appointments/doctor/my-appointments`           | Get all doctor appointments                 |
-| GET    | `/doctors/availability/my-slots`                 | Get doctor's availability slots             |
-| POST   | `/doctors/availability`                          | Add availability slot                       |
-| DELETE | `/doctors/availability/{slotId}`                 | Delete availability slot                    |
-| GET    | `/appointments/{appointmentId}/patient-record`   | Get patient record for appointment          |
-| PUT    | `/appointments/{appointmentId}/status`           | Update appointment status/details           |
-| PUT    | `/patient-records/patient/{patientId}`           | Update patient record                       |
-| POST   | `/arv-treatments/add`                            | Add ARV treatment for patient               |
-| GET    | `/arv-treatments/patient/{patientId}`            | Get ARV treatments for patient              |
-| PUT    | `/arv-treatments/{treatmentId}/edit`             | Edit ARV treatment                          |
-| PUT    | `/arv-treatments/{treatmentId}/deactivate`       | Deactivate ARV treatment                    |
-| DELETE | `/arv-treatments/{treatmentId}`                  | Delete ARV treatment                        |
+- **Response:** Returns the created patient object.
 
-### Admin Endpoints
-| Method | Endpoint                              | Description                                 |
-|--------|---------------------------------------|---------------------------------------------|
-| GET    | `/admin/health`                       | Health check                                |
-| GET    | `/admin/users`                        | List all users                              |
-| GET    | `/admin/patients`                     | List all patients                           |
-| GET    | `/admin/doctors`                      | List all doctors                            |
-| GET    | `/admin/appointments`                 | List all appointments                       |
-| GET    | `/admin/specialties`                  | List all specialties                        |
-| POST   | `/admin/doctors`                      | Create doctor account                       |
-| PUT    | `/admin/users/{userId}/toggle-status` | Activate/deactivate user                    |
-| PUT    | `/admin/users/{userId}/reset-password`| Reset user password                         |
-| POST   | `/admin/specialties`                  | Create new specialty                        |
+#### `GET /api/appointments`
 
-### Health Endpoints
-| Method | Endpoint           | Description                |
-|--------|--------------------|----------------------------|
-| GET    | `/health`          | Basic health check         |
-| GET    | `/health/db`       | Database connectivity      |
-| GET    | `/health/status`   | System status              |
+- **Description:** List all appointments.
 
----
+#### `POST /api/appointments`
 
-## How to Use and Test API Endpoints
+- **Description:** Create a new appointment.
 
-1. **Get a JWT Token:**
-   - Use `/auth/login` to authenticate and receive a token.
-   - Example:
-     ```bash
-     curl -X POST http://localhost:8080/api/auth/login \
-       -H "Content-Type: application/json" \
-       -d '{"username":"patient1","password":"patient123"}'
-     ```
-   - The response will include a `token` field.
+> For detailed API documentation, see the [API docs](docs/api.md) or use the OpenAPI/Swagger UI if available at `/api-docs`.
 
-2. **Include the Token:**
-   - For protected endpoints, add `Authorization: Bearer <token>` to your request headers.
+## Testing
 
-3. **Test with Postman or curl:**
-   - Set method, URL, headers, and body as needed.
-   - For file uploads, use `multipart/form-data` if required.
-   - Example (get appointments):
-     ```bash
-     curl -H "Authorization: Bearer <token>" \
-       http://localhost:8080/api/appointments/patient/my-appointments
-     ```
+1. **Run all tests:**
 
-4. **Check Responses:**
-   - Success: HTTP 200/201 with JSON data.
-   - Error: HTTP 400/401/403/500 with error message.
+   ```bash
+   npm test
+   ```
 
-5. **Refer to Frontend Service Files:**
-   - See `src/services/apiClient.js` and `src/services/authService.js` for example usage.
+   or
 
-6. **For endpoints with `{id}` in the path:**
-   - Replace with the actual resource ID.
+   ```bash
+   yarn test
+   ```
 
-7. **For more details on request/response payloads:**
-   - See backend controller JavaDocs or inspect API responses in your browser's network tab.
+2. **Run tests with coverage:**
 
----
+   ```bash
+   npm run test:coverage
+   ```
 
-## Troubleshooting
+3. **Testing tools:**  
+   - Unit tests: [Jest](https://jestjs.io/) or [Mocha](https://mochajs.org/)
+   - API tests: [Supertest](https://github.com/visionmedia/supertest)
 
-- **Connection refused:** Check if SQL Server and backend are running.
-- **Login failed:** Verify username/password and database setup.
-- **Port conflicts:** Ensure ports 8080 (backend) and 3000 (frontend) are available.
-- **CORS issues:** The backend is configured to allow all origins for development.
+4. **Add new tests:**  
+   Place test files in the `tests/` directory, following the naming convention `*.test.js`.
 
----
+## Contributing
 
-## Useful Scripts
+- Fork the repository and create your branch.
+- Submit a pull request with a clear description of your changes.
 
-- `setup-database.bat` / `setup-database.sh`: Setup database and initial data.
-- `test-database.sh`: Test database connectivity and data.
-- `start-application.sh`: Start both backend and frontend together (Linux/Mac).
+## License
 
----
-
-## Support
-
-- For issues, check the application logs or open an issue on GitHub.
-- For more details, see the code comments and service/controller files.
+This project is licensed under the MIT License.

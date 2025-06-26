@@ -73,4 +73,28 @@ public class DoctorAvailabilitySlot {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    // Getters
+    public Integer getAvailabilitySlotId() { return availabilitySlotId; }
+    public User getDoctorUser() { return doctorUser; }
+    public LocalDate getSlotDate() { return slotDate; }
+    public LocalTime getStartTime() { return startTime; }
+    public LocalTime getEndTime() { return endTime; }
+    public Boolean getIsBooked() { return isBooked; }
+    public String getNotes() { return notes; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public Appointment getAppointment() { return appointment; }
+
+    // Setters
+    public void setAvailabilitySlotId(Integer availabilitySlotId) { this.availabilitySlotId = availabilitySlotId; }
+    public void setDoctorUser(User doctorUser) { this.doctorUser = doctorUser; }
+    public void setSlotDate(LocalDate slotDate) { this.slotDate = slotDate; }
+    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+    public void setIsBooked(Boolean isBooked) { this.isBooked = isBooked; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setAppointment(Appointment appointment) { this.appointment = appointment; }
 }

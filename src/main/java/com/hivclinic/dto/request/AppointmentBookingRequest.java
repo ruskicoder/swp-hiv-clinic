@@ -71,4 +71,20 @@ public class AppointmentBookingRequest {
         throw new IllegalArgumentException("Invalid datetime format: " + appointmentDateTime 
             + ". Expected format: yyyy-MM-ddTHH:mm:ss or similar ISO format");
     }
+
+    public Integer getDoctorUserId() {
+        return doctorUserId;
+    }
+
+    public Integer getAvailabilitySlotId() {
+        return availabilitySlotId;
+    }
+
+    public String getAppointmentDateTime() {
+        return appointmentDateTime;
+    }
+
+    public Integer getDurationMinutes() {
+        return durationMinutes;
+    }
 }

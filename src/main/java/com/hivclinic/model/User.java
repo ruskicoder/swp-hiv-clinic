@@ -3,10 +3,6 @@ package com.hivclinic.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 /**
@@ -14,9 +10,6 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "Users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class User {
 
     @Id
@@ -34,6 +27,15 @@ public class User {
     @Column(name = "Email", nullable = false, unique = true)
     private String email;
 
+    @Column(name = "FirstName")
+    private String firstName;
+
+    @Column(name = "LastName")
+    private String lastName;
+
+    @Column(name = "Specialty")
+    private String specialty;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "RoleID", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -48,49 +50,29 @@ public class User {
     @Column(name = "UpdatedAt", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Transient fields for display purposes (not persisted)
-    @Transient
-    private String firstName;
+    // Getters
+    public Integer getUserId() { return userId; }
+    public String getUsername() { return username; }
+    public String getPasswordHash() { return passwordHash; }
+    public String getEmail() { return email; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getSpecialty() { return specialty; }
+    public Role getRole() { return role; }
+    public Boolean getIsActive() { return isActive; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    @Transient
-    private String lastName;
-
-    @Transient
-    private String specialty;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    // Getters and setters for transient fields
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getSpecialty() {
-        return specialty;
-    }
-
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
-    }
+    // Setters
+    public void setUserId(Integer userId) { this.userId = userId; }
+    public void setUsername(String username) { this.username = username; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public void setEmail(String email) { this.email = email; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setSpecialty(String specialty) { this.specialty = specialty; }
+    public void setRole(Role role) { this.role = role; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
