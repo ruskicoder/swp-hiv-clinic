@@ -561,35 +561,26 @@ const [appointments, setAppointments] = useState([]);
   // Use the same sidebar style as ManagerDashboard
   return (
     <div className="admin-dashboard">
-      <DashboardHeader 
-        title="Admin Portal"
-      />
+      <DashboardHeader title="Admin Dashboard" subtitle="System overview and management" />
       <div className="dashboard-layout">
-        {/* Sidebar styled like manager-dashboard */}
-        <div className="manager-sidebar">
-          <div className="sidebar-header">
-            <h1>Navigation</h1>
-          </div>
-          <nav className="dashboard-nav">
-            {navigationItems.map(item => (
-              <div key={item.id} className="nav-item">
-                <button
-                  className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
-                  onClick={() => setActiveTab(item.id)}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  {item.label}
-                </button>
-              </div>
-            ))}
-          </nav>
-        </div>
-        {/* Main Content */}
-        <div className="dashboard-main">
-          <div className="dashboard-content">
-            {renderContent()}
-          </div>
-        </div>
+        <aside className="manager-sidebar">
+          {navigationItems.map(item => (
+            <button
+              key={item.id}
+              className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
+              onClick={() => setActiveTab(item.id)}
+            >
+              {item.icon} {item.label}
+            </button>
+          ))}
+        </aside>
+        <main className="dashboard-main">
+          {activeTab === 'overview' && renderOverview()}
+          {activeTab === 'users' && renderUsers()}
+          {activeTab === 'doctors' && renderDoctors()}
+          {activeTab === 'appointments' && renderAppointments()}
+          {activeTab === 'create-doctor' && <CreateDoctorForm />}
+        </main>
       </div>
     </div>
   );
