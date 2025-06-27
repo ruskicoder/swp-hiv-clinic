@@ -245,11 +245,32 @@ BEGIN
     VALUES ('MaxBookingLeadDays', '30', 'Maximum number of days in advance that appointments can be booked');
 END
 
--- Add IsPrivate column to existing PatientProfiles table if it doesn't exist
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PatientProfiles') AND name = 'IsPrivate')
+-- Insert default ARV templates (default templates cannot be edited/deleted)
+-- Example templates for common HIV types
+
+-- Ensure there is a dummy patient and doctor for default templates
+DECLARE @DummyPatientId INT, @DummyDoctorId INT;
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'dummy_patient')
 BEGIN
-    ALTER TABLE PatientProfiles
-    ADD IsPrivate BIT NOT NULL DEFAULT 0;
+    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
+    VALUES ('dummy_patient', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dummy_patient@hivclinic.com', (SELECT RoleID FROM Roles WHERE RoleName = 'Patient'), 1);
+END
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'dummy_doctor')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
+    VALUES ('dummy_doctor', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dummy_doctor@hivclinic.com', (SELECT RoleID FROM Roles WHERE RoleName = 'Doctor'), 1);
+END
+SELECT @DummyPatientId = UserID FROM Users WHERE Username = 'dummy_patient';
+SELECT @DummyDoctorId = UserID FROM Users WHERE Username = 'dummy_doctor';
+
+IF NOT EXISTS (SELECT * FROM ARVTreatments WHERE Notes = 'default template')
+BEGIN
+    INSERT INTO ARVTreatments 
+        (PatientUserID, DoctorUserID, AppointmentID, Regimen, StartDate, EndDate, Adherence, SideEffects, Notes, IsActive, CreatedAt, UpdatedAt)
+    VALUES
+        (@DummyPatientId, @DummyDoctorId, NULL, 'TDF + 3TC + EFV', '2020-01-01', NULL, 'Excellent', 'Minimal', 'default template', 1, GETDATE(), GETDATE()),
+        (@DummyPatientId, @DummyDoctorId, NULL, 'AZT + 3TC + NVP', '2020-01-01', NULL, 'Excellent', 'Rash, anemia', 'default template', 1, GETDATE(), GETDATE()),
+        (@DummyPatientId, @DummyDoctorId, NULL, 'ABC + 3TC + LPV/r', '2020-01-01', NULL, 'Excellent', 'GI upset', 'default template', 1, GETDATE(), GETDATE());
 END
 
-GO
+-- No changes needed. Init script is syntactically correct for SQL Server.

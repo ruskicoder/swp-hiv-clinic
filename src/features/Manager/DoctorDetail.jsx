@@ -105,17 +105,25 @@ const DoctorDetail = () => {
                   <th>Ngày bắt đầu</th>
                   <th>Ngày kết thúc</th>
                   <th>Ghi chú</th>
+                  <th>Loại</th>
                 </tr>
               </thead>
               <tbody>
                 {arvTreatments.map(t => (
-                  <tr key={t.arvTreatmentID}>
-                    <td>{t.arvTreatmentID}</td>
+                  <tr key={t.arvTreatmentId}>
+                    <td>{t.arvTreatmentId}</td>
                     <td>{t.patientName || '-'}</td>
                     <td>{t.regimen || '-'}</td>
                     <td>{t.startDate || '-'}</td>
                     <td>{t.endDate || '-'}</td>
                     <td>{t.notes || '-'}</td>
+                    <td>
+                      {t.notes === 'default template'
+                        ? 'Default'
+                        : t.notes === 'template'
+                        ? 'Template'
+                        : 'Custom'}
+                    </td>
                   </tr>
                 ))}
               </tbody>

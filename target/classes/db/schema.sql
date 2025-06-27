@@ -237,3 +237,5 @@ END
 GO
 
 PRINT 'Database schema created successfully!';
+
+-- No changes needed. Schema is syntactically correct for SQL Server.

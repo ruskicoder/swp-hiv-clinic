@@ -10,10 +10,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * ARVTreatment entity for storing ARV treatment records
+ * ARVTreatment entity for storing ARV treatment records.
+ * Maps to the ARVTreatments table in the database.
  */
 @Entity
-@Table(name = "ARVTreatments")
+@Table(name = "ARVTreatments") // Table name must match schema: ARVTreatments
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
