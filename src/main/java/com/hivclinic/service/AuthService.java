@@ -1,11 +1,14 @@
 package com.hivclinic.service;
 
+import com.hivclinic.exception.ResourceNotFoundException;
+
 import com.hivclinic.config.JwtUtils;
 import com.hivclinic.dto.request.LoginRequest;
 import com.hivclinic.dto.request.RegisterRequest;
 import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
+import com.hivclinic.model.DoctorProfile;
 import com.hivclinic.model.PatientProfile;
 import com.hivclinic.model.Role;
 import com.hivclinic.model.User;
@@ -82,6 +85,13 @@ public class AuthService {
             user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
             user.setRole(patientRole);
             user.setIsActive(true);
+            // Set firstname and lastname in Users table
+            user.setFirstName(registerRequest.getFirstName());
+            user.setLastName(registerRequest.getLastName());
+            // No specialty for patient registration
+            // Set createdAt and updatedAt
+            user.setCreatedAt(java.time.LocalDateTime.now());
+            user.setUpdatedAt(java.time.LocalDateTime.now());
 
             // Save user
             User savedUser = userRepository.save(user);
@@ -204,24 +214,32 @@ public class AuthService {
 
         // Doctor profile
         if ("Doctor".equalsIgnoreCase(role)) {
-            return doctorProfileRepository.findByUser(user)
-                .map(profile -> new UserProfileResponse(
-                    user.getUserId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    role,
-                    user.getIsActive(),
-                    user.getCreatedAt(),
-                    profile.getFirstName(),
-                    profile.getLastName(),
-                    profile.getPhoneNumber(),
-                    null, // dateOfBirth
-                    null, // address
-                    profile.getSpecialty() != null ? profile.getSpecialty().getSpecialtyName() : null,
-                    profile.getBio(),
-                    profile.getProfileImageBase64()
-                ))
-                .orElseThrow(() -> new RuntimeException("Doctor profile not found"));
+            var doctorProfile = doctorProfileRepository.findByUser(user)
+                .orElseGet(() -> {
+                    // Create default doctor profile if not exists
+                    DoctorProfile newProfile = new DoctorProfile();
+                    newProfile.setUser(user);
+                    newProfile.setFirstName(user.getUsername()); // Default to username
+                    newProfile.setLastName("");
+                    return doctorProfileRepository.save(newProfile);
+                });
+
+            return new UserProfileResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                role,
+                user.getIsActive(),
+                user.getCreatedAt(),
+                doctorProfile.getFirstName(),
+                doctorProfile.getLastName(),
+                doctorProfile.getPhoneNumber(),
+                null, // dateOfBirth
+                null, // address
+                doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
+                doctorProfile.getBio(),
+                doctorProfile.getProfileImageBase64()
+            );
         }
 
         // Admin or other roles: basic info only
@@ -278,7 +296,7 @@ public class AuthService {
                 if (lastName != null) profile.setLastName(lastName);
                 if (phoneNumber != null) profile.setPhoneNumber(phoneNumber);
                 if (bio != null) profile.setBio(bio);
-                doctorProfileRepository.save(profile);
+                doctorProfileRepository.save(profile); // ensure save after update
             }
             // Optionally update email on user entity if needed
             return MessageResponse.success("Profile updated successfully!");
@@ -286,5 +304,98 @@ public class AuthService {
             logger.error("Error updating profile: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to update profile: " + e.getMessage());
         }
+    }
+
+    /**
+     * Update profile image for current user (Patient or Doctor)
+     */
+    @Transactional
+    public MessageResponse updateProfileImage(Integer userId, String base64Image) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return MessageResponse.error("User not found");
+        }
+        User user = userOpt.get();
+        String role = user.getRole().getRoleName();
+
+        try {
+            if ("Patient".equalsIgnoreCase(role)) {
+                var profileOpt = patientProfileRepository.findByUser(user);
+                if (profileOpt.isEmpty()) return MessageResponse.error("Patient profile not found");
+                var profile = profileOpt.get();
+                profile.setProfileImageBase64(base64Image);
+                patientProfileRepository.save(profile);
+            } else if ("Doctor".equalsIgnoreCase(role)) {
+                var profileOpt = doctorProfileRepository.findByUser(user);
+                if (profileOpt.isEmpty()) return MessageResponse.error("Doctor profile not found");
+                var profile = profileOpt.get();
+                profile.setProfileImageBase64(base64Image);
+                doctorProfileRepository.save(profile);
+            } else {
+                return MessageResponse.error("Profile image upload not supported for this role");
+            }
+            return MessageResponse.success("Profile image uploaded successfully");
+        } catch (Exception e) {
+            logger.error("Error updating profile image: {}", e.getMessage(), e);
+            return MessageResponse.error("Failed to update profile image: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get user profile by User (for internal use, e.g., admin panel)
+     */
+    public UserProfileResponse getUserProfile(User user) {
+        String role = user.getRole().getRoleName();
+
+        // Doctor profile
+        if ("Doctor".equalsIgnoreCase(role)) {
+            var doctorProfile = doctorProfileRepository.findByUser(user)
+                .orElseGet(() -> {
+                    // Create default doctor profile if not exists
+                    DoctorProfile newProfile = new DoctorProfile();
+                    newProfile.setUser(user);
+                    newProfile.setFirstName(user.getUsername()); // Default to username
+                    newProfile.setLastName("");
+                    return doctorProfileRepository.save(newProfile);
+                });
+
+            return new UserProfileResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                role,
+                user.getIsActive(),
+                user.getCreatedAt(),
+                doctorProfile.getFirstName(),
+                doctorProfile.getLastName(),
+                doctorProfile.getPhoneNumber(),
+                null, // dateOfBirth
+                null, // address
+                doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
+                doctorProfile.getBio(),
+                doctorProfile.getProfileImageBase64()
+            );
+        }
+
+        // Patient profile
+        var patientProfile = patientProfileRepository.findByUser(user)
+            .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
+
+        return new UserProfileResponse(
+            user.getUserId(),
+            user.getUsername(),
+            user.getEmail(),
+            role,
+            user.getIsActive(),
+            user.getCreatedAt(),
+            patientProfile.getFirstName(),
+            patientProfile.getLastName(),
+            patientProfile.getPhoneNumber(),
+            patientProfile.getDateOfBirth(),
+            patientProfile.getAddress(),
+            null, // specialty (not applicable for patients)
+            null, // bio (not applicable for patients)
+            patientProfile.getProfileImageBase64()
+        );
     }
 }

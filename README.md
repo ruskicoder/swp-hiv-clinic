@@ -1,59 +1,129 @@
-# HIV Medical Treatment System - Backend
+# SWP HIV Clinic
 
-A comprehensive Spring Boot backend API for managing HIV medical treatment with appointment booking functionality.
+A web application for managing HIV clinic operations.
 
-## Features
+## Project Setup
 
-- User authentication and role-based access control with JWT
-- RESTful API for appointment booking and management
-- Doctor availability management
-- Patient and doctor profile management
-- Admin dashboard API endpoints
-- Microsoft SQL Server integration
+1. **Clone the repository:**
 
-## Technology Stack
+   ```bash
+   git clone https://github.com/ruskicoder/swp-hiv-clinic.git
+   cd swp-hiv-clinic
+   ```
 
-### Backend
+2. **Install dependencies:**
 
-- Spring Boot 3.2.0
-- Spring Security with JWT authentication
-- Spring Data JPA
-- Microsoft SQL Server
-- Maven
+   ```bash
+   npm install
+   ```
 
-## API Endpoints
+   or
 
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User authentication
-- `GET /api/auth/me` - Get current user profile
-- `PUT /api/auth/profile` - Update user profile
-### Appointments
-- `GET /api/appointments/patient/my-appointments` - Get patient appointments
-- `GET /api/appointments/doctor/my-appointments` - Get doctor appointments
-- `POST /api/appointments/book` - Book new appointment
-- `PUT /api/appointments/{id}/cancel` - Cancel appointment
+   ```bash
+   yarn install
+   ```
 
-### Doctors
-- `GET /api/doctors` - Get all doctors
-- `GET /api/doctors/{id}/available-slots` - Get doctor availability
-- `POST /api/doctors/availability` - Add availability slot
-- `DELETE /api/doctors/availability/{id}` - Remove availability slot
+3. **Configure environment variables:**
+   - Copy `.env.example` to `.env` and update the values as needed.
 
-### Admin
-- `GET /api/admin/users` - Get all users
-- `GET /api/admin/doctors` - Get all doctors
-- `GET /api/admin/appointments` - Get all appointments
-- `POST /api/admin/doctors` - Create doctor account
-## Getting Started
+4. **Run database migrations (if applicable):**
 
-### Prerequisites
+   ```bash
+   npm run migrate
+   ```
 
-- Java 17 or higher
-- Maven 3.6+
-- Microsoft SQL Server
+5. **Start the development server:**
 
-### Database Setup
+   ```bash
+   npm run dev
+   ```
 
-1. Run the database setup script:
+   The app will be available at `http://localhost:4000` (or as configured).
 
+## API Documentation
+
+### Base URL
+
+```text
+http://localhost:4000/api
+```
+
+### Example Endpoints
+
+#### `GET /api/patients`
+
+- **Description:** Retrieve a list of all patients.
+- **Response:**
+
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "dob": "1990-01-01",
+      "status": "active"
+    }
+    // ...
+  ]
+  ```
+
+#### `POST /api/patients`
+
+- **Description:** Create a new patient record.
+- **Request Body:**
+
+  ```json
+  {
+    "name": "Jane Smith",
+    "dob": "1985-05-12",
+    "status": "active"
+  }
+  ```
+
+- **Response:** Returns the created patient object.
+
+#### `GET /api/appointments`
+
+- **Description:** List all appointments.
+
+#### `POST /api/appointments`
+
+- **Description:** Create a new appointment.
+
+> For detailed API documentation, see the [API docs](docs/api.md) or use the OpenAPI/Swagger UI if available at `/api-docs`.
+
+## Testing
+
+1. **Run all tests:**
+
+   ```bash
+   npm test
+   ```
+
+   or
+
+   ```bash
+   yarn test
+   ```
+
+2. **Run tests with coverage:**
+
+   ```bash
+   npm run test:coverage
+   ```
+
+3. **Testing tools:**  
+   - Unit tests: [Jest](https://jestjs.io/) or [Mocha](https://mochajs.org/)
+   - API tests: [Supertest](https://github.com/visionmedia/supertest)
+
+4. **Add new tests:**  
+   Place test files in the `tests/` directory, following the naming convention `*.test.js`.
+
+## Contributing
+
+- Fork the repository and create your branch.
+- Submit a pull request with a clear description of your changes.
+
+## License
+
+This project is licensed under the MIT License.

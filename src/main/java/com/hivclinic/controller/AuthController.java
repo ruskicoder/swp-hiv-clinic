@@ -18,8 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST Controller for authentication operations
- * Handles user registration, login, and profile management
+ * Authentication controller for handling user registration, login, and profile operations
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -30,6 +29,7 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
     /**
      * Register a new user account
      */
@@ -37,6 +37,15 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
             logger.info("Registration attempt for username: {}", registerRequest.getUsername());
+            
+            // Validate password confirmation
+            if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
+                logger.warn("Password confirmation mismatch for username: {}", registerRequest.getUsername());
+                return ResponseEntity.badRequest().body(MessageResponse.builder()
+                    .success(false)
+                    .message("Password and confirmation password do not match")
+                    .build());
+            }
             
             MessageResponse response = authService.registerUser(registerRequest);
             
@@ -74,7 +83,7 @@ public class AuthController {
     }
 
     /**
-     * Get current user profile
+     * Get current user profile - Updated endpoint path
      */
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
@@ -90,6 +99,80 @@ public class AuthController {
             logger.error("Error fetching profile for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to get user profile: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Alternative profile endpoint for compatibility
+     */
+    @GetMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+        return getCurrentUser(userPrincipal);
+    }
+
+    /**
+     * Update user profile
+     */
+    @PutMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateProfile(
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
+            @RequestBody java.util.Map<String, String> profileData) {
+        try {
+            logger.debug("Updating profile for user: {}", userPrincipal.getUsername());
+            
+            MessageResponse response = authService.updateUserProfile(
+                userPrincipal.getId(),
+                profileData.get("firstName"),
+                profileData.get("lastName"),
+                profileData.get("phoneNumber"),
+                profileData.get("dateOfBirth"),
+                profileData.get("address"),
+                profileData.get("bio")
+            );
+            
+            if (response.isSuccess()) {
+                logger.info("Profile updated successfully for user: {}", userPrincipal.getUsername());
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+        } catch (Exception e) {
+            logger.error("Error updating profile for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to update profile: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Update profile image
+     */
+    @PostMapping("/profile-image")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updateProfileImage(
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
+            @RequestBody java.util.Map<String, String> imageData) {
+        try {
+            logger.debug("Updating profile image for user: {}", userPrincipal.getUsername());
+            
+            MessageResponse response = authService.updateProfileImage(
+                userPrincipal.getId(),
+                imageData.get("imageData")
+            );
+            
+            if (response.isSuccess()) {
+                logger.info("Profile image updated successfully for user: {}", userPrincipal.getUsername());
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+        } catch (Exception e) {
+            logger.error("Error updating profile image for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to update profile image: " + e.getMessage()));
         }
     }
 
@@ -112,7 +195,7 @@ public class AuthController {
             logger.error("Error checking username {}: {}", username, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to check username: " + e.getMessage()));
-}
+        }
     }
 
     /**
@@ -127,53 +210,13 @@ public class AuthController {
             
             return ResponseEntity.ok(MessageResponse.builder()
                     .success(!exists)
-                    .message(exists ? "Email is already registered" : "Email is available")
+                    .message(exists ? "Email is already in use" : "Email is available")
                     .build());
                     
         } catch (Exception e) {
             logger.error("Error checking email {}: {}", email, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to check email: " + e.getMessage()));
-        }
-    }
-
-    /**
-     * Health check endpoint
-     */
-    @GetMapping("/health")
-    public ResponseEntity<?> healthCheck() {
-        return ResponseEntity.ok(MessageResponse.success("Auth service is running"));
-    }
-
-    /**
-     * Update current user profile (firstName, lastName, etc.)
-     */
-    @PutMapping("/profile")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> updateProfile(
-            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
-            @RequestBody(required = true) java.util.Map<String, Object> payload
-    ) {
-        try {
-            String firstName = (String) payload.getOrDefault("firstName", null);
-            String lastName = (String) payload.getOrDefault("lastName", null);
-            String phoneNumber = (String) payload.getOrDefault("phoneNumber", null);
-            String dateOfBirth = (String) payload.getOrDefault("dateOfBirth", null);
-            String address = (String) payload.getOrDefault("address", null);
-            String bio = (String) payload.getOrDefault("bio", null);
-
-            MessageResponse response = authService.updateUserProfile(
-                userPrincipal.getId(), firstName, lastName, phoneNumber, dateOfBirth, address, bio
-            );
-            if (response.isSuccess()) {
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.badRequest().body(response);
-            }
-        } catch (Exception e) {
-            logger.error("Error updating profile for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to update profile: " + e.getMessage()));
         }
     }
 }

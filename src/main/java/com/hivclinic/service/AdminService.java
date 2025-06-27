@@ -83,6 +83,17 @@ public class AdminService {
             user.setPasswordHash(passwordEncoder.encode(password));
             user.setRole(doctorRole);
             user.setIsActive(true);
+            // Set firstname, lastname, and specialty in Users table
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            if (specialty != null) {
+                user.setSpecialty(specialty.getSpecialtyName());
+            } else {
+                user.setSpecialty(null);
+            }
+            // Set createdAt and updatedAt
+            user.setCreatedAt(java.time.LocalDateTime.now());
+            user.setUpdatedAt(java.time.LocalDateTime.now());
 
             // Save user
             User savedUser = userRepository.save(user);
@@ -128,9 +139,20 @@ public class AdminService {
      * Get all doctors
      */
     public List<User> getAllDoctors() {
-        return userRepository.findAll().stream()
+        List<User> doctors = userRepository.findAll().stream()
                 .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
                 .toList();
+        // Attach doctor profile info for each doctor
+        for (User doctor : doctors) {
+            doctorProfileRepository.findByUser(doctor).ifPresent(profile -> {
+                doctor.setFirstName(profile.getFirstName());
+                doctor.setLastName(profile.getLastName());
+                if (profile.getSpecialty() != null) {
+                    doctor.setSpecialty(profile.getSpecialty().getSpecialtyName());
+                }
+            });
+        }
+        return doctors;
     }
 
     /**

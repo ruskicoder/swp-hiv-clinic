@@ -18,10 +18,12 @@ CREATE TABLE Roles (
 -- Users Table: Stores common information for all authenticated users
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
 CREATE TABLE Users (
-    UserID INT PRIMARY KEY IDENTITY(1,1),
-    Username VARCHAR(255) NOT NULL UNIQUE,
+    UserID INT PRIMARY KEY IDENTITY(1,1),    Username VARCHAR(255) NOT NULL UNIQUE,
     PasswordHash VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL UNIQUE,
+    FirstName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL,
+    Specialty NVARCHAR(255) NULL,
     RoleID INT NOT NULL,
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
@@ -64,7 +66,28 @@ CREATE TABLE PatientProfiles (
     PhoneNumber NVARCHAR(20) NULL,
     Address NVARCHAR(MAX) NULL,
     ProfileImageBase64 NVARCHAR(MAX) NULL,
+    IsPrivate BIT NOT NULL DEFAULT 0,
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
+-- PatientRecords Table: Enhanced for better medical record management
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
+CREATE TABLE PatientRecords (
+    RecordID INT PRIMARY KEY IDENTITY(1,1),
+    PatientUserID INT NOT NULL,
+    AppointmentId INT NULL,
+    MedicalHistory NVARCHAR(MAX) NULL,
+    Allergies NVARCHAR(MAX) NULL,
+    CurrentMedications NVARCHAR(MAX) NULL,
+    Notes NVARCHAR(MAX) NULL,
+    BloodType NVARCHAR(10) NULL,
+    EmergencyContact NVARCHAR(255) NULL,
+    EmergencyPhone NVARCHAR(20) NULL,
+    ProfileImageBase64 NVARCHAR(MAX) NULL, -- for base64 image upload
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL
 );
 
 -- DoctorAvailabilitySlots Table: Doctors define their work slots
@@ -95,6 +118,7 @@ CREATE TABLE Appointments (
     Status VARCHAR(50) NOT NULL DEFAULT 'Scheduled', -- e.g., 'Scheduled', 'Completed', 'CancelledByPatient', 'CancelledByDoctor', 'NoShow'
     PatientCancellationReason NVARCHAR(MAX) NULL,
     DoctorCancellationReason NVARCHAR(MAX) NULL,
+    AppointmentNotes NVARCHAR(MAX) NULL, -- Doctor's notes during/after appointment
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION ON UPDATE NO ACTION, -- Don't delete appointments if patient is deleted without review
@@ -152,5 +176,64 @@ CREATE TABLE PasswordResetTokens (
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE -- If user is deleted, their reset tokens are also deleted
 );
+
+-- ARVTreatments Table: Enhanced for better treatment management
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ARVTreatments' AND xtype='U')
+CREATE TABLE ARVTreatments (
+    ARVTreatmentID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    DoctorUserID INT FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT FOREIGN KEY REFERENCES Appointments(AppointmentID),
+    Regimen NVARCHAR(255) NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE,
+    Adherence NVARCHAR(255),
+    SideEffects NVARCHAR(MAX),
+    Notes NVARCHAR(MAX),
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+-- Add AppointmentNotes column to Appointments table if not exists
+IF COL_LENGTH('Appointments', 'AppointmentNotes') IS NULL
+    ALTER TABLE Appointments ADD AppointmentNotes NVARCHAR(MAX) NULL;
+
+-- Update PatientRecords table to allow nullable appointment ID 
+IF EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
+ALTER TABLE PatientRecords
+    DROP CONSTRAINT IF EXISTS FK_PatientRecords_Appointments;
+GO
+
+IF EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
+ALTER TABLE PatientRecords 
+    ADD CONSTRAINT FK_PatientRecords_Appointments 
+    FOREIGN KEY (AppointmentId) 
+    REFERENCES Appointments(AppointmentID)
+    ON DELETE SET NULL;
+GO
+
+-- Add DurationMinutes column to DoctorAvailabilitySlots if it doesn't exist
+IF NOT EXISTS (
+    SELECT * FROM sys.columns 
+    WHERE object_id = OBJECT_ID('DoctorAvailabilitySlots') AND name = 'DurationMinutes'
+)
+BEGIN
+    ALTER TABLE DoctorAvailabilitySlots ADD DurationMinutes INT NULL;
+END
+GO
+
+-- Update PatientRecords table to allow nullable appointment ID and set ON DELETE SET NULL constraint
+IF EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
+BEGIN
+    DECLARE @constraintName NVARCHAR(200);
+    SELECT @constraintName = name FROM sys.foreign_keys WHERE parent_object_id = OBJECT_ID('PatientRecords') AND referenced_object_id = OBJECT_ID('Appointments');
+    IF @constraintName IS NOT NULL
+    BEGIN
+        EXEC('ALTER TABLE PatientRecords DROP CONSTRAINT ' + @constraintName);
+    END
+    ALTER TABLE PatientRecords WITH NOCHECK ADD CONSTRAINT FK_PatientRecords_Appointments FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL;
+END
+GO
 
 PRINT 'Database schema created successfully!';

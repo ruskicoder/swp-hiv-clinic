@@ -24,9 +24,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        return UserPrincipal.create(user);
+        // Always use ROLE_ prefix
+        String roleWithPrefix = user.getRole().getRoleName().startsWith("ROLE_") 
+            ? user.getRole().getRoleName()
+            : "ROLE_" + user.getRole().getRoleName().toUpperCase();
+
+        return UserPrincipal.build(user, roleWithPrefix);
     }
 
     /**
@@ -52,7 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         private Boolean isActive;
         private List<GrantedAuthority> authorities;
 
-        public UserPrincipal(Integer id, String username, String email, String password, 
+        public UserPrincipal(Integer id, String username, String email, String password,
                             String role, Boolean isActive, List<GrantedAuthority> authorities) {
             this.id = id;
             this.username = username;
@@ -65,8 +70,26 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         public static UserPrincipal create(User user) {
             List<GrantedAuthority> authorities = new ArrayList<>();
-            // Add role as authority with ROLE_ prefix (Spring Security convention)
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName().toUpperCase()));
+            // Add role as authority with ROLE_ prefix if not already present
+            String roleWithPrefix = user.getRole().getRoleName().startsWith("ROLE_")
+                    ? user.getRole().getRoleName()
+                    : "ROLE_" + user.getRole().getRoleName().toUpperCase();
+            authorities.add(new SimpleGrantedAuthority(roleWithPrefix));
+
+            return new UserPrincipal(
+                    user.getUserId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getPasswordHash(),
+                    roleWithPrefix,  // Store the full role name with prefix
+                    user.getIsActive(),
+                    authorities
+            );
+        }
+
+        public static UserPrincipal build(User user, String roleWithPrefix) {
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(roleWithPrefix));
 
             return new UserPrincipal(
                     user.getUserId(),
