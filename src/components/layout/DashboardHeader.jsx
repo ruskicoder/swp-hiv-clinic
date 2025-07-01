@@ -72,7 +72,7 @@ const DashboardHeader = ({ title, subtitle }) => {
       console.error('Failed to update privacy settings:', error);
       setError('Failed to update privacy mode');
       // Revert the UI state if the API call failed
-      setIsPrivate(!newState);
+      setIsPrivate(!isPrivate);
     } finally {
       setIsLoading(false);
     }
@@ -83,9 +83,11 @@ const DashboardHeader = ({ title, subtitle }) => {
       month: 'short',
       day: 'numeric'
     };
+    // Show seconds, 24h format
     const timeOptions = {
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
       hour12: false
     };
     const date = currentDateTime.toLocaleDateString('en-GB', dateOptions);
@@ -96,8 +98,9 @@ const DashboardHeader = ({ title, subtitle }) => {
 
   return (
     <div className="dashboard-header">
-      <div className="dashboard-header-content">
-        <div className="dashboard-header-info">
+      <div className="dashboard-header-content modern-header-layout">
+        {/* Left: Logo and Title */}
+        <div className="dashboard-header-info modern-header-left">
           <span
             className="nav-logo"
             tabIndex={0}
@@ -116,7 +119,15 @@ const DashboardHeader = ({ title, subtitle }) => {
             {subtitle && <p className="dashboard-subtitle">{subtitle}</p>}
           </div>
         </div>
-          <div className="dashboard-header-actions">
+        {/* Center: Clock */}
+        <div className="modern-header-center">
+          <div className="digital-clock-glass" aria-label="Current date and time">
+            <div className="date digital-date">{date}</div>
+            <div className="time digital-time">{time}</div>
+          </div>
+        </div>
+        {/* Right: Actions */}
+        <div className="dashboard-header-actions modern-header-right">
           {isPatient() && (
             <button 
               className={`privacy-toggle ${isPrivate ? 'active' : ''} ${isLoading ? 'loading' : ''}`}
@@ -144,10 +155,6 @@ const DashboardHeader = ({ title, subtitle }) => {
               {isPrivate ? 'Anonymous' : 'Public'}
             </button>
           )}
-          <div className="system-datetime">
-            <div className="date">{date}</div>
-            <div className="time">{time}</div>
-          </div>
           <UserProfileDropdown />
         </div>
       </div>
