@@ -245,16 +245,10 @@ BEGIN
     VALUES ('MaxBookingLeadDays', '30', 'Maximum number of days in advance that appointments can be booked');
 END
 
--- Add IsPrivate column to existing PatientProfiles table if it doesn't exist
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PatientProfiles') AND name = 'IsPrivate')
-BEGIN
-    ALTER TABLE PatientProfiles
-    ADD IsPrivate BIT NOT NULL DEFAULT 0;
-END
-
 -- Insert default ARV templates (default templates cannot be edited/deleted)
 -- Example templates for common HIV types
 
+-- Ensure there is a dummy patient and doctor for default templates
 DECLARE @DummyPatientId INT, @DummyDoctorId INT;
 IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'dummy_patient')
 BEGIN
@@ -279,5 +273,4 @@ BEGIN
         (@DummyPatientId, @DummyDoctorId, NULL, 'ABC + 3TC + LPV/r', '2020-01-01', NULL, 'Excellent', 'GI upset', 'default template', 1, GETDATE(), GETDATE());
 END
 
-GO
 -- No changes needed. Init script is syntactically correct for SQL Server.
