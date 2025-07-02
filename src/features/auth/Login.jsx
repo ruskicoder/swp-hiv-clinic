@@ -58,8 +58,12 @@ const Login = () => {
         return;
       }
 
-      await login(formData);
-      
+      // Call login and get response
+      const response = await login(formData);
+      // Save token to localStorage if present
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+      }
       // Navigation will be handled by the AuthContext
     } catch (error) {
       setErrors({

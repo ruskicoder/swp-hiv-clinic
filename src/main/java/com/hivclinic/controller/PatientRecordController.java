@@ -70,33 +70,22 @@ public class PatientRecordController {
      * Update patient's own medical record
      */
     @PutMapping("/my-record")
-    @PreAuthorize("hasAuthority('ROLE_PATIENT')")  // Changed from hasRole to hasAuthority
+    @PreAuthorize("hasAuthority('ROLE_PATIENT')")
     public ResponseEntity<?> updateMyRecord(
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
             @RequestBody Map<String, Object> recordData) {
         try {
-            // Verify user has patient role
-            if (!userPrincipal.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_PATIENT"))) {
-                logger.warn("Unauthorized access attempt by user: {}", userPrincipal.getUsername());
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(MessageResponse.error("Access denied: User is not a patient"));
-            }
-
-            logger.info("Updating medical record for patient: {}", userPrincipal.getUsername());
+            logger.debug("Updating patient record for user {}: {}", userPrincipal.getId(), recordData);
             MessageResponse response = patientRecordService.updatePatientRecordWithResponse(userPrincipal.getId(), recordData);
-
             if (response.isSuccess()) {
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest().body(response);
             }
-
         } catch (Exception e) {
-            logger.error("Error updating patient record for user {}: {}", 
-                userPrincipal.getUsername(), e.getMessage(), e);
+            logger.error("Error updating patient record: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to update patient record: " + e.getMessage()));
+                    .body(Map.of("success", false, "message", "An error occurred: " + e.getMessage(), "data", null));
         }
     }
 
