@@ -1,0 +1,169 @@
+-- Create database if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'hiv_clinic')
+BEGIN
+    CREATE DATABASE hiv_clinic;
+END
+GO
+
+USE hiv_clinic;
+GO
+
+-- Create tables if not exist
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Roles' AND xtype='U')
+CREATE TABLE Roles (
+    RoleID INT IDENTITY(1,1) PRIMARY KEY,
+    RoleName NVARCHAR(50) NOT NULL UNIQUE
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
+CREATE TABLE Users (
+    UserID INT IDENTITY(1,1) PRIMARY KEY,    Username NVARCHAR(255) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Email NVARCHAR(255) NOT NULL UNIQUE,
+    FirstName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL,
+    Specialty NVARCHAR(255) NULL,
+    RoleID INT NOT NULL FOREIGN KEY REFERENCES Roles(RoleID),
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Specialties' AND xtype='U')
+CREATE TABLE Specialties (
+    SpecialtyID INT IDENTITY(1,1) PRIMARY KEY,
+    SpecialtyName NVARCHAR(255) NOT NULL UNIQUE,
+    Description NVARCHAR(MAX),
+    IsActive BIT DEFAULT 1
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorProfiles' AND xtype='U')
+CREATE TABLE DoctorProfiles (
+    DoctorProfileID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL UNIQUE FOREIGN KEY REFERENCES Users(UserID),
+    FirstName NVARCHAR(100) NOT NULL,
+    LastName NVARCHAR(100) NOT NULL,
+    SpecialtyID INT FOREIGN KEY REFERENCES Specialties(SpecialtyID),
+    PhoneNumber NVARCHAR(20),
+    Bio NVARCHAR(MAX),
+    ProfileImageBase64 NVARCHAR(MAX)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientProfiles' AND xtype='U')
+CREATE TABLE PatientProfiles (
+    PatientProfileID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL UNIQUE FOREIGN KEY REFERENCES Users(UserID),
+    FirstName NVARCHAR(100) NOT NULL,
+    LastName NVARCHAR(100) NOT NULL,
+    DateOfBirth DATE,
+    PhoneNumber NVARCHAR(20),
+    Address NVARCHAR(MAX),
+    ProfileImageBase64 NVARCHAR(MAX),
+    IsPrivate BIT NOT NULL DEFAULT 0
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
+CREATE TABLE DoctorAvailabilitySlots (
+    AvailabilitySlotID INT IDENTITY(1,1) PRIMARY KEY,
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    SlotDate DATE NOT NULL,
+    StartTime TIME NOT NULL,
+    EndTime TIME NOT NULL,
+    IsBooked BIT DEFAULT 0,
+    Notes NVARCHAR(MAX),
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    CONSTRAINT UQ_DoctorSlot UNIQUE (DoctorUserID, SlotDate, StartTime)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Appointments' AND xtype='U')
+CREATE TABLE Appointments (
+    AppointmentID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    AvailabilitySlotID INT FOREIGN KEY REFERENCES DoctorAvailabilitySlots(AvailabilitySlotID),
+    AppointmentDateTime DATETIME2 NOT NULL,
+    DurationMinutes INT DEFAULT 30,
+    Status VARCHAR(50) DEFAULT 'Scheduled',
+    PatientCancellationReason NVARCHAR(MAX),
+    DoctorCancellationReason NVARCHAR(MAX),
+    AppointmentNotes NVARCHAR(MAX),
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SystemSettings' AND xtype='U')
+CREATE TABLE SystemSettings (
+    SettingID INT IDENTITY(1,1) PRIMARY KEY,
+    SettingKey NVARCHAR(100) NOT NULL UNIQUE,
+    SettingValue NVARCHAR(MAX) NOT NULL,
+    Description NVARCHAR(MAX),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedByUserID INT FOREIGN KEY REFERENCES Users(UserID)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PasswordResetTokens' AND xtype='U')
+CREATE TABLE PasswordResetTokens (
+    TokenID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    Token NVARCHAR(255) NOT NULL UNIQUE,
+    ExpiryDateTime DATETIME2 NOT NULL,
+    IsUsed BIT DEFAULT 0,
+    CreatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentStatusHistory' AND xtype='U')
+CREATE TABLE AppointmentStatusHistory (
+    StatusHistoryID INT IDENTITY(1,1) PRIMARY KEY,
+    AppointmentID INT NOT NULL FOREIGN KEY REFERENCES Appointments(AppointmentID),
+    OldStatus NVARCHAR(50),
+    NewStatus NVARCHAR(50) NOT NULL,
+    ChangeReason NVARCHAR(MAX),
+    ChangedAt DATETIME2 DEFAULT GETDATE(),
+    ChangedByUserID INT FOREIGN KEY REFERENCES Users(UserID)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='LoginActivity' AND xtype='U')
+CREATE TABLE LoginActivity (
+    LogID BIGINT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+    UsernameAttempted NVARCHAR(255) NOT NULL,
+    AttemptTime DATETIME2 DEFAULT GETDATE(),
+    IsSuccess BIT NOT NULL,
+    IPAddress NVARCHAR(45),
+    UserAgent NVARCHAR(MAX)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
+CREATE TABLE PatientRecords (
+    RecordID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    MedicalHistory NVARCHAR(MAX),
+    Allergies NVARCHAR(MAX), 
+    CurrentMedications NVARCHAR(MAX),
+    Notes NVARCHAR(MAX),
+    BloodType NVARCHAR(10),
+    EmergencyContact NVARCHAR(255),
+    EmergencyPhone NVARCHAR(20),
+    ProfileImageBase64 NVARCHAR(MAX),
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    INDEX IX_PatientRecords_PatientUserID (PatientUserID)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ARVTreatments' AND xtype='U')
+CREATE TABLE ARVTreatments (
+    ARVTreatmentID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    DoctorUserID INT FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT FOREIGN KEY REFERENCES Appointments(AppointmentID),
+    Regimen NVARCHAR(255) NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE,
+    Adherence NVARCHAR(255),
+    SideEffects NVARCHAR(MAX),
+    Notes NVARCHAR(MAX),
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
+);

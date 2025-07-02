@@ -30,8 +30,7 @@ public class DoctorService {
      */
     public List<User> getAllDoctors() {
         try {
-            List<User> doctors = userRepository.findAll().stream()
-                .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
+            List<User> doctors = userRepository.findAllNonDummyDoctors().stream()
                 .filter(User::getIsActive)
                 .toList();
 
