@@ -146,14 +146,8 @@ const Settings = () => {
     setMessage('');
 
     try {
-      const response = await authService.updateProfile(
-        profileData.firstName,
-        profileData.lastName,
-        profileData.phoneNumber,
-        profileData.dateOfBirth,
-        profileData.address,
-        profileData.bio
-      );
+      // Send the entire profileData object, not individual fields
+      const response = await authService.updateProfile(profileData);
 
       if (response.success) {
         setMessage('Profile updated successfully!');
