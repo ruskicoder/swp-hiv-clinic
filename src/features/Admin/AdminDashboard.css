@@ -12,17 +12,14 @@
 
 .admin-dashboard {
   flex: 1;
-  width: 95%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 1.2rem 1.5rem 1.2rem 0;
-  background: var(--color-background, #fff);
+  padding: 2rem 2.5rem 2rem 0;
+  background: #fff;
   color: #1f2937;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.0625rem 0.25rem rgba(0,0,0,0.06);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(16,185,129,0.07);
   min-width: 0;
-  font-size: 0.97rem;
 }
 
 .manager-sidebar {
@@ -47,17 +44,16 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  background: var(--color-background-light, #f9fafb);
+  background: none;
   border: none;
   color: #059669;
   width: 100%;
   text-align: left;
-  font-size: 0.97rem;
-  text-shadow: none;
+  font-size: 1rem;
 }
 
 .sidebar-option:hover {
-  background: #10b981;
+  background: #059669;
   color: #fff;
 }
 
@@ -74,23 +70,21 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
 }
 
 .stat-card {
-  background: var(--color-background-light, #f9fafb);
+  background: linear-gradient(135deg, #f0fdfa 60%, #e0f2fe 100%);
   color: #059669;
   border: 1px solid #e2e8f0;
-  padding: 1.5rem 1.2rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 12px rgba(16,185,129,0.08);
+  padding: 1.1rem 1rem 1.1rem 1rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
   text-align: center;
   transition: box-shadow 0.2s, transform 0.2s;
   min-width: 0;
-  font-size: 1.1rem;
-  margin-bottom: 1.2rem;
 }
 
 .stat-card:hover {
@@ -99,16 +93,16 @@
 }
 
 .stat-card h3 {
-  color: #059669;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .stat-number {
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: bold;
   color: #059669;
   margin: 0;
@@ -151,11 +145,10 @@
 
 .users-table,
 .appointments-table {
-  font-size: 0.97rem;
-  background: var(--color-background-light, #f9fafb);
+  background: #fff;
   color: #1f2937;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.04);
   overflow: hidden;
   width: 100%;
   overflow-x: auto;
@@ -181,13 +174,11 @@
   background-color: #f8fafc;
   color: #059669;
   font-weight: 600;
-  font-size: 0.97rem;
 }
 
 .users-table td,
 .appointments-table td {
   color: #374151;
-  font-size: 0.97rem;
 }
 
 .role-badge {
@@ -496,7 +487,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  background: var(--color-background-light, #f9fafb);
+  background: none;
   border: none;
   color: #059669;
   width: 100%;
@@ -504,43 +495,13 @@
 }
 
 .sidebar-option:hover {
-  background: #10b981;
+  background: #059669;
   color: #fff;
 }
 
 .sidebar-option.active {
   background: #059669;
   color: #fff;
-}
-
-@media (max-width: 1200px) {
-  .admin-dashboard {
-    max-width: 98vw;
-    padding: 0.7rem 0.5rem 0.7rem 0;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
-}
-@media (max-width: 900px) {
-  .admin-dashboard {
-    padding: 0.5rem;
-    font-size: 0.95rem;
-  }
-  .stat-card {
-    font-size: 0.93rem;
-    padding: 0.5rem;
-  }
-}
-@media (max-width: 600px) {
-  .admin-dashboard {
-    font-size: 0.92rem;
-    padding: 0.2rem;
-  }
-  .stat-card {
-    font-size: 0.9rem;
-    padding: 0.3rem;
-  }
 }
 
 @media (max-width: 1024px) {
@@ -676,29 +637,4 @@
   .form-group textarea:focus {
     background: #f0fdf4 !important; /* ensure focus style background for dark mode too */
   }
-}
-
-.dashboard-content, .users-table, .appointments-table {
-  background: var(--color-background-light, #f9fafb);
-  border-radius: 1rem;
-  box-shadow: 0 1px 8px rgba(16,185,129,0.06);
-  padding: 2rem 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-button, .btn {
-  border-radius: 2rem;
-  font-size: 1.1rem;
-  padding: 0.7rem 2rem;
-  font-weight: 700;
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-  color: #fff;
-  border: none;
-  box-shadow: 0 2px 8px rgba(16,185,129,0.10);
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-button:hover, .btn:hover {
-  background: linear-gradient(90deg, #059669 0%, #10b981 100%);
-  box-shadow: 0 4px 16px rgba(16,185,129,0.18);
-  transform: translateY(-2px);
 }

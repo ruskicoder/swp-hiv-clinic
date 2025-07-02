@@ -1,16 +1,11 @@
 /* Modern Medical Green Theme - Customer Dashboard */
 .customer-dashboard {
-  width: 95%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 1.2rem;
-  background: var(--color-background, #fff);
+  padding: 2rem;
+  background: #fff; /* Changed to white background */
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.0625rem 0.25rem rgba(0,0,0,0.06);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  font-size: 0.97rem;
 }
 
 /* Vertical Header Layout */
@@ -114,14 +109,12 @@
 /* Main Content Area */
 .dashboard-content {
   flex: 1;
-  background: var(--color-background-light, #f9fafb);
-  border-radius: 1rem;
-  box-shadow: 0 1px 8px rgba(16,185,129,0.06);
-  padding: 2rem 1.5rem;
-  margin-bottom: 1.5rem;
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow-x: auto;
   min-width: 0;
-  font-size: 1.1rem;
 }
 
 /* Content Header */
@@ -147,24 +140,22 @@
 /* Stats Grid - Medical Dashboard Style */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 }
   
 .stat-card {
-  background: var(--color-background-light, #f9fafb);
-  color: #10b981;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
   border: 1px solid #e2e8f0;
-  padding: 1.5rem 1.2rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 12px rgba(16,185,129,0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   text-align: center;
-  transition: box-shadow 0.2s, transform 0.2s;
-  min-width: 0;
-  font-size: 1.1rem;
-  margin-bottom: 1.2rem;
-}
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  }
   
 .stat-card::before {
   content: '';
@@ -182,20 +173,20 @@
 }
 
 .stat-card h3 {
-  color: #10b981;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 1rem 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 800;
 }
 
 .stat-number {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 2.5rem;
+  font-weight: 800;
   color: #10b981;
   margin: 0;
-  letter-spacing: 1px;
+  line-height: 1;
 }
 
 /* Appointments List */
@@ -538,25 +529,27 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .customer-dashboard {
-    max-width: 98vw;
-    padding: 0.7rem;
+    padding: 1rem;
   }
+  
+  .dashboard-layout {
+    gap: 1rem;
+  }
+  
+  .dashboard-sidebar {
+    width: 240px;
+    padding: 1.5rem;
+  }
+  
   .stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
   }
 }
 
 @media (max-width: 900px) {
-  .customer-dashboard {
-    padding: 0.5rem;
-    font-size: 0.95rem;
-  }
-  .stat-card {
-    font-size: 0.93rem;
-    padding: 0.5rem;
-  }
   .dashboard-layout {
     flex-direction: column;
   }
@@ -622,41 +615,32 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   .customer-dashboard {
-    font-size: 0.92rem;
-    padding: 0.2rem;
+    padding: 0.5rem;
   }
-  .stat-card {
-    font-size: 0.9rem;
-    padding: 0.3rem;
-  }
+  
   .dashboard-content {
     padding: 0.5rem;
+  }
+  
+  .dashboard-sidebar {
+    padding: 1rem;
   }
   
   .content-header h2 {
     font-size: 1.5rem;
   }
   
+  .stat-card {
+    padding: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+  }
+  
   .stats-grid {
     gap: 0.5rem;
   }
-}
-
-button, .btn {
-  border-radius: 2rem;
-  font-size: 1.1rem;
-  padding: 0.7rem 2rem;
-  font-weight: 700;
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-  color: #fff;
-  border: none;
-  box-shadow: 0 2px 8px rgba(16,185,129,0.10);
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
-}
-button:hover, .btn:hover {
-  background: linear-gradient(90deg, #059669 0%, #10b981 100%);
-  box-shadow: 0 4px 16px rgba(16,185,129,0.18);
-  transform: translateY(-2px);
 }
