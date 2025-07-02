@@ -62,7 +62,7 @@ const ManagerDashboard = () => {
           const res = await apiClient.get('/manager/stats');
           setStats(res.data);
         } catch (err) {
-          setError('Failed to load statistics.');
+          setError(`Failed to load statistics: ${err.message}`);
         } finally {
           setLoading(false);
         }
@@ -80,7 +80,7 @@ const ManagerDashboard = () => {
           const res = await apiClient.get('/manager/patients');
           setPatients(res.data);
         } catch (err) {
-          setPatientsError('Failed to load patient list.');
+          setPatientsError(`Failed to load patient list: ${err.message}`);
         } finally {
           setPatientsLoading(false);
         }
@@ -98,7 +98,7 @@ const ManagerDashboard = () => {
           const res = await apiClient.get('/manager/doctors');
           setDoctors(res.data);
         } catch (err) {
-          setDoctorsError('Failed to load doctor list.');
+          setDoctorsError(`Failed to load doctor list: ${err.message}`);
         } finally {
           setDoctorsLoading(false);
         }
