@@ -10,29 +10,6 @@ import ErrorBoundary from '../../components/ErrorBoundary';
 import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
 
-const NAVIGATION_OPTIONS = [
-  { 
-    key: 'overview', 
-    label: 'Dashboard Overview',
-    icon: '📊'
-  },
-  { 
-    key: 'appointments', 
-    label: 'My Appointments',
-    icon: '📅'
-  },
-  { 
-    key: 'patient-record', 
-    label: 'Patient Records',
-    icon: '📋'
-  },
-  { 
-    key: 'availability', 
-    label: 'My Availability',
-    icon: '🕒'
-  }
-];
-
 /**
  * Doctor Dashboard component for managing appointments, availability, and patient records
  */
@@ -73,6 +50,7 @@ const DoctorDashboard = () => {
     recheckDateTime: '',
     durationMinutes: 30
   });
+  const [showPrivacyAlert, setShowPrivacyAlert] = useState(false);
 
   // Load dashboard data
   useEffect(() => {
@@ -373,6 +351,14 @@ const DoctorDashboard = () => {
     navigate('/');
   };
 
+  // Navigation items
+  const navigationItems = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'appointments', label: 'Appointments', icon: '📅' },
+    { id: 'patient-record', label: 'Patient Records', icon: '📋' },
+    { id: 'availability', label: 'My Availability', icon: '🕒' }
+  ];
+
   // Render overview
   const renderOverview = () => {
     // Ensure availabilitySlots is an array before using filter
@@ -380,34 +366,29 @@ const DoctorDashboard = () => {
     const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
     return (
-      <div>
-        <div className="section-header">
-          <h2>System Overview</h2>
-        </div>
-        
-        {loading ? (
-          <div className="loading-state">
-            <div>📊 Loading dashboard statistics...</div>
+      <ErrorBoundary>
+        <div className="overview-content">
+          <div className="content-header">
+            <h2>Dashboard Overview</h2>
+            <p>Welcome, Dr. {doctorName}</p>
           </div>
-        ) : error ? (
-          <div className="error-state">{error}</div>
-        ) : (
+
           <div className="stats-grid">
             <div className="stat-card">
               <h3>Total Appointments</h3>
-              <div className="stat-number">{safeAppointments.length}</div>
+              <p className="stat-number">{safeAppointments.length}</p>
             </div>
             <div className="stat-card">
               <h3>Available Slots</h3>
-              <div className="stat-number">{safeAvailabilitySlots.filter(slot => !slot.isBooked).length}</div>
+              <p className="stat-number">{safeAvailabilitySlots.filter(slot => !slot.isBooked).length}</p>
             </div>
             <div className="stat-card">
               <h3>Booked Slots</h3>
-              <div className="stat-number">{safeAvailabilitySlots.filter(slot => slot.isBooked).length}</div>
+              <p className="stat-number">{safeAvailabilitySlots.filter(slot => slot.isBooked).length}</p>
             </div>
             <div className="stat-card">
               <h3>Today's Appointments</h3>
-              <div className="stat-number">
+              <p className="stat-number">
                 {safeAppointments.filter(apt => {
                   try {
                     const today = new Date().toDateString();
@@ -417,45 +398,45 @@ const DoctorDashboard = () => {
                     return false;
                   }
                 }).length}
-              </div>
+              </p>
             </div>
           </div>
-        )}
 
-        <div className="recent-appointments">
-          <h3>Recent Appointments</h3>
-          {safeAppointments.length > 0 ? (
-            <div className="appointments-list">
-              {safeAppointments.slice(0, 5).map(appointment => (
-                <div key={appointment.appointmentId} className="appointment-card">
-                  <div className="appointment-header">
-                    <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
-                    <span className={`status ${appointment.status?.toLowerCase()}`}>
-                      {safeRender(appointment.status)}
-                    </span>
+          <div className="recent-appointments">
+            <h3>Recent Appointments</h3>
+            {safeAppointments.length > 0 ? (
+              <div className="appointments-list">
+                {safeAppointments.slice(0, 5).map(appointment => (
+                  <div key={appointment.appointmentId} className="appointment-card">
+                    <div className="appointment-header">
+                      <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
+                      <span className={`status ${appointment.status?.toLowerCase()}`}>
+                        {safeRender(appointment.status)}
+                      </span>
+                    </div>
+                    <div className="appointment-details">
+                      <p><strong>Date:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
+                      <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
+                    </div>
+                    <div className="appointment-actions">
+                      <button 
+                        className="btn-primary"
+                        onClick={() => loadPatientRecord(appointment)}
+                      >
+                        View Record
+                      </button>
+                    </div>
                   </div>
-                  <div className="appointment-details">
-                    <p><strong>Date:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
-                    <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
-                  </div>
-                  <div className="appointment-actions">
-                    <button 
-                      className="btn-primary"
-                      onClick={() => loadPatientRecord(appointment)}
-                    >
-                      View Record
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-data">
-              <p>No appointments found.</p>
-            </div>
-          )}
+                ))}
+              </div>
+            ) : (
+              <div className="no-data">
+                <p>No appointments found.</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </ErrorBoundary>
     );
   };
 
@@ -464,80 +445,83 @@ const DoctorDashboard = () => {
     const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
     return (
-      <div>
-        <div className="section-header">
-          <h2>My Appointments</h2>
-        </div>
+      <ErrorBoundary>
+        <div className="appointments-content">
+          <div className="content-header">
+            <h2>My Appointments</h2>
+            <p>Manage your scheduled appointments</p>
+          </div>
 
-        {safeAppointments.length > 0 ? (
-          <div className="appointments-list">
-            {safeAppointments.map(appointment => (
-              <div key={appointment.appointmentId} className="appointment-card">
-                <div className="appointment-header">
-                  <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
-                  <span className={`status ${appointment.status?.toLowerCase()}`}>
-                    {safeRender(appointment.status)}
-                  </span>
+          {safeAppointments.length > 0 ? (
+            <div className="appointments-list">
+              {safeAppointments.map(appointment => (
+                <div key={appointment.appointmentId} className="appointment-card">
+                  <div className="appointment-header">
+                    <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
+                    <span className={`status ${appointment.status?.toLowerCase()}`}>
+                      {safeRender(appointment.status)}
+                    </span>
+                  </div>
+                  <div className="appointment-details">
+                    <p><strong>Date & Time:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
+                    <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
+                    <p><strong>Patient Email:</strong> {safeRender(appointment.patientUser?.email)}</p>
+                    {appointment.appointmentNotes && (
+                      <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
+                    )}
+                  </div>
+                  <div className="appointment-actions">
+                    {appointment.status !== 'Completed' && (
+                      <button 
+                        className="btn-primary"
+                        onClick={() => loadPatientRecord(appointment)}
+                      >
+                        View Patient Record
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="appointment-details">
-                  <p><strong>Date & Time:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
-                  <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
-                  <p><strong>Patient Email:</strong> {safeRender(appointment.patientUser?.email)}</p>
-                  {appointment.appointmentNotes && (
-                    <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
-                  )}
-                </div>
-                <div className="appointment-actions">
-                  {appointment.status !== 'Completed' && (
-                    <button 
-                      className="btn-primary"
-                      onClick={() => loadPatientRecord(appointment)}
-                    >
-                      View Patient Record
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="no-data">
-            <p>No appointments scheduled.</p>
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          ) : (
+            <div className="no-data">
+              <p>No appointments scheduled.</p>
+            </div>
+          )}
+        </div>
+      </ErrorBoundary>
     );
   };
 
   // Render patient record
   const renderPatientRecord = () => (
-    <div>
-      {selectedAppointment ? (
-        <>
-          <div className="appointment-header">
-            <h3>Patient Record - {patientRecord?.isPrivate ? 'Anonymous' : selectedAppointment.patientUser?.username}</h3>
-            <p>Appointment: {safeDateTime(selectedAppointment.appointmentDateTime)}</p>
-          </div>
-
-          {patientRecord?.isPrivate && (
-            <div className="privacy-alert">
-              <i className="fas fa-lock"></i>
-              <p>This patient has enabled private mode. Some information will be hidden for privacy reasons.</p>
+    <ErrorBoundary>
+      <div className="patient-record-content">
+        {selectedAppointment ? (
+          <>
+            <div className="appointment-header">
+              <h3>Patient Record - {patientRecord?.isPrivate ? 'Anonymous' : selectedAppointment.patientUser?.username}</h3>
+              <p>Appointment: {safeDateTime(selectedAppointment.appointmentDateTime)}</p>
             </div>
-          )}
 
-          <PatientRecordSection
-            record={patientRecord}
-            onSave={handleSavePatientRecord}
-            onImageUpload={handleUploadImage}
-            hideImage={patientRecord?.isPrivate}
-          />
+            {patientRecord?.isPrivate && (
+              <div className="privacy-alert">
+                <i className="fas fa-lock"></i>
+                <p>This patient has enabled private mode. Some information will be hidden for privacy reasons.</p>
+              </div>
+            )}
 
-          {/* ARV Treatments Section */}
-          <div className="arv-treatments-section">
-            <div className="section-header">
-              <h3>ARV Treatments</h3>
-              <div>
+            <PatientRecordSection
+              record={patientRecord}
+              onSave={handleSavePatientRecord}
+              onImageUpload={handleUploadImage}
+              hideImage={patientRecord?.isPrivate}
+            />
+
+            {/* ARV Treatments Section */}
+            <div className="arv-treatments-section">
+              <div className="section-header">
+                <h3>ARV Treatments</h3>
                 <button 
                   className="btn-secondary"
                   onClick={() => { loadTemplates(); setShowTemplateModal(true); }}
@@ -552,110 +536,110 @@ const DoctorDashboard = () => {
                   Create custom ARV
                 </button>
               </div>
+
+              {Array.isArray(arvTreatments) && arvTreatments.length > 0 ? (
+                <div className="treatments-list">
+                  {arvTreatments.map(treatment => (
+                    <div key={treatment.arvTreatmentId} className="treatment-card">
+                      <div className="treatment-header">
+                        <h4>{safeRender(treatment.regimen)}</h4>
+                        <span className={`status ${treatment.isActive ? 'active' : 'inactive'}`}>
+                          {treatment.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                      <div className="treatment-details">
+                        <p><strong>Start Date:</strong> {safeDate(treatment.startDate)}</p>
+                        {treatment.endDate && (
+                          <p><strong>End Date:</strong> {safeDate(treatment.endDate)}</p>
+                        )}
+                        {treatment.adherence && (
+                          <p><strong>Adherence:</strong> {safeRender(treatment.adherence)}</p>
+                        )}
+                        {treatment.sideEffects && (
+                          <p><strong>Side Effects:</strong> {safeRender(treatment.sideEffects)}</p>
+                        )}
+                        {treatment.notes && (
+                          <p><strong>Notes:</strong> {safeRender(treatment.notes)}</p>
+                        )}
+                      </div>
+                      <div className="treatment-actions">
+                        <button 
+                          className="btn-danger"
+                          onClick={() => handleDeleteARV(treatment.arvTreatmentId)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-data">
+                  <p>No ARV treatments recorded.</p>
+                </div>
+              )}
             </div>
 
-            {Array.isArray(arvTreatments) && arvTreatments.length > 0 ? (
-              <div className="treatments-list">
-                {arvTreatments.map(treatment => (
-                  <div key={treatment.arvTreatmentId} className="treatment-card">
-                    <div className="treatment-header">
-                      <h4>{safeRender(treatment.regimen)}</h4>
-                      <span className={`status ${treatment.isActive ? 'active' : 'inactive'}`}>
-                        {treatment.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                    <div className="treatment-details">
-                      <p><strong>Start Date:</strong> {safeDate(treatment.startDate)}</p>
-                      {treatment.endDate && (
-                        <p><strong>End Date:</strong> {safeDate(treatment.endDate)}</p>
-                      )}
-                      {treatment.adherence && (
-                        <p><strong>Adherence:</strong> {safeRender(treatment.adherence)}</p>
-                      )}
-                      {treatment.sideEffects && (
-                        <p><strong>Side Effects:</strong> {safeRender(treatment.sideEffects)}</p>
-                      )}
-                      {treatment.notes && (
-                        <p><strong>Notes:</strong> {safeRender(treatment.notes)}</p>
-                      )}
-                    </div>
-                    <div className="treatment-actions">
-                      <button 
-                        className="btn-danger"
-                        onClick={() => handleDeleteARV(treatment.arvTreatmentId)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="no-data">
-                <p>No ARV treatments recorded.</p>
-              </div>
-            )}
-          </div>
-
-          {/* Appointment Update Section */}
-          <div className="appointment-update-section">
-            <h3>Update Appointment</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Status:</label>
-                <select
-                  name="status"
-                  value={appointmentUpdateData.status}
-                  onChange={handleAppointmentUpdateChange}
-                >
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
+            {/* Appointment Update Section */}
+            <div className="appointment-update-section">
+              <h3>Update Appointment</h3>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Status:</label>
+                  <select
+                    name="status"
+                    value={appointmentUpdateData.status}
+                    onChange={handleAppointmentUpdateChange}
+                  >
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Duration (minutes):</label>
+                  <input
+                    type="number"
+                    name="durationMinutes"
+                    value={appointmentUpdateData.durationMinutes}
+                    onChange={handleAppointmentUpdateChange}
+                    min="15"
+                    max="120"
+                  />
+                </div>
               </div>
               <div className="form-group">
-                <label>Duration (minutes):</label>
-                <input
-                  type="number"
-                  name="durationMinutes"
-                  value={appointmentUpdateData.durationMinutes}
+                <label>Notes:</label>
+                <textarea
+                  name="notes"
+                  value={appointmentUpdateData.notes}
                   onChange={handleAppointmentUpdateChange}
-                  min="15"
-                  max="120"
+                  rows="3"
+                  placeholder="Add appointment notes..."
                 />
               </div>
+              <button 
+                className="btn-primary"
+                onClick={handleUpdateAppointment}
+              >
+                Update Appointment
+              </button>
             </div>
-            <div className="form-group">
-              <label>Notes:</label>
-              <textarea
-                name="notes"
-                value={appointmentUpdateData.notes}
-                onChange={handleAppointmentUpdateChange}
-                rows="3"
-                placeholder="Add appointment notes..."
-              />
-            </div>
+          </>
+        ) : (
+          <div className="no-selection">
+            <p>Please select an appointment from the appointments tab to view patient records.</p>
             <button 
               className="btn-primary"
-              onClick={handleUpdateAppointment}
+              onClick={() => setActiveTab('appointments')}
             >
-              Update Appointment
+              Go to Appointments
             </button>
           </div>
-        </>
-      ) : (
-        <div className="no-selection">
-          <p>Please select an appointment from the appointments tab to view patient records.</p>
-          <button 
-            className="btn-primary"
-            onClick={() => setActiveTab('appointments')}
-          >
-            Go to Appointments
-          </button>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
 
   // Render availability
@@ -663,7 +647,7 @@ const DoctorDashboard = () => {
     const safeAvailabilitySlots = Array.isArray(availabilitySlots) ? availabilitySlots : [];
 
     return (
-      <div>
+      <div className="availability-content">
         <h3>Manage Your Availability</h3>
         <ErrorBoundary>
           <UnifiedCalendar
@@ -712,27 +696,34 @@ const DoctorDashboard = () => {
 
   return (
     <div className="doctor-dashboard">
-      <DashboardHeader title="Doctor Dashboard" />
-      
-      <div className="dashboard-container">
-        <div className="dashboard-layout">
-          <aside className="doctor-sidebar">
-            <div className="sidebar-title">Navigation Menu</div>
-            <nav className="sidebar-nav">
-              {NAVIGATION_OPTIONS.map(opt => (
-                <button
-                  key={opt.key}
-                  className={`sidebar-option ${activeTab === opt.key ? 'active' : ''}`}
-                  onClick={() => setActiveTab(opt.key)}
-                >
-                  <span className="sidebar-icon">{opt.icon}</span>
-                  <span>{opt.label}</span>
-                </button>
-              ))}
-            </nav>
-          </aside>
+      <DashboardHeader 
+        title="Doctor Dashboard"
+        subtitle={`Welcome, Dr. ${doctorName}`}
+      />
 
-          <main className="dashboard-main">
+      <div className="dashboard-layout">
+        <div className="dashboard-sidebar">
+          <div className="sidebar-header">
+            <h1>Navigation</h1>
+          </div>
+
+          <nav className="dashboard-nav">
+            {navigationItems.map(item => (
+              <div key={item.id} className="nav-item">
+                <button
+                  className={`nav-button ${activeTab === item.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(item.id)}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  {item.label}
+                </button>
+              </div>
+            ))}
+          </nav>
+        </div>
+
+        <div className="dashboard-main">
+          <div className="dashboard-content">
             {error && (
               <div className="error-banner">
                 <span>{error}</span>
@@ -746,7 +737,7 @@ const DoctorDashboard = () => {
             )}
 
             {renderContent()}
-          </main>
+          </div>
         </div>
       </div>
 
