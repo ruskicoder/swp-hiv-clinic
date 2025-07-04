@@ -1,7 +1,9 @@
 import { useAuth } from '../../contexts/AuthContext';
 import UserProfileDropdown from './UserProfileDropdown';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import apiClient from '../../services/apiClient';
+import NotificationIcon from '../notifications/NotificationIcon';
+import NotificationPanel from '../notifications/NotificationPanel';
 import './DashboardHeader.css';
 
 const DashboardHeader = ({ title, subtitle }) => {
@@ -10,16 +12,31 @@ const DashboardHeader = ({ title, subtitle }) => {
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showPanel, setShowPanel] = useState(false);
 
   // Function to check if user is a patient
-  const isPatient = () => {
+  const isPatient = useCallback(() => {
     return user && (user.role === 'Patient' || user?.role?.roleName === 'Patient');
-  };
+  }, [user]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
     }, 1000);
+
+    const fetchNotifications = async () => {
+        if (user) {
+            try {
+                const response = await apiClient.get(`/notifications?userId=${user.id}`);
+                setNotifications(response.data);
+                setUnreadCount(response.data.filter(n => !n.isRead).length);
+            } catch (error) {
+                console.error('Failed to fetch notifications:', error);
+            }
+        }
+    };
 
     // Load initial private mode state from API
     const loadPrivateMode = async () => {
@@ -42,8 +59,14 @@ const DashboardHeader = ({ title, subtitle }) => {
     };
 
     loadPrivateMode();
-    return () => clearInterval(timer);
-  }, [user]);
+    fetchNotifications();
+    const notificationInterval = setInterval(fetchNotifications, 60000); // Poll every minute
+
+    return () => {
+        clearInterval(timer);
+        clearInterval(notificationInterval);
+    };
+  }, [user, isPatient]);
 
   const togglePrivacy = async () => {
     if (!isPatient() || isLoading) return;
@@ -72,11 +95,36 @@ const DashboardHeader = ({ title, subtitle }) => {
       console.error('Failed to update privacy settings:', error);
       setError('Failed to update privacy mode');
       // Revert the UI state if the API call failed
-      setIsPrivate(!newState);
+      const savedMode = localStorage.getItem('privateMode');
+      if (savedMode) {
+        setIsPrivate(JSON.parse(savedMode));
+      }
     } finally {
       setIsLoading(false);
     }
-  };  const formatDateTime = () => {
+  };
+
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+        await apiClient.post(`/notifications/${notificationId}/read`);
+        setNotifications(notifications.map(n => n.notificationId === notificationId ? { ...n, isRead: true } : n));
+        setUnreadCount(unreadCount - 1);
+    } catch (error) {
+        console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+        await apiClient.post(`/notifications/read-all?userId=${user.id}`);
+        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
+    } catch (error) {
+        console.error('Failed to mark all notifications as read:', error);
+    }
+  };
+
+  const formatDateTime = () => {
     const dateOptions = {
       weekday: 'short',
       year: 'numeric',
@@ -148,6 +196,14 @@ const DashboardHeader = ({ title, subtitle }) => {
             <div className="date">{date}</div>
             <div className="time">{time}</div>
           </div>
+          <NotificationIcon count={unreadCount} onClick={() => setShowPanel(!showPanel)} />
+          {showPanel && (
+            <NotificationPanel
+              notifications={notifications}
+              onMarkAsRead={handleMarkAsRead}
+              onMarkAllAsRead={handleMarkAllAsRead}
+            />
+          )}
           <UserProfileDropdown />
         </div>
       </div>
