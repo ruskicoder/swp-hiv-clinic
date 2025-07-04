@@ -1,0 +1,33 @@
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background-color: #f0f8ff;
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.item-title {
+    font-weight: bold;
+}
+
+.item-time {
+    font-size: 12px;
+    color: #888;
+}
+
+.item-body {
+    font-size: 14px;
+}

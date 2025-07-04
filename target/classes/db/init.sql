@@ -167,3 +167,81 @@ CREATE TABLE ARVTreatments (
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
+
+
+
+-- Notifications Table: Stores all types of notifications
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Notifications' AND xtype='U')
+CREATE TABLE Notifications (
+    NotificationID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    Type NVARCHAR(50) NOT NULL, -- 'APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'SYSTEM_NOTIFICATION'
+    Title NVARCHAR(255) NOT NULL,
+    Message NVARCHAR(MAX) NOT NULL,
+    IsRead BIT DEFAULT 0,
+    Priority NVARCHAR(20) DEFAULT 'MEDIUM', -- 'LOW', 'MEDIUM', 'HIGH'
+    RelatedEntityID INT NULL, -- Could be AppointmentID, MedicationRoutineID, etc.
+    RelatedEntityType NVARCHAR(50) NULL, -- 'APPOINTMENT', 'MEDICATION', 'SYSTEM'
+    ScheduledFor DATETIME2 NULL, -- When the notification should be sent
+    SentAt DATETIME2 NULL, -- When the notification was actually sent
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    CONSTRAINT CHK_NotificationType CHECK (Type IN ('APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'GENERAL_ALERT', 'SYSTEM_NOTIFICATION'))
+);
+
+-- MedicationRoutines Table: Defines daily medication schedules for patients
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationRoutines' AND xtype='U')
+CREATE TABLE MedicationRoutines (
+    RoutineID INT PRIMARY KEY IDENTITY(1,1),
+    PatientUserID INT NOT NULL,
+    DoctorUserID INT NOT NULL,
+    ARVTreatmentID INT NULL,
+    MedicationName NVARCHAR(255) NOT NULL,
+    Dosage NVARCHAR(100) NOT NULL,
+    Instructions NVARCHAR(MAX) NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NULL,
+    TimeOfDay TIME NOT NULL, -- When to take the medication daily
+    IsActive BIT DEFAULT 1,
+    ReminderEnabled BIT DEFAULT 1,
+    ReminderMinutesBefore INT DEFAULT 30, -- Minutes before medication time to send reminder
+    LastReminderSentAt DATETIME2 NULL, -- Tracks when the last reminder was sent for this routine
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (ARVTreatmentID) REFERENCES ARVTreatments(ARVTreatmentID) ON DELETE SET NULL
+);
+
+-- MedicationReminders Table: Tracks individual medication reminder instances
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationReminders' AND xtype='U')
+CREATE TABLE MedicationReminders (
+    ReminderID INT PRIMARY KEY IDENTITY(1,1),
+    RoutineID INT NOT NULL,
+    PatientUserID INT NOT NULL,
+    ReminderDate DATE NOT NULL,
+    ReminderTime TIME NOT NULL,
+    Status NVARCHAR(20) DEFAULT 'PENDING', -- 'PENDING', 'SENT', 'ACKNOWLEDGED', 'MISSED'
+    SentAt DATETIME2 NULL,
+    AcknowledgedAt DATETIME2 NULL,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (RoutineID) REFERENCES MedicationRoutines(RoutineID) ON DELETE CASCADE,
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
+-- AppointmentReminders Table: Tracks appointment reminder instances
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentReminders' AND xtype='U')
+CREATE TABLE AppointmentReminders (
+    ReminderID INT PRIMARY KEY IDENTITY(1,1),
+    AppointmentID INT NOT NULL,
+    PatientUserID INT NOT NULL,
+    ReminderType NVARCHAR(50) NOT NULL, -- '24_HOUR', '1_HOUR', '30_MINUTE'
+    ReminderDateTime DATETIME2 NOT NULL,
+    Status NVARCHAR(20) DEFAULT 'PENDING', -- 'PENDING', 'SENT', 'ACKNOWLEDGED'
+    SentAt DATETIME2 NULL,
+    AcknowledgedAt DATETIME2 NULL,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE CASCADE,
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
