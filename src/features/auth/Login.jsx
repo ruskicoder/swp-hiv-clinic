@@ -59,6 +59,10 @@ const Login = () => {
     const response = await login(formData);
     if (!response.success) {
       setErrors(prev => ({ ...prev, submit: response.message || 'Login failed. Please try again.' }));
+    } else {
+      if (response && response.token) {
+        sessionStorage.setItem('token', response.token);
+      }
     }
     setLoading(false);
   };

@@ -359,6 +359,12 @@ const DoctorDashboard = () => {
     { id: 'availability', label: 'My Availability', icon: '🕒' }
   ];
 
+  // Helper to check if doctor can edit
+  const canEditRecord = () => {
+    // Only allow edit if not doctor
+    return !(user && (user.role === 'Doctor' || user.role?.roleName === 'Doctor'));
+  };
+
   // Render overview
   const renderOverview = () => {
     // Ensure availabilitySlots is an array before using filter
@@ -513,9 +519,8 @@ const DoctorDashboard = () => {
 
             <PatientRecordSection
               record={patientRecord}
-              onSave={handleSavePatientRecord}
-              onImageUpload={handleUploadImage}
-              hideImage={patientRecord?.isPrivate}
+              isEditable={false}
+              loading={loading}
             />
 
             {/* ARV Treatments Section */}

@@ -66,6 +66,8 @@ apiClient.interceptors.response.use(
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
+        // Remove userData from sessionStorage on 401
+        sessionStorage.removeItem('userData');
       } catch (e) {
         console.error('Error handling 401:', e);
       }

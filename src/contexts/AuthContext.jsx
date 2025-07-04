@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         
         if (token) {
           try {

@@ -28,12 +28,12 @@ const DashboardHeader = ({ title, subtitle }) => {
           const response = await apiClient.get('/patients/privacy-settings');
           const privacyState = response.data?.isPrivate ?? false;
           setIsPrivate(privacyState);
-          localStorage.setItem('privateMode', JSON.stringify(privacyState));
+          sessionStorage.setItem('privateMode', JSON.stringify(privacyState));
         } catch (error) {
           console.error('Failed to load privacy settings:', error);
           setError('Failed to load privacy settings');
           // Fallback to localStorage if API fails
-          const savedMode = localStorage.getItem('privateMode');
+          const savedMode = sessionStorage.getItem('privateMode');
           if (savedMode) {
             setIsPrivate(JSON.parse(savedMode));
           }
@@ -65,8 +65,8 @@ const DashboardHeader = ({ title, subtitle }) => {
         throw new Error(response.data?.message || 'Failed to update privacy settings');
       }
       
-      // Update localStorage after successful API call
-      localStorage.setItem('privateMode', JSON.stringify(newState));
+      // Update sessionStorage after successful API call
+      sessionStorage.setItem('privateMode', JSON.stringify(newState));
       
     } catch (error) {
       console.error('Failed to update privacy settings:', error);

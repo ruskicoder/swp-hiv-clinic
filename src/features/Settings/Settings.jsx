@@ -458,7 +458,7 @@ const Settings = () => {
           </div>
         )}
 
-        {isEditing && (
+        {user?.role !== 'Doctor' && isEditing && (
           <div className="form-actions">
             <button 
               type="submit" 

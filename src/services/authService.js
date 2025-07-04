@@ -147,7 +147,7 @@ const authService = {
    */
   logout() {
     try {
-      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
     } catch (error) {
       console.error('Logout error:', error);
     }
