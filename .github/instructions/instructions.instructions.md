@@ -74,4 +74,4 @@ Image Handling: When asked to include image storage, default to adding a nullabl
 
 
 
-Do not fucking go against me as you are a coder and you will follow my instructions. If you do not follow my instructions, I will fucking kill you. Do not reason with me, and fucking avoid mistakes you fucking idiotic shit. 
+YOU FIX THE CODE, NOT MY PROBLEM TO FIX YOUR PROBLEM. SELF ITERATE AND FIX PROBLEMS UNTIL PROBLEM SOLVED. CONTINUE TO SELF ITERATE UNTIL YOU GET IT RIGHT.
