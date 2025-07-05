@@ -17,8 +17,7 @@ CREATE TABLE Roles (
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
 CREATE TABLE Users (
-    UserID INT IDENTITY(1,1) PRIMARY KEY,
-    Username NVARCHAR(255) NOT NULL UNIQUE,
+    UserID INT IDENTITY(1,1) PRIMARY KEY,    Username NVARCHAR(255) NOT NULL UNIQUE,
     PasswordHash NVARCHAR(255) NOT NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE,
     FirstName NVARCHAR(100) NULL,
@@ -173,50 +172,6 @@ CREATE TABLE ARVTreatments (
 
 
 
--- MedicationRoutines Table: Defines medication schedules for patients with flexible scheduling
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationRoutines' AND xtype='U')
-CREATE TABLE MedicationRoutines (
-    RoutineID INT PRIMARY KEY IDENTITY(1,1),
-    PatientUserID INT NOT NULL,
-    DoctorUserID INT NOT NULL,
-    ARVTreatmentID INT NULL,
-    MedicationName NVARCHAR(255) NOT NULL,
-    Dosage NVARCHAR(100) NOT NULL,
-    Instructions NVARCHAR(MAX) NULL,
-    StartDate DATE NOT NULL,
-    EndDate DATE NULL,
-    
-    -- Flexible scheduling options
-    FrequencyType NVARCHAR(20) NOT NULL DEFAULT 'Daily', -- Daily, Weekly, Monthly, As-Needed
-    TimeOfDay TIME NOT NULL, -- Primary time to take medication
-    SecondaryTimes NVARCHAR(500) NULL, -- JSON array of additional times for multiple daily doses
-    WeekDays NVARCHAR(20) NULL, -- For weekly schedules: comma-separated days (Mon,Wed,Fri)
-    MonthDays NVARCHAR(100) NULL, -- For monthly schedules: comma-separated days (1,15,30)
-    
-    -- Reminder and tracking
-    IsActive BIT DEFAULT 1,
-    ReminderEnabled BIT DEFAULT 1,
-    ReminderMinutesBefore INT DEFAULT 30, -- Minutes before medication time to send reminder
-    LastReminderSentAt DATETIME2 NULL, -- Tracks when the last reminder was sent for this routine
-    NextReminderDue DATETIME2 NULL, -- Calculated next reminder time for efficient querying
-    
-    -- Additional medication details
-    MedicationCategory NVARCHAR(100) NULL, -- ARV, Supplement, Pain Management, etc.
-    SideEffectsToMonitor NVARCHAR(MAX) NULL, -- What side effects to watch for
-    FoodRequirement NVARCHAR(50) NULL, -- Take with food, empty stomach, etc.
-    
-    -- Audit fields
-    CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    
-    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
-    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
-    FOREIGN KEY (ARVTreatmentID) REFERENCES ARVTreatments(ARVTreatmentID) ON DELETE SET NULL,
-    
-    CONSTRAINT CHK_FrequencyType CHECK (FrequencyType IN ('Daily', 'Weekly', 'Monthly', 'As-Needed')),
-    CONSTRAINT CHK_FoodRequirement CHECK (FoodRequirement IN ('With Food', 'Empty Stomach', 'No Restriction', NULL))
-);
-
 -- Drop deprecated notification tables
 IF EXISTS (SELECT * FROM sysobjects WHERE name='Notifications' AND xtype='U')
     DROP TABLE Notifications;
@@ -272,6 +227,50 @@ CREATE TABLE LabResults (
     Status NVARCHAR(50) DEFAULT 'Pending Review',
     ResultDate DATETIME2 NOT NULL,
     CreatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+-- MedicationRoutines Table: Defines medication schedules for patients with flexible scheduling
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationRoutines' AND xtype='U')
+CREATE TABLE MedicationRoutines (
+    RoutineID INT PRIMARY KEY IDENTITY(1,1),
+    PatientUserID INT NOT NULL,
+    DoctorUserID INT NOT NULL,
+    ARVTreatmentID INT NULL,
+    MedicationName NVARCHAR(255) NOT NULL,
+    Dosage NVARCHAR(100) NOT NULL,
+    Instructions NVARCHAR(MAX) NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NULL,
+    
+    -- Flexible scheduling options
+    FrequencyType NVARCHAR(20) NOT NULL DEFAULT 'Daily', -- Daily, Weekly, Monthly, As-Needed
+    TimeOfDay TIME NOT NULL, -- Primary time to take medication
+    SecondaryTimes NVARCHAR(500) NULL, -- JSON array of additional times for multiple daily doses
+    WeekDays NVARCHAR(20) NULL, -- For weekly schedules: comma-separated days (Mon,Wed,Fri)
+    MonthDays NVARCHAR(100) NULL, -- For monthly schedules: comma-separated days (1,15,30)
+    
+    -- Reminder and tracking
+    IsActive BIT DEFAULT 1,
+    ReminderEnabled BIT DEFAULT 1,
+    ReminderMinutesBefore INT DEFAULT 30, -- Minutes before medication time to send reminder
+    LastReminderSentAt DATETIME2 NULL, -- Tracks when the last reminder was sent for this routine
+    NextReminderDue DATETIME2 NULL, -- Calculated next reminder time for efficient querying
+    
+    -- Additional medication details
+    MedicationCategory NVARCHAR(100) NULL, -- ARV, Supplement, Pain Management, etc.
+    SideEffectsToMonitor NVARCHAR(MAX) NULL, -- What side effects to watch for
+    FoodRequirement NVARCHAR(50) NULL, -- Take with food, empty stomach, etc.
+    
+    -- Audit fields
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (ARVTreatmentID) REFERENCES ARVTreatments(ARVTreatmentID) ON DELETE SET NULL,
+    
+    CONSTRAINT CHK_FrequencyType CHECK (FrequencyType IN ('Daily', 'Weekly', 'Monthly', 'As-Needed')),
+    CONSTRAINT CHK_FoodRequirement CHECK (FoodRequirement IN ('With Food', 'Empty Stomach', 'No Restriction', NULL))
 );
 
 -- Drop deprecated reminder tables
