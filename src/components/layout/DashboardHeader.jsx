@@ -1,6 +1,6 @@
 import { useAuth } from '../../contexts/AuthContext';
 import UserProfileDropdown from './UserProfileDropdown';
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import apiClient from '../../services/apiClient';
 import NotificationIcon from '../notifications/NotificationIcon';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -11,20 +11,14 @@ const DashboardHeader = ({ title, subtitle }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showPanel, setShowPanel] = useState(false);
-  const notificationPanelRef = useRef(null);
 
   // Function to check if user is a patient
   const isPatient = useCallback(() => {
     return user && (user.role === 'Patient' || user?.role?.roleName === 'Patient');
-  }, [user]);
-
-  const isDoctor = useCallback(() => {
-    return user && (user.role === 'Doctor' || user?.role?.roleName === 'Doctor');
   }, [user]);
 
   useEffect(() => {
@@ -33,29 +27,15 @@ const DashboardHeader = ({ title, subtitle }) => {
     }, 1000);
 
     const fetchNotifications = async () => {
-      if (!user) return;
-      
-      setNotificationsLoading(true);
-      try {
-        let response;
-        if (isDoctor()) {
-          // For doctors, get all notifications they need to see
-          response = await apiClient.get('/notifications/doctor');
-          setNotifications(response.data);
-          // Count notifications with status "Unread"
-          setUnreadCount(response.data.filter(n => n.status === 'Unread').length);
-        } else {
-          // For patients and other users
-          response = await apiClient.get(`/notifications?userId=${user.id}`);
-          setNotifications(response.data);
-          // Count notifications with status "Unread"
-          setUnreadCount(response.data.filter(n => n.status === 'Unread').length);
+        if (user) {
+            try {
+                const response = await apiClient.get(`/notifications?userId=${user.id}`);
+                setNotifications(response.data);
+                setUnreadCount(response.data.filter(n => !n.isRead).length);
+            } catch (error) {
+                console.error('Failed to fetch notifications:', error);
+            }
         }
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error);
-      } finally {
-        setNotificationsLoading(false);
-      }
     };
 
     // Load initial private mode state from API
@@ -78,25 +58,15 @@ const DashboardHeader = ({ title, subtitle }) => {
       }
     };
 
-    // Close notification panel when clicking outside
-    const handleClickOutside = (event) => {
-      if (notificationPanelRef.current && !notificationPanelRef.current.contains(event.target) && 
-          !event.target.closest('.notification-icon-wrapper')) {
-        setShowPanel(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
     loadPrivateMode();
     fetchNotifications();
     const notificationInterval = setInterval(fetchNotifications, 60000); // Poll every minute
 
     return () => {
-      clearInterval(timer);
-      clearInterval(notificationInterval);
-      document.removeEventListener('mousedown', handleClickOutside);
+        clearInterval(timer);
+        clearInterval(notificationInterval);
     };
-  }, [user, isPatient, isDoctor]);
+  }, [user, isPatient]);
 
   const togglePrivacy = async () => {
     if (!isPatient() || isLoading) return;
@@ -109,10 +79,10 @@ const DashboardHeader = ({ title, subtitle }) => {
       
       // Update UI state immediately for better user feedback
       setIsPrivate(newState);
-      // Make API call
-      const response = await apiClient.post('/patients/privacy-settings', {
-        isPrivate: newState
-      });
+        // Make API call
+        const response = await apiClient.post('/patients/privacy-settings', {
+          isPrivate: newState
+        });
       
       if (!response.data?.success) {
         throw new Error(response.data?.message || 'Failed to update privacy settings');
@@ -136,84 +106,21 @@ const DashboardHeader = ({ title, subtitle }) => {
 
   const handleMarkAsRead = async (notificationId) => {
     try {
-      await apiClient.post(`/notifications/${notificationId}/read`);
-      
-      // Update notification status in the local state
-      setNotifications(notifications.map(n => {
-        if (n.notificationId === notificationId) {
-          return { ...n, status: 'Read' };
-        }
-        return n;
-      }));
-      
-      // Update unread count
-      setUnreadCount(prev => Math.max(0, prev - 1));
+        await apiClient.post(`/notifications/${notificationId}/read`);
+        setNotifications(notifications.map(n => n.notificationId === notificationId ? { ...n, isRead: true } : n));
+        setUnreadCount(unreadCount - 1);
     } catch (error) {
-      console.error('Failed to mark notification as read:', error);
-    }
-  };
-
-  const handleMarkAsSeen = async (notificationId) => {
-    // This would be called when a notification is displayed but not explicitly marked as read
-    try {
-      await apiClient.post(`/notifications/${notificationId}/seen`);
-      
-      // Only update local state if the notification is currently Unread
-      setNotifications(notifications.map(n => {
-        if (n.notificationId === notificationId && n.status === 'Unread') {
-          return { ...n, status: 'Seen' };
-        }
-        return n;
-      }));
-      
-      // Don't update unread count since "Seen" still counts as unread in the icon badge
-    } catch (error) {
-      console.error('Failed to mark notification as seen:', error);
+        console.error('Failed to mark notification as read:', error);
     }
   };
 
   const handleMarkAllAsRead = async () => {
     try {
-      if (isDoctor()) {
-        await apiClient.post('/notifications/doctor/read-all');
-      } else {
         await apiClient.post(`/notifications/read-all?userId=${user.id}`);
-      }
-      
-      // Update all notifications to "Read" status
-      setNotifications(notifications.map(n => {
-        if (n.status === 'Unread' || n.status === 'Seen') {
-          return { ...n, status: 'Read' };
-        }
-        return n;
-      }));
-      
-      // Reset unread count
-      setUnreadCount(0);
+        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
     } catch (error) {
-      console.error('Failed to mark all notifications as read:', error);
-    }
-  };
-
-  const handleRetractNotification = async (notificationId) => {
-    try {
-      await apiClient.post(`/notifications/${notificationId}/retract`);
-      
-      // Update notification status in the local state
-      setNotifications(notifications.map(n => {
-        if (n.notificationId === notificationId) {
-          return { ...n, status: 'Retracted' };
-        }
-        return n;
-      }));
-      
-      // If the notification was unread, update the count
-      const wasUnread = notifications.find(n => n.notificationId === notificationId)?.status === 'Unread';
-      if (wasUnread) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-    } catch (error) {
-      console.error('Failed to retract notification:', error);
+        console.error('Failed to mark all notifications as read:', error);
     }
   };
 
@@ -234,18 +141,6 @@ const DashboardHeader = ({ title, subtitle }) => {
     return { date, time };
   };
   const { date, time } = formatDateTime();
-
-  const toggleNotificationPanel = () => {
-    setShowPanel(!showPanel);
-    
-    // Mark visible notifications as seen when opening the panel
-    if (!showPanel) {
-      const unreadNotifications = notifications.filter(n => n.status === 'Unread');
-      unreadNotifications.forEach(notification => {
-        handleMarkAsSeen(notification.notificationId);
-      });
-    }
-  };
 
   return (
     <div className="dashboard-header">
@@ -269,7 +164,7 @@ const DashboardHeader = ({ title, subtitle }) => {
             {subtitle && <p className="dashboard-subtitle">{subtitle}</p>}
           </div>
         </div>
-        <div className="dashboard-header-actions">
+          <div className="dashboard-header-actions">
           {isPatient() && (
             <button 
               className={`privacy-toggle ${isPrivate ? 'active' : ''} ${isLoading ? 'loading' : ''}`}
@@ -301,20 +196,13 @@ const DashboardHeader = ({ title, subtitle }) => {
             <div className="date">{date}</div>
             <div className="time">{time}</div>
           </div>
-          <NotificationIcon 
-            count={unreadCount} 
-            onClick={toggleNotificationPanel} 
-          />
+          <NotificationIcon count={unreadCount} onClick={() => setShowPanel(!showPanel)} />
           {showPanel && (
-            <div ref={notificationPanelRef}>
-              <NotificationPanel
-                notifications={notifications}
-                onMarkAsRead={handleMarkAsRead}
-                onMarkAllAsRead={handleMarkAllAsRead}
-                onRetractNotification={handleRetractNotification}
-                loading={notificationsLoading}
-              />
-            </div>
+            <NotificationPanel
+              notifications={notifications}
+              onMarkAsRead={handleMarkAsRead}
+              onMarkAllAsRead={handleMarkAllAsRead}
+            />
           )}
           <UserProfileDropdown />
         </div>

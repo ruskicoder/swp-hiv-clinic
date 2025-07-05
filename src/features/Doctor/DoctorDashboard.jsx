@@ -8,9 +8,6 @@ import UnifiedCalendar from '../../components/schedule/UnifiedCalendar';
 import ARVTreatmentModal from '../../components/arv/ARVTreatmentModal';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
-import PatientDashboard from './PatientDashboard';
-import TemplateManager from './TemplateManager';
-import NotificationsManager from './NotificationsManager';
 import './DoctorDashboard.css';
 
 /**
@@ -359,9 +356,7 @@ const DoctorDashboard = () => {
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'appointments', label: 'Appointments', icon: '📅' },
     { id: 'patient-record', label: 'Patient Records', icon: '📋' },
-    { id: 'availability', label: 'My Availability', icon: '🕒' },
-    { id: 'notifications', label: 'Notifications Manager', icon: '🔔' },
-    { id: 'templates', label: 'Template Manager', icon: '📝' }
+    { id: 'availability', label: 'My Availability', icon: '🕒' }
   ];
 
   // Helper to check if doctor can edit
@@ -690,18 +685,6 @@ const DoctorDashboard = () => {
         return renderPatientRecord();
       case 'availability':
         return renderAvailability();
-      case 'notifications':
-        return (
-          <div className="notifications-content">
-            <div className="content-header">
-              <h2>Notification Management</h2>
-              <p>Manage patient notifications and communication</p>
-            </div>
-            <NotificationsManager />
-          </div>
-        );
-      case 'templates':
-        return <TemplateManager />;
       default:
         return renderOverview();
     }
