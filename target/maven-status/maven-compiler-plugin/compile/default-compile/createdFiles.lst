@@ -33,7 +33,6 @@ com\hivclinic\service\AuthService.class
 com\hivclinic\service\AppointmentService.class
 com\hivclinic\dto\request\DoctorAvailabilityRequest.class
 com\hivclinic\repository\AppointmentRepository.class
-com\hivclinic\model\Profile.class
 com\hivclinic\model\DoctorAvailabilitySlot.class
 com\hivclinic\model\PasswordResetToken.class
 com\hivclinic\config\CustomLocalDateTimeDeserializer.class
