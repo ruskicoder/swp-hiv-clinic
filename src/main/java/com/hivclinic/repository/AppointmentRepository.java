@@ -110,28 +110,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
            "WHERE a.availabilitySlot = :availabilitySlot " +
            "ORDER BY a.appointmentDateTime DESC")
     List<Appointment> findByAvailabilitySlot(@Param("availabilitySlot") DoctorAvailabilitySlot availabilitySlot);
-
-    /**
-     * Find appointments by doctor user ID and status
-     */
-    @Query("SELECT a FROM Appointment a " +
-           "LEFT JOIN FETCH a.patientUser pu " +
-           "LEFT JOIN FETCH pu.role " +
-           "LEFT JOIN FETCH a.doctorUser du " +
-           "LEFT JOIN FETCH du.role " +
-           "WHERE a.doctorUser.id = :doctorId " +
-           "AND a.status = :status " +
-           "ORDER BY a.appointmentDateTime ASC")
-    List<Appointment> findByDoctorUserIdAndStatus(@Param("doctorId") Integer doctorId, @Param("status") String status);
-
-    /**
-     * Find appointments by date and time range
-     */
-    List<Appointment> findByAppointmentDateTimeBetween(LocalDateTime start, LocalDateTime end);
-
-    /**
-     * Find appointments by doctor user ID
-     */
-    @Query("SELECT a FROM Appointment a WHERE a.doctorUser.id = :doctorId")
-    List<Appointment> findByDoctorUserId(@Param("doctorId") Integer doctorId);
 }

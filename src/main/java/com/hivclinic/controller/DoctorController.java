@@ -3,14 +3,10 @@ package com.hivclinic.controller;
 import com.hivclinic.config.CustomUserDetailsService.UserPrincipal;
 import com.hivclinic.dto.request.DoctorAvailabilityRequest;
 import com.hivclinic.dto.response.MessageResponse;
-import com.hivclinic.dto.PatientAppointmentDTO;
-import com.hivclinic.dto.NotificationDto;
 import com.hivclinic.model.DoctorAvailabilitySlot;
 import com.hivclinic.model.User;
-import com.hivclinic.model.Notification;
 import com.hivclinic.service.DoctorAvailabilityService;
 import com.hivclinic.service.DoctorService;
-import com.hivclinic.service.NotificationService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -43,9 +38,6 @@ public class DoctorController {
 
     @Autowired
     private DoctorAvailabilityService availabilityService;
-    
-    @Autowired
-    private NotificationService notificationService;
 
     /**
      * Get all doctors
@@ -228,231 +220,6 @@ public class DoctorController {
             logger.error("Error deleting availability slot {}: {}", slotId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to delete availability slot: " + e.getMessage()));
-        }
-    }
-
-    /**
-     * Get patients with appointments for the current doctor
-     */
-    @GetMapping("/patients-with-appointments")
-    @PreAuthorize("hasRole('DOCTOR')")
-    public ResponseEntity<?> getPatientsWithAppointments(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        try {
-            logger.debug("Fetching patients with appointments for doctor: {}", userPrincipal.getUsername());
-            List<?> patients = doctorService.getPatientsWithAppointments(userPrincipal.getId());
-            logger.info("Retrieved {} patients with appointments for doctor: {}", patients.size(), userPrincipal.getUsername());
-            return ResponseEntity.ok(patients);
-        } catch (Exception e) {
-            logger.error("Error fetching patients with appointments for doctor {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to fetch patients with appointments: " + e.getMessage()));
-        }
-    }
-
-    @GetMapping("/dashboard-patients")
-    @PreAuthorize("hasRole('DOCTOR')")
-    public ResponseEntity<?> getDashboardPatients(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        try {
-            List<?> patients = doctorService.getDashboardPatients(userPrincipal.getId());
-            return ResponseEntity.ok(patients);
-        } catch (Exception e) {
-            logger.error("Error fetching dashboard patients for doctor {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to fetch dashboard patients: " + e.getMessage()));
-        }
-    }
-    
-    // ================== MANAGER NOTIFICATION ENDPOINTS ==================
-    
-    /**
-     * Get all patients with appointments sorted by status (Manager/Doctor access)
-     * Order: In Progress, Completed, Scheduled
-     */
-    @GetMapping("/patients-appointments-sorted")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('DOCTOR')")
-    public ResponseEntity<?> getPatientsWithAppointmentsSorted(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        try {
-            logger.debug("Fetching patients with appointments sorted by status for user: {}", userPrincipal.getUsername());
-            List<PatientAppointmentDTO> patients = notificationService.getAllPatientsWithAppointmentsSortedByStatus(userPrincipal.getId());
-            logger.info("Retrieved {} patients with appointments sorted by status", patients.size());
-            return ResponseEntity.ok(patients);
-        } catch (Exception e) {
-            logger.error("Error fetching patients with appointments sorted by status: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to fetch patients with appointments: " + e.getMessage()));
-        }
-    }
-    
-    /**
-     * Send notification to specific patient (Manager/Doctor access)
-     */
-    @PostMapping("/send-notification")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('DOCTOR')")
-    public ResponseEntity<?> sendNotificationToPatient(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody Map<String, Object> request) {
-        try {
-            Integer patientId = (Integer) request.get("patientId");
-            String message = (String) request.get("message");
-            String type = (String) request.get("type");
-            
-            if (patientId == null || message == null || message.trim().isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(MessageResponse.error("Patient ID and message are required"));
-            }
-            
-            if (type == null || type.trim().isEmpty()) {
-                type = "GENERAL";
-            }
-            
-            logger.info("Sending notification from {} to patient {}: {}", userPrincipal.getUsername(), patientId, message);
-            
-            Notification notification = notificationService.sendNotification(
-                userPrincipal.getId(),
-                patientId,
-                message,
-                type
-            );
-            
-            logger.info("Notification sent successfully with ID: {}", notification.getNotificationId());
-            return ResponseEntity.ok(MessageResponse.success("Notification sent successfully"));
-            
-        } catch (Exception e) {
-            logger.error("Error sending notification to patient: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to send notification: " + e.getMessage()));
-        }
-    }
-    
-    /**
-     * Send batch notifications to multiple patients (Manager/Doctor access)
-     */
-    @PostMapping("/send-batch-notifications")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('DOCTOR')")
-    public ResponseEntity<?> sendBatchNotifications(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody Map<String, Object> request) {
-        try {
-            @SuppressWarnings("unchecked")
-            List<Integer> patientIds = (List<Integer>) request.get("patientIds");
-            String message = (String) request.get("message");
-            String medicationDetails = (String) request.get("medicationDetails");
-            
-            if (patientIds == null || patientIds.isEmpty() || message == null || message.trim().isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(MessageResponse.error("Patient IDs and message are required"));
-            }
-            
-            logger.info("Sending batch notifications from {} to {} patients", userPrincipal.getUsername(), patientIds.size());
-            
-            List<Notification> notifications = notificationService.sendBatchMedicationReminders(
-                userPrincipal.getId(),
-                patientIds,
-                message,
-                medicationDetails
-            );
-            
-            logger.info("Batch notifications sent successfully: {} notifications", notifications.size());
-            return ResponseEntity.ok(MessageResponse.success("Batch notifications sent: " + notifications.size() + " successful"));
-            
-        } catch (Exception e) {
-            logger.error("Error sending batch notifications: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to send batch notifications: " + e.getMessage()));
-        }
-    }
-    
-    /**
-     * Unsend/retract notification with reason tracking (Manager/Doctor access)
-     */
-    @PostMapping("/notifications/{notificationId}/retract")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('DOCTOR')")
-    public ResponseEntity<?> retractNotification(
-            @PathVariable Integer notificationId,
-            @RequestBody Map<String, String> request,
-            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        try {
-            String reason = request.get("reason");
-            if (reason == null || reason.trim().isEmpty()) {
-                reason = "Retracted by " + userPrincipal.getUsername();
-            }
-            
-            logger.info("Retracting notification {} with reason: {}", notificationId, reason);
-            
-            // Check if notification can be retracted
-            if (!notificationService.canRetractNotification(notificationId)) {
-                return ResponseEntity.badRequest()
-                        .body(MessageResponse.error("Cannot retract notification - it may have already been seen by the patient"));
-            }
-            
-            notificationService.retractNotificationWithReason(notificationId, reason);
-            
-            logger.info("Notification {} retracted successfully", notificationId);
-            return ResponseEntity.ok(MessageResponse.success("Notification retracted successfully"));
-            
-        } catch (Exception e) {
-            logger.error("Error retracting notification {}: {}", notificationId, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to retract notification: " + e.getMessage()));
-        }
-    }
-    
-    /**
-     * Get notification status and history (Manager/Doctor access)
-     */
-    @GetMapping("/notifications/{notificationId}/status")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('DOCTOR')")
-    public ResponseEntity<?> getNotificationStatus(@PathVariable Integer notificationId) {
-        try {
-            logger.debug("Getting notification status for ID: {}", notificationId);
-            
-            Optional<Notification> notificationOpt = notificationService.getNotificationById(notificationId);
-            if (notificationOpt.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-            
-            NotificationDto notificationDto = NotificationDto.fromEntity(notificationOpt.get());
-            return ResponseEntity.ok(notificationDto);
-            
-        } catch (Exception e) {
-            logger.error("Error getting notification status for ID {}: {}", notificationId, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to get notification status: " + e.getMessage()));
-        }
-    }
-    
-    /**
-     * Update notification status (Manager/Doctor access)
-     */
-    @PutMapping("/notifications/{notificationId}/status")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('DOCTOR')")
-    public ResponseEntity<?> updateNotificationStatus(
-            @PathVariable Integer notificationId,
-            @RequestBody Map<String, String> request) {
-        try {
-            String status = request.get("status");
-            String failureReason = request.get("failureReason");
-            
-            if (status == null || status.trim().isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(MessageResponse.error("Status is required"));
-            }
-            
-            logger.info("Updating notification {} status to: {}", notificationId, status);
-            
-            if (failureReason != null && !failureReason.trim().isEmpty()) {
-                notificationService.updateNotificationStatusWithFailureReason(notificationId, status, failureReason);
-            } else {
-                notificationService.updateNotificationStatus(notificationId, status);
-            }
-            
-            logger.info("Notification {} status updated successfully", notificationId);
-            return ResponseEntity.ok(MessageResponse.success("Notification status updated successfully"));
-            
-        } catch (Exception e) {
-            logger.error("Error updating notification status for ID {}: {}", notificationId, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to update notification status: " + e.getMessage()));
         }
     }
 }
