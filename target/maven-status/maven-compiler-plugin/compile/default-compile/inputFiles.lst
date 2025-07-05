@@ -13,6 +13,7 @@ d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\Notificatio
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\PatientPrivacyController.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\ManagerController.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\AppointmentRepository.java
+d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\NotificationTemplate.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\DoctorController.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\Appointment.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\MedicationRoutine.java
@@ -20,9 +21,12 @@ d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\SpecialtyRe
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\AdminService.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\PasswordResetTokenRepository.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\UserRepository.java
+d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\NotificationSchedulingService.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\DoctorAvailabilitySlot.java
+d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\NotificationTemplateService.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\ARVTreatmentController.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\SystemSetting.java
+d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\DoctorNotificationService.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\ManagerService.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\NotificationService.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\request\DoctorAvailabilityRequest.java
@@ -62,6 +66,7 @@ d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\PatientPrivacy
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\AdminController.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\Role.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\UserService.java
+d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\NotificationTemplateRepository.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\Notification.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\DoctorAvailabilitySlotRepository.java
 d:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\HivClinicBackendApplication.java

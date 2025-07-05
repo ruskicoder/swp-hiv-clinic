@@ -218,4 +218,26 @@ BEGIN
     SELECT @SlotId2 = SCOPE_IDENTITY();
 END
 
+-- Insert default notification templates
+IF NOT EXISTS (SELECT * FROM NotificationTemplates WHERE name = '24-Hour Appointment Reminder')
+BEGIN
+    INSERT INTO NotificationTemplates (name, type, subject, body, Priority, isActive) VALUES
+    -- Appointment reminder templates
+    ('24-Hour Appointment Reminder', 'APPOINTMENT_REMINDER', 'Appointment Reminder - {{patientName}}', 'Dear {{patientName}}, you have an appointment tomorrow at {{appointmentTime}} with Dr. {{doctorName}}. Please arrive 15 minutes early.', 'MEDIUM', 1),
+    ('1-Hour Appointment Reminder', 'APPOINTMENT_REMINDER', 'Appointment Starting Soon - {{patientName}}', 'Dear {{patientName}}, your appointment with Dr. {{doctorName}} is starting in 1 hour at {{appointmentTime}}.', 'HIGH', 1),
+    ('30-Minute Appointment Reminder', 'APPOINTMENT_REMINDER', 'Appointment in 30 Minutes - {{patientName}}', 'Dear {{patientName}}, your appointment with Dr. {{doctorName}} is starting in 30 minutes at {{appointmentTime}}. Please head to the clinic now.', 'URGENT', 1),
+    
+    -- Medication reminder templates
+    ('Daily ARV Medication Reminder', 'MEDICATION_REMINDER', 'Time for Your ARV Medication - {{patientName}}', 'Dear {{patientName}}, it''s time to take your ARV medication: {{medicationName}}. Please take it as prescribed by Dr. {{doctorName}}.', 'HIGH', 1),
+    ('Medication Adherence Reminder', 'MEDICATION_REMINDER', 'Important: Medication Adherence - {{patientName}}', 'Dear {{patientName}}, maintaining consistent medication adherence is crucial for your treatment success. Please take your prescribed ARV medication: {{medicationName}}.', 'URGENT', 1),
+    ('Missed Dose Follow-up', 'MEDICATION_REMINDER', 'Missed Dose Notification - {{patientName}}', 'Dear {{patientName}}, you may have missed your scheduled medication dose. Please contact Dr. {{doctorName}} if you need guidance on missed doses.', 'HIGH', 1),
+    
+    -- General templates
+    ('General Health Reminder', 'GENERAL', 'Health Reminder - {{patientName}}', 'Dear {{patientName}}, this is a reminder from Dr. {{doctorName}} about: {{customMessage}}', 'MEDIUM', 1),
+    ('Lab Results Available', 'GENERAL', 'Lab Results Ready - {{patientName}}', 'Dear {{patientName}}, your lab results are ready for review. Please contact Dr. {{doctorName}} to discuss your results.', 'MEDIUM', 1),
+    ('Treatment Plan Update', 'GENERAL', 'Treatment Plan Update - {{patientName}}', 'Dear {{patientName}}, Dr. {{doctorName}} has updated your treatment plan. Please review the changes and contact us if you have questions.', 'HIGH', 1);
+    
+    PRINT 'Default notification templates created';
+END
+
 PRINT 'Initial data setup completed!';
