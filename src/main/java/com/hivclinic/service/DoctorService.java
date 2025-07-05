@@ -1,10 +1,6 @@
 package com.hivclinic.service;
 
-import com.hivclinic.dto.PatientAppointmentDTO;
-import com.hivclinic.dto.PatientDashboardDTO;
-import com.hivclinic.model.Appointment;
 import com.hivclinic.model.User;
-import com.hivclinic.repository.AppointmentRepository;
 import com.hivclinic.repository.DoctorProfileRepository;
 import com.hivclinic.repository.UserRepository;
 import org.slf4j.Logger;
@@ -14,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Service for managing doctor-related operations
@@ -29,9 +24,6 @@ public class DoctorService {
     
     @Autowired
     private DoctorProfileRepository doctorProfileRepository;
-
-    @Autowired
-    private AppointmentRepository appointmentRepository;
     
     /**
      * Get all doctors in the system
@@ -83,47 +75,6 @@ public class DoctorService {
         } catch (Exception e) {
             logger.error("Error fetching doctor by ID {}: {}", doctorId, e.getMessage(), e);
             throw new RuntimeException("Failed to fetch doctor: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Get patients with appointments for a specific doctor
-     */
-    public List<PatientAppointmentDTO> getPatientsWithAppointments(Integer doctorId) {
-        try {
-            List<Appointment> appointments = appointmentRepository.findByDoctorUserIdAndStatus(doctorId, "Scheduled");
-            return appointments.stream()
-                    .map(appointment -> {
-                        PatientAppointmentDTO dto = new PatientAppointmentDTO();
-                        dto.setAppointmentId(appointment.getAppointmentId());
-                        dto.setPatientName(appointment.getPatientUser().getUsername());
-                        dto.setAppointmentDateTime(appointment.getAppointmentDateTime());
-                        dto.setStatus(appointment.getStatus());
-                        dto.setPatientUserId(appointment.getPatientUser().getUserId());
-                        dto.setNotificationCount(0); // Default value
-                        return dto;
-                    })
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            logger.error("Error fetching patients with appointments for doctor ID {}: {}", doctorId, e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch patients with appointments: " + e.getMessage());
-        }
-    }
-
-    public List<PatientDashboardDTO> getDashboardPatients(Integer doctorId) {
-        try {
-            List<Appointment> appointments = appointmentRepository.findByDoctorUserId(doctorId);
-            return appointments.stream()
-                    .map(appointment -> new PatientDashboardDTO(
-                            appointment.getPatientUser().getUserId(),
-                            appointment.getPatientUser().getUsername(),
-                            appointment.getAppointmentDateTime(),
-                            appointment.getStatus()
-                    ))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            logger.error("Error fetching dashboard patients for doctor ID {}: {}", doctorId, e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch dashboard patients: " + e.getMessage());
         }
     }
 }
