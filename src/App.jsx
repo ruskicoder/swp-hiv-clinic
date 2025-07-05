@@ -5,6 +5,8 @@ import AppRouter from './routes/AppRouter';
 import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
+import StagewiseToolbarDevOnly from './StagewiseToolbarDevOnly';
+
 /**
  * Main App component that sets up the application structure
  * with routing, authentication context, and error boundaries
@@ -15,6 +17,7 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <div className="App">
+            <StagewiseToolbarDevOnly />
             <AppRouter />
           </div>
         </AuthProvider>
