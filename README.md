@@ -1,5 +1,7 @@
 # SWP HIV Clinic
 
+[![Node.js CI](https://github.com/ruskicoder/swp-hiv-clinic/actions/workflows/node.js.yml/badge.svg)](https://github.com/ruskicoder/swp-hiv-clinic/actions/workflows/node.js.yml)
+
 A web application for managing HIV clinic operations.
 
 ## Project Setup

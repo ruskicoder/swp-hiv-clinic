@@ -1,5 +1,5 @@
 -- Create database if it doesn't exist
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'hiv_clinic')
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'hiv_clinic')
 BEGIN
     CREATE DATABASE hiv_clinic;
 END
@@ -8,176 +8,151 @@ GO
 USE hiv_clinic;
 GO
 
--- Roles Table: Defines the types of users in the system
+-- Create tables if not exist
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Roles' AND xtype='U')
 CREATE TABLE Roles (
-    RoleID INT PRIMARY KEY IDENTITY(1,1),
-    RoleName VARCHAR(50) NOT NULL UNIQUE -- e.g., 'Patient', 'Doctor', 'Admin'
+    RoleID INT IDENTITY(1,1) PRIMARY KEY,
+    RoleName NVARCHAR(50) NOT NULL UNIQUE
 );
 
--- Users Table: Stores common information for all authenticated users
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
 CREATE TABLE Users (
-    UserID INT PRIMARY KEY IDENTITY(1,1),    Username VARCHAR(255) NOT NULL UNIQUE,
-    PasswordHash VARCHAR(255) NOT NULL,
-    Email VARCHAR(255) NOT NULL UNIQUE,
+    UserID INT IDENTITY(1,1) PRIMARY KEY,    Username NVARCHAR(255) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    Email NVARCHAR(255) NOT NULL UNIQUE,
     FirstName NVARCHAR(100) NULL,
     LastName NVARCHAR(100) NULL,
     Specialty NVARCHAR(255) NULL,
-    RoleID INT NOT NULL,
+    RoleID INT NOT NULL FOREIGN KEY REFERENCES Roles(RoleID),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID) ON DELETE NO ACTION ON UPDATE NO ACTION
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
 
--- Specialties Table: Lookup table for Doctor's specialties (Admin managed)
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Specialties' AND xtype='U')
 CREATE TABLE Specialties (
-    SpecialtyID INT PRIMARY KEY IDENTITY(1,1),
+    SpecialtyID INT IDENTITY(1,1) PRIMARY KEY,
     SpecialtyName NVARCHAR(255) NOT NULL UNIQUE,
-    Description NVARCHAR(MAX) NULL,
+    Description NVARCHAR(MAX),
     IsActive BIT DEFAULT 1
 );
 
--- DoctorProfiles Table: Stores additional information specific to Doctors
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorProfiles' AND xtype='U')
 CREATE TABLE DoctorProfiles (
-    DoctorProfileID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL UNIQUE,
+    DoctorProfileID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL UNIQUE FOREIGN KEY REFERENCES Users(UserID),
     FirstName NVARCHAR(100) NOT NULL,
     LastName NVARCHAR(100) NOT NULL,
-    SpecialtyID INT NULL,
-    PhoneNumber NVARCHAR(20) NULL,
-    Bio NVARCHAR(MAX) NULL,
-    ProfileImageBase64 NVARCHAR(MAX) NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (SpecialtyID) REFERENCES Specialties(SpecialtyID) ON DELETE SET NULL ON UPDATE NO ACTION
+    SpecialtyID INT FOREIGN KEY REFERENCES Specialties(SpecialtyID),
+    PhoneNumber NVARCHAR(20),
+    Bio NVARCHAR(MAX),
+    ProfileImageBase64 NVARCHAR(MAX)
 );
 
--- PatientProfiles Table: Stores additional information specific to Patients
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientProfiles' AND xtype='U')
 CREATE TABLE PatientProfiles (
-    PatientProfileID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL UNIQUE,
+    PatientProfileID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL UNIQUE FOREIGN KEY REFERENCES Users(UserID),
     FirstName NVARCHAR(100) NOT NULL,
     LastName NVARCHAR(100) NOT NULL,
-    DateOfBirth DATE NULL,
-    PhoneNumber NVARCHAR(20) NULL,
-    Address NVARCHAR(MAX) NULL,
-    ProfileImageBase64 NVARCHAR(MAX) NULL,
+    DateOfBirth DATE,
+    PhoneNumber NVARCHAR(20),
+    Address NVARCHAR(MAX),
+    ProfileImageBase64 NVARCHAR(MAX),
     IsPrivate BIT NOT NULL DEFAULT 0,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+    PreferredChannel NVARCHAR(20) DEFAULT 'In-App',
+    CONSTRAINT CHK_PreferredChannel CHECK (PreferredChannel IN ('In-App', 'SMS', 'Email'))
 );
 
--- PatientRecords Table: Enhanced for better medical record management
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
-CREATE TABLE PatientRecords (
-    RecordID INT PRIMARY KEY IDENTITY(1,1),
-    PatientUserID INT NOT NULL,
-    AppointmentId INT NULL,
-    MedicalHistory NVARCHAR(MAX) NULL,
-    Allergies NVARCHAR(MAX) NULL,
-    CurrentMedications NVARCHAR(MAX) NULL,
-    Notes NVARCHAR(MAX) NULL,
-    BloodType NVARCHAR(10) NULL,
-    EmergencyContact NVARCHAR(255) NULL,
-    EmergencyPhone NVARCHAR(20) NULL,
-    ProfileImageBase64 NVARCHAR(MAX) NULL, -- for base64 image upload
-    CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL
-);
-
--- DoctorAvailabilitySlots Table: Doctors define their work slots
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
 CREATE TABLE DoctorAvailabilitySlots (
-    AvailabilitySlotID INT PRIMARY KEY IDENTITY(1,1),
-    DoctorUserID INT NOT NULL, -- Refers to the UserID of a Doctor
+    AvailabilitySlotID INT IDENTITY(1,1) PRIMARY KEY,
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     SlotDate DATE NOT NULL,
     StartTime TIME NOT NULL,
     EndTime TIME NOT NULL,
-    IsBooked BIT DEFAULT 0, -- Flag to indicate if an appointment has taken this slot
-    Notes NVARCHAR(MAX) NULL, -- Doctor's notes for this slot, e.g., "Reserved for follow-ups"
+    IsBooked BIT DEFAULT 0,
+    Notes NVARCHAR(MAX),
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    CONSTRAINT UQ_DoctorSlot UNIQUE (DoctorUserID, SlotDate, StartTime), -- A doctor cannot have overlapping start times for slots on the same day
-    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE CASCADE -- If Doctor user is deleted, their slots are deleted
+    CONSTRAINT UQ_DoctorSlot UNIQUE (DoctorUserID, SlotDate, StartTime)
 );
 
--- Appointments Table: Core table for booking appointments
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Appointments' AND xtype='U')
 CREATE TABLE Appointments (
-    AppointmentID INT PRIMARY KEY IDENTITY(1,1),
-    PatientUserID INT NOT NULL, -- Refers to the UserID of a Patient
-    DoctorUserID INT NOT NULL, -- Refers to the UserID of a Doctor
-    AvailabilitySlotID INT NULL, -- Optional: links to the specific slot that was booked
-    AppointmentDateTime DATETIME2 NOT NULL, -- The confirmed date and time of the appointment
-    DurationMinutes INT DEFAULT 30, -- MVP: Assume a default, could be a system setting
-    Status VARCHAR(50) NOT NULL DEFAULT 'Scheduled', -- e.g., 'Scheduled', 'Completed', 'CancelledByPatient', 'CancelledByDoctor', 'NoShow'
-    PatientCancellationReason NVARCHAR(MAX) NULL,
-    DoctorCancellationReason NVARCHAR(MAX) NULL,
-    AppointmentNotes NVARCHAR(MAX) NULL, -- Doctor's notes during/after appointment
+    AppointmentID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    AvailabilitySlotID INT FOREIGN KEY REFERENCES DoctorAvailabilitySlots(AvailabilitySlotID),
+    AppointmentDateTime DATETIME2 NOT NULL,
+    DurationMinutes INT DEFAULT 30,
+    Status VARCHAR(50) DEFAULT 'Scheduled',
+    PatientCancellationReason NVARCHAR(MAX),
+    DoctorCancellationReason NVARCHAR(MAX),
+    AppointmentNotes NVARCHAR(MAX),
     CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION ON UPDATE NO ACTION, -- Don't delete appointments if patient is deleted without review
-    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE NO ACTION ON UPDATE NO ACTION, -- Don't delete appointments if doctor is deleted without review
-    FOREIGN KEY (AvailabilitySlotID) REFERENCES DoctorAvailabilitySlots(AvailabilitySlotID) ON DELETE SET NULL ON UPDATE NO ACTION -- If slot is deleted, keep appointment but unlink slot
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
 
--- AppointmentStatusHistory Table: Logs status changes for an appointment
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentStatusHistory' AND xtype='U')
-CREATE TABLE AppointmentStatusHistory (
-    StatusHistoryID INT PRIMARY KEY IDENTITY(1,1),
-    AppointmentID INT NOT NULL,
-    OldStatus VARCHAR(50) NULL,
-    NewStatus VARCHAR(50) NOT NULL,
-    ChangeReason NVARCHAR(MAX) NULL,
-    ChangedAt DATETIME2 DEFAULT GETDATE(),
-    ChangedByUserID INT NULL, -- User who made the change (Patient, Doctor, Admin, or System)
-    FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE CASCADE, -- If appointment is deleted, its history is deleted
-    FOREIGN KEY (ChangedByUserID) REFERENCES Users(UserID) ON DELETE SET NULL ON UPDATE NO ACTION -- If user who changed status is deleted, keep log but nullify user
-);
-
--- SystemSettings Table: Admin-configurable global parameters
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SystemSettings' AND xtype='U')
 CREATE TABLE SystemSettings (
-    SettingID INT PRIMARY KEY IDENTITY(1,1),
-    SettingKey VARCHAR(100) NOT NULL UNIQUE, -- e.g., 'DefaultAppointmentDurationMinutes', 'MaxBookingLeadDays'
+    SettingID INT IDENTITY(1,1) PRIMARY KEY,
+    SettingKey NVARCHAR(100) NOT NULL UNIQUE,
     SettingValue NVARCHAR(MAX) NOT NULL,
-    Description NVARCHAR(MAX) NULL,
+    Description NVARCHAR(MAX),
     UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedByUserID INT NULL, -- Admin who last updated
-    FOREIGN KEY (UpdatedByUserID) REFERENCES Users(UserID) ON DELETE SET NULL ON UPDATE NO ACTION
+    UpdatedByUserID INT FOREIGN KEY REFERENCES Users(UserID)
 );
 
--- LoginActivity Table: Logs login attempts for basic security monitoring
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='LoginActivity' AND xtype='U')
-CREATE TABLE LoginActivity (
-    LogID BIGINT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NULL, -- Null if username was not found
-    UsernameAttempted VARCHAR(255) NOT NULL,
-    AttemptTime DATETIME2 DEFAULT GETDATE(),
-    IsSuccess BIT NOT NULL,
-    IPAddress VARCHAR(45) NULL,
-    UserAgent NVARCHAR(MAX) NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE SET NULL ON UPDATE NO ACTION -- If user is deleted, keep log but nullify user
-);
-
--- PasswordResetTokens Table: Stores tokens for password reset functionality
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PasswordResetTokens' AND xtype='U')
 CREATE TABLE PasswordResetTokens (
-    TokenID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL,
+    TokenID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     Token NVARCHAR(255) NOT NULL UNIQUE,
     ExpiryDateTime DATETIME2 NOT NULL,
     IsUsed BIT DEFAULT 0,
-    CreatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE -- If user is deleted, their reset tokens are also deleted
+    CreatedAt DATETIME2 DEFAULT GETDATE()
 );
 
--- ARVTreatments Table: Enhanced for better treatment management
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentStatusHistory' AND xtype='U')
+CREATE TABLE AppointmentStatusHistory (
+    StatusHistoryID INT IDENTITY(1,1) PRIMARY KEY,
+    AppointmentID INT NOT NULL FOREIGN KEY REFERENCES Appointments(AppointmentID),
+    OldStatus NVARCHAR(50),
+    NewStatus NVARCHAR(50) NOT NULL,
+    ChangeReason NVARCHAR(MAX),
+    ChangedAt DATETIME2 DEFAULT GETDATE(),
+    ChangedByUserID INT FOREIGN KEY REFERENCES Users(UserID)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='LoginActivity' AND xtype='U')
+CREATE TABLE LoginActivity (
+    LogID BIGINT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+    UsernameAttempted NVARCHAR(255) NOT NULL,
+    AttemptTime DATETIME2 DEFAULT GETDATE(),
+    IsSuccess BIT NOT NULL,
+    IPAddress NVARCHAR(45),
+    UserAgent NVARCHAR(MAX)
+);
+
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
+CREATE TABLE PatientRecords (
+    RecordID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    MedicalHistory NVARCHAR(MAX),
+    Allergies NVARCHAR(MAX), 
+    CurrentMedications NVARCHAR(MAX),
+    Notes NVARCHAR(MAX),
+    BloodType NVARCHAR(10),
+    EmergencyContact NVARCHAR(255),
+    EmergencyPhone NVARCHAR(20),
+    ProfileImageBase64 NVARCHAR(MAX),
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    INDEX IX_PatientRecords_PatientUserID (PatientUserID)
+);
+
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='ARVTreatments' AND xtype='U')
 CREATE TABLE ARVTreatments (
     ARVTreatmentID INT IDENTITY(1,1) PRIMARY KEY,
@@ -195,47 +170,134 @@ CREATE TABLE ARVTreatments (
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
 
--- Add AppointmentNotes column to Appointments table if not exists
-IF COL_LENGTH('Appointments', 'AppointmentNotes') IS NULL
-    ALTER TABLE Appointments ADD AppointmentNotes NVARCHAR(MAX) NULL;
 
--- Update PatientRecords table to allow nullable appointment ID 
-IF EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
-ALTER TABLE PatientRecords
-    DROP CONSTRAINT IF EXISTS FK_PatientRecords_Appointments;
+
+-- Drop deprecated notification tables
+IF EXISTS (SELECT * FROM sysobjects WHERE name='Notifications' AND xtype='U')
+    DROP TABLE Notifications;
+GO
+IF EXISTS (SELECT * FROM sysobjects WHERE name='NotificationTemplates' AND xtype='U')
+    DROP TABLE NotificationTemplates;
 GO
 
-IF EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
-ALTER TABLE PatientRecords 
-    ADD CONSTRAINT FK_PatientRecords_Appointments 
-    FOREIGN KEY (AppointmentId) 
-    REFERENCES Appointments(AppointmentID)
-    ON DELETE SET NULL;
+-- Doctor-facing notifications table
+CREATE TABLE Notifications (
+    NotificationID INT IDENTITY(1,1) PRIMARY KEY,
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID) ON DELETE NO ACTION,
+    AppointmentID INT NULL FOREIGN KEY REFERENCES Appointments(AppointmentID) ON DELETE SET NULL,
+    MedicationRoutineID INT NULL FOREIGN KEY REFERENCES MedicationRoutines(RoutineID) ON DELETE SET NULL,
+    Type NVARCHAR(50) NOT NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Sent',
+    Message NVARCHAR(MAX) NOT NULL,
+    Payload NVARCHAR(MAX) NULL, -- JSON for action-specific data
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    DeliveredAt DATETIME2 NULL,
+    SeenAt DATETIME2 NULL,
+    ReadAt DATETIME2 NULL,
+    RetractedAt DATETIME2 NULL,
+    RetractionReason NVARCHAR(MAX) NULL, -- Reason why notification was retracted
+    FailureReason NVARCHAR(MAX) NULL,
+    CONSTRAINT CHK_NotificationType_V2 CHECK (Type IN ('APPOINTMENT_REMINDER', 'FOLLOW_UP_REQUIRED', 'TEST_RESULTS_AVAILABLE', 'MEDICATION_REMINDER', 'CUSTOM')),
+    CONSTRAINT CHK_NotificationStatus_V2 CHECK (Status IN ('Sent', 'Delivered', 'Failed', 'Seen', 'Read', 'Retracted'))
+);
+
+-- Notification Templates table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='NotificationTemplates' AND xtype='U')
+CREATE TABLE NotificationTemplates (
+    TemplateID INT IDENTITY(1,1) PRIMARY KEY,
+    TemplateName NVARCHAR(255) NOT NULL UNIQUE,
+    TemplateContent NVARCHAR(MAX) NOT NULL,
+    CreatedByUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+-- LabResults table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='LabResults' AND xtype='U')
+CREATE TABLE LabResults (
+    LabResultID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT NULL FOREIGN KEY REFERENCES Appointments(AppointmentID),
+    TestName NVARCHAR(255) NOT NULL,
+    ResultValue NVARCHAR(255) NOT NULL,
+    ReferenceRange NVARCHAR(255),
+    Notes NVARCHAR(MAX),
+    Status NVARCHAR(50) DEFAULT 'Pending Review',
+    ResultDate DATETIME2 NOT NULL,
+    CreatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+-- MedicationRoutines Table: Defines medication schedules for patients with flexible scheduling
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationRoutines' AND xtype='U')
+CREATE TABLE MedicationRoutines (
+    RoutineID INT PRIMARY KEY IDENTITY(1,1),
+    PatientUserID INT NOT NULL,
+    DoctorUserID INT NOT NULL,
+    ARVTreatmentID INT NULL,
+    MedicationName NVARCHAR(255) NOT NULL,
+    Dosage NVARCHAR(100) NOT NULL,
+    Instructions NVARCHAR(MAX) NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NULL,
+    
+    -- Flexible scheduling options
+    FrequencyType NVARCHAR(20) NOT NULL DEFAULT 'Daily', -- Daily, Weekly, Monthly, As-Needed
+    TimeOfDay TIME NOT NULL, -- Primary time to take medication
+    SecondaryTimes NVARCHAR(500) NULL, -- JSON array of additional times for multiple daily doses
+    WeekDays NVARCHAR(20) NULL, -- For weekly schedules: comma-separated days (Mon,Wed,Fri)
+    MonthDays NVARCHAR(100) NULL, -- For monthly schedules: comma-separated days (1,15,30)
+    
+    -- Reminder and tracking
+    IsActive BIT DEFAULT 1,
+    ReminderEnabled BIT DEFAULT 1,
+    ReminderMinutesBefore INT DEFAULT 30, -- Minutes before medication time to send reminder
+    LastReminderSentAt DATETIME2 NULL, -- Tracks when the last reminder was sent for this routine
+    NextReminderDue DATETIME2 NULL, -- Calculated next reminder time for efficient querying
+    
+    -- Additional medication details
+    MedicationCategory NVARCHAR(100) NULL, -- ARV, Supplement, Pain Management, etc.
+    SideEffectsToMonitor NVARCHAR(MAX) NULL, -- What side effects to watch for
+    FoodRequirement NVARCHAR(50) NULL, -- Take with food, empty stomach, etc.
+    
+    -- Audit fields
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (ARVTreatmentID) REFERENCES ARVTreatments(ARVTreatmentID) ON DELETE SET NULL,
+    
+    CONSTRAINT CHK_FrequencyType CHECK (FrequencyType IN ('Daily', 'Weekly', 'Monthly', 'As-Needed')),
+    CONSTRAINT CHK_FoodRequirement CHECK (FoodRequirement IN ('With Food', 'Empty Stomach', 'No Restriction', NULL))
+);
+
+-- Drop deprecated reminder tables
+IF EXISTS (SELECT * FROM sysobjects WHERE name='MedicationReminders' AND xtype='U')
+    DROP TABLE MedicationReminders;
 GO
 
--- Add DurationMinutes column to DoctorAvailabilitySlots if it doesn't exist
-IF NOT EXISTS (
-    SELECT * FROM sys.columns 
-    WHERE object_id = OBJECT_ID('DoctorAvailabilitySlots') AND name = 'DurationMinutes'
-)
-BEGIN
-    ALTER TABLE DoctorAvailabilitySlots ADD DurationMinutes INT NULL;
-END
+IF EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentReminders' AND xtype='U')
+    DROP TABLE AppointmentReminders;
 GO
 
--- Update PatientRecords table to allow nullable appointment ID and set ON DELETE SET NULL constraint
-IF EXISTS (SELECT * FROM sysobjects WHERE name='PatientRecords' AND xtype='U')
-BEGIN
-    DECLARE @constraintName NVARCHAR(200);
-    SELECT @constraintName = name FROM sys.foreign_keys WHERE parent_object_id = OBJECT_ID('PatientRecords') AND referenced_object_id = OBJECT_ID('Appointments');
-    IF @constraintName IS NOT NULL
-    BEGIN
-        EXEC('ALTER TABLE PatientRecords DROP CONSTRAINT ' + @constraintName);
-    END
-    ALTER TABLE PatientRecords WITH NOCHECK ADD CONSTRAINT FK_PatientRecords_Appointments FOREIGN KEY (AppointmentId) REFERENCES Appointments(AppointmentID) ON DELETE SET NULL;
-END
+-- Create indexes for optimal notification and medication routine performance
+-- Notifications table indexes
+CREATE INDEX IX_Notifications_DoctorUserID ON Notifications(DoctorUserID);
+CREATE INDEX IX_Notifications_PatientUserID ON Notifications(PatientUserID);
+CREATE INDEX IX_Notifications_Type ON Notifications(Type);
+CREATE INDEX IX_Notifications_Status ON Notifications(Status);
+CREATE INDEX IX_Notifications_CreatedAt ON Notifications(CreatedAt);
+CREATE INDEX IX_Notifications_TypeStatus ON Notifications(Type, Status);
+CREATE INDEX IX_Notifications_PatientType ON Notifications(PatientUserID, Type);
+
+-- MedicationRoutines table indexes
+CREATE INDEX IX_MedicationRoutines_PatientUserID ON MedicationRoutines(PatientUserID);
+CREATE INDEX IX_MedicationRoutines_IsActive ON MedicationRoutines(IsActive);
+CREATE INDEX IX_MedicationRoutines_ReminderEnabled ON MedicationRoutines(ReminderEnabled);
+CREATE INDEX IX_MedicationRoutines_NextReminderDue ON MedicationRoutines(NextReminderDue);
+CREATE INDEX IX_MedicationRoutines_ActiveReminders ON MedicationRoutines(IsActive, ReminderEnabled, NextReminderDue);
+CREATE INDEX IX_MedicationRoutines_PatientActive ON MedicationRoutines(PatientUserID, IsActive);
+CREATE INDEX IX_MedicationRoutines_ARVTreatmentID ON MedicationRoutines(ARVTreatmentID);
 GO
-
-PRINT 'Database schema created successfully!';
-
--- No changes needed. Schema is syntactically correct for SQL Server.

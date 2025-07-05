@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import DashboardHeader from '../../components/layout/DashboardHeader';
+import NotificationsManager from '../Doctor/NotificationsManager';
 import './ManagerDashboard.css';
 
 const SIDEBAR_OPTIONS = [
@@ -29,6 +30,11 @@ const SIDEBAR_OPTIONS = [
     key: 'schedules', 
     label: 'Schedule Management',
     icon: '📅'
+  },
+  {
+    key: 'notifications',
+    label: 'Notification Management',
+    icon: '🔔'
   },
 ];
 
@@ -470,6 +476,16 @@ const ManagerDashboard = () => {
     </div>
   );
 
+  const renderNotifications = () => (
+    <div>
+      <div className="section-header">
+        <h2>Notification Management</h2>
+        <p>Manage patient notifications and communication across the system</p>
+      </div>
+      <NotificationsManager />
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -482,6 +498,8 @@ const ManagerDashboard = () => {
         return renderARV();
       case 'schedules':
         return renderSchedules();
+      case 'notifications':
+        return renderNotifications();
       default:
         return renderOverview();
     }

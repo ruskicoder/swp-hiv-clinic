@@ -45,6 +45,9 @@ public class PatientProfile {
     @Column(name = "IsPrivate", nullable = false)
     private Boolean isPrivate = false;
 
+    @Column(name = "PreferredChannel", length = 20)
+    private String preferredChannel;
+
     // Getters
     public Integer getPatientProfileId() { return patientProfileId; }
     public User getUser() { return user; }
@@ -57,6 +60,7 @@ public class PatientProfile {
     public String getProfileImageBase64() { return profileImageBase64; }
     public Boolean isPrivate() { return isPrivate; }
     public Boolean getIsPrivate() { return isPrivate; }
+    public String getPreferredChannel() { return preferredChannel; }
 
     // Setters
     public void setPatientProfileId(Integer id) { this.patientProfileId = id; }
@@ -70,4 +74,5 @@ public class PatientProfile {
     public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
     public void setIsPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }
     public void setPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }  // Added method to match service usage
+    public void setPreferredChannel(String preferredChannel) { this.preferredChannel = preferredChannel; }
 }

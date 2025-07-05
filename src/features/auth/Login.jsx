@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import BackNavigation from '../../components/layout/BackNavigation';
 import './Auth.css';
@@ -11,7 +11,8 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const { login, error: authError } = useAuth();
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
 
   // Get success message from registration
@@ -50,21 +51,27 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrors({});
-    const isValid = validateForm();
-    if (!isValid) {
-      setLoading(false);
-      return;
-    }
-    const response = await login(formData);
-    if (!response.success) {
-      setErrors(prev => ({ ...prev, submit: response.message || 'Login failed. Please try again.' }));
-    } else {
-      if (response && response.token) {
-        sessionStorage.setItem('token', response.token);
+    
+    try {
+      const isValid = validateForm();
+      if (!isValid) {
+        return;
       }
+
+      // Call login and get response
+      const response = await login(formData);
+      // Save token to localStorage if present
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+      }
+      // Navigation will be handled by the AuthContext
+    } catch (error) {
+      setErrors({
+        submit: error.message || 'Login failed. Please try again.'
+      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -82,10 +89,9 @@ const Login = () => {
           </div>
         )}
 
-
-        {(errors.submit || authError) && (
+        {errors.submit && (
           <div className="error-message">
-            {errors.submit || authError}
+            {errors.submit}
           </div>
         )}
 
@@ -114,11 +120,11 @@ const Login = () => {
               id="password"
               name="password"
               value={formData.password}
-              onChange={handleChange}
-              className={errors.password ? 'error' : ''}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-            />
+                onChange={handleChange}
+                className={errors.password ? 'error' : ''}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+              />
             {errors.password && (
               <span className="field-error">{errors.password}</span>
             )}
