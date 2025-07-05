@@ -206,22 +206,18 @@ const ManagerDashboard = () => {
           <div className="stat-card">
             <h3>Total Patients</h3>
             <div className="stat-number">{stats.totalPatients || 0}</div>
-            <div className="stat-change positive">+12% from last month</div>
           </div>
           <div className="stat-card">
             <h3>Active Doctors</h3>
             <div className="stat-number">{stats.totalDoctors || 0}</div>
-            <div className="stat-change positive">+5% from last month</div>
           </div>
           <div className="stat-card">
             <h3>Total Appointments</h3>
             <div className="stat-number">{stats.totalAppointments || 0}</div>
-            <div className="stat-change positive">+18% from last week</div>
           </div>
           <div className="stat-card">
             <h3>ARV Treatments</h3>
             <div className="stat-number">{stats.totalARVTreatments || 0}</div>
-            <div className="stat-change positive">Active regimens</div>
           </div>
         </div>
       )}
