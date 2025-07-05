@@ -59,7 +59,9 @@ CREATE TABLE PatientProfiles (
     PhoneNumber NVARCHAR(20),
     Address NVARCHAR(MAX),
     ProfileImageBase64 NVARCHAR(MAX),
-    IsPrivate BIT NOT NULL DEFAULT 0
+    IsPrivate BIT NOT NULL DEFAULT 0,
+    PreferredChannel NVARCHAR(20) DEFAULT 'In-App',
+    CONSTRAINT CHK_PreferredChannel CHECK (PreferredChannel IN ('In-App', 'SMS', 'Email'))
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
@@ -170,27 +172,64 @@ CREATE TABLE ARVTreatments (
 
 
 
--- Notifications Table: Stores all types of notifications
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Notifications' AND xtype='U')
+-- Drop deprecated notification tables
+IF EXISTS (SELECT * FROM sysobjects WHERE name='Notifications' AND xtype='U')
+    DROP TABLE Notifications;
+GO
+IF EXISTS (SELECT * FROM sysobjects WHERE name='NotificationTemplates' AND xtype='U')
+    DROP TABLE NotificationTemplates;
+GO
+
+-- Doctor-facing notifications table
 CREATE TABLE Notifications (
-    NotificationID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL,
-    Type NVARCHAR(50) NOT NULL, -- 'APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'SYSTEM_NOTIFICATION'
-    Title NVARCHAR(255) NOT NULL,
+    NotificationID INT IDENTITY(1,1) PRIMARY KEY,
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID) ON DELETE CASCADE,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID) ON DELETE NO ACTION,
+    AppointmentID INT NULL FOREIGN KEY REFERENCES Appointments(AppointmentID) ON DELETE SET NULL,
+    MedicationRoutineID INT NULL FOREIGN KEY REFERENCES MedicationRoutines(RoutineID) ON DELETE SET NULL,
+    Type NVARCHAR(50) NOT NULL,
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Sent',
     Message NVARCHAR(MAX) NOT NULL,
-    IsRead BIT DEFAULT 0,
-    Priority NVARCHAR(20) DEFAULT 'MEDIUM', -- 'LOW', 'MEDIUM', 'HIGH'
-    RelatedEntityID INT NULL, -- Could be AppointmentID, MedicationRoutineID, etc.
-    RelatedEntityType NVARCHAR(50) NULL, -- 'APPOINTMENT', 'MEDICATION', 'SYSTEM'
-    ScheduledFor DATETIME2 NULL, -- When the notification should be sent
-    SentAt DATETIME2 NULL, -- When the notification was actually sent
+    Payload NVARCHAR(MAX) NULL, -- JSON for action-specific data
     CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    CONSTRAINT CHK_NotificationType CHECK (Type IN ('APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'GENERAL_ALERT', 'SYSTEM_NOTIFICATION'))
+    DeliveredAt DATETIME2 NULL,
+    SeenAt DATETIME2 NULL,
+    ReadAt DATETIME2 NULL,
+    RetractedAt DATETIME2 NULL,
+    RetractionReason NVARCHAR(MAX) NULL, -- Reason why notification was retracted
+    FailureReason NVARCHAR(MAX) NULL,
+    CONSTRAINT CHK_NotificationType_V2 CHECK (Type IN ('APPOINTMENT_REMINDER', 'FOLLOW_UP_REQUIRED', 'TEST_RESULTS_AVAILABLE', 'MEDICATION_REMINDER', 'CUSTOM')),
+    CONSTRAINT CHK_NotificationStatus_V2 CHECK (Status IN ('Sent', 'Delivered', 'Failed', 'Seen', 'Read', 'Retracted'))
 );
 
--- MedicationRoutines Table: Defines daily medication schedules for patients
+-- Notification Templates table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='NotificationTemplates' AND xtype='U')
+CREATE TABLE NotificationTemplates (
+    TemplateID INT IDENTITY(1,1) PRIMARY KEY,
+    TemplateName NVARCHAR(255) NOT NULL UNIQUE,
+    TemplateContent NVARCHAR(MAX) NOT NULL,
+    CreatedByUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+-- LabResults table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='LabResults' AND xtype='U')
+CREATE TABLE LabResults (
+    LabResultID INT IDENTITY(1,1) PRIMARY KEY,
+    PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    DoctorUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT NULL FOREIGN KEY REFERENCES Appointments(AppointmentID),
+    TestName NVARCHAR(255) NOT NULL,
+    ResultValue NVARCHAR(255) NOT NULL,
+    ReferenceRange NVARCHAR(255),
+    Notes NVARCHAR(MAX),
+    Status NVARCHAR(50) DEFAULT 'Pending Review',
+    ResultDate DATETIME2 NOT NULL,
+    CreatedAt DATETIME2 DEFAULT GETDATE()
+);
+
+-- MedicationRoutines Table: Defines medication schedules for patients with flexible scheduling
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationRoutines' AND xtype='U')
 CREATE TABLE MedicationRoutines (
     RoutineID INT PRIMARY KEY IDENTITY(1,1),
@@ -202,46 +241,63 @@ CREATE TABLE MedicationRoutines (
     Instructions NVARCHAR(MAX) NULL,
     StartDate DATE NOT NULL,
     EndDate DATE NULL,
-    TimeOfDay TIME NOT NULL, -- When to take the medication daily
+    
+    -- Flexible scheduling options
+    FrequencyType NVARCHAR(20) NOT NULL DEFAULT 'Daily', -- Daily, Weekly, Monthly, As-Needed
+    TimeOfDay TIME NOT NULL, -- Primary time to take medication
+    SecondaryTimes NVARCHAR(500) NULL, -- JSON array of additional times for multiple daily doses
+    WeekDays NVARCHAR(20) NULL, -- For weekly schedules: comma-separated days (Mon,Wed,Fri)
+    MonthDays NVARCHAR(100) NULL, -- For monthly schedules: comma-separated days (1,15,30)
+    
+    -- Reminder and tracking
     IsActive BIT DEFAULT 1,
     ReminderEnabled BIT DEFAULT 1,
     ReminderMinutesBefore INT DEFAULT 30, -- Minutes before medication time to send reminder
     LastReminderSentAt DATETIME2 NULL, -- Tracks when the last reminder was sent for this routine
+    NextReminderDue DATETIME2 NULL, -- Calculated next reminder time for efficient querying
+    
+    -- Additional medication details
+    MedicationCategory NVARCHAR(100) NULL, -- ARV, Supplement, Pain Management, etc.
+    SideEffectsToMonitor NVARCHAR(MAX) NULL, -- What side effects to watch for
+    FoodRequirement NVARCHAR(50) NULL, -- Take with food, empty stomach, etc.
+    
+    -- Audit fields
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    
     FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
     FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
-    FOREIGN KEY (ARVTreatmentID) REFERENCES ARVTreatments(ARVTreatmentID) ON DELETE SET NULL
+    FOREIGN KEY (ARVTreatmentID) REFERENCES ARVTreatments(ARVTreatmentID) ON DELETE SET NULL,
+    
+    CONSTRAINT CHK_FrequencyType CHECK (FrequencyType IN ('Daily', 'Weekly', 'Monthly', 'As-Needed')),
+    CONSTRAINT CHK_FoodRequirement CHECK (FoodRequirement IN ('With Food', 'Empty Stomach', 'No Restriction', NULL))
 );
 
--- MedicationReminders Table: Tracks individual medication reminder instances
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationReminders' AND xtype='U')
-CREATE TABLE MedicationReminders (
-    ReminderID INT PRIMARY KEY IDENTITY(1,1),
-    RoutineID INT NOT NULL,
-    PatientUserID INT NOT NULL,
-    ReminderDate DATE NOT NULL,
-    ReminderTime TIME NOT NULL,
-    Status NVARCHAR(20) DEFAULT 'PENDING', -- 'PENDING', 'SENT', 'ACKNOWLEDGED', 'MISSED'
-    SentAt DATETIME2 NULL,
-    AcknowledgedAt DATETIME2 NULL,
-    CreatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (RoutineID) REFERENCES MedicationRoutines(RoutineID) ON DELETE CASCADE,
-    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION
-);
+-- Drop deprecated reminder tables
+IF EXISTS (SELECT * FROM sysobjects WHERE name='MedicationReminders' AND xtype='U')
+    DROP TABLE MedicationReminders;
+GO
 
--- AppointmentReminders Table: Tracks appointment reminder instances
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentReminders' AND xtype='U')
-CREATE TABLE AppointmentReminders (
-    ReminderID INT PRIMARY KEY IDENTITY(1,1),
-    AppointmentID INT NOT NULL,
-    PatientUserID INT NOT NULL,
-    ReminderType NVARCHAR(50) NOT NULL, -- '24_HOUR', '1_HOUR', '30_MINUTE'
-    ReminderDateTime DATETIME2 NOT NULL,
-    Status NVARCHAR(20) DEFAULT 'PENDING', -- 'PENDING', 'SENT', 'ACKNOWLEDGED'
-    SentAt DATETIME2 NULL,
-    AcknowledgedAt DATETIME2 NULL,
-    CreatedAt DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE CASCADE,
-    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION
-);
+IF EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentReminders' AND xtype='U')
+    DROP TABLE AppointmentReminders;
+GO
+
+-- Create indexes for optimal notification and medication routine performance
+-- Notifications table indexes
+CREATE INDEX IX_Notifications_DoctorUserID ON Notifications(DoctorUserID);
+CREATE INDEX IX_Notifications_PatientUserID ON Notifications(PatientUserID);
+CREATE INDEX IX_Notifications_Type ON Notifications(Type);
+CREATE INDEX IX_Notifications_Status ON Notifications(Status);
+CREATE INDEX IX_Notifications_CreatedAt ON Notifications(CreatedAt);
+CREATE INDEX IX_Notifications_TypeStatus ON Notifications(Type, Status);
+CREATE INDEX IX_Notifications_PatientType ON Notifications(PatientUserID, Type);
+
+-- MedicationRoutines table indexes
+CREATE INDEX IX_MedicationRoutines_PatientUserID ON MedicationRoutines(PatientUserID);
+CREATE INDEX IX_MedicationRoutines_IsActive ON MedicationRoutines(IsActive);
+CREATE INDEX IX_MedicationRoutines_ReminderEnabled ON MedicationRoutines(ReminderEnabled);
+CREATE INDEX IX_MedicationRoutines_NextReminderDue ON MedicationRoutines(NextReminderDue);
+CREATE INDEX IX_MedicationRoutines_ActiveReminders ON MedicationRoutines(IsActive, ReminderEnabled, NextReminderDue);
+CREATE INDEX IX_MedicationRoutines_PatientActive ON MedicationRoutines(PatientUserID, IsActive);
+CREATE INDEX IX_MedicationRoutines_ARVTreatmentID ON MedicationRoutines(ARVTreatmentID);
+GO

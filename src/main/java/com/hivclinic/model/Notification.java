@@ -13,91 +13,63 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notification {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "NotificationID")
     private Integer notificationId;
-    
-    @Column(name = "UserID", nullable = false)
-    private Integer userId;
-    
-    @Enumerated(EnumType.STRING)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DoctorUserID", nullable = false)
+    private User doctor;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PatientUserID", nullable = false)
+    private User patient;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "AppointmentID")
+    private Appointment appointment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MedicationRoutineID")
+    private MedicationRoutine medicationRoutine;
+
     @Column(name = "Type", nullable = false, length = 50)
-    private NotificationType type;
-    
-    @Column(name = "Title", nullable = false)
-    private String title;
-    
+    private String type;
+
+    @Column(name = "Status", nullable = false, length = 20)
+    private String status = "Sent";
+
     @Column(name = "Message", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String message;
-    
-    @Column(name = "IsRead", nullable = false)
-    private Boolean isRead = false;
-    
-    @Column(name = "Priority", length = 20)
-    private String priority = "MEDIUM";
-    
-    @Column(name = "RelatedEntityID")
-    private Integer relatedEntityId;
-    
-    @Column(name = "RelatedEntityType", length = 50)
-    private String relatedEntityType;
-    
-    @Column(name = "ScheduledFor")
-    private LocalDateTime scheduledFor;
-    
-    @Column(name = "SentAt")
-    private LocalDateTime sentAt;
-    
+
+    @Column(name = "Payload", columnDefinition = "NVARCHAR(MAX)")
+    private String payload;
+
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt;
-    
-    @Column(name = "UpdatedAt")
-    private LocalDateTime updatedAt;
-    
+
+    @Column(name = "DeliveredAt")
+    private LocalDateTime deliveredAt;
+
+    @Column(name = "SeenAt")
+    private LocalDateTime seenAt;
+
+    @Column(name = "ReadAt")
+    private LocalDateTime readAt;
+
+    @Column(name = "RetractedAt")
+    private LocalDateTime retractedAt;
+
+    @Column(name = "RetractionReason", columnDefinition = "NVARCHAR(MAX)")
+    private String retractionReason;
+
+    @Column(name = "FailureReason", columnDefinition = "NVARCHAR(MAX)")
+    private String failureReason;
+
     @PrePersist
     protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-    }
-    
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-    
-    // Nested enum for notification types
-    public enum NotificationType {
-        APPOINTMENT_REMINDER("APPOINTMENT_REMINDER"),
-        MEDICATION_REMINDER("MEDICATION_REMINDER"),
-        GENERAL_ALERT("GENERAL_ALERT"),
-        SYSTEM_NOTIFICATION("SYSTEM_NOTIFICATION");
-        
-        private final String value;
-        
-        NotificationType(String value) {
-            this.value = value;
-        }
-        
-        public String getValue() {
-            return value;
-        }
-    }
-    
-    // Nested enum for priorities
-    public enum Priority {
-        LOW("LOW"),
-        MEDIUM("MEDIUM"),
-        HIGH("HIGH");
-        
-        private final String value;
-        
-        Priority(String value) {
-            this.value = value;
-        }
-        
-        public String getValue() {
-            return value;
-        }
+        this.createdAt = LocalDateTime.now();
     }
 }
