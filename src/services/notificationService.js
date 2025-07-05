@@ -10,10 +10,43 @@ class NotificationService {
    */
   async getPatientsWithAppointments(doctorId) {
     try {
-      const response = await apiClient.get(`/api/v1/notifications/doctor/patients-with-appointments?doctorId=${doctorId}`);
+      const response = await apiClient.get(`/v1/notifications/doctor/patients-with-appointments?doctorId=${doctorId}`);
+      const patients = response.data || [];
+      
+      // Validate patient data structure
+      const validatedPatients = patients.map((patient, index) => {
+        console.log(`Validating patient ${index}:`, patient);
+        
+        // Check required fields
+        if (!patient.userId && !patient.patientId) {
+          console.error(`Patient ${index} missing userId/patientId:`, patient);
+        }
+        if (!patient.firstName && !patient.patientName) {
+          console.error(`Patient ${index} missing firstName/patientName:`, patient);
+        }
+        if (!patient.lastName) {
+          console.error(`Patient ${index} missing lastName:`, patient);
+        }
+        if (!patient.email && !patient.patientEmail) {
+          console.error(`Patient ${index} missing email/patientEmail:`, patient);
+        }
+        
+        // Return standardized structure
+        return {
+          userId: patient.userId || patient.patientId,
+          firstName: patient.firstName || patient.patientName || 'Unknown',
+          lastName: patient.lastName || 'Patient',
+          email: patient.email || patient.patientEmail || 'No email',
+          lastAppointment: patient.lastAppointment,
+          appointmentStatus: patient.appointmentStatus
+        };
+      });
+      
+      console.log(`Successfully fetched ${validatedPatients.length} patients with appointments`);
+      
       return {
         success: true,
-        data: response.data || []
+        data: validatedPatients
       };
     } catch (error) {
       console.error('Error fetching patients with appointments:', error);
@@ -30,7 +63,7 @@ class NotificationService {
    */
   async getNotificationTemplates() {
     try {
-      const response = await apiClient.get('/api/v1/notifications/templates');
+      const response = await apiClient.get('/v1/notifications/templates');
       return {
         success: true,
         data: response.data || []
@@ -66,6 +99,30 @@ class NotificationService {
       // Send individual notifications for each patient (backend expects individual calls)
       for (const patientId of patientIds) {
         try {
+          // Validate patientId is a valid number
+          if (!patientId || isNaN(patientId)) {
+            console.error(`Invalid patientId: ${patientId}`);
+            results.push({
+              patientId,
+              success: false,
+              error: 'Invalid patient ID'
+            });
+            failureCount++;
+            continue;
+          }
+
+          // Validate templateId is a valid number
+          if (!templateId || isNaN(templateId)) {
+            console.error(`Invalid templateId: ${templateId}`);
+            results.push({
+              patientId,
+              success: false,
+              error: 'Invalid template ID'
+            });
+            failureCount++;
+            continue;
+          }
+
           const variables = {};
           if (useCustomMessage && customMessage) {
             variables.customMessage = customMessage;
@@ -81,7 +138,7 @@ class NotificationService {
           }
 
           const response = await apiClient.post(
-            `/api/v1/notifications/doctor/send?doctorId=${doctorId}&patientId=${patientId}&templateId=${templateId}`,
+            `/v1/notifications/doctor/send?doctorId=${doctorId}&patientId=${patientId}&templateId=${templateId}`,
             variables
           );
 
@@ -125,8 +182,8 @@ class NotificationService {
   async getNotificationHistory(doctorId, patientId = null) {
     try {
       const url = patientId
-        ? `/api/v1/notifications/doctor/history/${patientId}?doctorId=${doctorId}`
-        : `/api/v1/notifications/doctor/history?doctorId=${doctorId}`;
+        ? `/v1/notifications/doctor/history/${patientId}?doctorId=${doctorId}`
+        : `/v1/notifications/doctor/history?doctorId=${doctorId}`;
       
       const response = await apiClient.get(url);
       return {
@@ -148,7 +205,7 @@ class NotificationService {
    */
   async unsendNotification(notificationId, doctorId) {
     try {
-      const response = await apiClient.post(`/api/v1/notifications/doctor/${notificationId}/unsend?doctorId=${doctorId}`);
+      const response = await apiClient.post(`/v1/notifications/doctor/${notificationId}/unsend?doctorId=${doctorId}`);
       return {
         success: true,
         data: response.data,
@@ -168,7 +225,7 @@ class NotificationService {
    */
   async bulkOperation(operation, notificationIds) {
     try {
-      const response = await apiClient.post(`/api/v1/notifications/bulk/${operation}`, {
+      const response = await apiClient.post(`/v1/notifications/bulk/${operation}`, {
         notificationIds
       });
       return {
@@ -190,7 +247,7 @@ class NotificationService {
    */
   async createTemplate(templateData) {
     try {
-      const response = await apiClient.post('/api/v1/notifications/templates', templateData);
+      const response = await apiClient.post('/v1/notifications/templates', templateData);
       return {
         success: true,
         data: response.data,
@@ -210,7 +267,7 @@ class NotificationService {
    */
   async updateTemplate(templateId, templateData) {
     try {
-      const response = await apiClient.put(`/api/v1/notifications/templates/${templateId}`, templateData);
+      const response = await apiClient.put(`/v1/notifications/templates/${templateId}`, templateData);
       return {
         success: true,
         data: response.data,
@@ -230,7 +287,7 @@ class NotificationService {
    */
   async deleteTemplate(templateId) {
     try {
-      const response = await apiClient.delete(`/api/v1/notifications/templates/${templateId}`);
+      const response = await apiClient.delete(`/v1/notifications/templates/${templateId}`);
       return {
         success: true,
         data: response.data,
@@ -248,9 +305,9 @@ class NotificationService {
   /**
    * Get notifications for the current user (general notifications)
    */
-  async getUserNotifications(userId) {
+  async getUserNotifications() {
     try {
-      const response = await apiClient.get(`/api/v1/notifications?userId=${userId}`);
+      const response = await apiClient.get(`/v1/notifications`);
       return {
         success: true,
         data: response.data || []
@@ -270,7 +327,7 @@ class NotificationService {
    */
   async markAsRead(notificationId) {
     try {
-      const response = await apiClient.post(`/api/v1/notifications/${notificationId}/read`);
+      const response = await apiClient.post(`/v1/notifications/${notificationId}/read`);
       return {
         success: true,
         data: response.data,
@@ -288,9 +345,9 @@ class NotificationService {
   /**
    * Mark all notifications as read for a user
    */
-  async markAllAsRead(userId) {
+  async markAllAsRead() {
     try {
-      const response = await apiClient.post(`/api/v1/notifications/read-all?userId=${userId}`);
+      const response = await apiClient.post(`/v1/notifications/read-all`);
       return {
         success: true,
         data: response.data,
@@ -309,13 +366,13 @@ class NotificationService {
    * Subscribe to real-time notification updates
    * Returns a cleanup function to unsubscribe
    */
-  subscribeToNotifications(userId, onNotificationUpdate) {
+  subscribeToNotifications(onNotificationUpdate) {
     // For now, use polling. In production, you might want to use WebSockets or Server-Sent Events
     const pollInterval = 30000; // 30 seconds
     
     const poll = async () => {
       try {
-        const result = await this.getUserNotifications(userId);
+        const result = await this.getUserNotifications();
         if (result.success) {
           onNotificationUpdate(result.data);
         }
@@ -341,7 +398,7 @@ class NotificationService {
    */
   async getNotificationAnalytics() {
     try {
-      const response = await apiClient.get('/api/v1/notifications/analytics');
+      const response = await apiClient.get('/v1/notifications/analytics');
       return {
         success: true,
         data: response.data || {
@@ -380,7 +437,7 @@ class NotificationService {
       if (filters.endDate) queryParams.append('endDate', filters.endDate);
       if (filters.searchTerm) queryParams.append('search', filters.searchTerm);
       
-      const response = await apiClient.get(`/api/v1/notifications/search?${queryParams}`);
+      const response = await apiClient.get(`/v1/notifications/search?${queryParams}`);
       return {
         success: true,
         data: response.data || []
@@ -400,7 +457,7 @@ class NotificationService {
    */
   async getDeliveryStats(timeRange = 'week') {
     try {
-      const response = await apiClient.get(`/api/v1/notifications/stats?range=${timeRange}`);
+      const response = await apiClient.get(`/v1/notifications/stats?range=${timeRange}`);
       return {
         success: true,
         data: response.data || {

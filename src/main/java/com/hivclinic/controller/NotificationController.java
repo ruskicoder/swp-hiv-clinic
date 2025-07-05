@@ -33,7 +33,8 @@ public class NotificationController {
     private DoctorNotificationService doctorNotificationService;
 
     @GetMapping
-    public ResponseEntity<List<NotificationDto>> getNotifications(@RequestParam Integer userId, @RequestParam(required = false) String status) {
+    public ResponseEntity<List<NotificationDto>> getNotifications(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) String status) {
+        Integer userId = ((com.hivclinic.config.CustomUserDetailsService.UserPrincipal) userDetails).getId();
         List<NotificationDto> notifications;
         if ("unread".equalsIgnoreCase(status)) {
             notifications = notificationService.getUnreadNotificationsByUserId(userId);
@@ -50,7 +51,8 @@ public class NotificationController {
     }
 
     @PostMapping("/read-all")
-    public ResponseEntity<Void> markAllAsRead(@RequestParam Integer userId) {
+    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal UserDetails userDetails) {
+        Integer userId = ((com.hivclinic.config.CustomUserDetailsService.UserPrincipal) userDetails).getId();
         notificationService.markAllAsRead(userId);
         return ResponseEntity.ok().build();
     }
@@ -88,7 +90,7 @@ public class NotificationController {
     }
     
     @PutMapping("/templates/{id}")
-    public ResponseEntity<NotificationTemplate> updateTemplate(@PathVariable Integer id,
+    public ResponseEntity<NotificationTemplate> updateTemplate(@PathVariable Long id,
                                                               @RequestBody NotificationTemplate template) {
         try {
             return notificationTemplateService.updateTemplate(id, template)
@@ -101,7 +103,7 @@ public class NotificationController {
     }
     
     @DeleteMapping("/templates/{id}")
-    public ResponseEntity<Void> deleteTemplate(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteTemplate(@PathVariable Long id) {
         boolean deleted = notificationTemplateService.deleteTemplate(id);
         return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }

@@ -35,6 +35,9 @@ public class DoctorNotificationService {
     @Autowired
     private AppointmentRepository appointmentRepository;
     
+    @Autowired
+    private com.hivclinic.repository.PatientProfileRepository patientProfileRepository;
+    
     /**
      * Get notification templates by type
      */
@@ -81,7 +84,7 @@ public class DoctorNotificationService {
             }
             
             // Get template
-            Optional<NotificationTemplate> templateOpt = notificationTemplateService.getTemplateById(templateId.intValue());
+            Optional<NotificationTemplate> templateOpt = notificationTemplateService.getTemplateById(templateId);
             if (templateOpt.isEmpty() || !templateOpt.get().getIsActive()) {
                 logger.error("Template not found or inactive: {}", templateId);
                 return false;
@@ -194,6 +197,7 @@ public class DoctorNotificationService {
     public List<Map<String, Object>> getPatientsWithAppointments(Long doctorId) {
         try {
             logger.debug("Getting patients with appointments for doctor {}", doctorId);
+            logger.debug("Expected frontend structure: userId, firstName, lastName, email");
             
             Optional<User> doctorOpt = userRepository.findById(doctorId.intValue());
             if (doctorOpt.isEmpty()) {
@@ -203,20 +207,79 @@ public class DoctorNotificationService {
             
             List<Appointment> appointments = appointmentRepository.findByDoctorUser(doctorOpt.get());
             
-            // Get unique patients from appointments
-            return appointments.stream()
-                .map(appointment -> {
-                    User patient = appointment.getPatientUser();
+            // Get unique patients from appointments with enhanced mapping
+            Map<Integer, Map<String, Object>> uniquePatients = new java.util.HashMap<>();
+            
+            for (Appointment appointment : appointments) {
+                User patient = appointment.getPatientUser();
+                Integer patientId = patient.getUserId();
+                
+                if (!uniquePatients.containsKey(patientId)) {
                     Map<String, Object> patientMap = new java.util.HashMap<>();
-                    patientMap.put("patientId", patient.getUserId());
-                    patientMap.put("patientName", patient.getUsername());
-                    patientMap.put("patientEmail", patient.getEmail());
+                    
+                    // Frontend expects: userId, firstName, lastName, email
+                    patientMap.put("userId", patient.getUserId());
+                    
+                    // Try to get name from PatientProfile first, then from User entity
+                    String firstName = "Unknown";
+                    String lastName = "Patient";
+                    
+                    try {
+                        Optional<com.hivclinic.model.PatientProfile> profileOpt =
+                            patientProfileRepository.findByUser(patient);
+                        
+                        if (profileOpt.isPresent()) {
+                            com.hivclinic.model.PatientProfile profile = profileOpt.get();
+                            firstName = profile.getFirstName() != null ? profile.getFirstName() : firstName;
+                            lastName = profile.getLastName() != null ? profile.getLastName() : lastName;
+                            logger.debug("Found PatientProfile for user {}: {} {}",
+                                        patientId, firstName, lastName);
+                        } else {
+                            // Fallback to User entity names
+                            if (patient.getFirstName() != null && !patient.getFirstName().trim().isEmpty()) {
+                                firstName = patient.getFirstName();
+                            } else if (patient.getUsername() != null && !patient.getUsername().trim().isEmpty()) {
+                                firstName = patient.getUsername();
+                            }
+                            
+                            if (patient.getLastName() != null && !patient.getLastName().trim().isEmpty()) {
+                                lastName = patient.getLastName();
+                            }
+                            logger.debug("No PatientProfile found for user {}, using User entity: {} {}",
+                                        patientId, firstName, lastName);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Error fetching PatientProfile for user {}: {}", patientId, e.getMessage());
+                        // Use fallback values already set
+                    }
+                    
+                    patientMap.put("firstName", firstName);
+                    patientMap.put("lastName", lastName);
+                    patientMap.put("email", patient.getEmail() != null ? patient.getEmail() : "");
+                    
+                    logger.debug("Final mapping for patient: userId={}, username={}, email={}, firstName={}, lastName={}",
+                                patient.getUserId(), patient.getUsername(), patient.getEmail(),
+                                firstName, lastName);
+                    
                     patientMap.put("lastAppointment", appointment.getAppointmentDateTime());
                     patientMap.put("appointmentStatus", appointment.getStatus());
-                    return patientMap;
-                })
-                .distinct()
-                .collect(java.util.stream.Collectors.toList());
+                    
+                    uniquePatients.put(patientId, patientMap);
+                } else {
+                    // Update last appointment if this appointment is more recent
+                    Map<String, Object> existingPatient = uniquePatients.get(patientId);
+                    java.time.LocalDateTime existingLastAppt = (java.time.LocalDateTime) existingPatient.get("lastAppointment");
+                    if (appointment.getAppointmentDateTime().isAfter(existingLastAppt)) {
+                        existingPatient.put("lastAppointment", appointment.getAppointmentDateTime());
+                        existingPatient.put("appointmentStatus", appointment.getStatus());
+                    }
+                }
+            }
+            List<Map<String, Object>> result = new java.util.ArrayList<>(uniquePatients.values());
+            logger.info("Successfully fetched {} unique patients with appointments for doctor {}",
+                       result.size(), doctorId);
+            
+            return result;
                 
         } catch (Exception e) {
             logger.error("Error getting patients for doctor {}: {}", doctorId, e.getMessage(), e);

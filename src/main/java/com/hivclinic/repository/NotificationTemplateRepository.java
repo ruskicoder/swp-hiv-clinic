@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, Integer> {
+public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, Long> {
     
     List<NotificationTemplate> findByIsActiveTrue();
     

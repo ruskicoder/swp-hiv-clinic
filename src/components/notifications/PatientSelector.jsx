@@ -22,8 +22,8 @@ const PatientSelector = ({
   useEffect(() => {
     // Filter patients based on search term
     const filtered = patients.filter(patient => {
-      const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
-      const email = patient.email.toLowerCase();
+      const fullName = `${patient.firstName || ''} ${patient.lastName || ''}`.toLowerCase();
+      const email = (patient.email || '').toLowerCase();
       const search = searchTerm.toLowerCase();
       
       return fullName.includes(search) || email.includes(search);
@@ -116,9 +116,9 @@ const PatientSelector = ({
             <div key={patient.userId} className="selected-patient-tag">
               <span className="patient-info">
                 <span className="patient-name">
-                  {patient.firstName} {patient.lastName}
+                  {patient.firstName || 'Unknown'} {patient.lastName || 'Patient'}
                 </span>
-                <span className="patient-email">{patient.email}</span>
+                <span className="patient-email">{patient.email || 'No email'}</span>
               </span>
               <button
                 type="button"
@@ -190,10 +190,10 @@ const PatientSelector = ({
                     >
                       <div className="patient-info">
                         <div className="patient-name">
-                          {patient.firstName} {patient.lastName}
+                          {patient.firstName || 'Unknown'} {patient.lastName || 'Patient'}
                         </div>
                         <div className="patient-details">
-                          <span className="patient-email">{patient.email}</span>
+                          <span className="patient-email">{patient.email || 'No email'}</span>
                           {patient.lastAppointment && (
                             <span className="last-appointment">
                               Last visit: {new Date(patient.lastAppointment).toLocaleDateString()}

@@ -79,7 +79,7 @@ public class NotificationService {
     public NotificationDto createSystemNotification(Integer userId, String title, String message, String priority) {
         Notification notification = new Notification();
         notification.setUserId(userId);
-        notification.setType(Notification.NotificationType.SYSTEM_NOTIFICATION);
+        notification.setType(Notification.NotificationType.SYSTEM);
         notification.setTitle(title);
         notification.setMessage(message);
         notification.setPriority(priority);
