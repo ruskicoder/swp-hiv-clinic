@@ -6,6 +6,7 @@ import DashboardHeader from '../../components/layout/DashboardHeader';
 import PatientRecordSection from '../../components/PatientRecordSection';
 import UnifiedCalendar from '../../components/schedule/UnifiedCalendar';
 import ARVTreatmentModal from '../../components/arv/ARVTreatmentModal';
+import NotificationManagerTab from '../../components/notifications/NotificationManagerTab';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
@@ -356,14 +357,13 @@ const DoctorDashboard = () => {
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'appointments', label: 'Appointments', icon: '📅' },
     { id: 'patient-record', label: 'Patient Records', icon: '📋' },
-    { id: 'availability', label: 'My Availability', icon: '🕒' }
+    { id: 'availability', label: 'My Availability', icon: '🕒' },
+    { id: 'notifications', label: 'Notifications', icon: '🔔' }
   ];
 
-  // Helper to check if doctor can edit
-  const canEditRecord = () => {
-    // Only allow edit if not doctor
-    return !(user && (user.role === 'Doctor' || user.role?.roleName === 'Doctor'));
-  };
+  // Debug: Log navigation items
+  console.log('Navigation items array:', navigationItems);
+  console.log('Navigation items length:', navigationItems.length);
 
   // Render overview
   const renderOverview = () => {
@@ -519,8 +519,9 @@ const DoctorDashboard = () => {
 
             <PatientRecordSection
               record={patientRecord}
-              isEditable={false}
-              loading={loading}
+              onSave={handleSavePatientRecord}
+              onImageUpload={handleUploadImage}
+              hideImage={patientRecord?.isPrivate}
             />
 
             {/* ARV Treatments Section */}
@@ -674,6 +675,13 @@ const DoctorDashboard = () => {
     );
   };
 
+  // Render notifications tab
+  const renderNotifications = () => (
+    <ErrorBoundary>
+      <NotificationManagerTab isActive={activeTab === 'notifications'} />
+    </ErrorBoundary>
+  );
+
   // Render content based on active tab
   const renderContent = () => {
     switch (activeTab) {
@@ -685,6 +693,8 @@ const DoctorDashboard = () => {
         return renderPatientRecord();
       case 'availability':
         return renderAvailability();
+      case 'notifications':
+        return renderNotifications();
       default:
         return renderOverview();
     }

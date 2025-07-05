@@ -15,6 +15,7 @@ public class MedicationRoutineDto {
     private Integer routineId;
     private Integer patientUserId;
     private Integer doctorUserId;
+    private Integer arvTreatmentId;
     private String medicationName;
     private String dosage;
     private String instructions;
@@ -29,6 +30,7 @@ public class MedicationRoutineDto {
                 routine.getRoutineId(),
                 routine.getPatientUserId(),
                 routine.getDoctorUserId(),
+                routine.getArvTreatmentId(),
                 routine.getMedicationName(),
                 routine.getDosage(),
                 routine.getInstructions(),
