@@ -221,7 +221,7 @@ END
 -- Insert default notification templates
 IF NOT EXISTS (SELECT * FROM NotificationTemplates WHERE name = '24-Hour Appointment Reminder')
 BEGIN
-    INSERT INTO NotificationTemplates (name, type, subject, body, priority, isActive) VALUES
+    INSERT INTO NotificationTemplates (name, type, subject, body, Priority, isActive) VALUES
     -- Appointment reminder templates
     ('24-Hour Appointment Reminder', 'APPOINTMENT_REMINDER', 'Appointment Reminder - {{patientName}}', 'Dear {{patientName}}, you have an appointment tomorrow at {{appointmentTime}} with Dr. {{doctorName}}. Please arrive 15 minutes early.', 'MEDIUM', 1),
     ('1-Hour Appointment Reminder', 'APPOINTMENT_REMINDER', 'Appointment Starting Soon - {{patientName}}', 'Dear {{patientName}}, your appointment with Dr. {{doctorName}} is starting in 1 hour at {{appointmentTime}}.', 'HIGH', 1),

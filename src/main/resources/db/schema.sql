@@ -254,14 +254,14 @@ CREATE TABLE NotificationTemplates (
     type NVARCHAR(50) NOT NULL,
     subject NVARCHAR(255) NOT NULL,
     body NVARCHAR(MAX) NOT NULL,
-    priority NVARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
+    Priority NVARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
     isActive BIT NOT NULL DEFAULT 1,
     createdAt DATETIME2 DEFAULT GETDATE(),
     updatedAt DATETIME2 DEFAULT GETDATE(),
     
     -- Constraints
     CONSTRAINT chk_notification_template_type CHECK (type IN ('APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'GENERAL', 'SYSTEM')),
-    CONSTRAINT chk_notification_template_priority CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT'))
+    CONSTRAINT chk_notification_template_priority CHECK (Priority IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT'))
 );
 
 -- Add columns to existing Notifications table
