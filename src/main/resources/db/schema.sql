@@ -245,3 +245,58 @@ CREATE TABLE AppointmentReminders (
     FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE CASCADE,
     FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE NO ACTION
 );
+
+-- NotificationTemplates Table: Stores reusable notification templates
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='NotificationTemplates' AND xtype='U')
+CREATE TABLE NotificationTemplates (
+    templateId BIGINT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(100) NOT NULL,
+    type NVARCHAR(50) NOT NULL,
+    subject NVARCHAR(255) NOT NULL,
+    body NVARCHAR(MAX) NOT NULL,
+    priority NVARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
+    isActive BIT NOT NULL DEFAULT 1,
+    createdAt DATETIME2 DEFAULT GETDATE(),
+    updatedAt DATETIME2 DEFAULT GETDATE(),
+    
+    -- Constraints
+    CONSTRAINT chk_notification_template_type CHECK (type IN ('APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'GENERAL', 'SYSTEM')),
+    CONSTRAINT chk_notification_template_priority CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT'))
+);
+
+-- Add columns to existing Notifications table
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Notifications]') AND name = 'templateId')
+BEGIN
+    ALTER TABLE Notifications
+    ADD templateId BIGINT NULL,
+        CONSTRAINT fk_notification_template
+        FOREIGN KEY (templateId) REFERENCES NotificationTemplates(templateId) ON DELETE SET NULL;
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Notifications]') AND name = 'status')
+BEGIN
+    ALTER TABLE Notifications
+    ADD status NVARCHAR(20) DEFAULT 'PENDING',
+        CONSTRAINT chk_notification_status CHECK (status IN ('PENDING', 'SENT', 'DELIVERED', 'FAILED', 'CANCELLED'));
+END
+
+-- Add indexes for performance
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_notifications_scheduled_for')
+BEGIN
+    CREATE INDEX idx_notifications_scheduled_for ON Notifications(scheduledFor, isRead);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_notifications_user_type')
+BEGIN
+    CREATE INDEX idx_notifications_user_type ON Notifications(userId, type);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_notification_templates_type_active')
+BEGIN
+    CREATE INDEX idx_notification_templates_type_active ON NotificationTemplates(type, isActive);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_medication_routines_patient_active')
+BEGIN
+    CREATE INDEX idx_medication_routines_patient_active ON MedicationRoutines(PatientUserID, isActive);
+END

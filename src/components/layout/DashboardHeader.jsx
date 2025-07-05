@@ -2,6 +2,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import UserProfileDropdown from './UserProfileDropdown';
 import { useEffect, useState, useCallback } from 'react';
 import apiClient from '../../services/apiClient';
+import notificationService from '../../services/notificationService';
 import NotificationIcon from '../notifications/NotificationIcon';
 import NotificationPanel from '../notifications/NotificationPanel';
 import './DashboardHeader.css';
@@ -29,9 +30,13 @@ const DashboardHeader = ({ title, subtitle }) => {
     const fetchNotifications = async () => {
         if (user) {
             try {
-                const response = await apiClient.get(`/notifications?userId=${user.id}`);
-                setNotifications(response.data);
-                setUnreadCount(response.data.filter(n => !n.isRead).length);
+                const result = await notificationService.getUserNotifications(user.id);
+                if (result.success) {
+                    setNotifications(result.data);
+                    setUnreadCount(result.data.filter(n => !n.isRead).length);
+                } else {
+                    console.error('Failed to fetch notifications:', result.error);
+                }
             } catch (error) {
                 console.error('Failed to fetch notifications:', error);
             }
@@ -106,9 +111,13 @@ const DashboardHeader = ({ title, subtitle }) => {
 
   const handleMarkAsRead = async (notificationId) => {
     try {
-        await apiClient.post(`/notifications/${notificationId}/read`);
-        setNotifications(notifications.map(n => n.notificationId === notificationId ? { ...n, isRead: true } : n));
-        setUnreadCount(unreadCount - 1);
+        const result = await notificationService.markAsRead(notificationId);
+        if (result.success) {
+            setNotifications(notifications.map(n => n.notificationId === notificationId ? { ...n, isRead: true } : n));
+            setUnreadCount(Math.max(0, unreadCount - 1));
+        } else {
+            console.error('Failed to mark notification as read:', result.error);
+        }
     } catch (error) {
         console.error('Failed to mark notification as read:', error);
     }
@@ -116,9 +125,13 @@ const DashboardHeader = ({ title, subtitle }) => {
 
   const handleMarkAllAsRead = async () => {
     try {
-        await apiClient.post(`/notifications/read-all?userId=${user.id}`);
-        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
-        setUnreadCount(0);
+        const result = await notificationService.markAllAsRead(user.id);
+        if (result.success) {
+            setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+            setUnreadCount(0);
+        } else {
+            console.error('Failed to mark all notifications as read:', result.error);
+        }
     } catch (error) {
         console.error('Failed to mark all notifications as read:', error);
     }
@@ -202,6 +215,7 @@ const DashboardHeader = ({ title, subtitle }) => {
               notifications={notifications}
               onMarkAsRead={handleMarkAsRead}
               onMarkAllAsRead={handleMarkAllAsRead}
+              onClose={() => setShowPanel(false)}
             />
           )}
           <UserProfileDropdown />
