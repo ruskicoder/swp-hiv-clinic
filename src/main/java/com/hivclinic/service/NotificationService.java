@@ -33,18 +33,126 @@ public class NotificationService {
         return notificationRepository.findByUserIdAndIsRead(userId, false).size();
     }
 
-    @Transactional
-    public NotificationDto markAsRead(Integer notificationId) {
-        return notificationRepository.findById(notificationId)
-                .map(notification -> {
-                    notification.setIsRead(true);
-                    return NotificationDto.fromEntity(notificationRepository.save(notification));
-                }).orElse(null);
+    @Transactional(rollbackFor = Exception.class)
+    public NotificationDto markAsRead(Integer notificationId, Integer userId) {
+        System.out.println("DEBUG: NotificationService.markAsRead called with notificationId=" + notificationId + ", userId=" + userId);
+        
+        try {
+            return notificationRepository.findById(notificationId)
+                    .map(notification -> {
+                        System.out.println("DEBUG: Found notification with ID=" + notification.getNotificationId() +
+                                         ", userId=" + notification.getUserId() +
+                                         ", isRead=" + notification.getIsRead() +
+                                         ", status=" + notification.getStatus() +
+                                         ", title=" + notification.getTitle());
+                        
+                        // Verify that the notification belongs to the authenticated user
+                        if (!notification.getUserId().equals(userId)) {
+                            System.out.println("DEBUG: User ID mismatch - notification belongs to userId=" + notification.getUserId() +
+                                             ", but request from userId=" + userId);
+                            return null; // Return null if user doesn't own the notification
+                        }
+                        
+                        // Check if already read to avoid unnecessary database operations
+                        if (notification.getIsRead() != null && notification.getIsRead() && "READ".equals(notification.getStatus())) {
+                            System.out.println("DEBUG: Notification already marked as read, returning existing state");
+                            return NotificationDto.fromEntity(notification);
+                        }
+                        
+                        System.out.println("DEBUG: Setting notification as read - updating both isRead and status fields");
+                        
+                        // Atomically update both fields to ensure consistency
+                        notification.setIsRead(true);
+                        notification.setStatus("READ");
+                        
+                        // Force flush to ensure database commit
+                        Notification savedNotification = notificationRepository.saveAndFlush(notification);
+                        System.out.println("DEBUG: Saved and flushed notification with isRead=" + savedNotification.getIsRead() + 
+                                         ", status=" + savedNotification.getStatus());
+                        
+                        // Verify the save was successful for both fields
+                        if (savedNotification.getIsRead() == null || !savedNotification.getIsRead() || 
+                            !"READ".equals(savedNotification.getStatus())) {
+                            System.out.println("ERROR: Failed to save notification as read - database state inconsistent. " +
+                                             "isRead=" + savedNotification.getIsRead() + ", status=" + savedNotification.getStatus());
+                            throw new RuntimeException("Failed to update notification read status in database - field synchronization failed");
+                        }
+                        
+                        // Double-check by re-reading from database
+                        Notification verificationNotification = notificationRepository.findById(notificationId).orElse(null);
+                        if (verificationNotification == null || 
+                            verificationNotification.getIsRead() == null || 
+                            !verificationNotification.getIsRead() || 
+                            !"READ".equals(verificationNotification.getStatus())) {
+                            System.out.println("ERROR: Database verification failed - notification not properly saved. " +
+                                             "Re-read notification: isRead=" + (verificationNotification != null ? verificationNotification.getIsRead() : "null") + 
+                                             ", status=" + (verificationNotification != null ? verificationNotification.getStatus() : "null"));
+                            throw new RuntimeException("Database persistence verification failed - notification read status not properly saved");
+                        }
+                        
+                        NotificationDto dto = NotificationDto.fromEntity(savedNotification);
+                        System.out.println("DEBUG: Successfully created DTO with isRead=" + dto.isRead() + ", status=" + dto.getStatus());
+                        
+                        return dto;
+                    }).orElse(null);
+        } catch (Exception e) {
+            System.out.println("ERROR: Exception in markAsRead: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // Re-throw to trigger transaction rollback
+        }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void markAllAsRead(Integer userId) {
-        notificationRepository.markAllAsReadByUserId(userId);
+        System.out.println("DEBUG: NotificationService.markAllAsRead called for userId=" + userId);
+        
+        try {
+            // Get all unread notifications for verification
+            List<Notification> unreadNotifications = notificationRepository.findByUserIdAndIsRead(userId, false);
+            System.out.println("DEBUG: Found " + unreadNotifications.size() + " unread notifications to mark as read");
+            
+            if (unreadNotifications.isEmpty()) {
+                System.out.println("DEBUG: No unread notifications found, nothing to update");
+                return;
+            }
+            
+            // Use the repository method to mark all as read
+            int updatedCount = notificationRepository.markAllAsReadByUserId(userId);
+            System.out.println("DEBUG: Repository method updated " + updatedCount + " notifications for userId=" + userId);
+            
+            // Verify the update was successful by checking multiple notifications
+            int verificationCount = 0;
+            for (Notification originalNotification : unreadNotifications) {
+                Notification verifiedNotification = notificationRepository.findById(originalNotification.getNotificationId())
+                        .orElse(null);
+                if (verifiedNotification != null) {
+                    System.out.println("DEBUG: Verification - notification ID=" + verifiedNotification.getNotificationId() +
+                                     ", isRead=" + verifiedNotification.getIsRead() + 
+                                     ", status=" + verifiedNotification.getStatus());
+                    
+                    if (verifiedNotification.getIsRead() == null || !verifiedNotification.getIsRead() || 
+                        !"READ".equals(verifiedNotification.getStatus())) {
+                        System.out.println("ERROR: markAllAsRead failed - notification ID=" + verifiedNotification.getNotificationId() +
+                                         " still not marked as read. isRead=" + verifiedNotification.getIsRead() + 
+                                         ", status=" + verifiedNotification.getStatus());
+                        throw new RuntimeException("Failed to mark all notifications as read in database - field synchronization failed");
+                    }
+                    verificationCount++;
+                }
+                
+                // Verify first few notifications to avoid excessive database queries
+                if (verificationCount >= Math.min(3, unreadNotifications.size())) {
+                    break;
+                }
+            }
+            
+            System.out.println("DEBUG: Successfully marked all notifications as read for userId=" + userId + 
+                             ". Verified " + verificationCount + " notifications.");
+        } catch (Exception e) {
+            System.out.println("ERROR: Exception in markAllAsRead: " + e.getMessage());
+            e.printStackTrace();
+            throw e; // Re-throw to trigger transaction rollback
+        }
     }
 
     @Transactional
@@ -58,6 +166,7 @@ public class NotificationService {
         notification.setMessage(message);
         notification.setRelatedEntityId(appointmentId);
         notification.setRelatedEntityType("APPOINTMENT");
+        notification.setStatus("SENT"); // Set initial status as SENT for created notifications
         return NotificationDto.fromEntity(notificationRepository.save(notification));
     }
 
@@ -72,6 +181,7 @@ public class NotificationService {
         notification.setMessage(message);
         notification.setRelatedEntityId(routineId);
         notification.setRelatedEntityType("MEDICATION_ROUTINE");
+        notification.setStatus("SENT"); // Set initial status as SENT for created notifications
         return NotificationDto.fromEntity(notificationRepository.save(notification));
     }
 
@@ -84,6 +194,7 @@ public class NotificationService {
         notification.setMessage(message);
         notification.setPriority(priority);
         notification.setRelatedEntityType("SYSTEM");
+        notification.setStatus("SENT"); // Set initial status as SENT for created notifications
         return NotificationDto.fromEntity(notificationRepository.save(notification));
     }
 }

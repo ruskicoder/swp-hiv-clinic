@@ -17,6 +17,7 @@ public class NotificationDto {
     private String title;
     private String message;
     private boolean isRead;
+    private String status;
     private Integer relatedEntityId;
     private String relatedEntityType;
     private LocalDateTime createdAt;
@@ -28,7 +29,8 @@ public class NotificationDto {
                 notification.getType(),
                 notification.getTitle(),
                 notification.getMessage(),
-                notification.getIsRead(),
+                notification.getIsRead() != null ? notification.getIsRead() : false, // Safe null handling
+                notification.getStatus() != null ? notification.getStatus() : "PENDING", // Safe null handling
                 notification.getRelatedEntityId(),
                 notification.getRelatedEntityType(),
                 notification.getCreatedAt()

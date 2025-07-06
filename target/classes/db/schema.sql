@@ -178,7 +178,7 @@ CREATE TABLE Notifications (
     Type NVARCHAR(50) NOT NULL, -- 'APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'SYSTEM_NOTIFICATION'
     Title NVARCHAR(255) NOT NULL,
     Message NVARCHAR(MAX) NOT NULL,
-    IsRead BIT DEFAULT 0,
+    IsRead BIT NOT NULL DEFAULT 0, -- NOT NULL to prevent null values causing DTO mapping issues
     Priority NVARCHAR(20) DEFAULT 'MEDIUM', -- 'LOW', 'MEDIUM', 'HIGH'
     RelatedEntityID INT NULL, -- Could be AppointmentID, MedicationRoutineID, etc.
     RelatedEntityType NVARCHAR(50) NULL, -- 'APPOINTMENT', 'MEDICATION', 'SYSTEM'
@@ -277,7 +277,14 @@ IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[No
 BEGIN
     ALTER TABLE Notifications
     ADD status NVARCHAR(20) DEFAULT 'PENDING',
-        CONSTRAINT chk_notification_status CHECK (status IN ('PENDING', 'SENT', 'DELIVERED', 'FAILED', 'CANCELLED'));
+        CONSTRAINT chk_notification_status CHECK (status IN ('PENDING', 'SENT', 'DELIVERED', 'FAILED', 'CANCELLED', 'READ'));
+END
+
+-- Update existing constraint if it exists to include 'READ' status
+IF EXISTS (SELECT * FROM sys.check_constraints WHERE name = 'chk_notification_status')
+BEGIN
+    ALTER TABLE Notifications DROP CONSTRAINT chk_notification_status;
+    ALTER TABLE Notifications ADD CONSTRAINT chk_notification_status CHECK (status IN ('PENDING', 'SENT', 'DELIVERED', 'FAILED', 'CANCELLED', 'READ'));
 END
 
 -- Add indexes for performance
