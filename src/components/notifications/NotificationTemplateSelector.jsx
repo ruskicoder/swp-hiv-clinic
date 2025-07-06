@@ -366,7 +366,7 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates = [], onRefre
           )}
 
           {/* Create/Edit Template Tab */}
-          {activeTab === 'create' && showCreateForm && (
+          {activeTab === 'create' && (
             <div className="create-template">
               <form onSubmit={handleSaveTemplate} className="template-form">
                 <div className="form-section">
