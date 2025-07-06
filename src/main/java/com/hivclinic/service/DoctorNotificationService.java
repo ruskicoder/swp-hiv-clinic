@@ -35,6 +35,9 @@ public class DoctorNotificationService {
     @Autowired
     private AppointmentRepository appointmentRepository;
     
+    @Autowired
+    private com.hivclinic.repository.PatientProfileRepository patientProfileRepository;
+    
     /**
      * Get notification templates by type
      */
@@ -81,17 +84,60 @@ public class DoctorNotificationService {
             }
             
             // Get template
-            Optional<NotificationTemplate> templateOpt = notificationTemplateService.getTemplateById(templateId.intValue());
+            Optional<NotificationTemplate> templateOpt = notificationTemplateService.getTemplateById(templateId);
             if (templateOpt.isEmpty() || !templateOpt.get().getIsActive()) {
                 logger.error("Template not found or inactive: {}", templateId);
                 return false;
             }
             
             NotificationTemplate template = templateOpt.get();
+            User doctor = doctorOpt.get();
+            User patient = patientOpt.get();
+            
+            // Automatically populate common template variables
+            Map<String, String> allVariables = new java.util.HashMap<>();
+            if (variables != null) {
+                allVariables.putAll(variables);
+            }
+            
+            // Add patient information
+            String patientFirstName = "Unknown";
+            String patientLastName = "Patient";
+            try {
+                Optional<com.hivclinic.model.PatientProfile> profileOpt =
+                    patientProfileRepository.findByUser(patient);
+                if (profileOpt.isPresent()) {
+                    com.hivclinic.model.PatientProfile profile = profileOpt.get();
+                    patientFirstName = profile.getFirstName() != null ? profile.getFirstName() : patient.getFirstName();
+                    patientLastName = profile.getLastName() != null ? profile.getLastName() : patient.getLastName();
+                } else {
+                    patientFirstName = patient.getFirstName() != null ? patient.getFirstName() : patient.getUsername();
+                    patientLastName = patient.getLastName() != null ? patient.getLastName() : "";
+                }
+            } catch (Exception e) {
+                logger.warn("Error fetching patient profile: {}", e.getMessage());
+            }
+            
+            allVariables.put("patientName", patientFirstName + " " + patientLastName);
+            allVariables.put("patientFirstName", patientFirstName);
+            allVariables.put("patientLastName", patientLastName);
+            
+            // Add doctor information
+            String doctorFirstName = doctor.getFirstName() != null ? doctor.getFirstName() : doctor.getUsername();
+            String doctorLastName = doctor.getLastName() != null ? doctor.getLastName() : "";
+            allVariables.put("doctorName", doctorFirstName + " " + doctorLastName);
+            allVariables.put("doctorFirstName", doctorFirstName);
+            allVariables.put("doctorLastName", doctorLastName);
+            
+            // Add current date/time
+            allVariables.put("currentDate", java.time.LocalDate.now().toString());
+            allVariables.put("currentTime", java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
+            
+            logger.debug("Template variables: {}", allVariables);
             
             // Process template variables
-            String processedSubject = notificationTemplateService.processTemplate(template.getSubject(), variables);
-            String processedBody = notificationTemplateService.processTemplate(template.getBody(), variables);
+            String processedSubject = notificationTemplateService.processTemplate(template.getSubject(), allVariables);
+            String processedBody = notificationTemplateService.processTemplate(template.getBody(), allVariables);
             
             // Create notification
             Notification notification = new Notification();
@@ -139,6 +185,102 @@ public class DoctorNotificationService {
             
         } catch (Exception e) {
             logger.error("Error retrieving notification history for patient {}: {}", patientId, e.getMessage(), e);
+            return List.of();
+        }
+    }
+    
+    /**
+     * Get notification history for a doctor (all notifications sent by this doctor)
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getNotificationHistoryForDoctor(Long doctorId) {
+        try {
+            logger.debug("Doctor {} requesting all notification history", doctorId);
+            
+            // Get all notifications sent by this doctor to their patients
+            List<Notification> allNotifications = notificationRepository.findAll();
+            
+            // Filter for notifications sent to patients who have appointments with this doctor
+            List<Map<String, Object>> notificationHistory = new java.util.ArrayList<>();
+            
+            for (Notification notification : allNotifications) {
+                if (canDoctorContactPatient(doctorId.intValue(), notification.getUserId())) {
+                    Map<String, Object> notificationData = new java.util.HashMap<>();
+                    
+                    // Add notification details
+                    notificationData.put("notificationId", notification.getNotificationId());
+                    notificationData.put("title", notification.getTitle());
+                    notificationData.put("message", notification.getMessage());
+                    notificationData.put("type", notification.getType().name());
+                    notificationData.put("priority", notification.getPriority());
+                    notificationData.put("isRead", notification.getIsRead());
+                    notificationData.put("sentAt", notification.getSentAt());
+                    notificationData.put("createdAt", notification.getCreatedAt());
+                    
+                    // Add patient information
+                    try {
+                        Optional<User> patientOpt = userRepository.findById(notification.getUserId());
+                        if (patientOpt.isPresent()) {
+                            User patient = patientOpt.get();
+                            
+                            String patientFirstName = "Unknown";
+                            String patientLastName = "Patient";
+                            
+                            // Try to get name from PatientProfile first
+                            try {
+                                Optional<com.hivclinic.model.PatientProfile> profileOpt =
+                                    patientProfileRepository.findByUser(patient);
+                                if (profileOpt.isPresent()) {
+                                    com.hivclinic.model.PatientProfile profile = profileOpt.get();
+                                    patientFirstName = profile.getFirstName() != null ? profile.getFirstName() : patient.getFirstName();
+                                    patientLastName = profile.getLastName() != null ? profile.getLastName() : patient.getLastName();
+                                } else {
+                                    patientFirstName = patient.getFirstName() != null ? patient.getFirstName() : patient.getUsername();
+                                    patientLastName = patient.getLastName() != null ? patient.getLastName() : "";
+                                }
+                            } catch (Exception e) {
+                                logger.warn("Error fetching patient profile for notification history: {}", e.getMessage());
+                            }
+                            
+                            notificationData.put("patientName", patientFirstName + " " + patientLastName);
+                            notificationData.put("patientEmail", patient.getEmail());
+                            notificationData.put("patientId", patient.getUserId());
+                        } else {
+                            notificationData.put("patientName", "Unknown Patient");
+                            notificationData.put("patientEmail", "");
+                            notificationData.put("patientId", notification.getUserId());
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Error fetching patient details for notification {}: {}",
+                                   notification.getNotificationId(), e.getMessage());
+                        notificationData.put("patientName", "Unknown Patient");
+                        notificationData.put("patientEmail", "");
+                        notificationData.put("patientId", notification.getUserId());
+                    }
+                    
+                    // Add status based on sentAt and isRead
+                    String status = "pending";
+                    if (notification.getSentAt() != null) {
+                        status = notification.getIsRead() ? "read" : "delivered";
+                    }
+                    notificationData.put("status", status);
+                    
+                    notificationHistory.add(notificationData);
+                }
+            }
+            
+            // Sort by creation date descending
+            notificationHistory.sort((a, b) -> {
+                java.time.LocalDateTime dateA = (java.time.LocalDateTime) a.get("createdAt");
+                java.time.LocalDateTime dateB = (java.time.LocalDateTime) b.get("createdAt");
+                return dateB.compareTo(dateA);
+            });
+            
+            logger.debug("Found {} notifications for doctor {}", notificationHistory.size(), doctorId);
+            return notificationHistory;
+            
+        } catch (Exception e) {
+            logger.error("Error retrieving notification history for doctor {}: {}", doctorId, e.getMessage(), e);
             return List.of();
         }
     }
@@ -194,6 +336,7 @@ public class DoctorNotificationService {
     public List<Map<String, Object>> getPatientsWithAppointments(Long doctorId) {
         try {
             logger.debug("Getting patients with appointments for doctor {}", doctorId);
+            logger.debug("Expected frontend structure: userId, firstName, lastName, email");
             
             Optional<User> doctorOpt = userRepository.findById(doctorId.intValue());
             if (doctorOpt.isEmpty()) {
@@ -203,20 +346,79 @@ public class DoctorNotificationService {
             
             List<Appointment> appointments = appointmentRepository.findByDoctorUser(doctorOpt.get());
             
-            // Get unique patients from appointments
-            return appointments.stream()
-                .map(appointment -> {
-                    User patient = appointment.getPatientUser();
+            // Get unique patients from appointments with enhanced mapping
+            Map<Integer, Map<String, Object>> uniquePatients = new java.util.HashMap<>();
+            
+            for (Appointment appointment : appointments) {
+                User patient = appointment.getPatientUser();
+                Integer patientId = patient.getUserId();
+                
+                if (!uniquePatients.containsKey(patientId)) {
                     Map<String, Object> patientMap = new java.util.HashMap<>();
-                    patientMap.put("patientId", patient.getUserId());
-                    patientMap.put("patientName", patient.getUsername());
-                    patientMap.put("patientEmail", patient.getEmail());
+                    
+                    // Frontend expects: userId, firstName, lastName, email
+                    patientMap.put("userId", patient.getUserId());
+                    
+                    // Try to get name from PatientProfile first, then from User entity
+                    String firstName = "Unknown";
+                    String lastName = "Patient";
+                    
+                    try {
+                        Optional<com.hivclinic.model.PatientProfile> profileOpt =
+                            patientProfileRepository.findByUser(patient);
+                        
+                        if (profileOpt.isPresent()) {
+                            com.hivclinic.model.PatientProfile profile = profileOpt.get();
+                            firstName = profile.getFirstName() != null ? profile.getFirstName() : firstName;
+                            lastName = profile.getLastName() != null ? profile.getLastName() : lastName;
+                            logger.debug("Found PatientProfile for user {}: {} {}",
+                                        patientId, firstName, lastName);
+                        } else {
+                            // Fallback to User entity names
+                            if (patient.getFirstName() != null && !patient.getFirstName().trim().isEmpty()) {
+                                firstName = patient.getFirstName();
+                            } else if (patient.getUsername() != null && !patient.getUsername().trim().isEmpty()) {
+                                firstName = patient.getUsername();
+                            }
+                            
+                            if (patient.getLastName() != null && !patient.getLastName().trim().isEmpty()) {
+                                lastName = patient.getLastName();
+                            }
+                            logger.debug("No PatientProfile found for user {}, using User entity: {} {}",
+                                        patientId, firstName, lastName);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Error fetching PatientProfile for user {}: {}", patientId, e.getMessage());
+                        // Use fallback values already set
+                    }
+                    
+                    patientMap.put("firstName", firstName);
+                    patientMap.put("lastName", lastName);
+                    patientMap.put("email", patient.getEmail() != null ? patient.getEmail() : "");
+                    
+                    logger.debug("Final mapping for patient: userId={}, username={}, email={}, firstName={}, lastName={}",
+                                patient.getUserId(), patient.getUsername(), patient.getEmail(),
+                                firstName, lastName);
+                    
                     patientMap.put("lastAppointment", appointment.getAppointmentDateTime());
                     patientMap.put("appointmentStatus", appointment.getStatus());
-                    return patientMap;
-                })
-                .distinct()
-                .collect(java.util.stream.Collectors.toList());
+                    
+                    uniquePatients.put(patientId, patientMap);
+                } else {
+                    // Update last appointment if this appointment is more recent
+                    Map<String, Object> existingPatient = uniquePatients.get(patientId);
+                    java.time.LocalDateTime existingLastAppt = (java.time.LocalDateTime) existingPatient.get("lastAppointment");
+                    if (appointment.getAppointmentDateTime().isAfter(existingLastAppt)) {
+                        existingPatient.put("lastAppointment", appointment.getAppointmentDateTime());
+                        existingPatient.put("appointmentStatus", appointment.getStatus());
+                    }
+                }
+            }
+            List<Map<String, Object>> result = new java.util.ArrayList<>(uniquePatients.values());
+            logger.info("Successfully fetched {} unique patients with appointments for doctor {}",
+                       result.size(), doctorId);
+            
+            return result;
                 
         } catch (Exception e) {
             logger.error("Error getting patients for doctor {}: {}", doctorId, e.getMessage(), e);

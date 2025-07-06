@@ -39,7 +39,7 @@ public class NotificationTemplateService {
      * Get template by ID
      */
     @Transactional(readOnly = true)
-    public Optional<NotificationTemplate> getTemplateById(Integer templateId) {
+    public Optional<NotificationTemplate> getTemplateById(Long templateId) {
         return notificationTemplateRepository.findById(templateId);
     }
     
@@ -56,7 +56,7 @@ public class NotificationTemplateService {
      * Update an existing notification template
      */
     @Transactional
-    public Optional<NotificationTemplate> updateTemplate(Integer templateId, NotificationTemplate updatedTemplate) {
+    public Optional<NotificationTemplate> updateTemplate(Long templateId, NotificationTemplate updatedTemplate) {
         return notificationTemplateRepository.findById(templateId)
                 .map(template -> {
                     template.setName(updatedTemplate.getName());
@@ -75,7 +75,7 @@ public class NotificationTemplateService {
      * Deactivate a notification template
      */
     @Transactional
-    public boolean deactivateTemplate(Integer templateId) {
+    public boolean deactivateTemplate(Long templateId) {
         return notificationTemplateRepository.findById(templateId)
                 .map(template -> {
                     template.setIsActive(false);
@@ -90,7 +90,7 @@ public class NotificationTemplateService {
      * Delete a notification template
      */
     @Transactional
-    public boolean deleteTemplate(Integer templateId) {
+    public boolean deleteTemplate(Long templateId) {
         if (notificationTemplateRepository.existsById(templateId)) {
             notificationTemplateRepository.deleteById(templateId);
             logger.info("Deleted notification template with ID: {}", templateId);
@@ -108,15 +108,22 @@ public class NotificationTemplateService {
     }
     
     /**
-     * Process template variables
+     * Process template variables - supports both {{var}} and {var} formats
      */
     public String processTemplate(String templateBody, java.util.Map<String, String> variables) {
         String processedBody = templateBody;
         
         if (variables != null && !variables.isEmpty()) {
             for (java.util.Map.Entry<String, String> entry : variables.entrySet()) {
-                String placeholder = "{{" + entry.getKey() + "}}";
-                processedBody = processedBody.replace(placeholder, entry.getValue());
+                String key = entry.getKey();
+                String value = entry.getValue() != null ? entry.getValue() : "";
+                
+                // Support both {{variable}} and {variable} formats
+                String placeholder1 = "{{" + key + "}}";
+                String placeholder2 = "{" + key + "}";
+                
+                processedBody = processedBody.replace(placeholder1, value);
+                processedBody = processedBody.replace(placeholder2, value);
             }
         }
         

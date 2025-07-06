@@ -1,0 +1,137 @@
+sequenceDiagram
+    participant Patient as Patient (React)
+    participant AppCtrl as AppointmentController
+    participant AppSvc as AppointmentService
+    participant SlotSvc as DoctorAvailabilityService
+    participant NotifSvc as NotificationService
+    participant AppRepo as AppointmentRepository
+    participant SlotRepo as DoctorAvailabilityRepository
+    participant NotifRepo as NotificationRepository
+    participant DB as SQL Server Database
+
+    Note over Patient, DB: Appointment Booking Flow
+
+    Patient->>AppCtrl: POST /api/appointments/book
+    Note right of Patient: {doctorId, availabilitySlotId, appointmentDateTime, notes}
+    
+    AppCtrl->>AppSvc: createAppointment(request, patientId)
+    AppSvc->>SlotSvc: validateAppointmentSlot(slotId, doctorId)
+    SlotSvc->>SlotRepo: findByIdAndDoctorId(slotId, doctorId)
+    SlotRepo->>DB: SELECT availability slot
+    DB-->>SlotRepo: DoctorAvailabilitySlot
+    SlotRepo-->>SlotSvc: Optional<DoctorAvailabilitySlot>
+    
+    alt Slot available and valid
+        SlotSvc-->>AppSvc: true
+        AppSvc->>AppSvc: validateNoConflicts(patientId, doctorId, dateTime)
+        AppSvc->>AppRepo: findConflictingAppointments(...)
+        AppRepo->>DB: SELECT conflicting appointments
+        DB-->>AppRepo: List<Appointment>
+        AppRepo-->>AppSvc: No conflicts found
+        
+        AppSvc->>AppRepo: save(appointment)
+        AppRepo->>DB: INSERT INTO Appointments
+        DB-->>AppRepo: Appointment created
+        AppRepo-->>AppSvc: Appointment
+        
+        AppSvc->>SlotSvc: bookSlot(slotId)
+        SlotSvc->>SlotRepo: updateSlotAsBooked(slotId)
+        SlotRepo->>DB: UPDATE DoctorAvailabilitySlots SET IsBooked = 1
+        DB-->>SlotRepo: Success
+        
+        AppSvc->>NotifSvc: scheduleAppointmentReminders(appointment)
+        NotifSvc->>NotifRepo: saveAppointmentReminders(...)
+        NotifRepo->>DB: INSERT INTO AppointmentReminders
+        DB-->>NotifRepo: Success
+        
+        NotifSvc->>NotifSvc: sendAppointmentConfirmation(appointment)
+        NotifSvc->>NotifRepo: save(confirmationNotification)
+        NotifRepo->>DB: INSERT INTO Notifications
+        DB-->>NotifRepo: Success
+        
+        AppSvc-->>AppCtrl: Appointment
+        AppCtrl-->>Patient: 201 Created with appointment details
+        
+    else Slot not available or invalid
+        SlotSvc-->>AppSvc: false
+        AppSvc-->>AppCtrl: ValidationException
+        AppCtrl-->>Patient: 400 Bad Request - Slot not available
+    end
+
+    Note over Patient, DB: Appointment Cancellation Flow
+
+    Patient->>AppCtrl: PUT /api/appointments/{id}/cancel
+    Note right of Patient: {reason: "Patient needs to reschedule"}
+    
+    AppCtrl->>AppSvc: cancelAppointment(appointmentId, reason, userId)
+    AppSvc->>AppRepo: findByIdAndPatientId(appointmentId, userId)
+    AppRepo->>DB: SELECT appointment
+    DB-->>AppRepo: Appointment
+    AppRepo-->>AppSvc: Optional<Appointment>
+    
+    alt Appointment found and can be cancelled
+        AppSvc->>AppSvc: recordStatusChange(appointment, "Scheduled", "Cancelled")
+        AppSvc->>AppRepo: save(appointment)
+        AppRepo->>DB: UPDATE Appointments SET Status = 'Cancelled'
+        DB-->>AppRepo: Success
+        
+        AppSvc->>SlotSvc: releaseSlot(availabilitySlotId)
+        SlotSvc->>SlotRepo: updateSlotAsAvailable(slotId)
+        SlotRepo->>DB: UPDATE DoctorAvailabilitySlots SET IsBooked = 0
+        DB-->>SlotRepo: Success
+        
+        AppSvc->>NotifSvc: sendCancellationNotification(appointment, reason)
+        NotifSvc->>NotifRepo: save(cancellationNotification)
+        NotifRepo->>DB: INSERT INTO Notifications
+        DB-->>NotifRepo: Success
+        
+        AppSvc-->>AppCtrl: Success
+        AppCtrl-->>Patient: 200 OK - Appointment cancelled
+        
+    else Appointment not found or cannot be cancelled
+        AppSvc-->>AppCtrl: NotFoundException or ValidationException
+        AppCtrl-->>Patient: 404 Not Found or 400 Bad Request
+    end
+
+    Note over Patient, DB: Doctor Availability Management
+
+    Patient->>AppCtrl: GET /api/doctors/{doctorId}/available-slots
+    Note right of Patient: ?startDate=2025-01-10&endDate=2025-01-17
+    
+    AppCtrl->>SlotSvc: getDoctorAvailableSlots(doctorId, startDate, endDate)
+    SlotSvc->>SlotRepo: findAvailableSlots(doctorId, startDate, endDate)
+    SlotRepo->>DB: SELECT available slots
+    DB-->>SlotRepo: List<DoctorAvailabilitySlot>
+    SlotRepo-->>SlotSvc: List<DoctorAvailabilitySlot>
+    SlotSvc-->>AppCtrl: List<AvailabilitySlotResponse>
+    AppCtrl-->>Patient: 200 OK with available slots
+
+    Note over Patient, DB: Appointment Status Update (Doctor)
+
+    Patient->>AppCtrl: PUT /api/appointments/{id}/status
+    Note right of Patient: {status: "Completed", notes: "Patient responded well"}
+    
+    AppCtrl->>AppSvc: updateAppointmentStatus(appointmentId, status, notes, doctorId)
+    AppSvc->>AppRepo: findByIdAndDoctorId(appointmentId, doctorId)
+    AppRepo->>DB: SELECT appointment
+    DB-->>AppRepo: Appointment
+    AppRepo-->>AppSvc: Optional<Appointment>
+    
+    alt Appointment found and doctor authorized
+        AppSvc->>AppSvc: recordStatusChange(appointment, oldStatus, newStatus)
+        AppSvc->>AppRepo: save(appointment)
+        AppRepo->>DB: UPDATE Appointments
+        DB-->>AppRepo: Success
+        
+        AppSvc->>NotifSvc: sendStatusUpdateNotification(appointment, status)
+        NotifSvc->>NotifRepo: save(statusUpdateNotification)
+        NotifRepo->>DB: INSERT INTO Notifications
+        DB-->>NotifRepo: Success
+        
+        AppSvc-->>AppCtrl: Updated Appointment
+        AppCtrl-->>Patient: 200 OK with updated appointment
+        
+    else Appointment not found or unauthorized
+        AppSvc-->>AppCtrl: NotFoundException or UnauthorizedException
+        AppCtrl-->>Patient: 404 Not Found or 403 Forbidden
+    end

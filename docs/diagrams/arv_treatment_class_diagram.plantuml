@@ -1,0 +1,343 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam classBackgroundColor lightblue
+skinparam interfaceBackgroundColor lightgreen
+
+package "Controller Layer" {
+    class ARVTreatmentController {
+        -arvTreatmentService: ARVTreatmentService
+        -medicationRoutineService: MedicationRoutineService
+        -patientRecordService: PatientRecordService
+        +getMyTreatments(Authentication): ResponseEntity
+        +getPatientTreatments(Long, Authentication): ResponseEntity
+        +addTreatment(ARVTreatmentRequest, Authentication): ResponseEntity
+        +updateTreatment(Long, ARVTreatmentRequest, Authentication): ResponseEntity
+        +deactivateTreatment(Long, Authentication): ResponseEntity
+        +editTreatment(Long, ARVTreatmentRequest, Authentication): ResponseEntity
+        +deleteTreatment(Long, Authentication): ResponseEntity
+        +getTreatmentTemplates(): ResponseEntity
+    }
+    
+    class MedicationRoutineController {
+        -medicationRoutineService: MedicationRoutineService
+        +createMedicationRoutine(MedicationRoutineRequest): ResponseEntity
+        +updateMedicationRoutine(Long, MedicationRoutineRequest): ResponseEntity
+        +getMedicationRoutines(Authentication): ResponseEntity
+        +deactivateRoutine(Long, Authentication): ResponseEntity
+    }
+}
+
+package "Service Layer" {
+    class ARVTreatmentService {
+        -arvTreatmentRepository: ARVTreatmentRepository
+        -userRepository: UserRepository
+        -appointmentRepository: AppointmentRepository
+        -medicationRoutineService: MedicationRoutineService
+        -notificationService: NotificationService
+        +createTreatment(ARVTreatmentRequest, Integer): ARVTreatment
+        +updateTreatment(Long, ARVTreatmentRequest, Integer): ARVTreatment
+        +getTreatmentsByPatient(Integer): List<ARVTreatment>
+        +getTreatmentsByDoctor(Integer): List<ARVTreatment>
+        +deactivateTreatment(Long, Integer): void
+        +deleteTreatment(Long, Integer): void
+        +validateTreatmentAccess(Long, Integer): boolean
+        +getTreatmentTemplates(): List<TreatmentTemplate>
+        +updateAdherence(Long, String, String): void
+        +trackSideEffects(Long, String): void
+        -validateDoctorPatientRelationship(Integer, Integer): boolean
+    }
+    
+    class MedicationRoutineService {
+        -medicationRoutineRepository: MedicationRoutineRepository
+        -notificationService: NotificationService
+        -medicationReminderRepository: MedicationReminderRepository
+        +createMedicationRoutine(MedicationRoutineRequest): MedicationRoutine
+        +updateMedicationRoutine(Long, MedicationRoutineRequest): MedicationRoutine
+        +getMedicationRoutines(Integer): List<MedicationRoutine>
+        +deactivateRoutine(Long): void
+        +generateDailyReminders(MedicationRoutine): void
+        +trackMedicationAdherence(Long, LocalDate): void
+        +updateReminderSettings(Long, Boolean, Integer): void
+        +getActiveRoutinesForPatient(Integer): List<MedicationRoutine>
+        +shouldSendReminder(MedicationRoutine): boolean
+        -scheduleNextReminder(MedicationRoutine): void
+    }
+    
+    class PatientRecordService {
+        -patientRecordRepository: PatientRecordRepository
+        -arvTreatmentRepository: ARVTreatmentRepository
+        +updateMedicalHistory(Integer, String): void
+        +addTreatmentToRecord(Integer, ARVTreatment): void
+        +trackTreatmentProgress(Integer): TreatmentProgress
+        +getComprehensiveRecord(Integer): PatientRecord
+        +updateCurrentMedications(Integer, List<String>): void
+        +recordAllergies(Integer, String): void
+        +updateEmergencyContacts(Integer, String, String): void
+    }
+}
+
+package "Entity Layer" {
+    class ARVTreatment {
+        -arvTreatmentId: Integer
+        -patient: User
+        -doctor: User
+        -appointment: Appointment
+        -regimen: String
+        -startDate: LocalDate
+        -endDate: LocalDate
+        -adherence: String
+        -sideEffects: String
+        -notes: String
+        -isActive: Boolean
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +prePersist(): void
+        +preUpdate(): void
+        +getDurationDays(): int
+        +isCurrentlyActive(): boolean
+        +calculateAdherencePercentage(): double
+        +hasExpired(): boolean
+        +canBeModified(): boolean
+    }
+    
+    class MedicationRoutine {
+        -routineId: Integer
+        -patient: User
+        -doctor: User
+        -arvTreatment: ARVTreatment
+        -medicationName: String
+        -dosage: String
+        -instructions: String
+        -startDate: LocalDate
+        -endDate: LocalDate
+        -timeOfDay: LocalTime
+        -isActive: Boolean
+        -reminderEnabled: Boolean
+        -reminderMinutesBefore: Integer
+        -lastReminderSentAt: LocalDateTime
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +prePersist(): void
+        +preUpdate(): void
+        +shouldSendReminder(): boolean
+        +getNextReminderTime(): LocalDateTime
+        +isCurrentlyActive(): boolean
+        +getDailyDoseTimes(): List<LocalTime>
+    }
+    
+    class MedicationReminder {
+        -reminderId: Integer
+        -routine: MedicationRoutine
+        -patient: User
+        -reminderDate: LocalDate
+        -reminderTime: LocalTime
+        -status: String
+        -sentAt: LocalDateTime
+        -acknowledgedAt: LocalDateTime
+        -createdAt: LocalDateTime
+        +getScheduledDateTime(): LocalDateTime
+        +canBeSent(): boolean
+        +isOverdue(): boolean
+        +acknowledge(): void
+        +markAsMissed(): void
+    }
+    
+    class PatientRecord {
+        -recordId: Integer
+        -patient: User
+        -medicalHistory: String
+        -allergies: String
+        -currentMedications: String
+        -notes: String
+        -bloodType: String
+        -emergencyContact: String
+        -emergencyPhone: String
+        -profileImageBase64: String
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +prePersist(): void
+        +preUpdate(): void
+        +addMedicalHistoryEntry(String): void
+        +updateCurrentMedications(List<String>): void
+        +hasAllergies(): boolean
+        +getEmergencyContactInfo(): String
+    }
+    
+    class TreatmentTemplate {
+        -templateId: Integer
+        -name: String
+        -regimen: String
+        -description: String
+        -standardDosage: String
+        -duration: Integer
+        -sideEffects: String
+        -contraindications: String
+        -isActive: Boolean
+        +isApplicableFor(PatientRecord): boolean
+        +generateTreatmentPlan(): ARVTreatmentPlan
+    }
+    
+    class ARVTreatmentPlan {
+        -medications: List<String>
+        -dosages: List<String>
+        -schedule: List<LocalTime>
+        -duration: Integer
+        -specialInstructions: String
+        +generateMedicationRoutines(): List<MedicationRoutine>
+        +calculateTotalCost(): BigDecimal
+    }
+}
+
+package "Repository Layer" {
+    interface ARVTreatmentRepository {
+        +findByPatientUserIdAndIsActiveTrue(Integer): List<ARVTreatment>
+        +findByDoctorUserIdAndIsActiveTrue(Integer): List<ARVTreatment>
+        +findByPatientUserIdAndDoctorUserId(Integer, Integer): List<ARVTreatment>
+        +findActiveByPatientUserId(Integer): List<ARVTreatment>
+        +findByRegimenContainingIgnoreCase(String): List<ARVTreatment>
+        +countByPatientUserIdAndIsActiveTrue(Integer): Long
+        +findByStartDateBetween(LocalDate, LocalDate): List<ARVTreatment>
+        +findExpiringTreatments(LocalDate): List<ARVTreatment>
+    }
+    
+    interface MedicationRoutineRepository {
+        +findByPatientUserIdAndIsActiveTrue(Integer): List<MedicationRoutine>
+        +findByArvTreatmentArvTreatmentId(Integer): List<MedicationRoutine>
+        +findByIsActiveTrueAndReminderEnabledTrue(): List<MedicationRoutine>
+        +findByPatientUserIdAndMedicationNameContaining(Integer, String): List<MedicationRoutine>
+        +findActiveRoutinesForToday(): List<MedicationRoutine>
+        +findByTimeOfDayBetween(LocalTime, LocalTime): List<MedicationRoutine>
+        +countByPatientUserIdAndIsActiveTrue(Integer): Long
+    }
+    
+    interface MedicationReminderRepository {
+        +findByStatusAndReminderDateAndReminderTimeBefore(String, LocalDate, LocalTime): List<MedicationReminder>
+        +findByRoutineRoutineIdAndStatus(Integer, String): List<MedicationReminder>
+        +findByPatientUserIdAndReminderDateBetween(Integer, LocalDate, LocalDate): List<MedicationReminder>
+        +findPendingRemindersForToday(): List<MedicationReminder>
+        +findByPatientUserIdAndStatus(Integer, String): List<MedicationReminder>
+        +deleteByRoutineRoutineId(Integer): void
+        +countAcknowledgedByPatientAndDateRange(Integer, LocalDate, LocalDate): Long
+    }
+    
+    interface PatientRecordRepository {
+        +findByPatientUserId(Integer): Optional<PatientRecord>
+        +findByPatientUserIdAndRecordId(Integer, Integer): Optional<PatientRecord>
+        +findByBloodType(String): List<PatientRecord>
+        +findByAllergiesContainingIgnoreCase(String): List<PatientRecord>
+        +findByMedicalHistoryContainingIgnoreCase(String): List<PatientRecord>
+    }
+}
+
+package "DTO Layer" {
+    class ARVTreatmentRequest {
+        -patientId: Integer
+        -regimen: String
+        -startDate: LocalDate
+        -endDate: LocalDate
+        -notes: String
+        -medicationRoutines: List<MedicationRoutineRequest>
+        +validate(): boolean
+        +hasValidDateRange(): boolean
+    }
+    
+    class ARVTreatmentResponse {
+        -treatmentId: Integer
+        -patientName: String
+        -doctorName: String
+        -regimen: String
+        -startDate: LocalDate
+        -endDate: LocalDate
+        -adherence: String
+        -sideEffects: String
+        -isActive: Boolean
+        -medicationRoutines: List<MedicationRoutineResponse>
+        -canModify: boolean
+    }
+    
+    class MedicationRoutineRequest {
+        -medicationName: String
+        -dosage: String
+        -instructions: String
+        -timeOfDay: LocalTime
+        -reminderEnabled: Boolean
+        -reminderMinutesBefore: Integer
+        +validate(): boolean
+        +isValidTime(): boolean
+    }
+    
+    class MedicationRoutineResponse {
+        -routineId: Integer
+        -medicationName: String
+        -dosage: String
+        -instructions: String
+        -timeOfDay: LocalTime
+        -reminderEnabled: Boolean
+        -reminderMinutesBefore: Integer
+        -isActive: Boolean
+        -nextReminderTime: LocalDateTime
+        -adherencePercentage: Double
+    }
+}
+
+' Relationships
+ARVTreatmentController *-- ARVTreatmentService
+ARVTreatmentController *-- MedicationRoutineService
+MedicationRoutineController *-- MedicationRoutineService
+
+ARVTreatmentService *-- ARVTreatmentRepository
+ARVTreatmentService *-- MedicationRoutineService
+MedicationRoutineService *-- MedicationRoutineRepository
+MedicationRoutineService *-- MedicationReminderRepository
+PatientRecordService *-- PatientRecordRepository
+PatientRecordService *-- ARVTreatmentRepository
+
+ARVTreatment }o--|| User : "patient"
+ARVTreatment }o--|| User : "doctor"
+ARVTreatment }o--|| Appointment : "prescribed in"
+ARVTreatment ||--o{ MedicationRoutine : "includes"
+
+MedicationRoutine }o--|| User : "patient"
+MedicationRoutine }o--|| User : "doctor"
+MedicationRoutine }o--|| ARVTreatment : "part of"
+MedicationRoutine ||--o{ MedicationReminder : "generates"
+
+MedicationReminder }o--|| MedicationRoutine : "for"
+MedicationReminder }o--|| User : "sent to"
+
+PatientRecord }o--|| User : "belongs to"
+
+TreatmentTemplate ..> ARVTreatmentPlan : "generates"
+ARVTreatmentPlan ..> MedicationRoutine : "creates"
+
+ARVTreatmentController ..> ARVTreatmentRequest : "uses"
+ARVTreatmentController ..> ARVTreatmentResponse : "returns"
+MedicationRoutineController ..> MedicationRoutineRequest : "uses"
+MedicationRoutineController ..> MedicationRoutineResponse : "returns"
+
+note right of ARVTreatmentService
+    Core ARV treatment management service
+    - Creates and manages ARV treatments
+    - Tracks adherence and side effects
+    - Validates doctor-patient relationships
+    - Integrates with medication routines
+end note
+
+note right of MedicationRoutineService
+    Medication routine management service
+    - Manages daily medication schedules
+    - Generates and sends reminders
+    - Tracks medication adherence
+    - Handles routine lifecycle
+end note
+
+note right of ARVTreatment
+    Main ARV treatment entity
+    - Links patient, doctor, and appointment
+    - Tracks treatment regimen and dates
+    - Monitors adherence and side effects
+    - Supports treatment modifications
+end note
+
+@enduml

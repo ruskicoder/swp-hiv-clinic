@@ -33,7 +33,8 @@ public class NotificationController {
     private DoctorNotificationService doctorNotificationService;
 
     @GetMapping
-    public ResponseEntity<List<NotificationDto>> getNotifications(@RequestParam Integer userId, @RequestParam(required = false) String status) {
+    public ResponseEntity<List<NotificationDto>> getNotifications(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) String status) {
+        Integer userId = ((com.hivclinic.config.CustomUserDetailsService.UserPrincipal) userDetails).getId();
         List<NotificationDto> notifications;
         if ("unread".equalsIgnoreCase(status)) {
             notifications = notificationService.getUnreadNotificationsByUserId(userId);
@@ -50,7 +51,8 @@ public class NotificationController {
     }
 
     @PostMapping("/read-all")
-    public ResponseEntity<Void> markAllAsRead(@RequestParam Integer userId) {
+    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal UserDetails userDetails) {
+        Integer userId = ((com.hivclinic.config.CustomUserDetailsService.UserPrincipal) userDetails).getId();
         notificationService.markAllAsRead(userId);
         return ResponseEntity.ok().build();
     }
@@ -88,7 +90,7 @@ public class NotificationController {
     }
     
     @PutMapping("/templates/{id}")
-    public ResponseEntity<NotificationTemplate> updateTemplate(@PathVariable Integer id,
+    public ResponseEntity<NotificationTemplate> updateTemplate(@PathVariable Long id,
                                                               @RequestBody NotificationTemplate template) {
         try {
             return notificationTemplateService.updateTemplate(id, template)
@@ -101,7 +103,7 @@ public class NotificationController {
     }
     
     @DeleteMapping("/templates/{id}")
-    public ResponseEntity<Void> deleteTemplate(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteTemplate(@PathVariable Long id) {
         boolean deleted = notificationTemplateService.deleteTemplate(id);
         return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
@@ -121,22 +123,28 @@ public class NotificationController {
             @RequestParam Long templateId,
             @RequestBody(required = false) Map<String, String> variables) {
         
+        logger.info("POST /doctor/send called with doctorId={}, patientId={}, templateId={}, variables={}",
+                   doctorId, patientId, templateId, variables);
+        
         try {
             boolean success = doctorNotificationService.sendNotificationToPatient(doctorId, patientId, templateId, variables);
             
             if (success) {
+                logger.info("Notification sent successfully from doctor {} to patient {}", doctorId, patientId);
                 return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Notification sent successfully"
                 ));
             } else {
+                logger.warn("Failed to send notification from doctor {} to patient {}", doctorId, patientId);
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
                     "message", "Failed to send notification"
                 ));
             }
         } catch (Exception e) {
-            logger.error("Error sending notification: {}", e.getMessage(), e);
+            logger.error("Error sending notification from doctor {} to patient {}: {}",
+                        doctorId, patientId, e.getMessage(), e);
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "message", "Error: " + e.getMessage()
@@ -154,6 +162,20 @@ public class NotificationController {
             return ResponseEntity.ok(history);
         } catch (Exception e) {
             logger.error("Error getting notification history: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @GetMapping("/doctor/history")
+    public ResponseEntity<List<Map<String, Object>>> getNotificationHistoryForDoctor(
+            @RequestParam Long doctorId) {
+        
+        try {
+            logger.info("Getting notification history for doctor {}", doctorId);
+            List<Map<String, Object>> history = doctorNotificationService.getNotificationHistoryForDoctor(doctorId);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            logger.error("Error getting notification history for doctor {}: {}", doctorId, e.getMessage(), e);
             return ResponseEntity.badRequest().build();
         }
     }

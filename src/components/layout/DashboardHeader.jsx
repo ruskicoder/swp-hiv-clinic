@@ -30,7 +30,7 @@ const DashboardHeader = ({ title, subtitle }) => {
     const fetchNotifications = async () => {
         if (user) {
             try {
-                const result = await notificationService.getUserNotifications(user.id);
+                const result = await notificationService.getUserNotifications();
                 if (result.success) {
                     setNotifications(result.data);
                     setUnreadCount(result.data.filter(n => !n.isRead).length);
@@ -125,7 +125,7 @@ const DashboardHeader = ({ title, subtitle }) => {
 
   const handleMarkAllAsRead = async () => {
     try {
-        const result = await notificationService.markAllAsRead(user.id);
+        const result = await notificationService.markAllAsRead();
         if (result.success) {
             setNotifications(notifications.map(n => ({ ...n, isRead: true })));
             setUnreadCount(0);

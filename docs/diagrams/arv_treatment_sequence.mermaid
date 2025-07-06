@@ -1,0 +1,167 @@
+sequenceDiagram
+    participant Doctor as Doctor (React)
+    participant ARVCtrl as ARVTreatmentController
+    participant ARVSvc as ARVTreatmentService
+    participant MedSvc as MedicationRoutineService
+    participant NotifSvc as NotificationService
+    participant ARVRepo as ARVTreatmentRepository
+    participant MedRepo as MedicationRoutineRepository
+    participant PatientRepo as PatientRecordRepository
+    participant DB as SQL Server Database
+
+    Note over Doctor, DB: ARV Treatment Creation Flow
+
+    Doctor->>ARVCtrl: POST /api/arv-treatments/add
+    Note right of Doctor: {patientId, regimen, startDate, endDate, notes, medicationRoutines}
+    
+    ARVCtrl->>ARVSvc: createTreatment(request, doctorId)
+    ARVSvc->>ARVSvc: validateDoctorPatientRelationship(doctorId, patientId)
+    ARVSvc->>ARVRepo: findByPatientUserIdAndDoctorUserId(patientId, doctorId)
+    ARVRepo->>DB: SELECT appointments WHERE patientId = ? AND doctorId = ?
+    DB-->>ARVRepo: Appointment history
+    ARVRepo-->>ARVSvc: Relationship validated
+    
+    ARVSvc->>ARVRepo: save(arvTreatment)
+    ARVRepo->>DB: INSERT INTO ARVTreatments
+    DB-->>ARVRepo: ARVTreatment created
+    ARVRepo-->>ARVSvc: ARVTreatment
+    
+    Note over Doctor, DB: Medication Routine Creation
+    
+    loop For each medication routine
+        ARVSvc->>MedSvc: createMedicationRoutine(routineRequest)
+        MedSvc->>MedSvc: validateRoutineSchedule(routine)
+        MedSvc->>MedRepo: save(medicationRoutine)
+        MedRepo->>DB: INSERT INTO MedicationRoutines
+        DB-->>MedRepo: MedicationRoutine created
+        
+        MedSvc->>MedSvc: generateDailyReminders(routine)
+        MedSvc->>NotifSvc: scheduleMedicationReminders(routine)
+        NotifSvc->>DB: INSERT INTO MedicationReminders
+        DB-->>NotifSvc: Reminders scheduled
+    end
+    
+    ARVSvc->>PatientRepo: updateCurrentMedications(patientId, medications)
+    PatientRepo->>DB: UPDATE PatientRecords SET CurrentMedications = ?
+    DB-->>PatientRepo: Patient record updated
+    
+    ARVSvc->>NotifSvc: sendTreatmentStartNotification(treatment)
+    NotifSvc->>DB: INSERT INTO Notifications
+    DB-->>NotifSvc: Notification created
+    
+    ARVSvc-->>ARVCtrl: ARVTreatment
+    ARVCtrl-->>Doctor: 201 Created with treatment details
+
+    Note over Doctor, DB: Treatment Adherence Tracking
+
+    Doctor->>ARVCtrl: PUT /api/arv-treatments/{id}
+    Note right of Doctor: {adherence: "Good", sideEffects: "Mild nausea"}
+    
+    ARVCtrl->>ARVSvc: updateTreatment(treatmentId, request, doctorId)
+    ARVSvc->>ARVRepo: findByIdAndDoctorId(treatmentId, doctorId)
+    ARVRepo->>DB: SELECT treatment WHERE id = ? AND doctorId = ?
+    DB-->>ARVRepo: ARVTreatment
+    ARVRepo-->>ARVSvc: Treatment found
+    
+    ARVSvc->>ARVSvc: updateAdherence(treatmentId, adherence, sideEffects)
+    ARVSvc->>ARVRepo: save(updatedTreatment)
+    ARVRepo->>DB: UPDATE ARVTreatments
+    DB-->>ARVRepo: Treatment updated
+    
+    ARVSvc->>NotifSvc: sendAdherenceUpdateNotification(treatment)
+    NotifSvc->>DB: INSERT INTO Notifications
+    DB-->>NotifSvc: Notification sent to patient
+    
+    ARVSvc-->>ARVCtrl: Updated ARVTreatment
+    ARVCtrl-->>Doctor: 200 OK with updated treatment
+
+    Note over Doctor, DB: Medication Reminder Processing
+
+    MedSvc->>MedSvc: processDailyReminders()
+    MedSvc->>MedRepo: findActiveRoutinesForToday()
+    MedRepo->>DB: SELECT routines WHERE isActive = 1 AND reminderEnabled = 1
+    DB-->>MedRepo: List<MedicationRoutine>
+    MedRepo-->>MedSvc: Active routines
+    
+    loop For each active routine
+        MedSvc->>MedSvc: shouldSendReminder(routine)
+        alt Time for reminder
+            MedSvc->>NotifSvc: createMedicationReminder(routine)
+            NotifSvc->>DB: INSERT INTO Notifications
+            DB-->>NotifSvc: Reminder created
+            
+            MedSvc->>MedRepo: updateLastReminderSent(routineId)
+            MedRepo->>DB: UPDATE MedicationRoutines SET LastReminderSentAt = NOW()
+            DB-->>MedRepo: Updated
+        else Not time for reminder
+            MedSvc->>MedSvc: Skip reminder
+        end
+    end
+
+    Note over Doctor, DB: Patient Treatment Retrieval
+
+    Doctor->>ARVCtrl: GET /api/arv-treatments/patient/{patientId}
+    ARVCtrl->>ARVSvc: getTreatmentsByPatient(patientId)
+    ARVSvc->>ARVSvc: validateDoctorPatientRelationship(doctorId, patientId)
+    
+    alt Doctor authorized
+        ARVSvc->>ARVRepo: findByPatientUserIdAndIsActiveTrue(patientId)
+        ARVRepo->>DB: SELECT treatments WHERE patientId = ? AND isActive = 1
+        DB-->>ARVRepo: List<ARVTreatment>
+        ARVRepo-->>ARVSvc: Patient treatments
+        
+        ARVSvc->>MedRepo: findByPatientUserIdAndIsActiveTrue(patientId)
+        MedRepo->>DB: SELECT routines WHERE patientId = ? AND isActive = 1
+        DB-->>MedRepo: List<MedicationRoutine>
+        MedRepo-->>ARVSvc: Medication routines
+        
+        ARVSvc-->>ARVCtrl: Combined treatment data
+        ARVCtrl-->>Doctor: 200 OK with treatments and routines
+    else Doctor not authorized
+        ARVSvc-->>ARVCtrl: UnauthorizedException
+        ARVCtrl-->>Doctor: 403 Forbidden
+    end
+
+    Note over Doctor, DB: Treatment Deactivation
+
+    Doctor->>ARVCtrl: PUT /api/arv-treatments/{id}/deactivate
+    Note right of Doctor: {reason: "Treatment completed successfully"}
+    
+    ARVCtrl->>ARVSvc: deactivateTreatment(treatmentId, doctorId)
+    ARVSvc->>ARVRepo: findByIdAndDoctorId(treatmentId, doctorId)
+    ARVRepo->>DB: SELECT treatment WHERE id = ? AND doctorId = ?
+    DB-->>ARVRepo: ARVTreatment
+    ARVRepo-->>ARVSvc: Treatment found
+    
+    ARVSvc->>ARVRepo: deactivateTreatment(treatmentId)
+    ARVRepo->>DB: UPDATE ARVTreatments SET IsActive = 0, EndDate = NOW()
+    DB-->>ARVRepo: Treatment deactivated
+    
+    ARVSvc->>MedSvc: deactivateAssociatedRoutines(treatmentId)
+    MedSvc->>MedRepo: deactivateByTreatmentId(treatmentId)
+    MedRepo->>DB: UPDATE MedicationRoutines SET IsActive = 0
+    DB-->>MedRepo: Routines deactivated
+    
+    ARVSvc->>NotifSvc: sendTreatmentCompletionNotification(treatment)
+    NotifSvc->>DB: INSERT INTO Notifications
+    DB-->>NotifSvc: Completion notification sent
+    
+    ARVSvc-->>ARVCtrl: Treatment deactivated
+    ARVCtrl-->>Doctor: 200 OK - Treatment deactivated
+
+    Note over Doctor, DB: Patient Adherence Monitoring
+
+    Doctor->>ARVCtrl: GET /api/arv-treatments/patient/{patientId}/adherence
+    ARVCtrl->>ARVSvc: getAdherenceReport(patientId, doctorId)
+    ARVSvc->>MedRepo: getAdherenceStatistics(patientId, dateRange)
+    MedRepo->>DB: SELECT adherence data with reminder acknowledgments
+    DB-->>MedRepo: Adherence statistics
+    MedRepo-->>ARVSvc: AdherenceReport
+    
+    ARVSvc->>ARVRepo: getTreatmentProgressNotes(patientId)
+    ARVRepo->>DB: SELECT treatment notes and side effects
+    DB-->>ARVRepo: Treatment progress data
+    ARVRepo-->>ARVSvc: Progress notes
+    
+    ARVSvc-->>ARVCtrl: Comprehensive adherence report
+    ARVCtrl-->>Doctor: 200 OK with adherence analytics
