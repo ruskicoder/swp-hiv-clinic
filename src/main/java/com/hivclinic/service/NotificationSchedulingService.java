@@ -26,9 +26,6 @@ public class NotificationSchedulingService {
     private NotificationRepository notificationRepository;
     
     @Autowired
-    private AppointmentRepository appointmentRepository;
-    
-    @Autowired
     private MedicationRoutineRepository medicationRoutineRepository;
     
     /**
@@ -39,7 +36,6 @@ public class NotificationSchedulingService {
         logger.info("Scheduling appointment reminders for appointment ID: {}", appointment.getAppointmentId());
         
         LocalDateTime appointmentTime = appointment.getAppointmentDateTime();
-        String patientName = appointment.getPatientUser().getUsername();
         String doctorName = appointment.getDoctorUser().getUsername();
         
         // 24-hour reminder

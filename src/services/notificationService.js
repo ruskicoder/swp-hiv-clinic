@@ -307,13 +307,20 @@ class NotificationService {
    */
   async getUserNotifications() {
     try {
+      console.log('DEBUG: notificationService.getUserNotifications called');
       const response = await apiClient.get(`/v1/notifications`);
+      console.log('DEBUG: getUserNotifications response:', response);
+      console.log('DEBUG: getUserNotifications response.data:', response.data);
+      
       return {
         success: true,
         data: response.data || []
       };
     } catch (error) {
-      console.error('Error fetching user notifications:', error);
+      console.error('DEBUG: Error fetching user notifications:', error);
+      console.error('DEBUG: Error response:', error.response);
+      console.error('DEBUG: Error response data:', error.response?.data);
+      
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to fetch notifications',
@@ -327,14 +334,26 @@ class NotificationService {
    */
   async markAsRead(notificationId) {
     try {
+      console.log('DEBUG: notificationService.markAsRead called with notificationId=', notificationId);
+      console.log('DEBUG: Making API call to /v1/notifications/' + notificationId + '/read');
+      
       const response = await apiClient.post(`/v1/notifications/${notificationId}/read`);
+      
+      console.log('DEBUG: API response received:', response);
+      console.log('DEBUG: API response data:', response.data);
+      console.log('DEBUG: API response status:', response.status);
+      
       return {
         success: true,
         data: response.data,
         message: 'Notification marked as read'
       };
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error('DEBUG: Error marking notification as read:', error);
+      console.error('DEBUG: Error response:', error.response);
+      console.error('DEBUG: Error response data:', error.response?.data);
+      console.error('DEBUG: Error response status:', error.response?.status);
+      
       return {
         success: false,
         error: error.response?.data?.message || error.message || 'Failed to mark notification as read'

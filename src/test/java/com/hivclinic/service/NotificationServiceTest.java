@@ -145,6 +145,7 @@ class NotificationServiceTest {
     void testMarkAsRead_Success() {
         // Given
         Integer notificationId = 1;
+        Integer userId = 1;
         notification1.setIsRead(false);
         Notification updatedNotification = createNotification(1, 1, "Test Notification 1", "Test message 1", true);
 
@@ -152,7 +153,7 @@ class NotificationServiceTest {
         when(notificationRepository.save(any(Notification.class))).thenReturn(updatedNotification);
 
         // When
-        NotificationDto result = notificationService.markAsRead(notificationId);
+        NotificationDto result = notificationService.markAsRead(notificationId, userId);
 
         // Then
         assertNotNull(result);
@@ -168,13 +169,32 @@ class NotificationServiceTest {
     void testMarkAsRead_NotificationNotFound() {
         // Given
         Integer notificationId = 999;
+        Integer userId = 1;
         when(notificationRepository.findById(notificationId)).thenReturn(Optional.empty());
 
         // When
-        NotificationDto result = notificationService.markAsRead(notificationId);
+        NotificationDto result = notificationService.markAsRead(notificationId, userId);
 
         // Then
         assertNull(result);
+
+        verify(notificationRepository).findById(notificationId);
+        verify(notificationRepository, never()).save(any(Notification.class));
+    }
+
+    @Test
+    void testMarkAsRead_UnauthorizedUser() {
+        // Given
+        Integer notificationId = 1;
+        Integer userId = 2; // Different user ID
+        notification1.setUserId(1); // Notification belongs to user 1
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(notification1));
+
+        // When
+        NotificationDto result = notificationService.markAsRead(notificationId, userId);
+
+        // Then
+        assertNull(result); // Should return null for unauthorized access
 
         verify(notificationRepository).findById(notificationId);
         verify(notificationRepository, never()).save(any(Notification.class));

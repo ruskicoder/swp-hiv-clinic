@@ -135,7 +135,7 @@ class NotificationControllerTest {
     @Test
     void testMarkAsRead_Success() throws Exception {
         // Given
-        when(notificationService.markAsRead(1)).thenReturn(notificationDto);
+        when(notificationService.markAsRead(1, 1)).thenReturn(notificationDto);
 
         // When & Then
         mockMvc.perform(post("/api/v1/notifications/1/read")
@@ -145,13 +145,13 @@ class NotificationControllerTest {
                 .andExpect(jsonPath("$.notificationId").value(1))
                 .andExpect(jsonPath("$.title").value("Test Notification"));
 
-        verify(notificationService).markAsRead(1);
+        verify(notificationService).markAsRead(1, 1);
     }
 
     @Test
     void testMarkAsRead_NotFound() throws Exception {
         // Given
-        when(notificationService.markAsRead(999)).thenReturn(null);
+        when(notificationService.markAsRead(999, 1)).thenReturn(null);
 
         // When & Then
         mockMvc.perform(post("/api/v1/notifications/999/read")
@@ -159,7 +159,7 @@ class NotificationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        verify(notificationService).markAsRead(999);
+        verify(notificationService).markAsRead(999, 1);
     }
 
     @Test
