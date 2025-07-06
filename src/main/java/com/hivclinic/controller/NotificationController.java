@@ -123,22 +123,28 @@ public class NotificationController {
             @RequestParam Long templateId,
             @RequestBody(required = false) Map<String, String> variables) {
         
+        logger.info("POST /doctor/send called with doctorId={}, patientId={}, templateId={}, variables={}",
+                   doctorId, patientId, templateId, variables);
+        
         try {
             boolean success = doctorNotificationService.sendNotificationToPatient(doctorId, patientId, templateId, variables);
             
             if (success) {
+                logger.info("Notification sent successfully from doctor {} to patient {}", doctorId, patientId);
                 return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Notification sent successfully"
                 ));
             } else {
+                logger.warn("Failed to send notification from doctor {} to patient {}", doctorId, patientId);
                 return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
                     "message", "Failed to send notification"
                 ));
             }
         } catch (Exception e) {
-            logger.error("Error sending notification: {}", e.getMessage(), e);
+            logger.error("Error sending notification from doctor {} to patient {}: {}",
+                        doctorId, patientId, e.getMessage(), e);
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "message", "Error: " + e.getMessage()
@@ -156,6 +162,20 @@ public class NotificationController {
             return ResponseEntity.ok(history);
         } catch (Exception e) {
             logger.error("Error getting notification history: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    @GetMapping("/doctor/history")
+    public ResponseEntity<List<Map<String, Object>>> getNotificationHistoryForDoctor(
+            @RequestParam Long doctorId) {
+        
+        try {
+            logger.info("Getting notification history for doctor {}", doctorId);
+            List<Map<String, Object>> history = doctorNotificationService.getNotificationHistoryForDoctor(doctorId);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            logger.error("Error getting notification history for doctor {}: {}", doctorId, e.getMessage(), e);
             return ResponseEntity.badRequest().build();
         }
     }

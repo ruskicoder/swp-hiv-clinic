@@ -108,15 +108,22 @@ public class NotificationTemplateService {
     }
     
     /**
-     * Process template variables
+     * Process template variables - supports both {{var}} and {var} formats
      */
     public String processTemplate(String templateBody, java.util.Map<String, String> variables) {
         String processedBody = templateBody;
         
         if (variables != null && !variables.isEmpty()) {
             for (java.util.Map.Entry<String, String> entry : variables.entrySet()) {
-                String placeholder = "{{" + entry.getKey() + "}}";
-                processedBody = processedBody.replace(placeholder, entry.getValue());
+                String key = entry.getKey();
+                String value = entry.getValue() != null ? entry.getValue() : "";
+                
+                // Support both {{variable}} and {variable} formats
+                String placeholder1 = "{{" + key + "}}";
+                String placeholder2 = "{" + key + "}";
+                
+                processedBody = processedBody.replace(placeholder1, value);
+                processedBody = processedBody.replace(placeholder2, value);
             }
         }
         

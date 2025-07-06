@@ -107,29 +107,35 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
    * Update message preview with variable substitution
    */
   const updatePreview = () => {
-    if (formData.useCustomMessage && formData.customMessage) {
-      setPreviewMessage(formData.customMessage);
-      return;
-    }
+      if (formData.useCustomMessage && formData.customMessage) {
+          setPreviewMessage(formData.customMessage);
+          return;
+      }
 
-    if (!selectedTemplate) {
-      setPreviewMessage('');
-      return;
-    }
+      if (!selectedTemplate) {
+          setPreviewMessage('');
+          return;
+      }
 
-    let preview = selectedTemplate.content;
+      let preview = selectedTemplate.body || selectedTemplate.content || '';
     
-    // Simple variable substitution for preview
+    // Simple variable substitution for preview (support both {{}} and {} formats)
     if (formData.patientIds.length === 1) {
       const patient = patients.find(p => p.userId === formData.patientIds[0]);
       if (patient) {
         preview = preview
+          .replace(/\{\{patientName\}\}/g, `${patient.firstName} ${patient.lastName}`)
+          .replace(/\{\{firstName\}\}/g, patient.firstName)
+          .replace(/\{\{lastName\}\}/g, patient.lastName)
           .replace(/\{patientName\}/g, `${patient.firstName} ${patient.lastName}`)
           .replace(/\{firstName\}/g, patient.firstName)
           .replace(/\{lastName\}/g, patient.lastName);
       }
     } else if (formData.patientIds.length > 1) {
       preview = preview
+        .replace(/\{\{patientName\}\}/g, '[Patient Name]')
+        .replace(/\{\{firstName\}\}/g, '[First Name]')
+        .replace(/\{\{lastName\}\}/g, '[Last Name]')
         .replace(/\{patientName\}/g, '[Patient Name]')
         .replace(/\{firstName\}/g, '[First Name]')
         .replace(/\{lastName\}/g, '[Last Name]');
@@ -137,6 +143,12 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
 
     // Replace other common variables
     preview = preview
+      .replace(/\{\{doctorName\}\}/g, 'Dr. [Doctor Name]')
+      .replace(/\{\{clinicName\}\}/g, 'HIV Medical Clinic')
+      .replace(/\{\{currentDate\}\}/g, new Date().toLocaleDateString())
+      .replace(/\{\{currentTime\}\}/g, new Date().toLocaleTimeString())
+      .replace(/\{\{date\}\}/g, new Date().toLocaleDateString())
+      .replace(/\{\{time\}\}/g, new Date().toLocaleTimeString())
       .replace(/\{doctorName\}/g, 'Dr. [Doctor Name]')
       .replace(/\{clinicName\}/g, 'HIV Medical Clinic')
       .replace(/\{date\}/g, new Date().toLocaleDateString())
@@ -199,7 +211,7 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
     try {
       const notificationData = {
         ...formData,
-        message: formData.useCustomMessage ? formData.customMessage : selectedTemplate?.content,
+        message: formData.useCustomMessage ? formData.customMessage : (selectedTemplate?.body || selectedTemplate?.content || ''),
         templateName: selectedTemplate?.name || 'Custom Message'
       };
 
@@ -304,6 +316,13 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
               {validationErrors.template && (
                 <span className="error-text">{validationErrors.template}</span>
               )}
+              
+              {selectedTemplate && (
+                <div className="help-text">
+                  <p><strong>Available variables in templates:</strong> {'{{patientName}}'}, {'{{firstName}}'}, {'{{lastName}}'}, {'{{doctorName}}'}, {'{{clinicName}}'}, {'{{currentDate}}'}, {'{{currentTime}}'}</p>
+                  <p><small>These variables will be automatically replaced with actual values when the notification is sent.</small></p>
+                </div>
+              )}
             </div>
           )}
 
@@ -325,7 +344,8 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
                 <span className="error-text">{validationErrors.customMessage}</span>
               )}
               <div className="help-text">
-                <p>Available variables: {'{patientName}'}, {'{firstName}'}, {'{lastName}'}, {'{doctorName}'}, {'{clinicName}'}, {'{date}'}, {'{time}'}</p>
+                <p><strong>Available variables:</strong> {'{{patientName}}'}, {'{{firstName}}'}, {'{{lastName}}'}, {'{{doctorName}}'}, {'{{clinicName}}'}, {'{{currentDate}}'}, {'{{currentTime}}'}</p>
+                <p><small>Note: Single curly braces {'{patientName}'} are also supported for backward compatibility.</small></p>
               </div>
             </div>
           )}
@@ -477,7 +497,8 @@ NotificationSendModal.propTypes = {
     templateId: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
     subject: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
+    body: PropTypes.string,
+    content: PropTypes.string,
     type: PropTypes.string.isRequired
   })).isRequired
 };

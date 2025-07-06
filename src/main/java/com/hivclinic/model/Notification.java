@@ -71,7 +71,7 @@ public class Notification {
         APPOINTMENT_REMINDER("APPOINTMENT_REMINDER"),
         MEDICATION_REMINDER("MEDICATION_REMINDER"),
         GENERAL("GENERAL"),
-        SYSTEM("SYSTEM");
+        SYSTEM_NOTIFICATION("SYSTEM_NOTIFICATION");
         
         private final String value;
         
@@ -88,7 +88,8 @@ public class Notification {
     public enum Priority {
         LOW("LOW"),
         MEDIUM("MEDIUM"),
-        HIGH("HIGH");
+        HIGH("HIGH"),
+        URGENT("URGENT");
         
         private final String value;
         

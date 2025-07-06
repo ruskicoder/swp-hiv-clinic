@@ -6,7 +6,7 @@ import './NotificationTemplateSelector.css';
  * Modal component for managing notification templates
  * Provides template library interface and creation capabilities
  */
-const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh }) => {
+const NotificationTemplateSelector = ({ isOpen, onClose, templates = [], onRefresh }) => {
   const [activeTab, setActiveTab] = useState('browse');
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -67,11 +67,11 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
    */
   const startEditTemplate = (template) => {
     setFormData({
-      name: template.name,
-      subject: template.subject,
-      content: template.content,
-      type: template.type,
-      priority: template.priority,
+      name: template.name || '',
+      subject: template.subject || '',
+      content: template.content || '',
+      type: template.type || 'APPOINTMENT_REMINDER',
+      priority: template.priority || 'MEDIUM',
       description: template.description || ''
     });
     setEditingTemplate(template);
@@ -273,7 +273,7 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
           {/* Browse Templates Tab */}
           {activeTab === 'browse' && (
             <div className="browse-templates">
-              {templates.length === 0 ? (
+              {!templates || templates.length === 0 ? (
                 <div className="no-templates">
                   <div className="no-templates-icon">📝</div>
                   <h3>No Templates Found</h3>
@@ -291,13 +291,13 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
                 </div>
               ) : (
                 <div className="templates-grid">
-                  {templates.map(template => {
+                  {(templates || []).map(template => {
                     const priorityInfo = getPriorityInfo(template.priority);
                     
                     return (
                       <div key={template.templateId} className="template-card">
                         <div className="template-header">
-                          <h3 className="template-name">{template.name}</h3>
+                          <h3 className="template-name">{template.name || 'Unnamed Template'}</h3>
                           <div className="template-badges">
                             <span className="type-badge">
                               {getTypeDisplayName(template.type)}
@@ -310,7 +310,7 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
 
                         <div className="template-content">
                           <div className="template-subject">
-                            <strong>Subject:</strong> {template.subject}
+                            <strong>Subject:</strong> {template.subject || 'No subject'}
                           </div>
                           <div className="template-description">
                             {template.description && (
@@ -319,9 +319,9 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
                             <div className="template-preview">
                               <strong>Content Preview:</strong>
                               <div className="content-preview">
-                                {template.content.length > 150 
+                                {template.content && template.content.length > 150
                                   ? `${template.content.substring(0, 150)}...`
-                                  : template.content
+                                  : template.content || 'No content available'
                                 }
                               </div>
                             </div>
@@ -473,7 +473,8 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
                       <span className="error-text">{validationErrors.content}</span>
                     )}
                     <div className="help-text">
-                      <p>Available variables: {'{patientName}'}, {'{firstName}'}, {'{lastName}'}, {'{doctorName}'}, {'{clinicName}'}, {'{date}'}, {'{time}'}</p>
+                      <p><strong>Available variables:</strong> {'{{patientName}}'}, {'{{firstName}}'}, {'{{lastName}}'}, {'{{doctorName}}'}, {'{{clinicName}}'}, {'{{currentDate}}'}, {'{{currentTime}}'}</p>
+                      <p><small>Note: Single curly braces {'{patientName}'} are also supported for backward compatibility.</small></p>
                     </div>
                   </div>
                 </div>
@@ -519,7 +520,7 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
           <div className="template-preview-overlay" onClick={() => setSelectedTemplate(null)}>
             <div className="template-preview-modal" onClick={(e) => e.stopPropagation()}>
               <div className="preview-header">
-                <h3>Template Preview: {selectedTemplate.name}</h3>
+                <h3>Template Preview: {selectedTemplate.name || 'Unnamed Template'}</h3>
                 <button 
                   className="close-btn"
                   onClick={() => setSelectedTemplate(null)}
@@ -546,12 +547,12 @@ const NotificationTemplateSelector = ({ isOpen, onClose, templates, onRefresh })
 
                 <div className="preview-message">
                   <div className="message-subject">
-                    <strong>Subject:</strong> {selectedTemplate.subject}
+                    <strong>Subject:</strong> {selectedTemplate.subject || 'No subject'}
                   </div>
                   <div className="message-content">
                     <strong>Content:</strong>
                     <div className="content-text">
-                      {selectedTemplate.content}
+                      {selectedTemplate.content || 'No content available'}
                     </div>
                   </div>
                 </div>
@@ -602,7 +603,7 @@ NotificationTemplateSelector.propTypes = {
     type: PropTypes.string.isRequired,
     priority: PropTypes.string.isRequired,
     description: PropTypes.string
-  })).isRequired,
+  })),
   onRefresh: PropTypes.func.isRequired
 };
 

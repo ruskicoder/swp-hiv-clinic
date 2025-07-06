@@ -263,7 +263,7 @@ class NotificationServiceTest {
         String priority = "HIGH";
 
         Notification savedNotification = createNotification(1, userId, title, message, false);
-        savedNotification.setType(Notification.NotificationType.SYSTEM);
+        savedNotification.setType(Notification.NotificationType.SYSTEM_NOTIFICATION);
         savedNotification.setPriority(priority);
         savedNotification.setRelatedEntityType("SYSTEM");
 
@@ -276,7 +276,7 @@ class NotificationServiceTest {
         assertNotNull(result);
         assertEquals("System Maintenance", result.getTitle());
         assertEquals("System will be under maintenance from 2-4 AM", result.getMessage());
-        assertEquals(Notification.NotificationType.SYSTEM, result.getType());
+        assertEquals(Notification.NotificationType.SYSTEM_NOTIFICATION, result.getType());
         assertEquals("SYSTEM", result.getRelatedEntityType());
 
         verify(notificationRepository).save(any(Notification.class));
@@ -291,7 +291,7 @@ class NotificationServiceTest {
         String priority = null;
 
         Notification savedNotification = createNotification(1, userId, title, message, false);
-        savedNotification.setType(Notification.NotificationType.SYSTEM);
+        savedNotification.setType(Notification.NotificationType.SYSTEM_NOTIFICATION);
         savedNotification.setPriority(priority);
         savedNotification.setRelatedEntityType("SYSTEM");
 
@@ -304,7 +304,7 @@ class NotificationServiceTest {
         assertNotNull(result);
         assertEquals("System Notification", result.getTitle());
         assertEquals("Test message", result.getMessage());
-        assertEquals(Notification.NotificationType.SYSTEM, result.getType());
+        assertEquals(Notification.NotificationType.SYSTEM_NOTIFICATION, result.getType());
         assertEquals("SYSTEM", result.getRelatedEntityType());
 
         verify(notificationRepository).save(any(Notification.class));

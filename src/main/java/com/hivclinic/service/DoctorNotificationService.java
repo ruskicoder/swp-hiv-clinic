@@ -91,10 +91,53 @@ public class DoctorNotificationService {
             }
             
             NotificationTemplate template = templateOpt.get();
+            User doctor = doctorOpt.get();
+            User patient = patientOpt.get();
+            
+            // Automatically populate common template variables
+            Map<String, String> allVariables = new java.util.HashMap<>();
+            if (variables != null) {
+                allVariables.putAll(variables);
+            }
+            
+            // Add patient information
+            String patientFirstName = "Unknown";
+            String patientLastName = "Patient";
+            try {
+                Optional<com.hivclinic.model.PatientProfile> profileOpt =
+                    patientProfileRepository.findByUser(patient);
+                if (profileOpt.isPresent()) {
+                    com.hivclinic.model.PatientProfile profile = profileOpt.get();
+                    patientFirstName = profile.getFirstName() != null ? profile.getFirstName() : patient.getFirstName();
+                    patientLastName = profile.getLastName() != null ? profile.getLastName() : patient.getLastName();
+                } else {
+                    patientFirstName = patient.getFirstName() != null ? patient.getFirstName() : patient.getUsername();
+                    patientLastName = patient.getLastName() != null ? patient.getLastName() : "";
+                }
+            } catch (Exception e) {
+                logger.warn("Error fetching patient profile: {}", e.getMessage());
+            }
+            
+            allVariables.put("patientName", patientFirstName + " " + patientLastName);
+            allVariables.put("patientFirstName", patientFirstName);
+            allVariables.put("patientLastName", patientLastName);
+            
+            // Add doctor information
+            String doctorFirstName = doctor.getFirstName() != null ? doctor.getFirstName() : doctor.getUsername();
+            String doctorLastName = doctor.getLastName() != null ? doctor.getLastName() : "";
+            allVariables.put("doctorName", doctorFirstName + " " + doctorLastName);
+            allVariables.put("doctorFirstName", doctorFirstName);
+            allVariables.put("doctorLastName", doctorLastName);
+            
+            // Add current date/time
+            allVariables.put("currentDate", java.time.LocalDate.now().toString());
+            allVariables.put("currentTime", java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
+            
+            logger.debug("Template variables: {}", allVariables);
             
             // Process template variables
-            String processedSubject = notificationTemplateService.processTemplate(template.getSubject(), variables);
-            String processedBody = notificationTemplateService.processTemplate(template.getBody(), variables);
+            String processedSubject = notificationTemplateService.processTemplate(template.getSubject(), allVariables);
+            String processedBody = notificationTemplateService.processTemplate(template.getBody(), allVariables);
             
             // Create notification
             Notification notification = new Notification();
@@ -142,6 +185,102 @@ public class DoctorNotificationService {
             
         } catch (Exception e) {
             logger.error("Error retrieving notification history for patient {}: {}", patientId, e.getMessage(), e);
+            return List.of();
+        }
+    }
+    
+    /**
+     * Get notification history for a doctor (all notifications sent by this doctor)
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getNotificationHistoryForDoctor(Long doctorId) {
+        try {
+            logger.debug("Doctor {} requesting all notification history", doctorId);
+            
+            // Get all notifications sent by this doctor to their patients
+            List<Notification> allNotifications = notificationRepository.findAll();
+            
+            // Filter for notifications sent to patients who have appointments with this doctor
+            List<Map<String, Object>> notificationHistory = new java.util.ArrayList<>();
+            
+            for (Notification notification : allNotifications) {
+                if (canDoctorContactPatient(doctorId.intValue(), notification.getUserId())) {
+                    Map<String, Object> notificationData = new java.util.HashMap<>();
+                    
+                    // Add notification details
+                    notificationData.put("notificationId", notification.getNotificationId());
+                    notificationData.put("title", notification.getTitle());
+                    notificationData.put("message", notification.getMessage());
+                    notificationData.put("type", notification.getType().name());
+                    notificationData.put("priority", notification.getPriority());
+                    notificationData.put("isRead", notification.getIsRead());
+                    notificationData.put("sentAt", notification.getSentAt());
+                    notificationData.put("createdAt", notification.getCreatedAt());
+                    
+                    // Add patient information
+                    try {
+                        Optional<User> patientOpt = userRepository.findById(notification.getUserId());
+                        if (patientOpt.isPresent()) {
+                            User patient = patientOpt.get();
+                            
+                            String patientFirstName = "Unknown";
+                            String patientLastName = "Patient";
+                            
+                            // Try to get name from PatientProfile first
+                            try {
+                                Optional<com.hivclinic.model.PatientProfile> profileOpt =
+                                    patientProfileRepository.findByUser(patient);
+                                if (profileOpt.isPresent()) {
+                                    com.hivclinic.model.PatientProfile profile = profileOpt.get();
+                                    patientFirstName = profile.getFirstName() != null ? profile.getFirstName() : patient.getFirstName();
+                                    patientLastName = profile.getLastName() != null ? profile.getLastName() : patient.getLastName();
+                                } else {
+                                    patientFirstName = patient.getFirstName() != null ? patient.getFirstName() : patient.getUsername();
+                                    patientLastName = patient.getLastName() != null ? patient.getLastName() : "";
+                                }
+                            } catch (Exception e) {
+                                logger.warn("Error fetching patient profile for notification history: {}", e.getMessage());
+                            }
+                            
+                            notificationData.put("patientName", patientFirstName + " " + patientLastName);
+                            notificationData.put("patientEmail", patient.getEmail());
+                            notificationData.put("patientId", patient.getUserId());
+                        } else {
+                            notificationData.put("patientName", "Unknown Patient");
+                            notificationData.put("patientEmail", "");
+                            notificationData.put("patientId", notification.getUserId());
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Error fetching patient details for notification {}: {}",
+                                   notification.getNotificationId(), e.getMessage());
+                        notificationData.put("patientName", "Unknown Patient");
+                        notificationData.put("patientEmail", "");
+                        notificationData.put("patientId", notification.getUserId());
+                    }
+                    
+                    // Add status based on sentAt and isRead
+                    String status = "pending";
+                    if (notification.getSentAt() != null) {
+                        status = notification.getIsRead() ? "read" : "delivered";
+                    }
+                    notificationData.put("status", status);
+                    
+                    notificationHistory.add(notificationData);
+                }
+            }
+            
+            // Sort by creation date descending
+            notificationHistory.sort((a, b) -> {
+                java.time.LocalDateTime dateA = (java.time.LocalDateTime) a.get("createdAt");
+                java.time.LocalDateTime dateB = (java.time.LocalDateTime) b.get("createdAt");
+                return dateB.compareTo(dateA);
+            });
+            
+            logger.debug("Found {} notifications for doctor {}", notificationHistory.size(), doctorId);
+            return notificationHistory;
+            
+        } catch (Exception e) {
+            logger.error("Error retrieving notification history for doctor {}: {}", doctorId, e.getMessage(), e);
             return List.of();
         }
     }

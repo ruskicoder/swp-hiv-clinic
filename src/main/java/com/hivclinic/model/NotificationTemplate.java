@@ -77,7 +77,8 @@ public class NotificationTemplate {
     public enum Priority {
         LOW("LOW"),
         MEDIUM("MEDIUM"),
-        HIGH("HIGH");
+        HIGH("HIGH"),
+        URGENT("URGENT");
         
         private final String value;
         
