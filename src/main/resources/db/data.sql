@@ -240,4 +240,29 @@ BEGIN
     PRINT 'Default notification templates created';
 END
 
+-- Insert sample notifications for testing
+DECLARE @Patient1Id_Data INT, @Patient2Id_Data INT;
+SELECT @Patient1Id_Data = UserID FROM Users WHERE Username = 'patient1';
+SELECT @Patient2Id_Data = UserID FROM Users WHERE Username = 'patient2';
+
+IF @Patient1Id_Data IS NOT NULL AND NOT EXISTS (SELECT * FROM Notifications WHERE UserID = @Patient1Id_Data)
+BEGIN
+    INSERT INTO Notifications (UserID, Type, Title, Message, IsRead, Priority, RelatedEntityType, CreatedAt) VALUES
+    (@Patient1Id_Data, 'APPOINTMENT_REMINDER', 'Upcoming Appointment Reminder', 'You have an appointment with Dr. Smith tomorrow at 9:00 AM. Please arrive 15 minutes early.', 0, 'HIGH', 'APPOINTMENT', GETDATE()),
+    (@Patient1Id_Data, 'MEDICATION_REMINDER', 'Time for ARV Medication', 'It''s time to take your daily ARV medication. Please take as prescribed.', 0, 'URGENT', 'MEDICATION', GETDATE()),
+    (@Patient1Id_Data, 'GENERAL', 'Lab Results Available', 'Your recent lab results are now available. Please contact your doctor to review.', 1, 'MEDIUM', 'SYSTEM', DATEADD(DAY, -1, GETDATE())),
+    (@Patient1Id_Data, 'SYSTEM_NOTIFICATION', 'Welcome to HIV Clinic', 'Welcome to our medical system. Please update your profile information.', 1, 'LOW', 'SYSTEM', DATEADD(DAY, -7, GETDATE()));
+    
+    PRINT 'Sample notifications created for patient1';
+END
+
+IF @Patient2Id_Data IS NOT NULL AND NOT EXISTS (SELECT * FROM Notifications WHERE UserID = @Patient2Id_Data)
+BEGIN
+    INSERT INTO Notifications (UserID, Type, Title, Message, IsRead, Priority, RelatedEntityType, CreatedAt) VALUES
+    (@Patient2Id_Data, 'APPOINTMENT_REMINDER', 'Appointment in 1 Hour', 'Your appointment with Dr. Jones is in 1 hour. Please head to the clinic.', 0, 'URGENT', 'APPOINTMENT', GETDATE()),
+    (@Patient2Id_Data, 'MEDICATION_REMINDER', 'Missed Dose Alert', 'You may have missed your medication dose. Please contact your doctor if needed.', 0, 'HIGH', 'MEDICATION', DATEADD(HOUR, -2, GETDATE()));
+    
+    PRINT 'Sample notifications created for patient2';
+END
+
 PRINT 'Initial data setup completed!';

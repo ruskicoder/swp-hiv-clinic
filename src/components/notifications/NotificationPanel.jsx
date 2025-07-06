@@ -10,7 +10,6 @@ import './NotificationPanel.css';
 const NotificationPanel = ({
   notifications,
   onMarkAsRead,
-  onMarkAllAsRead,
   onClose
 }) => {
   const [filter, setFilter] = useState('all');
@@ -78,16 +77,6 @@ const NotificationPanel = ({
         </div>
         
         <div className="panel-actions">
-          {unreadCount > 0 && (
-            <button
-              className="mark-all-btn"
-              onClick={onMarkAllAsRead}
-              title="Mark all as read"
-            >
-              ✓ Mark all read
-            </button>
-          )}
-          
           {onClose && (
             <button
               className="close-panel-btn"
@@ -186,7 +175,6 @@ NotificationPanel.propTypes = {
     type: PropTypes.string
   })).isRequired,
   onMarkAsRead: PropTypes.func.isRequired,
-  onMarkAllAsRead: PropTypes.func.isRequired,
   onClose: PropTypes.func
 };
 

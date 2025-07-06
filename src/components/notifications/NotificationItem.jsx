@@ -69,15 +69,15 @@ const NotificationItem = ({ notification, onMarkAsRead, enhanced = false }) => {
   };
 
   /**
-   * Handle notification click
+   * Handle notification click - marks individual notification as read
    */
   const handleNotificationClick = (e) => {
-    // Don't mark as read if clicking on action buttons
-    if (e.target.closest('.notification-actions')) {
-      return;
-    }
+    // Prevent propagation to avoid conflicts with other click handlers
+    e.stopPropagation();
     
-    if (!isRead) {
+    // Only mark as read if the notification is currently unread
+    if (!isRead && onMarkAsRead) {
+      console.log('Marking notification as read:', notificationId);
       onMarkAsRead(notificationId);
     }
   };
@@ -164,30 +164,45 @@ const NotificationItem = ({ notification, onMarkAsRead, enhanced = false }) => {
         {/* Enhanced Actions */}
         {enhanced && (
           <div className="notification-actions">
-            {!isRead && (
-              <button
-                className="action-btn mark-read-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMarkAsRead(notificationId);
-                }}
-                title="Mark as read"
-                aria-label="Mark notification as read"
-              >
-                <span className="action-icon">✓</span>
-                <span className="action-text">Mark Read</span>
-              </button>
-            )}
-            
             <button
               className="action-btn details-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                // Could open detailed view or navigate to related content
-                console.log('View details for notification:', notificationId);
+                // Create a detailed view of the notification
+                const detailsContent = `
+Notification Details:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 ID: ${notificationId}
+📝 Title: ${title}
+📄 Message: ${message}
+📅 Created: ${new Date(createdAt).toLocaleString()}
+🔖 Type: ${type || 'GENERAL'}
+⚡ Priority: ${priority || 'MEDIUM'}
+👁️ Status: ${isRead ? 'Read' : 'Unread'}
+${notification.relatedEntityType ? `🔗 Related: ${notification.relatedEntityType}` : ''}
+${notification.relatedEntityId ? `🆔 Entity ID: ${notification.relatedEntityId}` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                `;
+                
+                // Show details in an alert for now - in production this would be a modal
+                alert(detailsContent);
+                
+                console.log('Notification Details:', {
+                  notificationId,
+                  title,
+                  message,
+                  createdAt,
+                  type,
+                  priority,
+                  isRead,
+                  relatedEntityType: notification.relatedEntityType,
+                  relatedEntityId: notification.relatedEntityId
+                });
               }}
-              title="View details"
-              aria-label="View notification details"
+              title="View notification details"
+              aria-label="View detailed information about this notification"
             >
               <span className="action-icon">👁️</span>
               <span className="action-text">Details</span>

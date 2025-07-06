@@ -45,16 +45,47 @@ public class NotificationController {
     }
 
     @PostMapping("/{id}/read")
-    public ResponseEntity<NotificationDto> markAsRead(@PathVariable Integer id) {
-        NotificationDto notification = notificationService.markAsRead(id);
+    public ResponseEntity<NotificationDto> markAsRead(@PathVariable Integer id, @AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println("DEBUG: NotificationController.markAsRead called with id=" + id);
+        System.out.println("DEBUG: UserDetails class: " + userDetails.getClass().getName());
+        System.out.println("DEBUG: UserDetails: " + userDetails);
+        
+        Integer userId = ((com.hivclinic.config.CustomUserDetailsService.UserPrincipal) userDetails).getId();
+        System.out.println("DEBUG: Extracted userId=" + userId);
+        
+        NotificationDto notification = notificationService.markAsRead(id, userId);
+        System.out.println("DEBUG: Service returned notification=" + notification);
+        
+        boolean isSuccess = notification != null;
+        System.out.println("DEBUG: Returning success=" + isSuccess);
+        
         return notification != null ? ResponseEntity.ok(notification) : ResponseEntity.notFound().build();
     }
 
     @PostMapping("/read-all")
-    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal UserDetails userDetails) {
-        Integer userId = ((com.hivclinic.config.CustomUserDetailsService.UserPrincipal) userDetails).getId();
-        notificationService.markAllAsRead(userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, Object>> markAllAsRead(@AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println("DEBUG: NotificationController.markAllAsRead called");
+        
+        try {
+            Integer userId = ((com.hivclinic.config.CustomUserDetailsService.UserPrincipal) userDetails).getId();
+            System.out.println("DEBUG: Extracted userId=" + userId);
+            
+            notificationService.markAllAsRead(userId);
+            System.out.println("DEBUG: Successfully marked all notifications as read for userId=" + userId);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "All notifications marked as read successfully"
+            ));
+        } catch (Exception e) {
+            System.out.println("ERROR: Exception in markAllAsRead controller: " + e.getMessage());
+            e.printStackTrace();
+            
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Failed to mark all notifications as read: " + e.getMessage()
+            ));
+        }
     }
     
     // Template management endpoints

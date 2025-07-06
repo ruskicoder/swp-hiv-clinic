@@ -17,9 +17,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
     List<Notification> findByUserIdAndIsRead(Integer userId, Boolean isRead);
 
-    @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true WHERE n.userId = :userId AND n.isRead = false")
-    void markAllAsReadByUserId(Integer userId);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Notification n SET n.isRead = true, n.status = 'READ' WHERE n.userId = :userId AND n.isRead = false")
+    int markAllAsReadByUserId(@Param("userId") Integer userId);
     
     /**
      * Find scheduled notifications that are due for processing

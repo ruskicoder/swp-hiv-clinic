@@ -30,8 +30,11 @@ public class Notification {
     @Column(name = "Message", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String message;
     
-    @Column(name = "IsRead", nullable = false)
+    @Column(name = "IsRead", nullable = false, columnDefinition = "BIT DEFAULT 0")
     private Boolean isRead = false;
+    
+    @Column(name = "status", length = 20)
+    private String status = "PENDING";
     
     @Column(name = "Priority", length = 20)
     private String priority = "MEDIUM";

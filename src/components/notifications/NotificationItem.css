@@ -210,6 +210,11 @@
   color: white;
 }
 
+.details-btn {
+  color: #6b7280;
+  border-color: #6b7280;
+}
+
 .details-btn:hover {
   background: #6b7280;
   color: white;
@@ -244,10 +249,6 @@
 }
 
 /* Read State Styles */
-.notification-item.read {
-  opacity: 0.8;
-}
-
 .notification-item.read .item-title {
   color: #64748b;
   font-weight: 500;
@@ -255,6 +256,36 @@
 
 .notification-item.read .message-content {
   color: #6b7280;
+}
+
+.notification-item.read .item-time {
+  color: #9ca3af;
+}
+
+/* Keep details button clearly visible and functional for read notifications */
+.notification-item.read .details-btn {
+  color: #6b7280;
+  border-color: #6b7280;
+  opacity: 1;
+  cursor: pointer;
+}
+
+.notification-item.read .details-btn:hover {
+  background: #6b7280;
+  color: white;
+  opacity: 1;
+  cursor: pointer;
+}
+
+/* Ensure action buttons remain interactive */
+.notification-item.read .action-btn {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.notification-item.read .action-btn:hover {
+  opacity: 1;
+  cursor: pointer;
 }
 
 /* Responsive Design */
