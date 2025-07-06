@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class NotificationTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer templateId;
+    private Long templateId;
     
     @Column(name = "Name", nullable = false, length = 100)
     private String name;
@@ -59,8 +59,8 @@ public class NotificationTemplate {
     public enum NotificationType {
         APPOINTMENT_REMINDER("APPOINTMENT_REMINDER"),
         MEDICATION_REMINDER("MEDICATION_REMINDER"),
-        GENERAL_ALERT("GENERAL_ALERT"),
-        SYSTEM_NOTIFICATION("SYSTEM_NOTIFICATION");
+        GENERAL("GENERAL"),
+        SYSTEM("SYSTEM");
         
         private final String value;
         
@@ -77,7 +77,8 @@ public class NotificationTemplate {
     public enum Priority {
         LOW("LOW"),
         MEDIUM("MEDIUM"),
-        HIGH("HIGH");
+        HIGH("HIGH"),
+        URGENT("URGENT");
         
         private final String value;
         

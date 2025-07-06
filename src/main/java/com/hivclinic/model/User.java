@@ -84,8 +84,7 @@ public class User implements UserDetails {
     // UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (role == null || role.getRoleName() == null) {
-            // Fallback to no authorities if role is missing
+        if (role == null) {
             return Collections.emptyList();
         }
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase()));

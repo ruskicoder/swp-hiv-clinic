@@ -36,7 +36,10 @@ const NotificationManagementDashboard = () => {
   const [dateRange, setDateRange] = useState('week');
 
   useEffect(() => {
-    loadDashboardData();
+    // Only load data if user is properly initialized
+    if (user && (user.userId || user.id)) {
+      loadDashboardData();
+    }
   }, [user]);
 
   /**
@@ -50,8 +53,11 @@ const NotificationManagementDashboard = () => {
       const doctorId = user?.userId || user?.id;
       if (!doctorId) {
         setError('Doctor ID not found. Please login again.');
+        setLoading(false);
         return;
       }
+
+      console.log('Loading dashboard data for doctor:', doctorId);
 
       const [patientsRes, templatesRes, historyRes] = await Promise.allSettled([
         notificationService.getPatientsWithAppointments(doctorId),
@@ -69,10 +75,15 @@ const NotificationManagementDashboard = () => {
 
       // Handle templates response
       if (templatesRes.status === 'fulfilled' && templatesRes.value.success) {
+        console.log('Templates loaded successfully:', templatesRes.value.data);
         setTemplates(templatesRes.value.data || []);
       } else {
         console.error('Failed to load templates:', templatesRes.value?.error || templatesRes.reason);
         setTemplates([]);
+        // Set a more specific error message for template loading
+        if (templatesRes.status === 'rejected') {
+          setError('Failed to load notification templates. Please try refreshing the page.');
+        }
       }
 
       // Handle notification history response
@@ -267,6 +278,18 @@ const NotificationManagementDashboard = () => {
     );
   }
 
+  // Show error if user is not available
+  if (!user || (!user.userId && !user.id)) {
+    return (
+      <div className="notification-management-loading">
+        <div className="error-message">
+          <span className="icon">⚠️</span>
+          <p>Please login to access the notification management dashboard.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="notification-management-dashboard">
       <div className="dashboard-header">
@@ -359,7 +382,7 @@ const NotificationManagementDashboard = () => {
               <option value="">All Patients</option>
               {patients.map(patient => (
                 <option key={patient.userId} value={patient.userId}>
-                  {patient.firstName} {patient.lastName} ({patient.email})
+                  {patient.firstName || 'Unknown'} {patient.lastName || 'Patient'} ({patient.email || 'No email'})
                 </option>
               ))}
             </select>

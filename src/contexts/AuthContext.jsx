@@ -63,24 +63,42 @@ export const AuthProvider = ({ children }) => {
         // Store token
         localStorage.setItem('token', response.token);
         
-        // Load full profile data after successful login
-        const profileResponse = await authService.getUserProfile();
-        
-        // Set user data with combined login and profile info
-        setUser({
+        // Set initial user data immediately from login response
+        const initialUser = {
           id: response.id,
-          userId: response.id,  
+          userId: response.id,
           username: response.username,
           email: response.email,
           role: response.role,
-          // Add profile data
-          firstName: profileResponse.firstName || '',
-          lastName: profileResponse.lastName || '',
-          phoneNumber: profileResponse.phoneNumber || '',
-          dateOfBirth: profileResponse.dateOfBirth || '',
-          address: profileResponse.address || '',
-          profileImageBase64: profileResponse.profileImageBase64 || ''
-        });
+          firstName: '',
+          lastName: '',
+          phoneNumber: '',
+          dateOfBirth: '',
+          address: '',
+          profileImageBase64: ''
+        };
+        
+        // Set user immediately so components have access to userId/doctorId
+        setUser(initialUser);
+        
+        // Load full profile data after successful login (async)
+        try {
+          const profileResponse = await authService.getUserProfile();
+          
+          // Update user data with profile information
+          setUser(prevUser => ({
+            ...prevUser,
+            firstName: profileResponse.firstName || '',
+            lastName: profileResponse.lastName || '',
+            phoneNumber: profileResponse.phoneNumber || '',
+            dateOfBirth: profileResponse.dateOfBirth || '',
+            address: profileResponse.address || '',
+            profileImageBase64: profileResponse.profileImageBase64 || ''
+          }));
+        } catch (profileError) {
+          console.error('Failed to load user profile:', profileError);
+          // Don't fail login if profile loading fails - user data is already set
+        }
         
         return { success: true };
       } else {

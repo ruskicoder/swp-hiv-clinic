@@ -125,10 +125,16 @@ const NotificationHistoryTable = ({
   };
 
   /**
-   * Get patient name by ID
+   * Get patient name by ID or from notification data
    */
-  const getPatientName = (patientId) => {
-    const patient = patients.find(p => p.userId === patientId);
+  const getPatientName = (notification) => {
+    // First try to get patient name from enriched notification data
+    if (notification.patientName) {
+      return notification.patientName;
+    }
+    
+    // Fallback to looking up from patients array
+    const patient = patients.find(p => p.userId === notification.patientId);
     return patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown Patient';
   };
 
@@ -357,7 +363,7 @@ const NotificationHistoryTable = ({
                     </td>
                     
                     <td className="patient-column">
-                      {getPatientName(notification.patientId)}
+                      {getPatientName(notification)}
                     </td>
                     
                     <td className="status-column">
