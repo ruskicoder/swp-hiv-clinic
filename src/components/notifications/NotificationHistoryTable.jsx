@@ -145,8 +145,10 @@ const NotificationHistoryTable = ({
     const statusMap = {
       SENT: { class: 'sent', text: 'Sent', icon: '✓' },
       PENDING: { class: 'pending', text: 'Pending', icon: '⏳' },
+      DELIVERED: { class: 'delivered', text: 'Delivered', icon: '📧' },
+      FAILED: { class: 'failed', text: 'Failed', icon: '⚠️' },
       CANCELLED: { class: 'cancelled', text: 'Cancelled', icon: '✕' },
-      FAILED: { class: 'failed', text: 'Failed', icon: '⚠️' }
+      READ: { class: 'read', text: 'Read', icon: '👁️' }
     };
     return statusMap[status] || { class: 'unknown', text: status, icon: '?' };
   };
@@ -177,12 +179,13 @@ const NotificationHistoryTable = ({
     }
   };
 
+
   /**
-   * Truncate text for display
+   * Truncate subject to 35 characters as per requirements
    */
-  const truncateText = (text, maxLength = 50) => {
-    if (!text) return '-';
-    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  const truncateSubject = (subject) => {
+    if (!subject) return '-';
+    return subject.length > 35 ? `${subject.substring(0, 35)}...` : subject;
   };
 
   const canUnsend = (notification) => {
@@ -346,7 +349,7 @@ const NotificationHistoryTable = ({
                     
                     <td className="subject-column">
                       <div className="subject-content">
-                        <span className="subject-text">{notification.subject}</span>
+                        <span className="subject-text">{truncateSubject(notification.subject)}</span>
                         <button
                           className="expand-btn"
                           onClick={() => toggleRowExpansion(notification.notificationId)}

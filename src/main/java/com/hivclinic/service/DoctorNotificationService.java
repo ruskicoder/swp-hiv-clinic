@@ -133,7 +133,62 @@ public class DoctorNotificationService {
             allVariables.put("currentDate", java.time.LocalDate.now().toString());
             allVariables.put("currentTime", java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm")));
             
-            logger.debug("Template variables: {}", allVariables);
+            // Add appointment information if available
+            try {
+                // Try to find the most recent appointment between doctor and patient
+                List<com.hivclinic.model.Appointment> appointments = appointmentRepository.findByDoctorUserAndPatientUser(doctor, patient);
+                if (!appointments.isEmpty()) {
+                    // Get the most recent appointment
+                    com.hivclinic.model.Appointment recentAppointment = appointments.stream()
+                        .max(java.util.Comparator.comparing(com.hivclinic.model.Appointment::getAppointmentDateTime))
+                        .orElse(null);
+                    
+                    if (recentAppointment != null) {
+                        java.time.LocalDateTime appointmentDateTime = recentAppointment.getAppointmentDateTime();
+                        java.time.format.DateTimeFormatter dateFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                        java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+                        java.time.format.DateTimeFormatter readableDateFormatter = java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy");
+                        java.time.format.DateTimeFormatter readableTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a");
+                        
+                        allVariables.put("appointmentDate", appointmentDateTime.format(dateFormatter));
+                        allVariables.put("appointmentTime", appointmentDateTime.format(timeFormatter));
+                        allVariables.put("appointmentDateReadable", appointmentDateTime.format(readableDateFormatter));
+                        allVariables.put("appointmentTimeReadable", appointmentDateTime.format(readableTimeFormatter));
+                        allVariables.put("appointmentDateTime", appointmentDateTime.toString());
+                        allVariables.put("appointmentStatus", recentAppointment.getStatus());
+                        
+                        logger.debug("Added appointment variables: date={}, time={}, status={}",
+                                   appointmentDateTime.format(dateFormatter),
+                                   appointmentDateTime.format(timeFormatter),
+                                   recentAppointment.getStatus());
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn("Error fetching appointment information for template variables: {}", e.getMessage());
+            }
+            
+            // Add clinic information
+            allVariables.put("clinicName", "HIV Clinic"); // Default clinic name
+            allVariables.put("clinicAddress", "123 Healthcare Avenue");
+            allVariables.put("clinicPhone", "(555) 123-4567");
+            allVariables.put("clinicEmail", "info@hivclinic.com");
+            
+            // Add custom message if provided
+            if (variables != null && variables.containsKey("message")) {
+                allVariables.put("message", variables.get("message"));
+            } else {
+                allVariables.put("message", ""); // Empty fallback
+            }
+            
+            // Add additional commonly used variables
+            allVariables.put("todayDate", java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy")));
+            allVariables.put("currentYear", String.valueOf(java.time.Year.now().getValue()));
+            allVariables.put("currentMonth", java.time.LocalDate.now().getMonth().name());
+            allVariables.put("currentDay", String.valueOf(java.time.LocalDate.now().getDayOfMonth()));
+            
+            logger.debug("Template variables populated: {}", allVariables);
+            logger.info("Processing template with {} variables for patient {} and doctor {}",
+                       allVariables.size(), patientId, doctorId);
             
             // Process template variables
             String processedSubject = notificationTemplateService.processTemplate(template.getSubject(), allVariables);
@@ -151,6 +206,7 @@ public class DoctorNotificationService {
             notification.setRelatedEntityType("TEMPLATE");
             notification.setRelatedEntityId(templateId.intValue());
             
+            notification.setStatus("SENT");
             notificationRepository.save(notification);
             
             logger.info("Notification sent successfully from doctor {} to patient {}", doctorId, patientId);
@@ -258,10 +314,14 @@ public class DoctorNotificationService {
                         notificationData.put("patientId", notification.getUserId());
                     }
                     
-                    // Add status based on sentAt and isRead
-                    String status = "pending";
-                    if (notification.getSentAt() != null) {
-                        status = notification.getIsRead() ? "read" : "delivered";
+                    // Use actual status field from database
+                    String status = notification.getStatus();
+                    if (status == null || status.trim().isEmpty()) {
+                        // Fallback to dynamic calculation only if status is null
+                        status = "PENDING";
+                        if (notification.getSentAt() != null) {
+                            status = notification.getIsRead() ? "READ" : "DELIVERED";
+                        }
                     }
                     notificationData.put("status", status);
                     
@@ -318,6 +378,7 @@ public class DoctorNotificationService {
             // Mark as cancelled instead of deleting
             notification.setMessage(notification.getMessage() + " [CANCELLED]");
             notification.setTitle(notification.getTitle() + " [CANCELLED]");
+            notification.setStatus("CANCELLED");
             notificationRepository.save(notification);
             
             logger.info("Notification {} cancelled by doctor {}", notificationId, doctorId);
@@ -325,6 +386,41 @@ public class DoctorNotificationService {
             
         } catch (Exception e) {
             logger.error("Error unsending notification {}: {}", notificationId, e.getMessage(), e);
+            return false;
+        }
+    }
+    
+    /**
+     * Delete a notification if doctor has permission
+     */
+    @Transactional
+    public boolean deleteNotification(Long notificationId, Long doctorId) {
+        try {
+            logger.info("Doctor {} attempting to delete notification {}", doctorId, notificationId);
+            
+            Optional<Notification> notificationOpt = notificationRepository.findById(notificationId.intValue());
+            if (notificationOpt.isEmpty()) {
+                logger.error("Notification not found: {}", notificationId);
+                return false;
+            }
+            
+            Notification notification = notificationOpt.get();
+            
+            // Validate doctor has permission to delete this notification
+            if (!canDoctorContactPatient(doctorId.intValue(), notification.getUserId())) {
+                logger.error("Doctor {} does not have permission to delete notification for patient {}",
+                           doctorId, notification.getUserId());
+                return false;
+            }
+            
+            // Delete the notification
+            notificationRepository.delete(notification);
+            
+            logger.info("Notification {} deleted by doctor {}", notificationId, doctorId);
+            return true;
+            
+        } catch (Exception e) {
+            logger.error("Error deleting notification {}: {}", notificationId, e.getMessage(), e);
             return false;
         }
     }
