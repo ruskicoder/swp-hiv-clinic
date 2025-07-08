@@ -3,7 +3,6 @@ package com.hivclinic.service;
 import com.hivclinic.model.Appointment;
 import com.hivclinic.model.MedicationRoutine;
 import com.hivclinic.model.Notification;
-import com.hivclinic.repository.AppointmentRepository;
 import com.hivclinic.repository.MedicationRoutineRepository;
 import com.hivclinic.repository.NotificationRepository;
 import org.slf4j.Logger;

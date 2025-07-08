@@ -18,19 +18,76 @@ public class NotificationService {
     private NotificationRepository notificationRepository;
 
     public List<NotificationDto> getNotificationsByUserId(Integer userId) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+        // Add logging to diagnose cancelled notification visibility issue
+        List<Notification> allNotifications = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        System.out.println("DEBUG: Found " + allNotifications.size() + " total notifications for user " + userId);
+        
+        // Use new repository method to efficiently filter out cancelled notifications
+        List<Notification> visibleNotifications = notificationRepository.findByUserIdExcludingCancelledOrderByCreatedAtDesc(userId);
+        
+        // Log cancelled notifications that were filtered out
+        int cancelledCount = allNotifications.size() - visibleNotifications.size();
+        System.out.println("DEBUG: Filtered out " + cancelledCount + " cancelled notifications for patient visibility");
+        
+        if (cancelledCount > 0) {
+            System.out.println("DEBUG: Successfully hidden " + cancelledCount + " cancelled notifications from patient");
+            allNotifications.stream()
+                    .filter(n -> "CANCELLED".equals(n.getStatus()))
+                    .forEach(n -> System.out.println("DEBUG: Hidden cancelled notification ID " + n.getNotificationId() +
+                                                   " with title: " + n.getTitle() +
+                                                   " and status: " + n.getStatus()));
+        }
+        
+        System.out.println("DEBUG: Returning " + visibleNotifications.size() + " visible notifications (filtered out " +
+                          cancelledCount + " cancelled notifications)");
+        
+        return visibleNotifications.stream()
                 .map(NotificationDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
     public List<NotificationDto> getUnreadNotificationsByUserId(Integer userId) {
-        return notificationRepository.findByUserIdAndIsRead(userId, false).stream()
+        // Add logging to diagnose cancelled notification visibility issue
+        List<Notification> allUnreadNotifications = notificationRepository.findByUserIdAndIsRead(userId, false);
+        System.out.println("DEBUG: Found " + allUnreadNotifications.size() + " total unread notifications for user " + userId);
+        
+        // Use new repository method to efficiently filter out cancelled notifications
+        List<Notification> visibleUnreadNotifications = notificationRepository.findByUserIdAndIsReadExcludingCancelled(userId, false);
+        
+        // Log cancelled notifications that were filtered out
+        int cancelledUnreadCount = allUnreadNotifications.size() - visibleUnreadNotifications.size();
+        System.out.println("DEBUG: Filtered out " + cancelledUnreadCount + " cancelled unread notifications for patient visibility");
+        
+        if (cancelledUnreadCount > 0) {
+            System.out.println("DEBUG: Successfully hidden " + cancelledUnreadCount + " cancelled unread notifications from patient");
+            allUnreadNotifications.stream()
+                    .filter(n -> "CANCELLED".equals(n.getStatus()))
+                    .forEach(n -> System.out.println("DEBUG: Hidden cancelled unread notification ID " + n.getNotificationId() +
+                                                   " with title: " + n.getTitle() +
+                                                   " and status: " + n.getStatus()));
+        }
+        
+        System.out.println("DEBUG: Returning " + visibleUnreadNotifications.size() + " visible unread notifications (filtered out " +
+                          cancelledUnreadCount + " cancelled notifications)");
+        
+        return visibleUnreadNotifications.stream()
                 .map(NotificationDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
     public long getUnreadNotificationCount(Integer userId) {
-        return notificationRepository.findByUserIdAndIsRead(userId, false).size();
+        // Use new repository method to efficiently filter out cancelled notifications
+        List<Notification> visibleUnreadNotifications = notificationRepository.findByUserIdAndIsReadExcludingCancelled(userId, false);
+        long visibleUnreadCount = visibleUnreadNotifications.size();
+        
+        // Log for debugging
+        List<Notification> allUnreadNotifications = notificationRepository.findByUserIdAndIsRead(userId, false);
+        int cancelledCount = allUnreadNotifications.size() - visibleUnreadNotifications.size();
+        
+        System.out.println("DEBUG: Unread count for user " + userId + ": " + visibleUnreadCount +
+                          " (filtered out " + cancelledCount + " cancelled)");
+        
+        return visibleUnreadCount;
     }
 
     @Transactional(rollbackFor = Exception.class)
