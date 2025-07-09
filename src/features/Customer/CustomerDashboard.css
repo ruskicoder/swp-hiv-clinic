@@ -8,6 +8,17 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Layout for Customer Dashboard */
+.customer-dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 80vh;
+  background: #f8fafc;
+  padding: 2rem;
+  margin-top: 80px; /* Add space for fixed header */
+}
+
 /* Vertical Header Layout */
 .dashboard-layout {
   display: flex;
@@ -123,20 +134,20 @@
   padding-bottom: 1rem;
   border-bottom: 2px solid #f1f5f9;
 }
-  
+
 .content-header h2 {
   font-size: 2rem;
   font-weight: 700;
   color: #1e293b;
   margin: 0 0 0.5rem 0;
 }
-  
+
 .content-header p {
   color: #64748b;
   font-size: 1.1rem;
   margin: 0;
 }
-  
+
 /* Stats Grid - Medical Dashboard Style */
 .stats-grid {
   display: grid;
@@ -144,7 +155,7 @@
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
-  
+
 .stat-card {
   background: white;
   padding: 2rem;
@@ -156,7 +167,7 @@
   overflow: hidden;
   transition: all 0.3s ease;
   }
-  
+
 .stat-card::before {
   content: '';
   position: absolute;
@@ -533,16 +544,16 @@
   .customer-dashboard {
     padding: 1rem;
   }
-  
+
   .dashboard-layout {
     gap: 1rem;
   }
-  
+
   .dashboard-sidebar {
     width: 240px;
     padding: 1.5rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
@@ -582,33 +593,33 @@
   .dashboard-layout {
     flex-direction: column;
   }
-  
+
   .dashboard-sidebar {
     width: 100%;
     position: static;
     margin-bottom: 1rem;
   }
-  
+
   .dashboard-nav {
     flex-direction: row;
     overflow-x: auto;
     gap: 0.5rem;
     padding-bottom: 0.5rem;
   }
-  
+
   .nav-button {
     white-space: nowrap;
     min-width: fit-content;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
-  
+
   .doctors-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .appointment-header {
     flex-direction: column;
     gap: 0.5rem;
@@ -619,27 +630,27 @@
   .customer-dashboard {
     padding: 0.5rem;
   }
-  
+
   .dashboard-content {
     padding: 0.5rem;
   }
-  
+
   .dashboard-sidebar {
     padding: 1rem;
   }
-  
+
   .content-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .stat-card {
     padding: 1rem;
   }
-  
+
   .stat-number {
     font-size: 2rem;
   }
-  
+
   .stats-grid {
     gap: 0.5rem;
   }

@@ -6,6 +6,7 @@ import DashboardHeader from '../../components/layout/DashboardHeader';
 import PatientRecordSection from '../../components/PatientRecordSection';
 import UnifiedCalendar from '../../components/schedule/UnifiedCalendar';
 import ARVTreatmentModal from '../../components/arv/ARVTreatmentModal';
+import NotificationManagerTab from '../../components/notifications/NotificationManagerTab';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
@@ -32,13 +33,16 @@ const DoctorDashboard = () => {
   const [patientRecord, setPatientRecord] = useState(null);
   const [arvTreatments, setArvTreatments] = useState([]);
   const [showARVModal, setShowARVModal] = useState(false);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [arvTemplates, setArvTemplates] = useState([]);
   const [arvFormData, setArvFormData] = useState({
     regimen: '',
     startDate: '',
     endDate: '',
     adherence: '',
     sideEffects: '',
-    notes: ''
+    notes: '',
+    setAsTemplate: false
   });
   const [appointmentUpdateData, setAppointmentUpdateData] = useState({
     status: 'Scheduled',
@@ -139,6 +143,16 @@ const DoctorDashboard = () => {
     }
   };
 
+  // Load ARV templates
+  const loadTemplates = async () => {
+    try {
+      const res = await apiClient.get('/arv-treatments/templates');
+      setArvTemplates(Array.isArray(res.data) ? res.data : []);
+    } catch (e) {
+      setArvTemplates([]);
+    }
+  };
+
   // Handle slot addition
   const handleAddSlot = async (slotData) => {
     try {
@@ -232,11 +246,26 @@ const DoctorDashboard = () => {
 
   // Handle ARV form changes
   const handleARVChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setArvFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
+  };
+
+  // Handle template selection
+  const handleSelectTemplate = (template) => {
+    setArvFormData({
+      regimen: template.regimen,
+      startDate: new Date().toISOString().slice(0, 10), // default to today
+      endDate: '',
+      adherence: template.adherence || '',
+      sideEffects: template.sideEffects || '',
+      notes: '', // notes should be empty for new ARV
+      setAsTemplate: false
+    });
+    setShowTemplateModal(false);
+    setShowARVModal(true);
   };
 
   // Handle adding ARV treatment
@@ -328,8 +357,13 @@ const DoctorDashboard = () => {
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'appointments', label: 'Appointments', icon: '📅' },
     { id: 'patient-record', label: 'Patient Records', icon: '📋' },
-    { id: 'availability', label: 'My Availability', icon: '🕒' }
+    { id: 'availability', label: 'My Availability', icon: '🕒' },
+    { id: 'notifications', label: 'Notifications', icon: '🔔' }
   ];
+
+  // Debug: Log navigation items
+  console.log('Navigation items array:', navigationItems);
+  console.log('Navigation items length:', navigationItems.length);
 
   // Render overview
   const renderOverview = () => {
@@ -495,10 +529,17 @@ const DoctorDashboard = () => {
               <div className="section-header">
                 <h3>ARV Treatments</h3>
                 <button 
+                  className="btn-secondary"
+                  onClick={() => { loadTemplates(); setShowTemplateModal(true); }}
+                  style={{ marginRight: 8 }}
+                >
+                  Select from templates
+                </button>
+                <button 
                   className="btn-primary"
                   onClick={() => setShowARVModal(true)}
                 >
-                  Add Treatment
+                  Create custom ARV
                 </button>
               </div>
 
@@ -634,6 +675,13 @@ const DoctorDashboard = () => {
     );
   };
 
+  // Render notifications tab
+  const renderNotifications = () => (
+    <ErrorBoundary>
+      <NotificationManagerTab isActive={activeTab === 'notifications'} />
+    </ErrorBoundary>
+  );
+
   // Render content based on active tab
   const renderContent = () => {
     switch (activeTab) {
@@ -645,6 +693,8 @@ const DoctorDashboard = () => {
         return renderPatientRecord();
       case 'availability':
         return renderAvailability();
+      case 'notifications':
+        return renderNotifications();
       default:
         return renderOverview();
     }
@@ -705,6 +755,77 @@ const DoctorDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* ARV Template Modal */}
+      {showTemplateModal && (
+        <div className="modal-overlay">
+          <div
+            className="modal-content"
+            style={{
+              width: '700px',
+              maxWidth: '95vw',
+              minHeight: '350px',
+              maxHeight: '80vh',
+              overflow: 'visible',
+              padding: '2rem'
+            }}
+          >
+            <div className="modal-header" style={{ marginBottom: '1rem' }}>
+              <h3>Select ARV Template</h3>
+              <button className="close-btn" onClick={() => setShowTemplateModal(false)}>×</button>
+            </div>
+            <div
+              style={{
+                maxHeight: '55vh',
+                overflowY: 'auto',
+                minHeight: '180px'
+              }}
+            >
+              {arvTemplates.length === 0 ? (
+                <div>No templates available.</div>
+              ) : (
+                <table className="patient-detail-table" style={{ minWidth: 600 }}>
+                  <thead>
+                    <tr>
+                      <th>Regimen</th>
+                      <th>Adherence</th>
+                      <th>Side Effects</th>
+                      <th>Notes</th>
+                      <th>Type</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {arvTemplates.map(tpl => (
+                      <tr key={tpl.arvTreatmentId}>
+                        <td>{tpl.regimen}</td>
+                        <td>{tpl.adherence}</td>
+                        <td>{tpl.sideEffects}</td>
+                        <td>{tpl.notes}</td>
+                        <td>
+                          {tpl.notes === 'default template'
+                            ? 'Default'
+                            : tpl.notes === 'template'
+                            ? 'Template'
+                            : 'Custom'}
+                        </td>
+                        <td>
+                          <button
+                            className="btn-primary"
+                            onClick={() => handleSelectTemplate(tpl)}
+                          >
+                            Use
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ARV Treatment Modal */}
       {showARVModal && (

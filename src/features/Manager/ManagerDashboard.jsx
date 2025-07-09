@@ -5,11 +5,31 @@ import DashboardHeader from '../../components/layout/DashboardHeader';
 import './ManagerDashboard.css';
 
 const SIDEBAR_OPTIONS = [
-  { key: 'overview', label: 'Overview' },
-  { key: 'patients', label: 'Patient Management' },
-  { key: 'doctors', label: 'Doctor Management' },
-  { key: 'arv', label: 'ARV Regimen Management' },
-  { key: 'schedules', label: 'Schedule Management' },
+  { 
+    key: 'overview', 
+    label: 'Dashboard Overview',
+    icon: '📊'
+  },
+  { 
+    key: 'patients', 
+    label: 'Patient Management',
+    icon: '👥'
+  },
+  { 
+    key: 'doctors', 
+    label: 'Doctor Management',
+    icon: '👨‍⚕️'
+  },
+  { 
+    key: 'arv', 
+    label: 'ARV Regimen Management',
+    icon: '💊'
+  },
+  { 
+    key: 'schedules', 
+    label: 'Schedule Management',
+    icon: '📅'
+  },
 ];
 
 const ManagerDashboard = () => {
@@ -42,7 +62,7 @@ const ManagerDashboard = () => {
           const res = await apiClient.get('/manager/stats');
           setStats(res.data);
         } catch (err) {
-          setError('Failed to load statistics.');
+          setError(`Failed to load statistics: ${err.message}`);
         } finally {
           setLoading(false);
         }
@@ -60,7 +80,7 @@ const ManagerDashboard = () => {
           const res = await apiClient.get('/manager/patients');
           setPatients(res.data);
         } catch (err) {
-          setPatientsError('Failed to load patient list.');
+          setPatientsError(`Failed to load patient list: ${err.message}`);
         } finally {
           setPatientsLoading(false);
         }
@@ -78,7 +98,7 @@ const ManagerDashboard = () => {
           const res = await apiClient.get('/manager/doctors');
           setDoctors(res.data);
         } catch (err) {
-          setDoctorsError('Failed to load doctor list.');
+          setDoctorsError(`Failed to load doctor list: ${err.message}`);
         } finally {
           setDoctorsLoading(false);
         }
@@ -163,267 +183,336 @@ const ManagerDashboard = () => {
     }
   };
 
-  return (
+  const renderOverview = () => (
     <div>
+      <div className="section-header">
+        <h2>System Overview</h2>
+      </div>
+      
+      {loading ? (
+        <div className="loading-state">
+          <div>📊 Loading dashboard statistics...</div>
+        </div>
+      ) : error ? (
+        <div className="error-state">{error}</div>
+      ) : (
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total Patients</h3>
+            <div className="stat-number">{stats.totalPatients || 0}</div>
+            <div className="stat-change positive">+12% from last month</div>
+          </div>
+          <div className="stat-card">
+            <h3>Active Doctors</h3>
+            <div className="stat-number">{stats.totalDoctors || 0}</div>
+            <div className="stat-change positive">+5% from last month</div>
+          </div>
+          <div className="stat-card">
+            <h3>Total Appointments</h3>
+            <div className="stat-number">{stats.totalAppointments || 0}</div>
+            <div className="stat-change positive">+18% from last week</div>
+          </div>
+          <div className="stat-card">
+            <h3>ARV Treatments</h3>
+            <div className="stat-number">{stats.totalARVTreatments || 0}</div>
+            <div className="stat-change positive">Active regimens</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderPatients = () => (
+    <div>
+      <div className="section-header">
+        <h2>Patient Management</h2>
+      </div>
+      
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search patients by name or email..."
+          value={patientSearch}
+          onChange={handlePatientSearch}
+          className="search-input"
+        />
+      </div>
+
+      {patientsLoading ? (
+        <div className="loading-state">Loading patient data...</div>
+      ) : patientsError ? (
+        <div className="error-state">{patientsError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Patient Info</th>
+                <th>Contact</th>
+                <th>Specialty</th>
+                <th>Status</th>
+                <th>Registered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patients.map((p, idx) => (
+                <tr key={p.userId || idx}>
+                  <td>
+                    <div>
+                      <div style={{ fontWeight: '600', color: '#1e293b' }}>
+                        {p.firstName} {p.lastName}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        @{p.username}
+                      </div>
+                    </div>
+                  </td>
+                  <td>{p.email}</td>
+                  <td>{p.specialty || 'General'}</td>
+                  <td>
+                    <span className={`status-badge ${p.isActive ? 'active' : 'inactive'}`}>
+                      {p.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '-'}</td>
+                  <td>
+                    <button
+                      className="action-link"
+                      onClick={() => navigate(`/manager/patients/${p.userId}`)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderDoctors = () => (
+    <div>
+      <div className="section-header">
+        <h2>Doctor Management</h2>
+      </div>
+      
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search doctors by name or specialty..."
+          value={doctorSearch}
+          onChange={handleDoctorSearch}
+          className="search-input"
+        />
+      </div>
+
+      {doctorsLoading ? (
+        <div className="loading-state">Loading doctor data...</div>
+      ) : doctorsError ? (
+        <div className="error-state">{doctorsError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Doctor Info</th>
+                <th>Contact</th>
+                <th>Specialty</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {doctors.map((d, idx) => (
+                <tr key={d.userId || idx}>
+                  <td>
+                    <div>
+                      <div style={{ fontWeight: '600', color: '#1e293b' }}>
+                        Dr. {d.firstName} {d.lastName}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        @{d.username}
+                      </div>
+                    </div>
+                  </td>
+                  <td>{d.email}</td>
+                  <td>{d.specialty || 'General Medicine'}</td>
+                  <td>
+                    <span className={`status-badge ${d.isActive ? 'active' : 'inactive'}`}>
+                      {d.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>{d.createdAt ? new Date(d.createdAt).toLocaleDateString() : '-'}</td>
+                  <td>
+                    <button
+                      className="action-link"
+                      onClick={() => navigate(`/manager/doctors/${d.userId}`)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      View Profile
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderARV = () => (
+    <div>
+      <div className="section-header">
+        <h2>ARV Treatment Management</h2>
+      </div>
+
+      {arvLoading ? (
+        <div className="loading-state">Loading ARV treatment data...</div>
+      ) : arvError ? (
+        <div className="error-state">{arvError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Treatment ID</th>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Regimen</th>
+                <th>Duration</th>
+                <th>Adherence</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {arvTreatments.map((arv, idx) => (
+                <tr key={arv.arvTreatmentID || idx}>
+                  <td>#{arv.arvTreatmentID}</td>
+                  <td>{arv.patientName || 'N/A'}</td>
+                  <td>{arv.doctorName || 'N/A'}</td>
+                  <td style={{ fontWeight: '600' }}>{arv.regimen}</td>
+                  <td>
+                    <div style={{ fontSize: '0.75rem' }}>
+                      <div>Start: {arv.startDate}</div>
+                      {arv.endDate && <div>End: {arv.endDate}</div>}
+                    </div>
+                  </td>
+                  <td>{arv.adherence || 'Not recorded'}</td>
+                  <td>
+                    <span className={`status-badge ${arv.isActive ? 'active' : 'inactive'}`}>
+                      {arv.isActive ? 'Active' : 'Completed'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderSchedules = () => (
+    <div>
+      <div className="section-header">
+        <h2>Schedule Management</h2>
+      </div>
+
+      {schedulesLoading ? (
+        <div className="loading-state">Loading schedule data...</div>
+      ) : schedulesError ? (
+        <div className="error-state">{schedulesError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Slot ID</th>
+                <th>Doctor</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Availability</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedules.map((s, idx) => (
+                <tr key={s.availabilitySlotId || idx}>
+                  <td>#{s.availabilitySlotId}</td>
+                  <td>
+                    {s.doctorUser && s.doctorUser.userId ? 
+                      `Doctor ID: ${s.doctorUser.userId}` : 'N/A'}
+                  </td>
+                  <td style={{ fontWeight: '600' }}>{s.slotDate}</td>
+                  <td>
+                    <div style={{ fontSize: '0.875rem' }}>
+                      {s.startTime} - {s.endTime}
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${s.isBooked ? 'booked' : 'available'}`}>
+                      {s.isBooked ? 'Booked' : 'Available'}
+                    </span>
+                  </td>
+                  <td>{s.notes || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return renderOverview();
+      case 'patients':
+        return renderPatients();
+      case 'doctors':
+        return renderDoctors();
+      case 'arv':
+        return renderARV();
+      case 'schedules':
+        return renderSchedules();
+      default:
+        return renderOverview();
+    }
+  };
+
+  return (
+    <div className="manager-dashboard">
       <DashboardHeader title="Manager Dashboard" />
-      <div className="manager-dashboard" style={{ display: 'flex', minHeight: '80vh' }}>
-        <aside className="manager-sidebar" style={{ minWidth: 220, background: '#f1f5f9', padding: '2rem 1rem', borderRadius: 12, marginRight: 32 }}>
-          <nav>
-            {SIDEBAR_OPTIONS.map(opt => (
-              <div
-                key={opt.key}
-                className={`sidebar-option${activeTab === opt.key ? ' active' : ''}`}
-                style={{
-                  padding: '0.75rem 1rem',
-                  marginBottom: 8,
-                  borderRadius: 8,
-                  background: activeTab === opt.key ? '#059669' : 'transparent',
-                  color: activeTab === opt.key ? '#fff' : '#1e293b',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                }}
-                onClick={() => setActiveTab(opt.key)}
-              >
-                {opt.label}
-              </div>
-            ))}
-          </nav>
-        </aside>
-        <main style={{ flex: 1 }}>
-          {activeTab === 'overview' && (
-            <div>
-              <div className="manager-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h1>Manager Dashboard</h1>
-                  <p>System overview</p>
+      
+      <div className="dashboard-container">
+        <div className="dashboard-layout">
+          <aside className="manager-sidebar">
+            <div className="sidebar-title">Navigation Menu</div>
+            <nav className="sidebar-nav">
+              {SIDEBAR_OPTIONS.map(opt => (
+                <div
+                  key={opt.key}
+                  className={`sidebar-option ${activeTab === opt.key ? 'active' : ''}`}
+                  onClick={() => setActiveTab(opt.key)}
+                >
+                  <span className="sidebar-icon">{opt.icon}</span>
+                  <span>{opt.label}</span>
                 </div>
-              </div>
-              {loading ? (
-                <div>Loading data...</div>
-              ) : error ? (
-                <div style={{ color: 'red' }}>{error}</div>
-              ) : (
-                <div className="stats-grid">
-                  <div className="stat-card">
-                    <h3>Total Patients</h3>
-                    <div className="stat-number">{stats.totalPatients}</div>
-                  </div>
-                  <div className="stat-card">
-                    <h3>Total Doctors</h3>
-                    <div className="stat-number">{stats.totalDoctors}</div>
-                  </div>
-                  <div className="stat-card">
-                    <h3>Total Appointments</h3>
-                    <div className="stat-number">{stats.totalAppointments}</div>
-                  </div>
-                  <div className="stat-card">
-                    <h3>Total ARV Regimens</h3>
-                    <div className="stat-number">{stats.totalARVTreatments}</div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          {activeTab === 'patients' && (
-            <section className="patients-section">
-              <h2>Patient List</h2>
-              <input
-                type="text"
-                placeholder="Search patient name..."
-                value={patientSearch}
-                onChange={handlePatientSearch}
-                style={{ marginBottom: 16, padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0', width: 300 }}
-              />
-              {patientsLoading ? (
-                <div>Loading patient list...</div>
-              ) : patientsError ? (
-                <div style={{ color: 'red' }}>{patientsError}</div>
-              ) : (
-                <div className="patients-table-container">
-                  <table className="patients-table">
-                    <thead>
-                      <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Specialty</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {patients.map((p, idx) => (
-                        <tr key={p.userId || idx}>
-                          <td>
-                            <span
-                              style={{ color: '#059669', cursor: 'pointer', textDecoration: 'underline' }}
-                              onClick={() => navigate(`/manager/patients/${p.userId}`)}
-                            >
-                              {p.username}
-                            </span>
-                          </td>
-                          <td>{p.email}</td>
-                          <td>{p.firstName}</td>
-                          <td>{p.lastName}</td>
-                          <td>{p.specialty || '-'}</td>
-                          <td>
-                            <span className={`status-badge ${p.isActive ? 'active' : 'inactive'}`}>
-                              {p.isActive ? 'Active' : 'Inactive'}
-                            </span>
-                          </td>
-                          <td>{p.createdAt ? new Date(p.createdAt).toLocaleString() : '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          )}
-          {activeTab === 'doctors' && (
-            <section className="doctors-section">
-              <h2>Doctor List</h2>
-              <input
-                type="text"
-                placeholder="Search name or specialty..."
-                value={doctorSearch}
-                onChange={handleDoctorSearch}
-                style={{ marginBottom: 16, padding: '0.5rem 1rem', borderRadius: 8, border: '1px solid #e2e8f0', width: 300 }}
-              />
-              {doctorsLoading ? (
-                <div>Loading doctor list...</div>
-              ) : doctorsError ? (
-                <div style={{ color: 'red' }}>{doctorsError}</div>
-              ) : (
-                <div className="doctors-table-container">
-                  <table className="doctors-table">
-                    <thead>
-                      <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Specialty</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {doctors.map((d, idx) => (
-                        <tr key={d.userId || idx}>
-                          <td>
-                            <span
-                              style={{ color: '#059669', cursor: 'pointer', textDecoration: 'underline' }}
-                              onClick={() => navigate(`/manager/doctors/${d.userId}`)}
-                            >
-                              {d.username}
-                            </span>
-                          </td>
-                          <td>{d.email}</td>
-                          <td>{d.firstName}</td>
-                          <td>{d.lastName}</td>
-                          <td>{d.specialty || '-'}</td>
-                          <td>
-                            <span className={`status-badge ${d.isActive ? 'active' : 'inactive'}`}>
-                              {d.isActive ? 'Active' : 'Inactive'}
-                            </span>
-                          </td>
-                          <td>{d.createdAt ? new Date(d.createdAt).toLocaleString() : '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          )}
-          {activeTab === 'arv' && (
-            <section className="arv-section">
-              <h2>ARV Regimen List</h2>
-              {arvLoading ? (
-                <div>Loading ARV regimens...</div>
-              ) : arvError ? (
-                <div style={{ color: 'red' }}>{arvError}</div>
-              ) : (
-                <div className="arv-table-container">
-                  <table className="arv-table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Patient</th>
-                        <th>Doctor</th>
-                        <th>Regimen</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Adherence</th>
-                        <th>Side Effects</th>
-                        <th>Notes</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {arvTreatments.map((arv, idx) => (
-                        <tr key={arv.arvTreatmentID || idx}>
-                          <td>{arv.arvTreatmentID}</td>
-                          <td>{arv.patientName || '-'}</td>
-                          <td>{arv.doctorName || '-'}</td>
-                          <td>{arv.regimen}</td>
-                          <td>{arv.startDate}</td>
-                          <td>{arv.endDate || '-'}</td>
-                          <td>{arv.adherence || '-'}</td>
-                          <td>{arv.sideEffects || '-'}</td>
-                          <td>{arv.notes || '-'}</td>
-                          <td>{arv.isActive ? 'Active' : 'Inactive'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          )}
-          {activeTab === 'schedules' && (
-            <section className="schedules-section">
-              <h2>Schedule List</h2>
-              {schedulesLoading ? (
-                <div>Loading schedules...</div>
-              ) : schedulesError ? (
-                <div style={{ color: 'red' }}>{schedulesError}</div>
-              ) : (
-                <div className="schedules-table-container">
-                  <table className="schedules-table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Doctor User ID</th>
-                        <th>Date</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Booked?</th>
-                        <th>Notes</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {schedules.map((s, idx) => (
-                        <tr key={s.availabilitySlotId || idx}>
-                          <td>{s.availabilitySlotId}</td>
-                          <td>{s.doctorUser && s.doctorUser.userId ? s.doctorUser.userId : '-'}</td>
-                          <td>{s.slotDate}</td>
-                          <td>{s.startTime}</td>
-                          <td>{s.endTime}</td>
-                          <td>{s.isBooked ? 'Booked' : 'Available'}</td>
-                          <td>{s.notes || '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          )}
-        </main>
+              ))}
+            </nav>
+          </aside>
+
+          <main className="dashboard-main">
+            {renderContent()}
+          </main>
+        </div>
       </div>
     </div>
   );

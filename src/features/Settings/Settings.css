@@ -12,7 +12,7 @@
 
 /* Settings Container */
 .settings-container {
-  max-width: 1200px;
+  max-width: 95%;
   margin: 0 auto;
   padding: 2rem;
   min-height: 100vh;
@@ -22,7 +22,7 @@
 /* Settings Layout */
 .settings-content {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 17.5rem 1fr;
   gap: 2rem;
   align-items: start;
 }
@@ -46,12 +46,12 @@
 /* Settings Sidebar */
 .settings-sidebar {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: 16px;
+  border-radius: 1rem;
   padding: 1.5rem;
   position: sticky;
   top: 2rem;
   height: fit-content;
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0.25rem 1.25rem rgba(16, 185, 129, 0.15);
 }
 
 .settings-nav {
@@ -70,7 +70,7 @@
   color: white;
   font-size: 0.95rem;
   font-weight: 500;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: left;
@@ -80,12 +80,12 @@
 
 .nav-button:hover {
   background: rgba(255, 255, 255, 0.1);
-  transform: translateX(4px);
+  transform: translateX(0.25rem);
 }
 
 .nav-button.active {
   background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
 }
 
 .nav-button.active::before {
@@ -94,18 +94,18 @@
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 4px;
+  width: 0.25rem;
   height: 60%;
   background: white;
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 0.125rem 0.125rem 0;
 }
 
 /* Settings Main Content */
 .settings-main {
   background: white;
-  border-radius: 16px;
+  border-radius: 1rem;
   padding: 2rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border-color);
 }
 
@@ -142,10 +142,10 @@
 }
 
 .profile-image-container {
-  width: 120px;
-  height: 120px;
-  border-radius: 12px;
-  border: 2px solid var(--border-color);
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 0.75rem;
+  border: 0.125rem solid var(--border-color);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -180,24 +180,24 @@
 .upload-btn {
   display: inline-block;
   background-color: white;
-  border: solid 2px var(--primary-color);
+  border: solid 0.125rem var(--primary-color);
   color: rgb(255, 255, 255);
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
   text-align: center;
   transition: all 0.3s ease;
   text-decoration: none;
-  min-width: 120px;
+  min-width: 7.5rem;
 }
 
 
 .upload-btn:hover {
   
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transform: translateY(-0.0625rem);
+  box-shadow: 0 0.25rem 0.75rem rgba(16, 185, 129, 0.2);
 }
 
 .upload-btn:active {
@@ -234,7 +234,7 @@
 .form-group textarea {
   padding: 0.75rem;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   background: white;
@@ -245,7 +245,7 @@
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 0.1875rem rgba(16, 185, 129, 0.1);
 }
 
 .form-group input:disabled,
@@ -258,7 +258,7 @@
 
 .form-group textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 5rem;
 }
 
 .form-help {
@@ -292,8 +292,8 @@
   background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
   color: var(--success-color);
   padding: 1rem;
-  border-radius: 8px;
-  border-left: 4px solid var(--primary-color);
+  border-radius: 0.5rem;
+  border-left: 0.25rem solid var(--primary-color);
   margin-bottom: 1rem;
   font-weight: 500;
 }
@@ -302,8 +302,8 @@
   background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: var(--error-color);
   padding: 1rem;
-  border-radius: 8px;
-  border-left: 4px solid var(--error-color);
+  border-radius: 0.5rem;
+  border-left: 0.25rem solid var(--error-color);
   margin-bottom: 1rem;
   font-weight: 500;
 }
@@ -313,7 +313,7 @@
   margin-top: 2rem;
   padding: 1.5rem;
   background: #f8fafc;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   border: 1px solid var(--border-color);
 }
 
@@ -338,7 +338,7 @@
 
 .status-badge {
   padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  border-radius: 1.25rem;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -370,7 +370,7 @@
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -379,7 +379,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 120px;
+  min-width: 7.5rem;
 }
 
 .btn-primary {
@@ -389,8 +389,8 @@
 
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transform: translateY(-0.0625rem);
+  box-shadow: 0 0.25rem 0.75rem rgba(16, 185, 129, 0.2);
 }
 
 .btn-secondary {
@@ -422,10 +422,10 @@
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f4f6;
-  border-top: 4px solid var(--primary-color);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.25rem solid #f3f4f6;
+  border-top: 0.25rem solid var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -439,7 +439,7 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .settings-content {
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 15rem 1fr;
     gap: 1.5rem;
   }
 }
@@ -463,7 +463,7 @@
   .nav-button {
     flex: 0 0 auto;
     padding: 0.75rem 1rem;
-    min-width: 120px;
+    min-width: 7.5rem;
   }
 
   .form-row {
@@ -514,8 +514,8 @@
   }
 
   .profile-image-container {
-    width: 100px;
-    height: 100px;
+    width: 6.25rem;
+    height: 6.25rem;
   }
 
   .upload-btn {

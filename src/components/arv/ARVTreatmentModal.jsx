@@ -1,40 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import './ARVTreatmentModal.css';
 
-const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) => {
-  const [formData, setFormData] = useState({
+const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, formData, onChange }) => {
+  const [localFormData, setLocalFormData] = useState({
     regimen: '',
     startDate: '',
     endDate: '',
     adherence: '',
     sideEffects: '',
-    notes: ''
+    notes: '',
+    setAsTemplate: false
   });
+  const [setAsTemplate, setSetAsTemplate] = useState(false);
 
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        regimen: initialData.regimen || '',
-        startDate: initialData.startDate || '',
-        endDate: initialData.endDate || '',
-        adherence: initialData.adherence || '',
-        sideEffects: initialData.sideEffects || '',
-        notes: initialData.notes || ''
+    if (formData) {
+      setLocalFormData({
+        regimen: formData.regimen || '',
+        startDate: formData.startDate || '',
+        endDate: formData.endDate || '',
+        adherence: formData.adherence || '',
+        sideEffects: formData.sideEffects || '',
+        notes: formData.notes || '',
+        setAsTemplate: formData.setAsTemplate || false
       });
+      setSetAsTemplate(formData.setAsTemplate || false);
     }
-  }, [initialData]);
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setLocalFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    onChange(e);
+  };
+
+  const handleCheckbox = (e) => {
+    setSetAsTemplate(e.target.checked);
+    onChange({ target: { name: 'setAsTemplate', value: e.target.checked } });
+    if (e.target.checked) {
+      onChange({ target: { name: 'notes', value: 'template' } });
+      setLocalFormData(prev => ({ ...prev, notes: 'template' }));
+    } else {
+      onChange({ target: { name: 'notes', value: '' } });
+      setLocalFormData(prev => ({ ...prev, notes: '' }));
+    }
+  };
+
+  const handleNotesChange = (e) => {
+    if (!setAsTemplate) onChange(e);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({ ...localFormData, setAsTemplate });
   };
 
   if (!isOpen) return null;
@@ -43,7 +64,7 @@ const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) =>
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h3>{initialData ? 'Edit ARV Treatment' : 'Add New ARV Treatment'}</h3>
+          <h3>{formData ? 'Edit ARV Treatment' : 'Add New ARV Treatment'}</h3>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
@@ -54,7 +75,7 @@ const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) =>
               <input
                 type="text"
                 name="regimen"
-                value={formData.regimen}
+                value={localFormData.regimen}
                 onChange={handleChange}
                 placeholder="Enter ARV regimen"
                 required
@@ -65,7 +86,7 @@ const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) =>
               <input
                 type="date"
                 name="startDate"
-                value={formData.startDate}
+                value={localFormData.startDate}
                 onChange={handleChange}
                 required
               />
@@ -78,7 +99,7 @@ const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) =>
               <input
                 type="date"
                 name="endDate"
-                value={formData.endDate}
+                value={localFormData.endDate}
                 onChange={handleChange}
               />
             </div>
@@ -86,7 +107,7 @@ const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) =>
               <label>Adherence:</label>
               <select
                 name="adherence"
-                value={formData.adherence}
+                value={localFormData.adherence}
                 onChange={handleChange}
               >
                 <option value="">Select adherence level</option>
@@ -102,7 +123,7 @@ const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) =>
             <label>Side Effects:</label>
             <textarea
               name="sideEffects"
-              value={formData.sideEffects}
+              value={localFormData.sideEffects}
               onChange={handleChange}
               rows="3"
               placeholder="Enter any side effects..."
@@ -110,19 +131,31 @@ const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, initialData = null }) =>
           </div>
 
           <div className="form-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={setAsTemplate}
+                onChange={handleCheckbox}
+              />{' '}
+              Set as template
+            </label>
+          </div>
+          <div className="form-group">
             <label>Notes:</label>
             <textarea
               name="notes"
-              value={formData.notes}
-              onChange={handleChange}
+              value={localFormData.notes}
+              onChange={handleNotesChange}
               rows="3"
-              placeholder="Enter additional notes..."
+              placeholder={setAsTemplate ? "Notes will be set as 'template'" : "Enter additional notes..."}
+              disabled={setAsTemplate}
+              style={setAsTemplate ? { background: '#eee' } : {}}
             />
           </div>
 
           <div className="form-actions">
             <button type="submit" className="btn-primary">
-              {initialData ? 'Save Changes' : 'Add Treatment'}
+              {formData ? 'Save Changes' : 'Add Treatment'}
             </button>
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel

@@ -23,11 +23,11 @@ public class ManagerService {
     private PatientRecordRepository patientRecordRepository;
 
     public long getTotalPatients() {
-        return userRepository.countByRoleName("Patient");
+        return userRepository.findAllNonDummyPatients().size();
     }
 
     public long getTotalDoctors() {
-        return userRepository.countByRoleName("Doctor");
+        return userRepository.findAllNonDummyDoctors().size();
     }
 
     public long getTotalAppointments() {
@@ -39,15 +39,11 @@ public class ManagerService {
     }
 
     public List<User> getAllPatients() {
-        return userRepository.findAll().stream()
-            .filter(user -> "Patient".equalsIgnoreCase(user.getRole().getRoleName()))
-            .toList();
+        return userRepository.findAllNonDummyPatients();
     }
 
     public List<User> getAllDoctors() {
-        return userRepository.findAll().stream()
-            .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
-            .toList();
+        return userRepository.findAllNonDummyDoctors();
     }
 
     public List<com.hivclinic.model.ARVTreatment> getAllARVTreatments() {
@@ -60,8 +56,7 @@ public class ManagerService {
 
     public List<User> searchPatientsByName(String q) {
         String query = q == null ? "" : q.trim().toLowerCase();
-        return userRepository.findAll().stream()
-            .filter(user -> "Patient".equalsIgnoreCase(user.getRole().getRoleName()))
+        return userRepository.findAllNonDummyPatients().stream()
             .filter(user -> user.getFirstName() != null && user.getFirstName().toLowerCase().contains(query)
                 || user.getLastName() != null && user.getLastName().toLowerCase().contains(query))
             .toList();
@@ -69,8 +64,7 @@ public class ManagerService {
 
     public List<User> searchDoctorsByNameOrSpecialty(String q) {
         String query = q == null ? "" : q.trim().toLowerCase();
-        return userRepository.findAll().stream()
-            .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
+        return userRepository.findAllNonDummyDoctors().stream()
             .filter(user -> (user.getFirstName() != null && user.getFirstName().toLowerCase().contains(query))
                 || (user.getLastName() != null && user.getLastName().toLowerCase().contains(query))
                 || (user.getSpecialty() != null && user.getSpecialty().toLowerCase().contains(query)))

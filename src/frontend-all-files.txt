@@ -1,0 +1,1629 @@
+# Frontend Hierarchy and Source Files
+
+## Hierarchy Structure
+
+src/
+├── App.css
+├── App.jsx
+├── index.css
+├── index.jsx
+├── main.jsx
+├── contexts/
+│   └── AuthContext.jsx
+├── components/
+│   ├── Debug.jsx
+│   ├── ErrorBoundary.css
+│   ├── ErrorBoundary.jsx
+│   ├── PatientRecordSection.css
+│   ├── PatientRecordSection.jsx
+│   ├── arv/
+│   │   ├── ARVTreatmentModal.css
+│   │   └── ARVTreatmentModal.jsx
+│   ├── layout/
+│   │   ├── BackNavigation.css
+│   │   ├── BackNavigation.jsx
+│   │   ├── DashboardHeader.css
+│   │   ├── DashboardHeader.jsx
+│   │   ├── Footer.jsx
+│   │   ├── Navbar.css
+│   │   ├── Navbar.jsx
+│   │   ├── UserProfileDropdown.css
+│   │   └── UserProfileDropdown.jsx
+│   └── schedule/
+│       ├── AvailabilityCalendar.css
+│       ├── AvailabilityCalendar.jsx
+│       ├── SlotActionModal.css
+│       ├── SlotActionModal.jsx
+│       ├── SlotManagementModal.css
+│       ├── SlotManagementModal.jsx
+│       ├── TimeSlotModal.css
+│       ├── TimeSlotModal.jsx
+│       ├── UnifiedCalendar.css
+│       ├── UnifiedCalendar.jsx
+│       ├── WeeklySchedule.css
+│       └── WeeklySchedule.jsx
+├── features/
+│   ├── Admin/
+│   │   ├── AdminDashboard.css
+│   │   └── AdminDashboard.jsx
+│   ├── auth/
+│   │   ├── Auth.css
+│   │   ├── Login.jsx
+│   │   └── Register.jsx
+│   ├── Customer/
+│   │   ├── CustomerDashboard.css
+│   │   └── CustomerDashboard.jsx
+│   ├── Doctor/
+│   │   ├── DoctorDashboard.css
+│   │   └── DoctorDashboard.jsx
+│   ├── Manager/
+│   │   ├── DoctorDetail.css
+│   │   ├── DoctorDetail.jsx
+│   │   ├── ManagerDashboard.css
+│   │   └── ManagerDashboard.jsx
+│   ├── Settings/
+│   │   ├── Settings.css
+│   │   └── Settings.jsx
+│   └── Website/
+│       ├── Home.css
+│       └── Home.jsx
+├── routes/
+│   └── AppRouter.jsx
+├── services/
+│   ├── apiClient.js
+│   └── authService.js
+└── utils/
+    ├── dateUtils.js
+    ├── imageUtils.js
+    ├── renderUtils.js
+    └── SafeComponents.jsx
+
+---
+
+## File: App.css
+```css
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  background: #fff;
+  color: #1f2937;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {…}
+  to {…}
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {…}
+```
+
+## File: App.jsx
+```jsx
+import React from 'react';
+
+/**
+ * Main App component that sets up the application structure
+ * with routing, authentication context, and error boundaries
+ */
+function App() {
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <div className="App">
+            <AppRouter />
+          </div>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
+}
+
+export default App;
+```
+
+## File: index.css
+```css
+* {…}
+
+*::before,
+*::after {…}
+
+:root {…}
+
+html {…}
+
+body, html {…}
+
+body {…}
+
+#root {…}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {…}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.875rem; }
+  h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+  
+p {
+  
+/* Links */
+a {
+
+a:hover {…}
+
+a:focus-visible {…}
+
+/* Form Elements */
+input, textarea, select, button {…}
+
+input, textarea, select {…}
+```
+
+## File: index.jsx
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import './index.css';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);
+```
+
+## File: main.jsx
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
+
+/**
+ * Main application entry point
+ * Renders the App component into the root DOM element
+ */
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
+```
+
+---
+
+## File: components/Debug.jsx
+
+const Debug = ({ data, title = "Debug Info", show = true }) => {
+  if (!show || process.env.NODE_ENV === 'production') {…}
+
+  const formatValue = (value, depth = 0) => {…};
+};
+
+export default Debug;
+
+---
+
+## File: components/ErrorBoundary.css
+
+.error-boundary {
+  padding: 2rem;
+  margin: 1rem 0;
+  background: #fee2e2;
+  border: 1px solid #f87171;
+  border-radius: 12px;
+  text-align: center;
+  color: #dc2626;
+}
+
+.error-content h3 {
+  color: #dc2626;
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+}
+
+.error-content p {
+  color: #7f1d1d;
+  margin: 0 0 1.5rem;
+}
+
+.retry-button {
+  background: #dc2626;
+}
+
+.retry-button:hover {…}
+
+.error-details {…}
+
+.error-details summary {…}
+
+.error-details pre {…}
+
+---
+
+## File: components/ErrorBoundary.jsx
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log the error to console for debugging
+  }
+
+  render() {…}
+}
+
+export default ErrorBoundary;
+
+---
+
+## File: components/PatientRecordSection.css
+
+.patient-record-section {…}
+
+.record-header {…}
+
+.record-header h3 {…}
+
+.error-banner, .success-banner {…}
+
+.error-banner {…}
+
+.success-banner {…}
+
+.record-actions, .edit-actions {…}
+
+.btn-primary, .btn-secondary {…}
+
+.btn-primary {…}
+
+.btn-primary:hover:not(:disabled) {…}
+
+.btn-primary:disabled {…}
+
+.btn-secondary {…}
+
+.btn-secondary:hover {…}
+
+.record-content {…}
+
+.profile-image-section {…}
+
+.profile-image-container {…}
+
+.profile-image {…}
+
+---
+
+## File: components/PatientRecordSection.jsx
+
+const PatientRecordSection = ({
+  record = {},
+  onSave,
+  onImageUpload,
+  loading = false,
+  isEditable = true,
+  hideImage = false
+}) => {
+  // Initialize form data with empty strings
+  const [formData, setFormData] = useState({
+    medicalHistory: '',
+    allergies: '',
+    currentMedications: '', 
+    notes: '',
+    bloodType: '',
+    emergencyContact: '',
+    emergencyPhone: ''
+  });
+};
+
+export default PatientRecordSection;
+
+---
+
+## File: components/arv/ARVTreatmentModal.css
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.modal-content {…}
+
+.modal-header {…}
+
+.modal-header h3 {…}
+
+.close-btn {…}
+
+.close-btn:hover {…}
+
+.arv-form {…}
+
+.form-row {…}
+
+.form-actions {…}
+
+.btn-primary {…}
+
+.btn-primary:hover:not(:disabled) {…}
+
+.btn-primary:focus {…}
+
+.btn-primary:disabled {…}
+
+.btn-secondary {…}
+
+.btn-secondary:hover {…}
+
+.btn-secondary:focus {…}
+
+---
+
+## File: components/arv/ARVTreatmentModal.jsx
+
+const ARVTreatmentModal = ({ isOpen, onClose, onSubmit, formData, onChange }) => {
+  const [localFormData, setLocalFormData] = useState({
+    regimen: '',
+    startDate: '',
+    endDate: '',
+    adherence: '',
+    sideEffects: '',
+    notes: '',
+    setAsTemplate: false
+  });
+  const [setAsTemplate, setSetAsTemplate] = useState(false);
+
+  useEffect(() => {…}, [formData]);
+
+  const handleChange = (e) => {…};
+};
+
+export default ARVTreatmentModal;
+
+---
+
+## File: components/layout/BackNavigation.css
+
+/* Back Navigation Styles */
+.back-navigation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+}
+
+.back-navigation:hover {…}
+
+.back-navigation:focus {…}
+
+.back-navigation:active {…}
+
+.back-navigation svg {…}
+
+.back-navigation:hover svg {…}
+
+/* Responsive Design */
+@media (max-width: 768px) {…}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {…}
+
+---
+
+## File: components/layout/BackNavigation.jsx
+
+const BackNavigation = ({ customBack, disabled = false }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Pages that should not show back navigation
+  const noBackPages = [
+    '/',
+    '/login',
+    '/register',
+    '/admin',
+    '/doctor',
+    '/customer'
+  ];
+
+  const shouldShowBack = !noBackPages.includes(location.pathname) && !disabled;
+
+  const handleBack = () => {…};
+};
+
+export default BackNavigation;
+
+---
+
+## File: components/layout/DashboardHeader.css
+
+/* Dashboard Header Styles */
+.dashboard-header {…}
+
+.dashboard-header-content {…}
+
+.dashboard-header-info {…}
+
+.dashboard-header-info .nav-logo {…}
+
+.dashboard-header-titles {…}
+
+.dashboard-title {…}
+
+.dashboard-subtitle {…}
+
+.dashboard-header-actions {…}
+
+.privacy-toggle {…}
+
+.privacy-toggle:hover {…}
+
+.privacy-toggle.active {…}
+
+.privacy-toggle.loading {…}
+
+.privacy-toggle svg {…}
+
+/* Responsive Design */
+@media (max-width: 768px) {…}
+
+---
+
+## File: components/layout/DashboardHeader.jsx
+
+const DashboardHeader = ({ title, subtitle }) => {
+  const { user } = useAuth();
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Function to check if user is a patient
+  const isPatient = () => {…};
+
+  useEffect(() => {…}, [user]);
+};
+
+export default DashboardHeader;
+
+---
+
+## File: components/layout/Footer.jsx
+
+const Footer = () => {…};
+
+export default Footer;
+
+---
+
+## File: components/layout/Navbar.css
+
+.navbar {…}
+
+.nav-container {…}
+
+.nav-logo {…}
+
+.logo-icon {…}
+
+.nav-menu {…}
+
+.nav-link {…}
+
+.nav-link:hover {…}
+
+.nav-cta {…}
+
+.nav-cta:hover {…}
+
+.nav-user-desktop {
+
+.nav-user-mobile {…}
+
+.nav-user-info {
+
+.user-greeting {
+
+.user-role {
+
+.logout-btn {…}
+
+.logout-btn:hover {…}
+
+.nav-toggle {…}
+
+.bar {…}
+
+/* Mobile Menu Animation */
+.nav-toggle .bar.active:nth-child(1) {…}
+
+.nav-toggle .bar.active:nth-child(2) {…}
+
+---
+
+## File: components/layout/Navbar.jsx
+
+const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = () => {…};
+
+  const toggleMenu = () => {…};
+
+  const closeMenu = () => {…};
+};
+
+export default Navbar;
+
+---
+
+## File: components/layout/UserProfileDropdown.css
+
+/* User Profile Dropdown Styles */
+.user-profile-dropdown {…}
+
+.profile-button {…}
+
+.profile-button:hover {…}
+
+.profile-button:hover .profile-name,
+.profile-button:hover .profile-role,
+.profile-button:hover .profile-initials {…}
+
+.profile-button:focus {…}
+
+.profile-avatar {…}
+
+.profile-image {…}
+
+.profile-initials {…}
+
+.profile-info {…}
+
+.profile-name {…}
+
+.profile-role {…}
+
+.profile-button:hover .profile-role {…}
+
+.dropdown-arrow {…}
+
+---
+
+## File: components/layout/UserProfileDropdown.jsx
+
+const UserProfileDropdown = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {…}, []);
+
+  const handleProfileClick = () => {…};
+
+  const handleDashboard = () => {…};
+
+  const handleSettings = () => {…};
+
+  const handleLogout = () => {…};
+};
+
+export default UserProfileDropdown;
+
+---
+
+## File: components/schedule/AvailabilityCalendar.css
+
+/* Enhanced Availability Calendar Styles */
+.availability-calendar {…}
+
+/* Calendar Header */
+.calendar-header {…}
+
+.calendar-navigation {…}
+
+
+.nav-button {…}
+
+.nav-button:hover {…}
+
+.date-selectors {…}
+
+.month-selector,
+.year-selector {…}
+
+.calendar-controls {…}
+
+.view-mode-buttons {…}
+
+.view-button {…}
+
+.view-button:hover {…}
+
+.view-button.active {…}
+
+/* Calendar Content */
+.calendar-content {…}
+
+.calendar-loading {…}
+
+/* Month View */
+
+---
+
+## File: components/schedule/AvailabilityCalendar.jsx
+
+const AvailabilityCalendar = ({ 
+  slots = [], 
+  onSlotSelect, 
+  onDateSelect,
+  viewMode = 'month',
+  userRole = 'doctor',
+  currentUserId
+}) => {
+  // Ensure currentDate is always a valid Date object
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [currentView, setCurrentView] = useState(viewMode);
+  const [loading, setLoading] = useState(false);
+};
+
+export default AvailabilityCalendar;
+
+---
+
+## File: components/schedule/SlotActionModal.css
+
+/* Slot Action Modal Styles */
+.slot-action-modal-overlay {…}
+
+.slot-action-modal {…}
+
+/* Modal Header */
+.modal-header {…}
+
+.modal-header h3 {…}
+
+.modal-header small {…}
+
+.close-button {…}
+
+.close-button:hover {…}
+
+/* Modal Content */
+.modal-content {…}
+
+/* Slot Sections */
+.slot-section {…}
+
+.slot-section:last-child {…}
+
+.slot-section-title {…}
+
+.empty-message {…}
+
+/* Slot List */
+.slot-list {…}
+
+.slot-item {…}
+
+.slot-item:hover {…}
+
+---
+
+## File: components/schedule/SlotActionModal.jsx
+
+const SlotActionModal = ({
+  isOpen, 
+  onClose, 
+  selectedDate, 
+  existingSlots = [], 
+  onAddSlot, 
+  onDeleteSlot,
+  onBookSlot,
+  userRole = 'doctor', // 'doctor' or 'patient'
+  currentUserId, // Added prop for current user ID (patient)
+  doctorInfo = null
+}) => {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+};
+
+export default SlotActionModal;
+
+---
+
+## File: components/schedule/SlotManagementModal.css
+
+/* Slot Management Modal Styles */
+.slot-modal-overlay {…}
+/* Slot Management Modal Styles */
+.slot-modal-overlay {…}
+
+.slot-modal {…}
+
+.modal-header {…}
+
+.modal-header h3 {…}
+
+.close-btn {…}
+
+.close-btn:hover {…}
+
+.modal-content {…}
+
+.modal-actions {…}
+
+.slot-sections {…}
+
+.slot-section {…}
+
+.slot-section h4 {…}
+
+.slots-list {…}
+
+.slot-item {…}
+
+.slot-item:hover {…}
+
+.slot-item.available {…}
+
+.slot-item.booked {…}
+
+.slot-info {…}
+
+---
+
+## File: components/schedule/SlotManagementModal.jsx
+
+/**
+ * Modal for managing time slots - allows doctors to manage availability and patients to book slots
+ */
+const SlotManagementModal = ({
+  isOpen,
+  onClose,
+  selectedDate,
+  existingSlots = [],
+  userRole = 'doctor',
+  currentUserId,
+  doctorInfo,
+  onAddSlot,
+  onDeleteSlot,
+  onBookSlot,
+  onCancelBooking
+}) => {
+  const [showAddModal, setShowAddModal] = useState(false);
+};
+
+export default SlotManagementModal;
+
+---
+
+## File: components/schedule/TimeSlotModal.css
+
+/* Time Slot Modal Styles */
+.time-slot-modal-overlay {…}
+
+.time-slot-modal {…}
+
+.modal-header {…}
+
+.modal-header h3 {…}
+
+.close-btn {…}
+
+.close-btn:hover {…}
+
+.close-btn:disabled {…}
+
+.slot-form {…}
+
+.form-group {…}
+
+.form-group label {…}
+
+.form-group input,
+.form-group select,
+.form-group textarea {…}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {…}
+
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {…}
+
+---
+
+## File: components/schedule/TimeSlotModal.jsx
+
+/**
+ * Modal for creating new time slots
+ */
+const TimeSlotModal = ({ 
+  isOpen, 
+  onClose, 
+  onSlotCreated, 
+  selectedDate, 
+  existingSlots = [] 
+}) => {
+  const [formData, setFormData] = useState({
+    slotDate: '',
+    startTime: '09:00',
+    durationMinutes: 30,
+    notes: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+};
+
+export default TimeSlotModal;
+
+---
+
+## File: components/schedule/UnifiedCalendar.css
+
+.unified-calendar {…}
+
+/* Calendar Header */
+.calendar-header {…}
+
+.calendar-navigation {…}
+
+.calendar-navigation button {…}
+
+.calendar-navigation button:hover {…}
+
+.calendar-navigation h3 {…}
+
+.calendar-controls {…}
+
+.calendar-controls button {…}
+
+.calendar-controls button:hover {…}
+
+.view-mode-buttons {…}
+
+.view-mode-buttons button {…}
+
+.view-mode-buttons button.active {…}
+
+.view-mode-buttons button:hover:not(.active) {…}
+
+/* Calendar Content */
+
+---
+
+## File: components/schedule/UnifiedCalendar.jsx
+
+/**
+ * Unified calendar component for managing doctor availability and patient bookings
+ */
+const UnifiedCalendar = ({
+  slots = [],
+  userRole = 'doctor',
+  currentUserId,
+  doctorInfo = null,
+  onAddSlot,
+  onDeleteSlot,
+  onBookSlot,
+  onCancelBooking,
+  onDateSelect,
+  onSlotSelect
+}) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState('month');
+};
+
+export default UnifiedCalendar;
+
+---
+
+## File: components/schedule/WeeklySchedule.css
+
+.weekly-schedule {…}
+
+.schedule-header {…}
+
+.schedule-navigation {…}
+
+.nav-buttons {…}
+
+.nav-btn, .today-btn {…}
+
+.nav-btn:hover, .today-btn:hover {…}
+
+.nav-btn {…}
+
+.current-period h3 {…}
+
+.view-selector {…}
+
+.view-btn {…}
+
+.view-btn:hover {…}
+
+.view-btn.active {…}
+
+.schedule-grid {…}
+
+.time-column {…}
+
+.time-header {…}
+
+.time-slot {…}
+
+.day-column {…}
+
+.day-column:last-child {…}
+
+.day-header {…}
+
+.day-name {…}
+
+.schedule-slot {…}
+
+---
+
+## File: components/schedule/WeeklySchedule.jsx
+
+const WeeklySchedule = ({ 
+  availableSlots = [], 
+  onSlotSelect, 
+  selectedSlot = null,
+  viewMode = 'week'
+}) => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentView, setCurrentView] = useState(viewMode);
+
+  // Get the start of the week (Monday) - fixed timezone handling
+  const getWeekStart = (date) => {…};
+
+  // Generate week days
+  const getWeekDays = () => {…};
+};
+
+export default WeeklySchedule;
+
+---
+
+## File: contexts/AuthContext.jsx
+
+/**
+ * Authentication Context for managing user authentication state
+ * Provides login, logout, and user state management across the application
+ */
+const AuthContext = createContext(null);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {…}
+  return context;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+};
+
+export default AuthContext;
+
+---
+
+## File: features/Admin/AdminDashboard.css
+
+/* --- Dashboard Layout Wrapper --- */
+.admin-dashboard-layout {…}
+
+.admin-dashboard {…}
+
+.manager-sidebar {…}
+
+.sidebar-option {…}
+
+.sidebar-option:hover {…}
+
+.sidebar-option.active {…}
+
+.dashboard-main {…}
+
+.stats-grid {…}
+
+.stat-card {…}
+
+.stat-card:hover {…}
+
+.stat-card h3 {…}
+
+.stat-number {…}
+
+.recent-activity {…}
+
+.recent-activity h3 {…}
+
+.activity-card {…}
+
+.activity-info h4 {…}
+
+.activity-info p {…}
+
+.users-table,
+
+---
+
+## File: features/Admin/AdminDashboard.jsx
+
+const AdminDashboard = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Data states
+  const [users, setUsers] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+};
+
+export default AdminDashboard;
+
+---
+
+## File: features/auth/Auth.css
+
+/* Modern Medical Green Theme - Authentication */
+.auth-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+  
+.auth-card::before {
+
+.auth-header {…}
+
+.auth-header h2 {…}
+
+.auth-header p {…}
+
+/* Messages */
+.success-message {…}
+
+.error-message {…}
+
+/* Form Styles */
+.auth-form {…}
+
+.form-group {…}
+
+.form-row {…}
+
+.form-group label {…}
+
+.form-group input {…}
+
+.form-group input:hover {…}
+
+.form-group input:focus {…}
+```
+
+## File: features/auth/Login.jsx
+
+const Login = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get success message from registration
+  const successMessage = location.state?.message;
+
+  const handleChange = (e) => {…};
+};
+
+export default Login;
+
+---
+
+## File: features/auth/Register.jsx
+
+const Register = () => {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: ''
+  });
+  
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {…};
+};
+
+export default Register;
+
+---
+
+## File: features/Customer/CustomerDashboard.css
+
+/* Modern Medical Green Theme - Customer Dashboard */
+.customer-dashboard {…}
+
+/* Vertical Header Layout */
+.dashboard-layout {…}
+
+.dashboard-sidebar {…}
+
+.sidebar-header {…}
+
+.sidebar-header h1 {…}
+
+.sidebar-header p {…}
+
+/* Vertical Navigation */
+.dashboard-nav {…}
+
+.nav-item {…}
+
+.nav-button {…}
+
+.nav-button:hover {…}
+
+.nav-button.active {…}
+
+.nav-button.active::before {…}
+
+.nav-icon {…}
+
+/* Main Content Area */
+.dashboard-content {…}
+```
+
+## File: features/Customer/CustomerDashboard.jsx
+
+const CustomerDashboard = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  // State management
+  const [activeTab, setActiveTab] = useState('overview');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [appointments, setAppointments] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+};
+
+export default CustomerDashboard;
+
+---
+
+## File: features/Doctor/DoctorDashboard.css
+
+/* Modern Medical Green Theme - Doctor Dashboard */
+.doctor-dashboard {…}
+
+/* Dashboard Layout */
+.dashboard-layout {…}
+
+/* Left Sidebar */
+.dashboard-sidebar {…}
+
+.sidebar-header {…}
+
+.sidebar-header h1 {…}
+
+/* Vertical Navigation */
+.dashboard-nav {…}
+
+.nav-item {…}
+
+.nav-button {…}
+
+.nav-button:hover {…}
+
+.nav-button.active {…}
+
+.nav-button.active::before {…}
+
+.nav-icon {…}
+
+/* Right Main Content Area */
+.dashboard-main {…}
+```
+
+## File: features/Doctor/DoctorDashboard.jsx
+
+/**
+ * Doctor Dashboard component for managing appointments, availability, and patient records
+ */
+const DoctorDashboard = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  // Format doctor's name
+  const doctorName = user?.firstName 
+    ? `${user.firstName} ${user.lastName || ''}`
+    : user?.username || 'Doctor';
+
+  // State management
+};
+
+export default DoctorDashboard;
+
+---
+
+## File: features/Manager/DoctorDetail.css
+
+/* DoctorDetail.css - Chuyên biệt cho trang chi tiết bác sĩ */
+.doctor-detail-container {…}
+.doctor-detail-back {…}
+.doctor-detail-back:hover {…}
+.doctor-detail-card {…}
+.doctor-detail-flex {…}
+.doctor-detail-avatar {…}
+.doctor-detail-avatar-img {…}
+.doctor-detail-avatar-placeholder {…}
+.doctor-detail-username {…}
+.doctor-detail-info {…}
+.doctor-detail-title {…}
+.doctor-detail-grid {…}
+.doctor-detail-label {…}
+doctor-detail-value {…}
+
+---
+
+## File: features/Manager/ManagerDashboard.css
+
+/* --- Dashboard Layout Wrapper --- */
+.manager-dashboard-layout {…}
+
+.manager-dashboard {…}
+
+.manager-sidebar {…}
+
+.sidebar-option {…}
+
+.sidebar-option:hover {…}
+
+.sidebar-option.active {…}
+
+.dashboard-main {…}
+
+.stats-grid {…}
+
+.stat-card {…}
+
+.stat-card:hover {…}
+
+.stat-card h3 {…}
+
+.stat-number {…}
+
+.recent-activity {…}
+
+.recent-activity h3 {…}
+
+.activity-card {…}
+
+.activity-info h4 {…}
+
+.activity-info p {…}
+
+.users-table,
+
+---
+
+## File: features/Manager/ManagerDashboard.jsx
+
+const SIDEBAR_OPTIONS = [
+  { key: 'overview', label: 'Overview' },
+  { key: 'patients', label: 'Patient Management' },
+  { key: 'doctors', label: 'Doctor Management' },
+  { key: 'arv', label: 'ARV Regimen Management' },
+  { key: 'schedules', label: 'Schedule Management' },
+];
+
+const ManagerDashboard = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [stats, setStats] = useState({});
+};
+
+export default ManagerDashboard;
+
+---
+
+## File: features/Manager/PatientDetail.css
+
+/* PatientDetail.css - Chuyên nghiệp, hiện đại, responsive */
+
+.patient-detail-container {…}
+
+.patient-detail-back {…}
+.patient-detail-back:hover {…}
+
+.patient-detail-card {…}
+
+.patient-detail-flex {…}
+
+.patient-detail-avatar {…}
+.patient-detail-avatar-img {…}
+.patient-detail-avatar-placeholder {…}
+.patient-detail-username {…}
+
+.patient-detail-info {…}
+.patient-detail-title {…}
+.patient-detail-grid {…}
+.patient-detail-label {…}
+.patient-detail-value {…}
+```
+
+## File: features/Manager/PatientDetail.jsx
+
+const PatientDetail = () => {
+  const { userId } = useParams();
+  const [profile, setProfile] = useState(null);
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {…}, [userId]);
+
+  if (loading)
+  if (error)
+  if (!profile)
+};
+
+export default PatientDetail;
+
+---
+
+## File: features/Settings/Settings.css
+
+/* Settings Page Styles */
+:root {…}
+
+/* Settings Container */
+.settings-container {…}
+
+/* Settings Layout */
+.settings-content {…}
+
+.settings-header {…}
+
+.settings-header h1 {…}
+
+.settings-header p {…}
+
+/* Settings Sidebar */
+.settings-sidebar {…}
+
+.settings-nav {…}
+
+.nav-button {…}
+
+.nav-button:hover {…}
+
+.nav-button.active {…}
+
+.nav-button.active::before {…}
+
+/* Settings Main Content */
+.settings-main {…}
+
+.settings-section {…}
+```
+
+## File: features/Settings/Settings.jsx
+
+/**
+ * Settings component for managing user profile, security, and notification preferences
+ */
+const Settings = () => {
+  const { user, updateUser } = useAuth();
+  
+  // State management
+  const [activeTab, setActiveTab] = useState('profile');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+};
+
+export default Settings;
+
+---
+
+## File: features/Website/Home.css
+
+.home-container {…}
+
+/* Hero Section */
+.hero-section {…}
+
+.hero-section::before {…}
+
+.hero-content {…}
+
+.hero-text {
+
+.hero-subtitle {
+
+.hero-description {
+  
+.hero-actions {
+  
+.hero-image {
+
+.hero-placeholder h3 {…}
+
+.hero-placeholder p {…}
+
+.medical-icon {…}
+
+.medical-icon svg {…}
+
+/* Button Styles */
+}
+
+.btn-primary {…}
+
+.btn-primary:hover {…}
+
+.btn-secondary {…}
+
+.btn-secondary:hover {…}
+
+.btn-outline {…}
+
+.btn-outline:hover {…}
+```
+
+## File: features/Website/Home.jsx
+
+/**
+ * Home page component
+ */
+const Home = () => {…};
+
+export default Home;
+
+---
+
+## File: routes/AppRouter.jsx
+
+// Lazy load components to improve performance
+const Home = React.lazy(() => import('../features/Website/Home'));
+const Login = React.lazy(() => import('../features/auth/Login'));
+const Register = React.lazy(() => import('../features/auth/Register'));
+const CustomerDashboard = React.lazy(() => import('../features/Customer/CustomerDashboard'));
+const DoctorDashboard = React.lazy(() => import('../features/Doctor/DoctorDashboard'));
+
+---
+
+## File: utils/dateUtils.js
+
+/**
+ * Enhanced utility functions for date formatting and validation
+ */
+
+/**
+ * Format date and time for API requests with enhanced error handling
+ * @param {string|Date|Object} date - The date in various formats
+ * @param {string|Date|Object} time - The time in various formats
+ * @returns {string} - Formatted datetime string for API
+ */
+export const formatDateTimeForAPI = (date, time) => {…};
+
+---
+
+## File: utils/imageUtils.js
+
+/**
+ * Crops an image to a square (512x512) with center cropping
+ * @param {File} file - The image file to crop
+ * @returns {Promise<string>} - Base64 encoded cropped image
+ */
+export const cropImageToSquare = (file) => {…};
+
+/**
+ * Validates image file before processing
+ * @param {File} file - The file to validate
+ * @returns {boolean} - Whether the file is a valid image
+ */
+export const validateImageFile = (file) => {…};
+
+---
+
+## File: utils/renderUtils.js
+
+/**
+ * Enhanced utility functions for safe rendering of data
+ */
+
+/**
+ * Safely renders a value, handling null, undefined, and object cases
+ * @param {any} value - The value to render
+ * @param {string} fallback - Fallback value if the input is null/undefined
+ * @returns {string} - Safe string representation
+ */
+export const safeRender = (value) => {…};
+
+---
+
+## File: utils/SafeComponents.jsx
+
+/**
+ * Safe text component for React
+ */
+export const SafeText = ({ children, fallback = 'N/A', className = '' }) => {…};
+
+/**
+ * Safe date component for React
+ */
+export const SafeDate = ({ children, fallback = 'N/A', className = '' }) => {…};
+
+/**
+ * Safe datetime component for React
+ */
+export const SafeDateTime = ({ children, fallback = 'N/A', className = '' }) => {…};
+
+/**
+ * Safe time component for React
+ */

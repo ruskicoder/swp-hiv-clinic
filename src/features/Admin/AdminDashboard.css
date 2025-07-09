@@ -8,11 +8,12 @@
   gap: 2rem;
   background: #f8fafc;
   padding: 2rem 0;
+  margin-top: 80px; /* Add space for fixed header */
 }
 
 .admin-dashboard {
   flex: 1;
-  max-width: 1400px;
+  max-width: 95%;
   margin: 0 auto;
   padding: 2rem 2.5rem 2rem 0;
   background: #fff;

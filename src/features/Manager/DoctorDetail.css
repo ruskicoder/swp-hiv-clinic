@@ -1,6 +1,6 @@
 /* DoctorDetail.css - Chuyên biệt cho trang chi tiết bác sĩ */
 .doctor-detail-container {
-  max-width: 1100px;
+  max-width: 95%;
   margin: 32px auto;
   padding: 24px;
   background: #fff;

@@ -36,8 +36,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         String parameterName = ex.getName();
-        String invalidValue = ex.getValue() != null ? ex.getValue().toString() : "null";
-        String expectedType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown";
+        Object value = ex.getValue();
+        Class<?> requiredType = ex.getRequiredType();
+        
+        String invalidValue = value != null ? value.toString() : "null";
+        String expectedType = requiredType != null ? requiredType.getSimpleName() : "unknown";
         
         String errorMessage;
         if ("NaN".equals(invalidValue)) {
