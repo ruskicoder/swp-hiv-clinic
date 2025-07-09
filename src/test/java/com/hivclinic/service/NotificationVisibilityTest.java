@@ -124,8 +124,6 @@ public class NotificationVisibilityTest {
         System.out.println("DEBUG: ✓ Step 4 passed - Cancelled notification not in unread list");
 
         // Step 5: Verify unread count excludes cancelled notifications
-        long unreadCount = notificationService.getUnreadNotificationCount(testPatientId);
-        
         // Create another non-cancelled notification to verify count logic
         Notification nonCancelledNotification = new Notification();
         nonCancelledNotification.setUserId(testPatientId);
