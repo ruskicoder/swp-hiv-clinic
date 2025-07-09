@@ -130,56 +130,71 @@ const ManagerDashboard = () => {
   }, [activeTab]);
 
   // Search patients
-  const handlePatientSearch = async (e) => {
-    const value = e.target.value;
-    setPatientSearch(value);
-    if (value.trim() === "") {
+  // Only update state on change
+  const handlePatientSearchChange = (e) => {
+    setPatientSearch(e.target.value);
+  };
+
+  const handlePatientSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setPatientsLoading(true);
+        setPatientsError("");
+        try {
+          const res = await apiClient.get('/manager/patients');
+          setPatients(res.data);
+        } catch {
+          setPatientsError('Failed to load patient list.');
+        } finally {
+          setPatientsLoading(false);
+        }
+        return;
+      }
       setPatientsLoading(true);
+      setPatientsError("");
       try {
-        const res = await apiClient.get('/manager/patients');
+        const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
         setPatients(res.data);
       } catch {
-        setPatientsError('Failed to load patient list.');
+        setPatientsError('Failed to search patients.');
       } finally {
         setPatientsLoading(false);
       }
-      return;
-    }
-    setPatientsLoading(true);
-    try {
-      const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
-      setPatients(res.data);
-    } catch {
-      setPatientsError('Failed to search patients.');
-    } finally {
-      setPatientsLoading(false);
     }
   };
 
   // Search doctors
-  const handleDoctorSearch = async (e) => {
-    const value = e.target.value;
-    setDoctorSearch(value);
-    if (value.trim() === "") {
+  const handleDoctorSearchChange = (e) => {
+    setDoctorSearch(e.target.value);
+  };
+
+  const handleDoctorSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setDoctorsLoading(true);
+        setDoctorsError("");
+        try {
+          const res = await apiClient.get('/manager/doctors');
+          setDoctors(res.data);
+        } catch {
+          setDoctorsError('Failed to load doctor list.');
+        } finally {
+          setDoctorsLoading(false);
+        }
+        return;
+      }
       setDoctorsLoading(true);
+      setDoctorsError("");
       try {
-        const res = await apiClient.get('/manager/doctors');
+        const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
         setDoctors(res.data);
       } catch {
-        setDoctorsError('Failed to load doctor list.');
+        setDoctorsError('Failed to search doctors.');
       } finally {
         setDoctorsLoading(false);
       }
-      return;
-    }
-    setDoctorsLoading(true);
-    try {
-      const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
-      setDoctors(res.data);
-    } catch {
-      setDoctorsError('Failed to search doctors.');
-    } finally {
-      setDoctorsLoading(false);
     }
   };
 
@@ -229,7 +244,8 @@ const ManagerDashboard = () => {
           type="text"
           placeholder="Search patients by name or email..."
           value={patientSearch}
-          onChange={handlePatientSearch}
+          onChange={handlePatientSearchChange}
+          onKeyDown={handlePatientSearchKeyDown}
           className="search-input"
         />
       </div>
@@ -301,7 +317,8 @@ const ManagerDashboard = () => {
           type="text"
           placeholder="Search doctors by name or specialty..."
           value={doctorSearch}
-          onChange={handleDoctorSearch}
+          onChange={handleDoctorSearchChange}
+          onKeyDown={handleDoctorSearchKeyDown}
           className="search-input"
         />
       </div>
