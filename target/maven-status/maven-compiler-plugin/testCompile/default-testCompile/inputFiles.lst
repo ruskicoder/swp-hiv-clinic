@@ -1,5 +1,9 @@
 D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\controller\NotificationControllerTest.java
 D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\service\NotificationServiceTest.java
+D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\service\NotificationVisibilityTest.java
+D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\integration\NotificationTemplateIntegrationTest.java
 D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\service\NotificationPersistenceTest.java
+D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\service\NotificationTemplateServiceTest.java
 D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\service\DoctorNotificationServiceTest.java
 D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\service\NotificationStatusFixTest.java
+D:\DATA\Github\swp-hiv-clinic\src\test\java\com\hivclinic\service\NotificationBulkOperationsTest.java

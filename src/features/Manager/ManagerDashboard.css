@@ -164,20 +164,6 @@
   line-height: 1;
 }
 
-.stat-change {
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  font-weight: 500;
-}
-
-.stat-change.positive {
-  color: #10b981;
-}
-
-.stat-change.negative {
-  color: #ef4444;
-}
-
 /* Section Headers */
 .section-header {
   display: flex;

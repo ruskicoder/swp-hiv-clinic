@@ -239,6 +239,102 @@ public class NotificationController {
         }
     }
     
+    @PostMapping("/bulk/unsend")
+    public ResponseEntity<Map<String, Object>> bulkUnsendNotifications(
+            @RequestBody List<Long> notificationIds,
+            @RequestParam Long doctorId) {
+        
+        try {
+            logger.info("Doctor {} attempting to bulk unsend {} notifications", doctorId, notificationIds.size());
+            
+            int successCount = 0;
+            int failureCount = 0;
+            List<String> errors = new java.util.ArrayList<>();
+            
+            for (Long notificationId : notificationIds) {
+                try {
+                    boolean success = doctorNotificationService.unsendNotification(notificationId, doctorId);
+                    if (success) {
+                        successCount++;
+                    } else {
+                        failureCount++;
+                        errors.add("Failed to unsend notification " + notificationId);
+                    }
+                } catch (Exception e) {
+                    failureCount++;
+                    errors.add("Error unsending notification " + notificationId + ": " + e.getMessage());
+                }
+            }
+            
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", failureCount == 0);
+            response.put("successCount", successCount);
+            response.put("failureCount", failureCount);
+            response.put("message", String.format("Bulk unsend completed: %d successful, %d failed", successCount, failureCount));
+            
+            if (!errors.isEmpty()) {
+                response.put("errors", errors);
+            }
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            logger.error("Error in bulk unsend operation: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Bulk unsend operation failed: " + e.getMessage()
+            ));
+        }
+    }
+    
+    @PostMapping("/bulk/delete")
+    public ResponseEntity<Map<String, Object>> bulkDeleteNotifications(
+            @RequestBody List<Long> notificationIds,
+            @RequestParam Long doctorId) {
+        
+        try {
+            logger.info("Doctor {} attempting to bulk delete {} notifications", doctorId, notificationIds.size());
+            
+            int successCount = 0;
+            int failureCount = 0;
+            List<String> errors = new java.util.ArrayList<>();
+            
+            for (Long notificationId : notificationIds) {
+                try {
+                    boolean success = doctorNotificationService.deleteNotification(notificationId, doctorId);
+                    if (success) {
+                        successCount++;
+                    } else {
+                        failureCount++;
+                        errors.add("Failed to delete notification " + notificationId);
+                    }
+                } catch (Exception e) {
+                    failureCount++;
+                    errors.add("Error deleting notification " + notificationId + ": " + e.getMessage());
+                }
+            }
+            
+            Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", failureCount == 0);
+            response.put("successCount", successCount);
+            response.put("failureCount", failureCount);
+            response.put("message", String.format("Bulk delete completed: %d successful, %d failed", successCount, failureCount));
+            
+            if (!errors.isEmpty()) {
+                response.put("errors", errors);
+            }
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            logger.error("Error in bulk delete operation: {}", e.getMessage(), e);
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Bulk delete operation failed: " + e.getMessage()
+            ));
+        }
+    }
+    
     @GetMapping("/doctor/patients-with-appointments")
     public ResponseEntity<List<Map<String, Object>>> getPatientsWithAppointments(@RequestParam Long doctorId) {
         try {

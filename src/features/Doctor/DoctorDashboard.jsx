@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../services/apiClient';
 import DashboardHeader from '../../components/layout/DashboardHeader';
@@ -8,15 +7,14 @@ import UnifiedCalendar from '../../components/schedule/UnifiedCalendar';
 import ARVTreatmentModal from '../../components/arv/ARVTreatmentModal';
 import NotificationManagerTab from '../../components/notifications/NotificationManagerTab';
 import ErrorBoundary from '../../components/ErrorBoundary';
-import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
+import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
 
 /**
  * Doctor Dashboard component for managing appointments, availability, and patient records
  */
 const DoctorDashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Format doctor's name
   const doctorName = user?.firstName 
@@ -51,7 +49,6 @@ const DoctorDashboard = () => {
     recheckDateTime: '',
     durationMinutes: 30
   });
-  const [showPrivacyAlert, setShowPrivacyAlert] = useState(false);
 
   // Load dashboard data
   useEffect(() => {
@@ -346,11 +343,6 @@ const DoctorDashboard = () => {
     }
   };
 
-  // Handle logout
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
   // Navigation items
   const navigationItems = [

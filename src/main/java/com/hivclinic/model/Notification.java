@@ -13,6 +13,29 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notification {
+    // Lombok @Data does not generate setters for final fields or enums with custom constructors.
+    // Add missing setters and getters for test compatibility
+    public void setNotificationId(Integer notificationId) { this.notificationId = notificationId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
+    public void setTitle(String title) { this.title = title; }
+    public void setMessage(String message) { this.message = message; }
+    public void setType(NotificationType type) { this.type = type; }
+    public void setPriority(String priority) { this.priority = priority; }
+    public void setIsRead(Boolean isRead) { this.isRead = isRead; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
+    public void setStatus(String status) { this.status = status; }
+
+    public Integer getNotificationId() { return notificationId; }
+    public Integer getUserId() { return userId; }
+    public String getTitle() { return title; }
+    public String getMessage() { return message; }
+    public NotificationType getType() { return type; }
+    public String getPriority() { return priority; }
+    public Boolean getIsRead() { return isRead; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getSentAt() { return sentAt; }
+    public String getStatus() { return status; }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer notificationId;
