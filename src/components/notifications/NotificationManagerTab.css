@@ -24,6 +24,7 @@
 
 /* Override dashboard header to integrate with tab layout */
 .tab-content-wrapper .dashboard-header {
+  z-index:2;
   margin-bottom: 1.5rem;
   padding: 1.5rem;
 }

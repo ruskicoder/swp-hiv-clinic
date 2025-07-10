@@ -168,10 +168,6 @@ const UnifiedCalendar = ({
     }
   };
 
-  // Handle slot creation
-  const handleSlotCreated = (slotData) => {
-    handleAddSlot(slotData);
-  };
 
   // Navigate dates
   const navigateDate = (direction) => {
