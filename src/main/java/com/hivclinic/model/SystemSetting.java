@@ -1,10 +1,7 @@
 package com.hivclinic.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -12,11 +9,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "SystemSettings")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class SystemSetting {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SettingID")
@@ -37,6 +30,65 @@ public class SystemSetting {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UpdatedByUserID")
     private User updatedByUser;
+
+    public SystemSetting() {}
+
+    public SystemSetting(Integer settingId, String settingKey, String settingValue, String description, LocalDateTime updatedAt, User updatedByUser) {
+        this.settingId = settingId;
+        this.settingKey = settingKey;
+        this.settingValue = settingValue;
+        this.description = description;
+        this.updatedAt = updatedAt;
+        this.updatedByUser = updatedByUser;
+    }
+
+    public Integer getSettingId() {
+        return settingId;
+    }
+
+    public void setSettingId(Integer settingId) {
+        this.settingId = settingId;
+    }
+
+    public String getSettingKey() {
+        return settingKey;
+    }
+
+    public void setSettingKey(String settingKey) {
+        this.settingKey = settingKey;
+    }
+
+    public String getSettingValue() {
+        return settingValue;
+    }
+
+    public void setSettingValue(String settingValue) {
+        this.settingValue = settingValue;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public User getUpdatedByUser() {
+        return updatedByUser;
+    }
+
+    public void setUpdatedByUser(User updatedByUser) {
+        this.updatedByUser = updatedByUser;
+    }
 
     @PrePersist
     @PreUpdate

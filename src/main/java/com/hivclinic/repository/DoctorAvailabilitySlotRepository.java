@@ -12,7 +12,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Repository
-public interface DoctorAvailabilitySlotRepository extends JpaRepository<DoctorAvailabilitySlot, Integer> {
+public interface DoctorAvailabilitySlotRepository extends JpaRepository<DoctorAvailabilitySlot, Integer>, DoctorAvailabilitySlotRepositoryCustom {
     
     // Find all slots for a doctor ordered by date and time
     List<DoctorAvailabilitySlot> findByDoctorUserOrderBySlotDateAscStartTimeAsc(User doctorUser);

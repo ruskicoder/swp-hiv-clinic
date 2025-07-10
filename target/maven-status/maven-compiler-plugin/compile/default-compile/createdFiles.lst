@@ -49,6 +49,7 @@ com\hivclinic\model\DoctorAvailabilitySlot.class
 com\hivclinic\controller\MedicationRoutineController.class
 com\hivclinic\model\PasswordResetToken.class
 com\hivclinic\repository\NotificationTemplateRepository.class
+com\hivclinic\repository\DoctorAvailabilitySlotRepositoryImpl.class
 com\hivclinic\config\CustomLocalDateTimeDeserializer.class
 com\hivclinic\config\JacksonConfig.class
 com\hivclinic\config\CustomUserDetailsService.class
@@ -66,6 +67,7 @@ com\hivclinic\controller\PatientRecordController.class
 com\hivclinic\model\Appointment.class
 com\hivclinic\model\DoctorProfile.class
 com\hivclinic\validation\PasswordMatch.class
+com\hivclinic\repository\DoctorAvailabilitySlotRepositoryCustom.class
 com\hivclinic\service\DoctorAvailabilityService.class
 com\hivclinic\HivClinicBackendApplication.class
 com\hivclinic\model\NotificationTemplate$Priority.class

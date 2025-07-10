@@ -25,6 +25,9 @@ public class Notification {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
     public void setStatus(String status) { this.status = status; }
+    public void setScheduledFor(LocalDateTime scheduledFor) { this.scheduledFor = scheduledFor; }
+    public void setRelatedEntityId(Integer relatedEntityId) { this.relatedEntityId = relatedEntityId; }
+    public void setRelatedEntityType(String relatedEntityType) { this.relatedEntityType = relatedEntityType; }
 
     public Integer getNotificationId() { return notificationId; }
     public Integer getUserId() { return userId; }
@@ -36,6 +39,9 @@ public class Notification {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getSentAt() { return sentAt; }
     public String getStatus() { return status; }
+    public LocalDateTime getScheduledFor() { return scheduledFor; }
+    public Integer getRelatedEntityId() { return relatedEntityId; }
+    public String getRelatedEntityType() { return relatedEntityType; }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer notificationId;

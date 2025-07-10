@@ -1,14 +1,25 @@
+
 package com.hivclinic.service;
 
 import com.hivclinic.model.User;
-import com.hivclinic.repository.*;
+import com.hivclinic.repository.UserRepository;
+import com.hivclinic.repository.ARVTreatmentRepository;
+import com.hivclinic.repository.AppointmentRepository;
+import com.hivclinic.repository.DoctorAvailabilitySlotRepository;
+import com.hivclinic.repository.PatientProfileRepository;
+import com.hivclinic.repository.PatientRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+
 
 @Service
 public class ManagerService {
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -21,6 +32,48 @@ public class ManagerService {
     private PatientProfileRepository patientProfileRepository;
     @Autowired
     private PatientRecordRepository patientRecordRepository;
+
+    /**
+     * Search ARV treatments by date range (startDate between from and to)
+     */
+    public List<Map<String, Object>> searchARVTreatmentsByDateRange(java.time.LocalDate from, java.time.LocalDate to) {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("Both from and to dates must be provided");
+        }
+        return arvTreatmentRepository.findAll().stream()
+            .filter(arv -> arv.getStartDate() != null &&
+                (arv.getStartDate().isEqual(from) || arv.getStartDate().isAfter(from)) &&
+                (arv.getStartDate().isEqual(to) || arv.getStartDate().isBefore(to)))
+            .map(arv -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("arvTreatmentID", arv.getArvTreatmentID());
+                map.put("regimen", arv.getRegimen());
+                map.put("startDate", arv.getStartDate());
+                map.put("endDate", arv.getEndDate());
+                map.put("adherence", arv.getAdherence());
+                map.put("sideEffects", arv.getSideEffects());
+                map.put("notes", arv.getNotes());
+                map.put("isActive", arv.getIsActive());
+                // Lấy tên bệnh nhân
+                if (arv.getPatientUserID() != null) {
+                    userRepository.findById(arv.getPatientUserID()).ifPresent(u -> {
+                        map.put("patientName", (u.getFirstName() != null ? u.getFirstName() : "") + " " + (u.getLastName() != null ? u.getLastName() : ""));
+                    });
+                } else {
+                    map.put("patientName", "-");
+                }
+                // Lấy tên bác sĩ
+                if (arv.getDoctorUserID() != null) {
+                    userRepository.findById(arv.getDoctorUserID()).ifPresent(u -> {
+                        map.put("doctorName", (u.getFirstName() != null ? u.getFirstName() : "") + " " + (u.getLastName() != null ? u.getLastName() : ""));
+                    });
+                } else {
+                    map.put("doctorName", "-");
+                }
+                return map;
+            })
+            .toList();
+    }
 
     public long getTotalPatients() {
         return userRepository.findAllNonDummyPatients().size();
@@ -50,8 +103,16 @@ public class ManagerService {
         return arvTreatmentRepository.findAll();
     }
 
+
     public List<com.hivclinic.model.DoctorAvailabilitySlot> getAllSchedules() {
         return doctorAvailabilitySlotRepository.findAll();
+    }
+
+    public List<com.hivclinic.model.DoctorAvailabilitySlot> searchSchedulesByDateRange(java.time.LocalDate from, java.time.LocalDate to) {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("Both from and to dates must be provided");
+        }
+        return doctorAvailabilitySlotRepository.findBySlotDateBetween(from, to);
     }
 
     public List<User> searchPatientsByName(String q) {
