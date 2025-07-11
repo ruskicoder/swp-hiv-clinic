@@ -302,32 +302,6 @@ class NotificationService {
     }
   }
 
-  /**
-   * Get notifications for the current user (general notifications)
-   */
-  async getUserNotifications() {
-    try {
-      console.log('DEBUG: notificationService.getUserNotifications called');
-      const response = await apiClient.get(`/v1/notifications`);
-      console.log('DEBUG: getUserNotifications response:', response);
-      console.log('DEBUG: getUserNotifications response.data:', response.data);
-      
-      return {
-        success: true,
-        data: response.data || []
-      };
-    } catch (error) {
-      console.error('DEBUG: Error fetching user notifications:', error);
-      console.error('DEBUG: Error response:', error.response);
-      console.error('DEBUG: Error response data:', error.response?.data);
-      
-      return {
-        success: false,
-        error: error.response?.data?.message || error.message || 'Failed to fetch notifications',
-        data: []
-      };
-    }
-  }
 
   /**
    * Mark a notification as read
@@ -382,34 +356,182 @@ class NotificationService {
   }
 
   /**
-   * Subscribe to real-time notification updates
+   * Singleton notification polling system
+   * Prevents multiple concurrent polling intervals
+   */
+  _pollingInterval = null;
+  _subscribers = new Set();
+  _lastNotificationTimestamp = null;
+  _notifications = [];
+  _isPolling = false;
+  _lastFetchTime = 0;
+
+  /**
+   * Get notifications for the current user with timestamp tracking
+   */
+  async getUserNotifications() {
+    try {
+      const response = await apiClient.get(`/v1/notifications`);
+      
+      return {
+        success: true,
+        data: response.data || []
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Failed to fetch notifications',
+        data: []
+      };
+    }
+  }
+
+  /**
+   * Fetch initial notifications on login/authentication
+   */
+  async getInitialNotifications() {
+    const result = await this.getUserNotifications();
+    
+    if (result.success) {
+      this._notifications = result.data;
+      this._lastNotificationTimestamp = this._getLatestTimestamp(result.data);
+      this._lastFetchTime = Date.now();
+      
+      // Notify all subscribers of initial data
+      this._subscribers.forEach(callback => {
+        callback(result.data, false); // false = not new notifications
+      });
+    }
+    
+    return result;
+  }
+
+  /**
+   * Poll for new notifications only (not full list)
+   */
+  async _pollForNewNotifications() {
+    if (this._isPolling) return;
+    
+    this._isPolling = true;
+    
+    try {
+      const result = await this.getUserNotifications();
+      
+      if (result.success) {
+        const newNotifications = this._filterNewNotifications(result.data);
+        
+        if (newNotifications.length > 0) {
+          // Only log when new notifications are found
+          console.log(`New notifications found: ${newNotifications.length}`);
+          
+          this._notifications = result.data;
+          this._lastNotificationTimestamp = this._getLatestTimestamp(result.data);
+          
+          // Notify subscribers of new notifications
+          this._subscribers.forEach(callback => {
+            callback(result.data, true); // true = new notifications found
+          });
+        }
+        // Silent update - no console logging when no new notifications
+        
+        this._lastFetchTime = Date.now();
+      }
+    } catch (error) {
+      console.error('Error polling for new notifications:', error);
+    } finally {
+      this._isPolling = false;
+    }
+  }
+
+  /**
+   * Filter notifications to find only new ones since last check
+   */
+  _filterNewNotifications(notifications) {
+    if (!this._lastNotificationTimestamp) {
+      return notifications;
+    }
+    
+    return notifications.filter(notification => {
+      const notificationTime = new Date(notification.createdAt).getTime();
+      const lastTime = new Date(this._lastNotificationTimestamp).getTime();
+      return notificationTime > lastTime;
+    });
+  }
+
+  /**
+   * Get the latest timestamp from notification list
+   */
+  _getLatestTimestamp(notifications) {
+    if (!notifications || notifications.length === 0) {
+      return null;
+    }
+    
+    return notifications.reduce((latest, notification) => {
+      const notificationTime = new Date(notification.createdAt);
+      const latestTime = latest ? new Date(latest) : new Date(0);
+      return notificationTime > latestTime ? notification.createdAt : latest;
+    }, null);
+  }
+
+  /**
+   * Start centralized notification polling
+   */
+  _startPolling() {
+    if (this._pollingInterval) return; // Already polling
+    
+    this._pollingInterval = setInterval(() => {
+      this._pollForNewNotifications();
+    }, 30000); // Poll every 30 seconds
+  }
+
+  /**
+   * Stop centralized notification polling
+   */
+  _stopPolling() {
+    if (this._pollingInterval) {
+      clearInterval(this._pollingInterval);
+      this._pollingInterval = null;
+    }
+  }
+
+  /**
+   * Subscribe to notification updates
    * Returns a cleanup function to unsubscribe
    */
   subscribeToNotifications(onNotificationUpdate) {
-    // For now, use polling. In production, you might want to use WebSockets or Server-Sent Events
-    const pollInterval = 30000; // 30 seconds
+    // Add subscriber to set
+    this._subscribers.add(onNotificationUpdate);
     
-    const poll = async () => {
-      try {
-        const result = await this.getUserNotifications();
-        if (result.success) {
-          onNotificationUpdate(result.data);
-        }
-      } catch (error) {
-        console.error('Error polling notifications:', error);
-      }
-    };
-
-    // Initial fetch
-    poll();
+    // Start polling if this is the first subscriber
+    if (this._subscribers.size === 1) {
+      this._startPolling();
+    }
     
-    // Set up polling interval
-    const intervalId = setInterval(poll, pollInterval);
+    // If we have cached notifications, provide them immediately
+    if (this._notifications.length > 0) {
+      onNotificationUpdate(this._notifications, false);
+    }
     
     // Return cleanup function
     return () => {
-      clearInterval(intervalId);
+      this._subscribers.delete(onNotificationUpdate);
+      
+      // Stop polling if no more subscribers
+      if (this._subscribers.size === 0) {
+        this._stopPolling();
+      }
     };
+  }
+
+  /**
+   * Reset notification polling state (for logout/login)
+   */
+  resetPollingState() {
+    this._stopPolling();
+    this._subscribers.clear();
+    this._lastNotificationTimestamp = null;
+    this._notifications = [];
+    this._lastFetchTime = 0;
   }
 
   /**

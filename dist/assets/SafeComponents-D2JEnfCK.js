@@ -1,0 +1,1 @@
+import{R as o,j as u}from"./index-ottAEAuo.js";const m=({children:t,fallback:s="N/A",className:r=""})=>{const e=o.useMemo(()=>t==null||typeof t=="string"&&t.trim()===""?s:t.toString(),[t,s]);return u.jsx("span",{className:r,children:e})};export{m as S};

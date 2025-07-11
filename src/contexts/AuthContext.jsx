@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
+import notificationService from '../services/notificationService';
 import useSessionMonitor from './useSessionMonitor';
 import SessionTimeoutModal from '../components/ui/SessionTimeoutModal';
 
@@ -22,12 +23,16 @@ export const AuthProvider = ({ children }) => {
       // Server-side logout
       await authService.logout();
       
+      // Reset notification polling state
+      notificationService.resetPollingState();
+      
       // Client-side cleanup
       setUser(null);
       setError(null);
     } catch (error) {
       console.error('Logout error:', error);
       // Still perform client-side cleanup even if server call fails
+      notificationService.resetPollingState();
       setUser(null);
       setError(null);
     }
@@ -52,6 +57,14 @@ export const AuthProvider = ({ children }) => {
             // Verify token is still valid by getting user profile
             const userProfile = await authService.getUserProfile();
             setUser(userProfile);
+            
+            // Initialize notifications for already logged-in user
+            try {
+              await notificationService.getInitialNotifications();
+            } catch (notificationError) {
+              console.error('Failed to initialize notifications on startup:', notificationError);
+              // Don't fail auth initialization if notification setup fails
+            }
           } catch (error) {
             console.error('Token validation failed:', error);
             localStorage.removeItem('token');
@@ -118,6 +131,14 @@ export const AuthProvider = ({ children }) => {
         } catch (profileError) {
           console.error('Failed to load user profile:', profileError);
           // Don't fail login if profile loading fails - user data is already set
+        }
+        
+        // Initialize notifications after successful login
+        try {
+          await notificationService.getInitialNotifications();
+        } catch (notificationError) {
+          console.error('Failed to initialize notifications:', notificationError);
+          // Don't fail login if notification initialization fails
         }
         
         return { success: true };
@@ -212,7 +233,7 @@ export const AuthProvider = ({ children }) => {
       {/* Session Timeout Modal */}
       <SessionTimeoutModal
         isOpen={showTimeoutModal}
-        remainingSeconds={sessionStatus.remainingMinutes * 60}
+        remainingSeconds={sessionStatus.remainingSeconds}
         onExtendSession={handleExtendSession}
         onLogout={logout}
       />
