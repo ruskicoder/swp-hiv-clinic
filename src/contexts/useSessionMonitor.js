@@ -31,8 +31,8 @@ const useSessionMonitor = (isAuthenticated, onLogout) => {
   // Warning threshold (1 minute = 60 seconds)
   const WARNING_THRESHOLD_SECONDS = 60;
   
-  // Activity timeout (5 minutes of inactivity pauses monitoring)
-  const ACTIVITY_TIMEOUT = 5 * 60 * 1000;
+  // Activity timeout (15 minutes of inactivity pauses monitoring)
+  const ACTIVITY_TIMEOUT = 15 * 60 * 1000;
 
   /**
    * Handle automatic logout
