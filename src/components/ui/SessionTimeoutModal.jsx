@@ -4,6 +4,7 @@ import './SessionTimeoutModal.css';
 /**
  * Modal component that appears when user session is about to expire
  * Provides options to extend the session or logout
+ * Works with client-side session management system
  */
 const SessionTimeoutModal = ({
   isOpen,
@@ -11,26 +12,30 @@ const SessionTimeoutModal = ({
   onExtendSession,
   onLogout
 }) => {
-  const [countdown, setCountdown] = useState(remainingSeconds);
+  const [countdown, setCountdown] = useState(remainingSeconds || 0);
 
   useEffect(() => {
     if (isOpen && remainingSeconds > 0) {
       setCountdown(remainingSeconds);
-      
-      const timer = setInterval(() => {
-        setCountdown(prevCount => {
-          if (prevCount <= 1) {
-            clearInterval(timer);
-            onLogout(); // Auto-logout when countdown reaches 0
-            return 0;
-          }
-          return prevCount - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
     }
-  }, [isOpen, remainingSeconds, onLogout]);
+  }, [isOpen, remainingSeconds]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const timer = setInterval(() => {
+      setCountdown(prevCount => {
+        if (prevCount <= 1) {
+          clearInterval(timer);
+          onLogout(); // Auto-logout when countdown reaches 0
+          return 0;
+        }
+        return prevCount - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isOpen, onLogout]);
 
   if (!isOpen) return null;
 

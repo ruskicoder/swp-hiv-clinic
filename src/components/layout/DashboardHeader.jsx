@@ -16,47 +16,22 @@ const DashboardHeader = ({ title, subtitle }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showPanel, setShowPanel] = useState(false);
-  
-  // Track when user actions were performed to delay polling
-  const [lastUserActionTime, setLastUserActionTime] = useState(0);
-  
-  // Track if polling should be temporarily disabled
-  const [isPollingDisabled, setIsPollingDisabled] = useState(false);
 
   // Function to check if user is a patient
   const isPatient = useCallback(() => {
     return user && (user.role === 'Patient' || user?.role?.roleName === 'Patient');
   }, [user]);
 
-  // Simplified fetchNotifications without complex state dependencies
-  const fetchNotifications = useCallback(async () => {
-    if (!user) return;
+  // Handle notification updates from the service
+  const handleNotificationUpdate = useCallback((notificationData, isNewNotifications) => {
+    setNotifications(notificationData);
+    setUnreadCount(notificationData.filter(n => !n.isRead).length);
     
-    console.log('DEBUG: DashboardHeader.fetchNotifications called at:', new Date().toISOString());
-    
-    // Check if polling should be skipped due to recent user actions
-    const timeSinceLastAction = Date.now() - lastUserActionTime;
-    const isWithinDelay = timeSinceLastAction < 5000; // 5 second delay after user actions
-    
-    if (isPollingDisabled || isWithinDelay) {
-        console.log('DEBUG: Skipping polling - disabled:', isPollingDisabled, 'within delay:', isWithinDelay, 'time since action:', timeSinceLastAction);
-        return;
+    // Only log when new notifications are received
+    if (isNewNotifications) {
+      console.log('New notifications received:', notificationData.filter(n => !n.isRead).length);
     }
-    
-    try {
-        const result = await notificationService.getUserNotifications();
-        console.log('DEBUG: fetchNotifications result at:', new Date().toISOString(), 'success:', result.success);
-        
-        if (result.success) {
-            setNotifications(result.data);
-            setUnreadCount(result.data.filter(n => !n.isRead).length);
-        } else {
-            console.error('DEBUG: Failed to fetch notifications:', result.error);
-        }
-    } catch (error) {
-        console.error('DEBUG: Exception in fetchNotifications:', error);
-    }
-  }, [user, lastUserActionTime, isPollingDisabled]);
+  }, []);
 
   // Separate useEffect for clock timer
   useEffect(() => {
@@ -91,43 +66,33 @@ const DashboardHeader = ({ title, subtitle }) => {
     loadPrivateMode();
   }, [isPatient]);
 
-  // Separate useEffect for notification polling - includes all dependencies
+  // Separate useEffect for notification management
   useEffect(() => {
     if (!user) return;
 
-    // Initial fetch
-    fetchNotifications();
-    
-    // Set up polling interval with stable reference
-    const notificationInterval = setInterval(() => {
-      // Check if polling should be skipped due to recent user actions
-      const currentTime = Date.now();
-      const timeSinceLastAction = currentTime - lastUserActionTime;
-      const isWithinDelay = timeSinceLastAction < 5000; // 5 second delay after user actions
-      
-      if (isPollingDisabled || isWithinDelay) {
-        console.log('DEBUG: Skipping polling interval - disabled:', isPollingDisabled, 'within delay:', isWithinDelay);
-        return;
-      }
-      
-      // Call the notification service directly to avoid dependency on fetchNotifications
-      notificationService.getUserNotifications().then(result => {
-        if (result.success) {
-          console.log('DEBUG: Interval notification fetch successful at:', new Date().toISOString());
-          setNotifications(result.data);
-          setUnreadCount(result.data.filter(n => !n.isRead).length);
-        } else {
-          console.error('DEBUG: Interval notification fetch failed:', result.error);
-        }
-      }).catch(error => {
-        console.error('DEBUG: Interval notification fetch exception:', error);
-      });
-    }, 30000); // Poll every 30 seconds to match session monitoring
+    // Initial fetch of notifications on login
+    const initializeNotifications = async () => {
+      await notificationService.getInitialNotifications();
+    };
+
+    initializeNotifications();
+
+    // Subscribe to notification updates
+    const unsubscribe = notificationService.subscribeToNotifications(handleNotificationUpdate);
 
     return () => {
-        clearInterval(notificationInterval);
+      unsubscribe();
     };
-  }, [user, fetchNotifications, isPollingDisabled, lastUserActionTime]);
+  }, [user, handleNotificationUpdate]);
+
+  // Reset notification state on logout
+  useEffect(() => {
+    if (!user) {
+      notificationService.resetPollingState();
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  }, [user]);
 
   const togglePrivacy = async () => {
     if (!isPatient() || isLoading) return;
@@ -166,88 +131,47 @@ const DashboardHeader = ({ title, subtitle }) => {
   };
 
   const handleMarkAsRead = async (notificationId) => {
-    console.log('DEBUG: DashboardHeader.handleMarkAsRead called with notificationId=', notificationId);
-    
-    // Record user action time to delay polling
-    const actionTime = Date.now();
-    setLastUserActionTime(actionTime);
-    
-    // Temporarily disable polling to prevent conflicts
-    setIsPollingDisabled(true);
-    
     // Store original state in case we need to revert
     const originalNotifications = [...notifications];
     const originalUnreadCount = unreadCount;
-    
-    console.log('DEBUG: Original notifications count:', originalNotifications.length);
-    console.log('DEBUG: Original unread count:', originalUnreadCount);
-    console.log('DEBUG: Notification to mark as read:', originalNotifications.find(n => n.notificationId === notificationId));
     
     // Optimistically update the UI
     setNotifications(notifications.map(n => n.notificationId === notificationId ? { ...n, isRead: true, status: 'READ' } : n));
     setUnreadCount(Math.max(0, unreadCount - 1));
     
-    console.log('DEBUG: UI updated optimistically');
-    
     try {
         const result = await notificationService.markAsRead(notificationId);
-        console.log('DEBUG: API call result:', result);
         
         if (!result.success) {
-            console.error('DEBUG: API call failed:', result.error);
+            console.error('Failed to mark notification as read:', result.error);
             // Revert the UI changes if API call failed
             setNotifications(originalNotifications);
             setUnreadCount(originalUnreadCount);
-            console.log('DEBUG: UI reverted due to API failure');
-        } else {
-            console.log('DEBUG: API call succeeded, keeping UI changes');
         }
     } catch (error) {
-        console.error('DEBUG: Exception in handleMarkAsRead:', error);
+        console.error('Exception in handleMarkAsRead:', error);
         // Revert the UI changes if API call failed
         setNotifications(originalNotifications);
         setUnreadCount(originalUnreadCount);
-        console.log('DEBUG: UI reverted due to exception');
-    } finally {
-        // Re-enable polling after a delay
-        setTimeout(() => {
-            setIsPollingDisabled(false);
-            console.log('DEBUG: Polling re-enabled after user action');
-        }, 3000); // 3 second delay before re-enabling polling
     }
   };
 
   const _handleMarkAllAsRead = async () => {
-    console.log('DEBUG: handleMarkAllAsRead called');
-    
-    // Record user action time to delay polling
-    const actionTime = Date.now();
-    setLastUserActionTime(actionTime);
-    
-    // Temporarily disable polling to prevent conflicts
-    setIsPollingDisabled(true);
-    
     try {
       const result = await notificationService.markAllAsRead();
       
       if (result.success) {
-        console.log('DEBUG: Successfully marked all notifications as read');
+        console.log('Successfully marked all notifications as read');
         // Update UI state after successful API call
         setNotifications(notifications.map(n => ({ ...n, isRead: true, status: 'READ' })));
         setUnreadCount(0);
       } else {
-        console.error('DEBUG: Failed to mark all notifications as read:', result.error);
+        console.error('Failed to mark all notifications as read:', result.error);
         setError('Failed to mark notifications as read');
       }
     } catch (error) {
-      console.error('DEBUG: Exception marking all notifications as read:', error);
+      console.error('Exception marking all notifications as read:', error);
       setError('Failed to mark notifications as read');
-    } finally {
-      // Re-enable polling after a delay
-      setTimeout(() => {
-        setIsPollingDisabled(false);
-        console.log('DEBUG: Polling re-enabled after mark all as read');
-      }, 3000); // 3 second delay before re-enabling polling
     }
   };
 
@@ -325,38 +249,25 @@ const DashboardHeader = ({ title, subtitle }) => {
           </div>
           <NotificationIcon count={unreadCount} onClick={async () => {
             // ALWAYS mark all notifications as read when notification button is clicked
-            console.log('DEBUG: Notification button clicked - marking all as read');
-            
-            // Record user action time to delay polling
-            const actionTime = Date.now();
-            setLastUserActionTime(actionTime);
-            
-            // Temporarily disable polling to prevent conflicts
-            setIsPollingDisabled(true);
+            console.log('Notification button clicked - marking all as read');
             
             try {
               // Wait for API response before updating UI
               const result = await notificationService.markAllAsRead();
               
               if (result.success) {
-                console.log('DEBUG: Successfully marked all notifications as read');
+                console.log('Successfully marked all notifications as read');
                 // Update UI state immediately after successful API call
                 setNotifications(notifications.map(n => ({ ...n, isRead: true, status: 'READ' })));
                 setUnreadCount(0);
               } else {
-                console.error('DEBUG: Failed to mark all notifications as read:', result.error);
+                console.error('Failed to mark all notifications as read:', result.error);
                 // Show error feedback to user
                 setError('Failed to mark notifications as read');
               }
             } catch (error) {
-              console.error('DEBUG: Exception marking all notifications as read:', error);
+              console.error('Exception marking all notifications as read:', error);
               setError('Failed to mark notifications as read');
-            } finally {
-              // Re-enable polling after a delay
-              setTimeout(() => {
-                setIsPollingDisabled(false);
-                console.log('DEBUG: Polling re-enabled after notification icon click');
-              }, 3000); // 3 second delay before re-enabling polling
             }
             
             // Show panel after marking as read
