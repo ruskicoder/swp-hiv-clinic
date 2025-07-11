@@ -76,6 +76,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
   display: flex;
+  width: 100%;
   align-items: center;
   gap: 0.75rem;
   color: #64748b;
@@ -99,8 +100,8 @@
   width: 4px;
 }
 
-.nav-button:hover {
-  background: rgba(34, 197, 94, 0.05);
+.nav-button:not(.active):hover {
+  background: rgba(150, 194, 166, 0.08);
   color: #22c55e;
   transform: translateX(4px);
 }
@@ -288,7 +289,16 @@
 .doctors-content,
 .book-appointment-content,
 .record-content {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
   animation: fadeIn 0.6s ease-out;
+}
+.record-main {
+  width: 100%;
 }
 
 /* Appointments List */
