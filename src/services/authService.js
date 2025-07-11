@@ -143,13 +143,60 @@ const authService = {
   },
 
   /**
-   * Logout user (client-side cleanup)
+   * Check session status and remaining time
    */
-  logout() {
+  async checkSessionStatus() {
     try {
+      const response = await apiClient.get('/auth/session/status');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Check session status error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to check session status'
+      };
+    }
+  },
+
+  /**
+   * Extend/refresh current session
+   */
+  async extendSession() {
+    try {
+      const response = await apiClient.post('/auth/session/extend');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Extend session error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to extend session'
+      };
+    }
+  },
+
+  /**
+   * Logout user (server-side session invalidation + client-side cleanup)
+   */
+  async logout() {
+    try {
+      // Invalidate session on server
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      console.error('Server logout error:', error);
+      // Continue with client-side cleanup even if server call fails
+    }
+    
+    try {
+      // Client-side cleanup
       localStorage.removeItem('token');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Client logout error:', error);
     }
   }
 };

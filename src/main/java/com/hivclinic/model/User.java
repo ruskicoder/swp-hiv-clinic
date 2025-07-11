@@ -55,6 +55,9 @@ public class User implements UserDetails {
     @Column(name = "UpdatedAt", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "LastLoginAt")
+    private LocalDateTime lastLoginAt;
+
     // Getters
     public Integer getUserId() { return userId; }
     public String getUsername() { return username; }
@@ -67,6 +70,7 @@ public class User implements UserDetails {
     public Boolean getIsActive() { return isActive; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public LocalDateTime getLastLoginAt() { return lastLoginAt; }
 
     // Setters
     public void setUserId(Integer userId) { this.userId = userId; }
@@ -80,6 +84,7 @@ public class User implements UserDetails {
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setLastLoginAt(LocalDateTime lastLoginAt) { this.lastLoginAt = lastLoginAt; }
 
     // UserDetails implementation
     @Override

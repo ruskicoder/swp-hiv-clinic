@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import notificationService from '../../services/notificationService';
 import NotificationSendModal from './NotificationSendModal';
 import NotificationHistoryTable from './NotificationHistoryTable';
@@ -34,13 +34,6 @@ const NotificationManagementDashboard = () => {
   const [selectedPatient, setSelectedPatient] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateRange, setDateRange] = useState('week');
-
-  useEffect(() => {
-    // Only load data if user is properly initialized
-    if (user && (user.userId || user.id)) {
-      loadDashboardData();
-    }
-  }, [user]);
 
   /**
    * Load all dashboard data including patients, templates, and history
@@ -103,6 +96,13 @@ const NotificationManagementDashboard = () => {
       setLoading(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    // Only load data if user is properly initialized and loadDashboardData is available
+    if (user && (user.userId || user.id) && loadDashboardData) {
+      loadDashboardData();
+    }
+  }, [user, loadDashboardData]);
 
 
   /**

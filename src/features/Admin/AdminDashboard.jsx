@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../contexts/useAuth';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import ErrorBoundary from '../../components/ErrorBoundary';
@@ -8,7 +8,7 @@ import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
@@ -80,7 +80,7 @@ const [appointments, setAppointments] = useState([]);
     }
   };
 
-  const handleLogout = () => {
+  const _handleLogout = () => {
     logout();
     navigate('/');
   };
@@ -330,7 +330,7 @@ const [appointments, setAppointments] = useState([]);
     </ErrorBoundary>
   );
 
-  const CreateDoctorForm = () => {
+  const CreateDoctorForm = React.memo(() => {
     const [formData, setFormData] = useState({
       username: '',
       email: '',
@@ -399,10 +399,10 @@ const [appointments, setAppointments] = useState([]);
     };
 
     const handleChange = (e) => {
-      setFormData({
-        ...formData,
+      setFormData(prev => ({
+        ...prev,
         [e.target.name]: e.target.value
-      });
+      }));
     };
 
     return (
@@ -531,24 +531,8 @@ const [appointments, setAppointments] = useState([]);
         </div>
       </ErrorBoundary>
     );
-  };
+  });
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return renderOverview();
-      case 'users':
-        return renderUsers();
-      case 'doctors':
-        return renderDoctors();
-      case 'appointments':
-        return renderAppointments();
-      case 'create-doctor':
-        return <CreateDoctorForm />;
-      default:
-        return renderOverview();
-    }
-  };
 
   if (loading) {
     return (

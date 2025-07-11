@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import BackNavigation from '../../components/layout/BackNavigation';
 import apiClient from '../../services/apiClient';
 import authService from '../../services/authService';

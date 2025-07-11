@@ -1,6 +1,7 @@
 import { vi } from 'vitest'
-import { cleanup } from '@testing-library/react'
+import { cleanup, screen, render, waitFor, userEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import { AuthContext } from '../../contexts/AuthContext'
 
 // Setup for all tests
 beforeEach(() => {
@@ -336,8 +337,6 @@ export {
   cleanup,
   screen,
   render,
-  fireEvent,
   waitFor,
-  userEvent,
-  within
+  userEvent
 } from '@testing-library/react'

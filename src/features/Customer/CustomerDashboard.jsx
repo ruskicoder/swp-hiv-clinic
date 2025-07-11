@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import apiClient from '../../services/apiClient';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import PatientRecordSection from '../../components/PatientRecordSection';
 import UnifiedCalendar from '../../components/schedule/UnifiedCalendar';
 import ErrorBoundary from '../../components/ErrorBoundary';
-import { formatDateTimeForAPI, createBookingData, validateBookingData, safeFormatDate, safeFormatTime } from '../../utils/dateUtils';
-import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
+import { createBookingData, validateBookingData } from '../../utils/dateUtils';
+import { safeRender, safeDate, safeTime } from '../../utils/renderUtils';
 import './CustomerDashboard.css';
 
 const CustomerDashboard = () => {

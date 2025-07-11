@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import PatientSelector from './PatientSelector';
 import './NotificationSendModal.css';
@@ -35,7 +35,7 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
   // Update preview when template or custom message changes
   useEffect(() => {
     updatePreview();
-  }, [formData.templateId, formData.customMessage, formData.useCustomMessage, formData.patientIds]);
+  }, [formData.templateId, formData.customMessage, formData.useCustomMessage, formData.patientIds, updatePreview]);
 
   /**
    * Reset form to initial state
@@ -106,7 +106,7 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
   /**
    * Update message preview with variable substitution
    */
-  const updatePreview = () => {
+  const updatePreview = useCallback(() => {
       if (formData.useCustomMessage && formData.customMessage) {
           setPreviewMessage(formData.customMessage);
           return;
@@ -155,7 +155,7 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
       .replace(/\{time\}/g, new Date().toLocaleTimeString());
 
     setPreviewMessage(preview);
-  };
+  }, [formData.useCustomMessage, formData.customMessage, selectedTemplate, formData.patientIds, patients]);
 
   /**
    * Validate form data

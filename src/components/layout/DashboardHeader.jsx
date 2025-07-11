@@ -1,4 +1,4 @@
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import UserProfileDropdown from './UserProfileDropdown';
 import { useEffect, useState, useCallback } from 'react';
 import apiClient from '../../services/apiClient';
@@ -72,7 +72,7 @@ const DashboardHeader = ({ title, subtitle }) => {
                     
                     // Clean up recently read notifications older than 3 minutes
                     // This prevents the set from growing indefinitely
-                    const cleanupTime = Date.now() - (3 * 60 * 1000);
+                    // const cleanupTime = Date.now() - (3 * 60 * 1000);
                     setRecentlyReadNotifications(prev => {
                         const cleanedSet = new Set();
                         for (const notifId of prev) {
@@ -232,7 +232,7 @@ const DashboardHeader = ({ title, subtitle }) => {
     }
   };
 
-  const handleMarkAllAsRead = async () => {
+  const _handleMarkAllAsRead = async () => {
     console.log('DEBUG: handleMarkAllAsRead called');
     
     // Record user action time to delay polling

@@ -164,16 +164,6 @@ const SlotActionModal = ({
     setShowAddModal(true);
   };
 
-  // Add this helper function before handleSlotCreated
-  const calculateEndTime = (startTime, durationMinutes) => {
-    if (!startTime || !durationMinutes) return '';
-    const [hours, minutes] = startTime.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes);
-    date.setMinutes(date.getMinutes() + parseInt(durationMinutes));
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:00`;
-  };
-
   // Update handleSlotCreated to use calculated endTime
   const handleSlotCreated = async (slotData) => {
     if (!onAddSlot) return;
@@ -207,34 +197,6 @@ const SlotActionModal = ({
     }
   };
 
-  // Helper function to calculate end time
-  const addMinutesToTime = (startTime, minutes) => {
-    const [hours, mins] = startTime.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, mins);
-    date.setMinutes(date.getMinutes() + minutes);
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-  };
-
-  const processedSlots = React.useMemo(() => {
-    if (!Array.isArray(existingSlots)) {
-      console.error('existingSlots is not an array:', existingSlots);
-      return [];
-    }
-
-    return existingSlots
-      .filter(slot => slot && typeof slot === 'object')
-      .map(slot => ({
-        availabilitySlotId: slot.availabilitySlotId,
-        slotDate: slot.slotDate,
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-        isBooked: Boolean(slot.isBooked),
-        notes: slot.notes || '',
-        appointment: slot.appointment,
-        doctorUser: slot.doctorUser
-      }));
-  }, [existingSlots]);
 
   // Render slot list
   const renderSlotList = (slots, title, emptyMessage) => (

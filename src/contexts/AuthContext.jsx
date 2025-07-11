@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
+import useSessionMonitor from './useSessionMonitor';
+import SessionTimeoutModal from '../components/ui/SessionTimeoutModal';
 
 /**
  * Authentication Context for managing user authentication state
@@ -7,18 +9,36 @@ import authService from '../services/authService';
  */
 const AuthContext = createContext(null);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  /**
+   * Enhanced logout function that handles both server and client cleanup
+   */
+  const logout = async () => {
+    try {
+      // Server-side logout
+      await authService.logout();
+      
+      // Client-side cleanup
+      setUser(null);
+      setError(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still perform client-side cleanup even if server call fails
+      setUser(null);
+      setError(null);
+    }
+  };
+
+  // Session monitoring integration
+  const {
+    sessionStatus,
+    showTimeoutModal,
+    extendSession
+  } = useSessionMonitor(!!user, logout);
 
   // Check for existing token on app load
   useEffect(() => {
@@ -141,18 +161,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  /**
-   * Logout function that clears user state and token
-   */
-  const logout = () => {
-    try {
-      localStorage.removeItem('token');
-      setUser(null);
-      setError(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   /**
    * Update user profile data
@@ -173,6 +181,18 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  /**
+   * Handle session timeout modal extend action
+   */
+  const handleExtendSession = async () => {
+    try {
+      await extendSession();
+    } catch (error) {
+      console.error('Failed to extend session:', error);
+      await logout();
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -181,12 +201,21 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUser,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    sessionStatus
   };
 
   return (
     <AuthContext.Provider value={value}>
       {children}
+      
+      {/* Session Timeout Modal */}
+      <SessionTimeoutModal
+        isOpen={showTimeoutModal}
+        remainingSeconds={sessionStatus.remainingMinutes * 60}
+        onExtendSession={handleExtendSession}
+        onLogout={logout}
+      />
     </AuthContext.Provider>
   );
 };

@@ -1,6 +1,6 @@
-/* globals process */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import Debug from '../../components/Debug';
 
 describe('Debug', () => {
@@ -10,11 +10,10 @@ describe('Debug', () => {
   });
 
   it('should not render in production environment', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     render(<Debug data={{ a: 1 }} />);
     expect(screen.queryByText('Debug Info')).not.toBeInTheDocument();
-    process.env.NODE_ENV = originalEnv;
+    vi.unstubAllEnvs();
   });
 
   it('should render with a title', () => {
