@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/useAuth';
-import BackNavigation from '../../components/layout/BackNavigation';
-import apiClient from '../../services/apiClient';
+import React, { useState, useEffect, useContext } from 'react';
+import AuthContext from '../../contexts/AuthContext';
 import authService from '../../services/authService';
-import { SafeText } from '../../utils/SafeComponents';
+import apiClient from '../../services/apiClient';
+import BackNavigation from '../../components/navigation/BackNavigation';
+import SafeText from '../../components/ui/SafeText';
+import LastLoginDisplay from '../../components/ui/LastLoginDisplay';
+import { formatDateTime } from '../../utils/dateUtils';
 import './Settings.css';
 
 /**
  * Settings component for managing user profile, security, and notification preferences
  */
 const Settings = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser } = useContext(AuthContext);
   
   // State management
   const [activeTab, setActiveTab] = useState('profile');
@@ -546,10 +548,10 @@ const Settings = () => {
       <div className="security-info">
         <h4>Security Information</h4>
         <div className="info-item">
-          <strong>Last Login:</strong> <SafeText>{user?.lastLogin || 'N/A'}</SafeText>
+          <strong>Last Login:</strong> <LastLoginDisplay lastLogin={user?.lastLogin} />
         </div>
         <div className="info-item">
-          <strong>Account Created:</strong> <SafeText>{user?.createdAt || 'N/A'}</SafeText>
+          <strong>Account Created:</strong> <SafeText>{user?.createdAt ? formatDateTime(user.createdAt) : 'N/A'}</SafeText>
         </div>
         <div className="info-item">
           <strong>Account Status:</strong> 
