@@ -19,6 +19,7 @@ const Settings = () => {
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [lastLoginData, setLastLoginData] = useState(null);
 
   // Profile data state
   const [profileData, setProfileData] = useState({
@@ -76,7 +77,22 @@ const Settings = () => {
       }
     };
 
+    const loadLastLoginData = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await apiClient.get('/login-activity/last-login');
+        if (response.data.success && response.data.data) {
+          setLastLoginData(response.data.data);
+        }
+      } catch (err) {
+        console.error('Error loading last login data:', err);
+        // Don't set error for this as it's not critical
+      }
+    };
+
     loadUserProfile();
+    loadLastLoginData();
   }, [user]);
 
   // Clear messages after 5 seconds
@@ -546,7 +562,7 @@ const Settings = () => {
       <div className="security-info">
         <h4>Security Information</h4>
         <div className="info-item">
-          <strong>Last Login:</strong> <SafeText>{user?.lastLogin || 'N/A'}</SafeText>
+          <strong>Last Login:</strong> <SafeText>{lastLoginData ? new Date(lastLoginData).toLocaleString() : 'N/A'}</SafeText>
         </div>
         <div className="info-item">
           <strong>Account Created:</strong> <SafeText>{user?.createdAt || 'N/A'}</SafeText>
