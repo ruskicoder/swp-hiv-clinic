@@ -46,9 +46,13 @@ const ManagerDashboard = () => {
   const [arvTreatments, setArvTreatments] = useState([]);
   const [arvLoading, setArvLoading] = useState(true);
   const [arvError, setArvError] = useState('');
+  const [arvFrom, setArvFrom] = useState("");
+  const [arvTo, setArvTo] = useState("");
   const [schedules, setSchedules] = useState([]);
   const [schedulesLoading, setSchedulesLoading] = useState(true);
   const [schedulesError, setSchedulesError] = useState('');
+  const [scheduleFrom, setScheduleFrom] = useState("");
+  const [scheduleTo, setScheduleTo] = useState("");
   const [patientSearch, setPatientSearch] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
   const navigate = useNavigate();
@@ -109,25 +113,67 @@ const ManagerDashboard = () => {
 
   useEffect(() => {
     if (activeTab === 'arv') {
-      setArvLoading(true);
-      setArvError('');
-      apiClient.get('/manager/arv-treatments')
-        .then(res => setArvTreatments(res.data))
-        .catch(() => setArvError('Failed to load ARV regimens.'))
-        .finally(() => setArvLoading(false));
+      fetchARVTreatments();
     }
+    // eslint-disable-next-line
   }, [activeTab]);
+
+  const fetchARVTreatments = async () => {
+    setArvLoading(true);
+    setArvError("");
+    try {
+      let res;
+      if (arvFrom && arvTo) {
+        res = await apiClient.get(`/manager/arv-treatments/search?from=${encodeURIComponent(arvFrom)}&to=${encodeURIComponent(arvTo)}`);
+      } else {
+        res = await apiClient.get('/manager/arv-treatments');
+      }
+      setArvTreatments(res.data);
+    } catch {
+      setArvError('Failed to load ARV regimens.');
+    } finally {
+      setArvLoading(false);
+    }
+  };
+
+  const handleARVFromChange = (e) => setArvFrom(e.target.value);
+  const handleARVToChange = (e) => setArvTo(e.target.value);
+  const handleARVSearch = (e) => {
+    e.preventDefault();
+    fetchARVTreatments();
+  };
 
   useEffect(() => {
     if (activeTab === 'schedules') {
-      setSchedulesLoading(true);
-      setSchedulesError('');
-      apiClient.get('/manager/schedules')
-        .then(res => setSchedules(res.data))
-        .catch(() => setSchedulesError('Failed to load schedules.'))
-        .finally(() => setSchedulesLoading(false));
+      fetchSchedules();
     }
+    // eslint-disable-next-line
   }, [activeTab]);
+
+  const fetchSchedules = async () => {
+    setSchedulesLoading(true);
+    setSchedulesError('');
+    try {
+      let res;
+      if (scheduleFrom && scheduleTo) {
+        res = await apiClient.get(`/manager/schedules/search?from=${encodeURIComponent(scheduleFrom)}&to=${encodeURIComponent(scheduleTo)}`);
+      } else {
+        res = await apiClient.get('/manager/schedules');
+      }
+      setSchedules(res.data);
+    } catch {
+      setSchedulesError('Failed to load schedules.');
+    } finally {
+      setSchedulesLoading(false);
+    }
+  };
+
+  const handleScheduleFromChange = (e) => setScheduleFrom(e.target.value);
+  const handleScheduleToChange = (e) => setScheduleTo(e.target.value);
+  const handleScheduleSearch = (e) => {
+    e.preventDefault();
+    fetchSchedules();
+  };
 
   // Search patients
   // Only update state on change
@@ -384,7 +430,18 @@ const ManagerDashboard = () => {
       <div className="section-header">
         <h2>ARV Treatment Management</h2>
       </div>
-
+      <form className="arv-search-form" onSubmit={handleARVSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <label>
+          From:
+          <input type="date" value={arvFrom} onChange={handleARVFromChange} />
+        </label>
+        <label>
+          To:
+          <input type="date" value={arvTo} onChange={handleARVToChange} />
+        </label>
+        <button type="submit" className="search-btn">Search</button>
+        <button type="button" className="reset-btn" onClick={() => { setArvFrom(""); setArvTo(""); fetchARVTreatments(); }}>Reset</button>
+      </form>
       {arvLoading ? (
         <div className="loading-state">Loading ARV treatment data...</div>
       ) : arvError ? (
@@ -436,7 +493,18 @@ const ManagerDashboard = () => {
       <div className="section-header">
         <h2>Schedule Management</h2>
       </div>
-
+      <form className="schedule-search-form" onSubmit={handleScheduleSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <label>
+          From:
+          <input type="date" value={scheduleFrom} onChange={handleScheduleFromChange} />
+        </label>
+        <label>
+          To:
+          <input type="date" value={scheduleTo} onChange={handleScheduleToChange} />
+        </label>
+        <button type="submit" className="search-btn">Search</button>
+        <button type="button" className="reset-btn" onClick={() => { setScheduleFrom(""); setScheduleTo(""); fetchSchedules(); }}>Reset</button>
+      </form>
       {schedulesLoading ? (
         <div className="loading-state">Loading schedule data...</div>
       ) : schedulesError ? (

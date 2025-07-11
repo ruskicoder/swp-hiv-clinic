@@ -1,3 +1,4 @@
+
 package com.hivclinic.controller;
 
 import com.hivclinic.repository.DoctorProfileRepository;
@@ -21,6 +22,10 @@ public class ManagerController {
     private DoctorProfileRepository doctorProfileRepository;
     @Autowired
     private SpecialtyRepository specialtyRepository;
+
+    // (Removed duplicate ARV search endpoint; see below for correct placement)
+
+
 
     @GetMapping("/stats")
     public ResponseEntity<?> getSystemStats() {
@@ -226,6 +231,30 @@ public class ManagerController {
             return ResponseEntity.ok("Cập nhật thông tin bác sĩ thành công");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Cập nhật thất bại: " + e.getMessage());
+        }
+    }
+    @GetMapping("/schedules/search")
+    public ResponseEntity<?> searchSchedulesByDateRange(@RequestParam("from") String fromStr, @RequestParam("to") String toStr) {
+        try {
+            java.time.LocalDate from = java.time.LocalDate.parse(fromStr);
+            java.time.LocalDate to = java.time.LocalDate.parse(toStr);
+            var results = managerService.searchSchedulesByDateRange(from, to);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể tìm kiếm lịch làm việc: " + e.getMessage());
+        }
+    }
+
+    // ARV Treatment search by date range
+    @GetMapping("/arv-treatments/search")
+    public ResponseEntity<?> searchARVTreatmentsByDateRange(@RequestParam("from") String fromStr, @RequestParam("to") String toStr) {
+        try {
+            java.time.LocalDate from = java.time.LocalDate.parse(fromStr);
+            java.time.LocalDate to = java.time.LocalDate.parse(toStr);
+            var results = managerService.searchARVTreatmentsByDateRange(from, to);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Không thể tìm kiếm điều trị ARV: " + e.getMessage());
         }
     }
 }

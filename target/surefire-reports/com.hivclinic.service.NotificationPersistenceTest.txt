@@ -1,0 +1,21 @@
+-------------------------------------------------------------------------------
+Test set: com.hivclinic.service.NotificationPersistenceTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.152 s <<< FAILURE! -- in com.hivclinic.service.NotificationPersistenceTest
+com.hivclinic.service.NotificationPersistenceTest.testMarkAsRead_ShouldSynchronizeBothFields -- Time elapsed: 0.026 s <<< FAILURE!
+Wanted but not invoked:
+notificationRepository.saveAndFlush(
+    <custom argument matcher>
+);
+-> at com.hivclinic.service.NotificationPersistenceTest.testMarkAsRead_ShouldSynchronizeBothFields(NotificationPersistenceTest.java:78)
+
+However, there was exactly 1 interaction with this mock:
+notificationRepository.findById(1);
+-> at com.hivclinic.service.NotificationService.markAsRead(NotificationService.java:98)
+
+
+	at com.hivclinic.service.NotificationPersistenceTest.testMarkAsRead_ShouldSynchronizeBothFields(NotificationPersistenceTest.java:78)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
