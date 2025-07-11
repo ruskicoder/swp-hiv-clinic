@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     extendSession
   } = useSessionMonitor(!!user, logout);
 
-  // Check for existing token on app load
+  // Check for existing token on app load - runs only once
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     initializeAuth();
-  }, []);
+  }, []); // No dependencies - runs only once on mount
 
   /**
    * Login function that authenticates user and stores token
