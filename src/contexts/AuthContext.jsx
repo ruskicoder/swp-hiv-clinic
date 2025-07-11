@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import authService from '../services/authService';
 import notificationService from '../services/notificationService';
 import useSessionMonitor from './useSessionMonitor';
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
   /**
    * Enhanced logout function that handles both server and client cleanup
    */
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       // Server-side logout
       await authService.logout();
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setError(null);
     }
-  };
+  }, []);
 
   // Session monitoring integration
   const {
@@ -48,19 +48,36 @@ export const AuthProvider = ({ children }) => {
   // Check for existing token on app load - runs only once
   useEffect(() => {
     const initializeAuth = async () => {
+      // Set a maximum initialization timeout to prevent indefinite loading
+      const initializationTimeout = setTimeout(() => {
+        console.error('AuthContext initialization timed out after 15 seconds');
+        setLoading(false);
+        setError('Authentication initialization timed out');
+      }, 15000); // 15 second timeout
+      
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
         
         if (token) {
           try {
-            // Verify token is still valid by getting user profile
-            const userProfile = await authService.getUserProfile();
+            // Verify token is still valid by getting user profile with timeout
+            const userProfile = await Promise.race([
+              authService.getUserProfile(),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('getUserProfile timeout')), 5000)
+              )
+            ]);
             setUser(userProfile);
             
-            // Initialize notifications for already logged-in user
+            // Initialize notifications for already logged-in user (non-blocking)
             try {
-              await notificationService.getInitialNotifications();
+              await Promise.race([
+                notificationService.getInitialNotifications(),
+                new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error('notification initialization timeout')), 3000)
+                )
+              ]);
             } catch (notificationError) {
               console.error('Failed to initialize notifications on startup:', notificationError);
               // Don't fail auth initialization if notification setup fails
@@ -75,6 +92,7 @@ export const AuthProvider = ({ children }) => {
         console.error('Auth initialization error:', error);
         setError('Failed to initialize authentication');
       } finally {
+        clearTimeout(initializationTimeout);
         setLoading(false);
       }
     };
