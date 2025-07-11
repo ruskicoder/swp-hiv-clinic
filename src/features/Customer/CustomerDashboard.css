@@ -30,10 +30,9 @@
   min-width: 280px;
   max-width: 280px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.1);
   position: sticky;
   top: 3rem;
-  flex-shrink: 0;
   margin: 0.5rem;
 }
 
@@ -75,17 +74,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   color: #64748b;
   position: relative;
   overflow: hidden;
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-size: 1rem;
-  text-align: left;
 }
 
 .nav-button::before {
@@ -95,7 +90,7 @@
   top: 0;
   height: 100%;
   width: 0;
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   transition: width 0.3s ease;
   border-radius: 12px;
 }
@@ -105,16 +100,16 @@
 }
 
 .nav-button:hover {
-  background: rgba(16, 185, 129, 0.05);
-  color: #10b981;
+  background: rgba(34, 197, 94, 0.05);
+  color: #22c55e;
   transform: translateX(4px);
 }
 
 .nav-button.active {
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
   color: white;
   transform: translateX(0);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 .nav-button.active::before {
