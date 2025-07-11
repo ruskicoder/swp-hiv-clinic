@@ -68,7 +68,23 @@ export const AuthProvider = ({ children }) => {
                 setTimeout(() => reject(new Error('getUserProfile timeout')), 5000)
               )
             ]);
-            setUser(userProfile);
+            
+            // Fetch last login time for existing user
+            let lastLoginTime = null;
+            try {
+              const lastLoginResponse = await authService.getLastLogin();
+              if (lastLoginResponse.success) {
+                lastLoginTime = lastLoginResponse.data;
+              }
+            } catch (lastLoginError) {
+              console.error('Failed to load last login time during initialization:', lastLoginError);
+              // Don't fail initialization if last login fetch fails
+            }
+            
+            setUser({
+              ...userProfile,
+              lastLogin: lastLoginTime
+            });
             
             // Initialize notifications for already logged-in user (non-blocking)
             try {
@@ -136,7 +152,19 @@ export const AuthProvider = ({ children }) => {
         try {
           const profileResponse = await authService.getUserProfile();
           
-          // Update user data with profile information
+          // Fetch last login time
+          let lastLoginTime = null;
+          try {
+            const lastLoginResponse = await authService.getLastLogin();
+            if (lastLoginResponse.success) {
+              lastLoginTime = lastLoginResponse.data;
+            }
+          } catch (lastLoginError) {
+            console.error('Failed to load last login time:', lastLoginError);
+            // Don't fail login if last login fetch fails
+          }
+          
+          // Update user data with profile information and last login
           setUser(prevUser => ({
             ...prevUser,
             firstName: profileResponse.firstName || '',
@@ -144,7 +172,8 @@ export const AuthProvider = ({ children }) => {
             phoneNumber: profileResponse.phoneNumber || '',
             dateOfBirth: profileResponse.dateOfBirth || '',
             address: profileResponse.address || '',
-            profileImageBase64: profileResponse.profileImageBase64 || ''
+            profileImageBase64: profileResponse.profileImageBase64 || '',
+            lastLogin: lastLoginTime
           }));
         } catch (profileError) {
           console.error('Failed to load user profile:', profileError);

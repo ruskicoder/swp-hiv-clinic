@@ -472,3 +472,101 @@ export const formatDateForAPI = (date) => {
     return null;
   }
 };
+
+/**
+ * Utility functions for date formatting
+ */
+
+/**
+ * Format a date for last login display
+ * @param {string|Date} dateTime - The date/time to format
+ * @returns {string} - Formatted date string
+ */
+export const formatLastLogin = (dateTime) => {
+  if (!dateTime) return 'Never';
+  
+  try {
+    const date = new Date(dateTime);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    // If it's within the last minute
+    if (diffMinutes < 1) {
+      return 'Just now';
+    }
+    
+    // If it's within the last hour
+    if (diffMinutes < 60) {
+      return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+    }
+    
+    // If it's within the last day
+    if (diffHours < 24) {
+      return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    }
+    
+    // If it's within the last week
+    if (diffDays < 7) {
+      return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    }
+    
+    // For older dates, show the full date
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('Error formatting last login date:', error);
+    return 'Invalid date';
+  }
+};
+
+/**
+ * Format a date for general display
+ * @param {string|Date} dateTime - The date/time to format
+ * @returns {string} - Formatted date string
+ */
+export const formatDate = (dateTime) => {
+  if (!dateTime) return 'N/A';
+  
+  try {
+    const date = new Date(dateTime);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
+};
+
+/**
+ * Format a date and time for general display
+ * @param {string|Date} dateTime - The date/time to format
+ * @returns {string} - Formatted date and time string
+ */
+export const formatDateTime = (dateTime) => {
+  if (!dateTime) return 'N/A';
+  
+  try {
+    const date = new Date(dateTime);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('Error formatting date time:', error);
+    return 'Invalid date';
+  }
+};
