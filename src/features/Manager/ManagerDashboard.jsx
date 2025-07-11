@@ -130,56 +130,71 @@ const ManagerDashboard = () => {
   }, [activeTab]);
 
   // Search patients
-  const handlePatientSearch = async (e) => {
-    const value = e.target.value;
-    setPatientSearch(value);
-    if (value.trim() === "") {
+  // Only update state on change
+  const handlePatientSearchChange = (e) => {
+    setPatientSearch(e.target.value);
+  };
+
+  const handlePatientSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setPatientsLoading(true);
+        setPatientsError("");
+        try {
+          const res = await apiClient.get('/manager/patients');
+          setPatients(res.data);
+        } catch {
+          setPatientsError('Failed to load patient list.');
+        } finally {
+          setPatientsLoading(false);
+        }
+        return;
+      }
       setPatientsLoading(true);
+      setPatientsError("");
       try {
-        const res = await apiClient.get('/manager/patients');
+        const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
         setPatients(res.data);
       } catch {
-        setPatientsError('Failed to load patient list.');
+        setPatientsError('Failed to search patients.');
       } finally {
         setPatientsLoading(false);
       }
-      return;
-    }
-    setPatientsLoading(true);
-    try {
-      const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
-      setPatients(res.data);
-    } catch {
-      setPatientsError('Failed to search patients.');
-    } finally {
-      setPatientsLoading(false);
     }
   };
 
   // Search doctors
-  const handleDoctorSearch = async (e) => {
-    const value = e.target.value;
-    setDoctorSearch(value);
-    if (value.trim() === "") {
+  const handleDoctorSearchChange = (e) => {
+    setDoctorSearch(e.target.value);
+  };
+
+  const handleDoctorSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setDoctorsLoading(true);
+        setDoctorsError("");
+        try {
+          const res = await apiClient.get('/manager/doctors');
+          setDoctors(res.data);
+        } catch {
+          setDoctorsError('Failed to load doctor list.');
+        } finally {
+          setDoctorsLoading(false);
+        }
+        return;
+      }
       setDoctorsLoading(true);
+      setDoctorsError("");
       try {
-        const res = await apiClient.get('/manager/doctors');
+        const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
         setDoctors(res.data);
       } catch {
-        setDoctorsError('Failed to load doctor list.');
+        setDoctorsError('Failed to search doctors.');
       } finally {
         setDoctorsLoading(false);
       }
-      return;
-    }
-    setDoctorsLoading(true);
-    try {
-      const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
-      setDoctors(res.data);
-    } catch {
-      setDoctorsError('Failed to search doctors.');
-    } finally {
-      setDoctorsLoading(false);
     }
   };
 
@@ -200,22 +215,18 @@ const ManagerDashboard = () => {
           <div className="stat-card">
             <h3>Total Patients</h3>
             <div className="stat-number">{stats.totalPatients || 0}</div>
-            <div className="stat-change positive">+12% from last month</div>
           </div>
           <div className="stat-card">
             <h3>Active Doctors</h3>
             <div className="stat-number">{stats.totalDoctors || 0}</div>
-            <div className="stat-change positive">+5% from last month</div>
           </div>
           <div className="stat-card">
             <h3>Total Appointments</h3>
             <div className="stat-number">{stats.totalAppointments || 0}</div>
-            <div className="stat-change positive">+18% from last week</div>
           </div>
           <div className="stat-card">
             <h3>ARV Treatments</h3>
             <div className="stat-number">{stats.totalARVTreatments || 0}</div>
-            <div className="stat-change positive">Active regimens</div>
           </div>
         </div>
       )}
@@ -233,7 +244,8 @@ const ManagerDashboard = () => {
           type="text"
           placeholder="Search patients by name or email..."
           value={patientSearch}
-          onChange={handlePatientSearch}
+          onChange={handlePatientSearchChange}
+          onKeyDown={handlePatientSearchKeyDown}
           className="search-input"
         />
       </div>
@@ -305,7 +317,8 @@ const ManagerDashboard = () => {
           type="text"
           placeholder="Search doctors by name or specialty..."
           value={doctorSearch}
-          onChange={handleDoctorSearch}
+          onChange={handleDoctorSearchChange}
+          onKeyDown={handleDoctorSearchKeyDown}
           className="search-input"
         />
       </div>

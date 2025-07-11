@@ -57,17 +57,40 @@ public class ManagerService {
     public List<User> searchPatientsByName(String q) {
         String query = q == null ? "" : q.trim().toLowerCase();
         return userRepository.findAllNonDummyPatients().stream()
-            .filter(user -> user.getFirstName() != null && user.getFirstName().toLowerCase().contains(query)
-                || user.getLastName() != null && user.getLastName().toLowerCase().contains(query))
+            .filter(user -> {
+                String firstName = user.getFirstName() != null ? user.getFirstName().toLowerCase() : "";
+                String lastName = user.getLastName() != null ? user.getLastName().toLowerCase() : "";
+                String fullName = (firstName + " " + lastName).replaceAll("\\s+", " ").trim();
+                // Support searching by first, last, or full name (with flexible whitespace)
+                if (query.isEmpty()) return true;
+                if (firstName.contains(query) || lastName.contains(query) || fullName.contains(query)) return true;
+                // Also support splitting query by space and matching both parts
+                String[] parts = query.split(" ");
+                if (parts.length >= 2) {
+                    return firstName.contains(parts[0]) && lastName.contains(parts[1]);
+                }
+                return false;
+            })
             .toList();
     }
 
     public List<User> searchDoctorsByNameOrSpecialty(String q) {
         String query = q == null ? "" : q.trim().toLowerCase();
         return userRepository.findAllNonDummyDoctors().stream()
-            .filter(user -> (user.getFirstName() != null && user.getFirstName().toLowerCase().contains(query))
-                || (user.getLastName() != null && user.getLastName().toLowerCase().contains(query))
-                || (user.getSpecialty() != null && user.getSpecialty().toLowerCase().contains(query)))
+            .filter(user -> {
+                String firstName = user.getFirstName() != null ? user.getFirstName().toLowerCase() : "";
+                String lastName = user.getLastName() != null ? user.getLastName().toLowerCase() : "";
+                String fullName = (firstName + " " + lastName).replaceAll("\\s+", " ").trim();
+                String specialty = user.getSpecialty() != null ? user.getSpecialty().toLowerCase() : "";
+                if (query.isEmpty()) return true;
+                if (firstName.contains(query) || lastName.contains(query) || fullName.contains(query) || specialty.contains(query)) return true;
+                // Also support splitting query by space and matching both parts
+                String[] parts = query.split(" ");
+                if (parts.length >= 2) {
+                    return firstName.contains(parts[0]) && lastName.contains(parts[1]);
+                }
+                return false;
+            })
             .toList();
     }
 

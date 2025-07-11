@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import notificationService from '../../services/notificationService';
 import NotificationSendModal from './NotificationSendModal';
@@ -45,7 +45,7 @@ const NotificationManagementDashboard = () => {
   /**
    * Load all dashboard data including patients, templates, and history
    */
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -102,19 +102,25 @@ const NotificationManagementDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
 
   /**
    * Calculate analytics from notification history
    */
   const calculateAnalytics = (history) => {
     const today = new Date().toDateString();
-    const todaysSent = history.filter(n => 
+    const todaysSent = history.filter(n =>
       new Date(n.sentAt).toDateString() === today && n.status === 'SENT'
     ).length;
 
+    // Handle all 6 status types from database
     const pending = history.filter(n => n.status === 'PENDING').length;
     const totalSent = history.filter(n => n.status === 'SENT').length;
+    const delivered = history.filter(n => n.status === 'DELIVERED').length;
+    const failed = history.filter(n => n.status === 'FAILED').length;
+    const cancelled = history.filter(n => n.status === 'CANCELLED').length;
+    const read = history.filter(n => n.status === 'READ').length;
 
     // Find most used template
     const templateUsage = {};
@@ -124,17 +130,21 @@ const NotificationManagementDashboard = () => {
       }
     });
 
-    const mostUsedTemplate = Object.keys(templateUsage).length > 0 
-      ? Object.keys(templateUsage).reduce((a, b) => 
+    const mostUsedTemplate = Object.keys(templateUsage).length > 0
+      ? Object.keys(templateUsage).reduce((a, b) =>
           templateUsage[a] > templateUsage[b] ? a : b
-        ) 
+        )
       : null;
 
     setAnalytics({
       totalSent,
       pendingNotifications: pending,
       todaysSent,
-      mostUsedTemplate
+      mostUsedTemplate,
+      delivered,
+      failed,
+      cancelled,
+      read
     });
   };
 
@@ -155,7 +165,13 @@ const NotificationManagementDashboard = () => {
       
       if (result.success) {
         setShowSendModal(false);
-        loadDashboardData(); // Reload to get updated data
+        // Update local state instead of full reload to prevent infinite loop
+        const historyRes = await notificationService.getNotificationHistory(doctorId);
+        if (historyRes.success) {
+          const history = historyRes.data || [];
+          setNotificationHistory(history);
+          calculateAnalytics(history);
+        }
         return { success: true, message: result.message || 'Notification sent successfully!' };
       } else {
         return {
@@ -188,7 +204,13 @@ const NotificationManagementDashboard = () => {
       const result = await notificationService.unsendNotification(notificationId, doctorId);
       
       if (result.success) {
-        loadDashboardData(); // Reload data
+        // Update local state instead of full reload to prevent infinite loop
+        const historyRes = await notificationService.getNotificationHistory(doctorId);
+        if (historyRes.success) {
+          const history = historyRes.data || [];
+          setNotificationHistory(history);
+          calculateAnalytics(history);
+        }
         return { success: true, message: result.message || 'Notification cancelled successfully!' };
       } else {
         return {
@@ -213,7 +235,16 @@ const NotificationManagementDashboard = () => {
       const result = await notificationService.bulkOperation(operation, selectedIds);
       
       if (result.success) {
-        loadDashboardData(); // Reload data
+        // Update local state instead of full reload to prevent infinite loop
+        const doctorId = user?.userId || user?.id;
+        if (doctorId) {
+          const historyRes = await notificationService.getNotificationHistory(doctorId);
+          if (historyRes.success) {
+            const history = historyRes.data || [];
+            setNotificationHistory(history);
+            calculateAnalytics(history);
+          }
+        }
         return { success: true, message: result.message || `Bulk ${operation} completed successfully!` };
       } else {
         return {
@@ -241,9 +272,9 @@ const NotificationManagementDashboard = () => {
       filtered = filtered.filter(n => n.patientId === parseInt(selectedPatient));
     }
 
-    // Filter by status
+    // Filter by status - standardize to uppercase to match backend
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(n => n.status.toLowerCase() === statusFilter.toLowerCase());
+      filtered = filtered.filter(n => n.status === statusFilter.toUpperCase());
     }
 
     // Filter by date range
@@ -397,10 +428,12 @@ const NotificationManagementDashboard = () => {
               className="filter-select"
             >
               <option value="all">All Status</option>
-              <option value="sent">Sent</option>
-              <option value="pending">Pending</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="failed">Failed</option>
+              <option value="SENT">Sent</option>
+              <option value="PENDING">Pending</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="FAILED">Failed</option>
+              <option value="CANCELLED">Cancelled</option>
+              <option value="READ">Read</option>
             </select>
           </div>
 
@@ -454,7 +487,19 @@ const NotificationManagementDashboard = () => {
           patients={patients}
           onUnsend={(notificationId) => handleUnsendNotification(notificationId)}
           onBulkOperation={handleBulkOperation}
-          onRefresh={loadDashboardData}
+          onRefresh={() => {
+            // Optimized refresh without full reload
+            const doctorId = user?.userId || user?.id;
+            if (doctorId) {
+              notificationService.getNotificationHistory(doctorId).then(historyRes => {
+                if (historyRes.success) {
+                  const history = historyRes.data || [];
+                  setNotificationHistory(history);
+                  calculateAnalytics(history);
+                }
+              });
+            }
+          }}
         />
       </div>
 

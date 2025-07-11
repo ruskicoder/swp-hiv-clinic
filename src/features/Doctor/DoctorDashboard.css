@@ -15,6 +15,16 @@
   align-items: flex-start;
 }
 
+.doctor-dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 80vh;
+  background: #f8fafc;
+  padding: 2rem;
+  margin-top: 80px; /* Add space for fixed header */
+}
+
 /* Left Sidebar */
 .dashboard-sidebar {
   width: 20rem;

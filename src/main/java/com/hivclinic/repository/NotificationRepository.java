@@ -16,6 +16,18 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     List<Notification> findByUserIdOrderByCreatedAtDesc(Integer userId);
 
     List<Notification> findByUserIdAndIsRead(Integer userId, Boolean isRead);
+    
+    /**
+     * Find notifications by user ID excluding cancelled ones (for patient visibility)
+     */
+    @Query("SELECT n FROM Notification n WHERE n.userId = :userId AND n.status != 'CANCELLED' ORDER BY n.createdAt DESC")
+    List<Notification> findByUserIdExcludingCancelledOrderByCreatedAtDesc(@Param("userId") Integer userId);
+    
+    /**
+     * Find unread notifications by user ID excluding cancelled ones (for patient visibility)
+     */
+    @Query("SELECT n FROM Notification n WHERE n.userId = :userId AND n.isRead = :isRead AND n.status != 'CANCELLED'")
+    List<Notification> findByUserIdAndIsReadExcludingCancelled(@Param("userId") Integer userId, @Param("isRead") Boolean isRead);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Notification n SET n.isRead = true, n.status = 'READ' WHERE n.userId = :userId AND n.isRead = false")

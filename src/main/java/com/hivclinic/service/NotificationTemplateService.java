@@ -109,11 +109,22 @@ public class NotificationTemplateService {
     
     /**
      * Process template variables - supports both {{var}} and {var} formats
+     * Enhanced with better error handling and logging
      */
     public String processTemplate(String templateBody, java.util.Map<String, String> variables) {
+        if (templateBody == null || templateBody.trim().isEmpty()) {
+            logger.warn("Template body is null or empty, returning empty string");
+            return "";
+        }
+        
         String processedBody = templateBody;
+        logger.debug("Processing template with {} characters and {} variables",
+                    templateBody.length(), variables != null ? variables.size() : 0);
         
         if (variables != null && !variables.isEmpty()) {
+            int totalReplacements = 0;
+            java.util.Set<String> unresolvedPlaceholders = new java.util.HashSet<>();
+            
             for (java.util.Map.Entry<String, String> entry : variables.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue() != null ? entry.getValue() : "";
@@ -122,11 +133,60 @@ public class NotificationTemplateService {
                 String placeholder1 = "{{" + key + "}}";
                 String placeholder2 = "{" + key + "}";
                 
+                // Count occurrences before replacement
+                int count1 = countOccurrences(processedBody, placeholder1);
+                int count2 = countOccurrences(processedBody, placeholder2);
+                
+                // Perform replacements
                 processedBody = processedBody.replace(placeholder1, value);
                 processedBody = processedBody.replace(placeholder2, value);
+                
+                int replacements = count1 + count2;
+                totalReplacements += replacements;
+                
+                if (replacements > 0) {
+                    logger.debug("Replaced {} occurrences of '{}' with '{}'",
+                               replacements, key, value.length() > 50 ? value.substring(0, 50) + "..." : value);
+                }
             }
+            
+            // Check for unresolved placeholders
+            java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\{\\{([^}]+)\\}\\}|\\{([^}]+)\\}");
+            java.util.regex.Matcher matcher = pattern.matcher(processedBody);
+            
+            while (matcher.find()) {
+                String placeholder = matcher.group(0);
+                String variableName = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+                unresolvedPlaceholders.add(placeholder);
+                logger.warn("Unresolved placeholder found: '{}' (variable: '{}')", placeholder, variableName);
+            }
+            
+            logger.info("Template processing completed: {} total replacements made, {} unresolved placeholders",
+                       totalReplacements, unresolvedPlaceholders.size());
+            
+            if (!unresolvedPlaceholders.isEmpty()) {
+                logger.warn("Unresolved placeholders in template: {}", unresolvedPlaceholders);
+            }
+        } else {
+            logger.debug("No variables provided for template processing");
         }
         
         return processedBody;
+    }
+    
+    /**
+     * Count occurrences of a substring in a string
+     */
+    private int countOccurrences(String text, String substring) {
+        if (text == null || substring == null || substring.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        int index = 0;
+        while ((index = text.indexOf(substring, index)) != -1) {
+            count++;
+            index += substring.length();
+        }
+        return count;
     }
 }
