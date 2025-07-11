@@ -181,25 +181,6 @@ const authService = {
   },
 
   /**
-   * Get user's last login time
-   */
-  async getLastLogin() {
-    try {
-      const response = await apiClient.get('/auth/last-login');
-      return {
-        success: true,
-        data: response.data.data
-      };
-    } catch (error) {
-      console.error('Get last login error:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to fetch last login time'
-      };
-    }
-  },
-
-  /**
    * Logout user (server-side session invalidation + client-side cleanup)
    */
   async logout() {
