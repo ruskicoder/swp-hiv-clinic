@@ -23,8 +23,9 @@ const useSessionMonitor = (isAuthenticated, onLogout) => {
   const sessionCheckInterval = useRef(null);
   const activityTimer = useRef(null);
   const timeoutModalShown = useRef(false);
+  const lastSessionCheck = useRef(0);
   
-  // Session monitoring interval (30 seconds)
+  // Session monitoring interval (30 seconds maximum as per requirements)
   const SESSION_CHECK_INTERVAL = 30000;
   
   // Warning threshold (1 minute = 60 seconds)
@@ -58,10 +59,18 @@ const useSessionMonitor = (isAuthenticated, onLogout) => {
   }, [onLogout]);
 
   /**
-   * Check current session status
+   * Check current session status with debouncing
    */
   const checkSessionStatus = useCallback(async () => {
     if (!isAuthenticated) return;
+    
+    // Debounce to prevent multiple simultaneous checks
+    const now = Date.now();
+    if (now - lastSessionCheck.current < 5000) { // 5 second debounce
+      return;
+    }
+    
+    lastSessionCheck.current = now;
     
     try {
       const response = await authService.checkSessionStatus();
@@ -136,16 +145,6 @@ const useSessionMonitor = (isAuthenticated, onLogout) => {
     setLastActivity(Date.now());
   }, []);
 
-  /**
-   * Check if user has been inactive for too long
-   */
-  const checkUserActivity = useCallback(() => {
-    const now = Date.now();
-    const timeSinceActivity = now - lastActivity;
-    
-    // If user has been inactive for more than ACTIVITY_TIMEOUT, pause monitoring
-    return timeSinceActivity < ACTIVITY_TIMEOUT;
-  }, [lastActivity, ACTIVITY_TIMEOUT]);
 
   /**
    * Start session monitoring
@@ -155,16 +154,62 @@ const useSessionMonitor = (isAuthenticated, onLogout) => {
       clearInterval(sessionCheckInterval.current);
     }
     
+    // Use a stable interval without dependencies to prevent recreation
     sessionCheckInterval.current = setInterval(() => {
       // Only check session if user has been active recently
-      if (checkUserActivity()) {
-        checkSessionStatus();
+      const now = Date.now();
+      const timeSinceActivity = now - lastActivity;
+      
+      // If user has been inactive for more than ACTIVITY_TIMEOUT, pause monitoring
+      if (timeSinceActivity < ACTIVITY_TIMEOUT) {
+        // Call checkSessionStatus directly to avoid dependency
+        if (isAuthenticated) {
+          authService.checkSessionStatus()
+            .then(response => {
+              if (response.success && response.data) {
+                const { isActive, remainingMinutes, expiresAt } = response.data;
+                
+                setSessionStatus({
+                  isActive,
+                  remainingMinutes,
+                  expiresAt: expiresAt ? new Date(expiresAt) : null
+                });
+                
+                // Show warning modal if session is about to expire
+                const remainingSeconds = remainingMinutes * 60;
+                if (isActive && remainingSeconds <= WARNING_THRESHOLD_SECONDS && remainingSeconds > 0) {
+                  if (!timeoutModalShown.current) {
+                    setShowTimeoutModal(true);
+                    timeoutModalShown.current = true;
+                  }
+                } else if (remainingSeconds > WARNING_THRESHOLD_SECONDS) {
+                  // Reset modal flag if we're outside warning threshold
+                  timeoutModalShown.current = false;
+                  setShowTimeoutModal(false);
+                }
+                
+                // Auto-logout if session is expired
+                if (!isActive || remainingSeconds <= 0) {
+                  handleAutoLogout();
+                }
+              } else {
+                // Session check failed, likely expired
+                handleAutoLogout();
+              }
+            })
+            .catch(error => {
+              console.error('Session check failed:', error);
+              // Don't auto-logout on network errors, just log
+            });
+        }
       }
     }, SESSION_CHECK_INTERVAL);
     
-    // Initial check
-    checkSessionStatus();
-  }, [checkSessionStatus, checkUserActivity]);
+    // Initial check - call once without dependencies
+    if (isAuthenticated) {
+      checkSessionStatus();
+    }
+  }, [ACTIVITY_TIMEOUT, checkSessionStatus, handleAutoLogout, isAuthenticated, lastActivity]);
 
   /**
    * Stop session monitoring
@@ -179,6 +224,9 @@ const useSessionMonitor = (isAuthenticated, onLogout) => {
       clearTimeout(activityTimer.current);
       activityTimer.current = null;
     }
+    
+    // Reset debounce tracking
+    lastSessionCheck.current = 0;
     
     setShowTimeoutModal(false);
     timeoutModalShown.current = false;
