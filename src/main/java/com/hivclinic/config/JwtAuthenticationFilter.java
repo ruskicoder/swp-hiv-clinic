@@ -1,5 +1,6 @@
 package com.hivclinic.config;
 
+import com.hivclinic.service.UserSessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+    
+    @Autowired
+    private UserSessionService userSessionService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -39,6 +43,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+                // Check if session is still valid
+                if (!userSessionService.isSessionValid(jwt)) {
+                    logger.warn("Session expired or invalid for token");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"error\":\"Session expired\",\"message\":\"Please login again\"}");
+                    response.setContentType("application/json");
+                    return;
+                }
+                
                 String extractedUsername = jwtUtils.getUsernameFromJwtToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(extractedUsername);
                 UsernamePasswordAuthenticationToken authentication =
@@ -46,6 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                
+                // Update session activity
+                userSessionService.updateSessionActivity(jwt);
+                
                 logger.debug("Set Authentication for user: {}", extractedUsername);
             }
         } catch (Exception e) {

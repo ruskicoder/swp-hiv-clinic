@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './AvailabilityCalendar.css';
 
 const AvailabilityCalendar = ({ 
   slots = [], 
-  onSlotSelect, 
+   
   onDateSelect,
   viewMode = 'month',
   userRole = 'doctor',
-  currentUserId
+  
 }) => {
   // Ensure currentDate is always a valid Date object
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [currentView, setCurrentView] = useState(viewMode);
-  const [loading, setLoading] = useState(false);
+  const [loading, _setLoading] = useState(false);
 
   // Helper function to ensure date is valid
   const ensureValidDate = (date) => {
@@ -97,7 +97,7 @@ const AvailabilityCalendar = ({
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    const _lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 

@@ -1,0 +1,180 @@
+/* Session Timeout Modal Styles */
+.session-timeout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.session-timeout-modal {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 450px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.session-timeout-modal-header {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 20px;
+  border-radius: 8px 8px 0 0;
+  text-align: center;
+}
+
+.session-timeout-modal-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.session-timeout-modal-content {
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.session-timeout-modal-content p {
+  margin: 10px 0;
+  color: #333;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.session-countdown {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border: 2px solid #e9ecef;
+}
+
+.countdown-time {
+  font-size: 2em;
+  font-weight: bold;
+  color: #dc3545;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.session-timeout-modal-actions {
+  padding: 20px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.session-timeout-modal-actions .btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.session-timeout-modal-actions .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.session-timeout-modal-actions .btn:active {
+  transform: translateY(0);
+}
+
+.session-timeout-modal-actions .btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.session-timeout-modal-actions .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.session-timeout-modal-actions .btn-primary:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.session-timeout-modal-actions .btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.session-timeout-modal-actions .btn-secondary:hover {
+  background-color: #545b62;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .session-timeout-modal {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .session-timeout-modal-content {
+    padding: 20px 15px;
+  }
+  
+  .session-timeout-modal-actions {
+    flex-direction: column;
+    padding: 15px;
+  }
+  
+  .session-timeout-modal-actions .btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .countdown-time {
+    font-size: 1.8em;
+  }
+}
+
+/* Blinking effect for countdown when time is running out */
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.5;
+  }
+}
+
+.countdown-time.urgent {
+  animation: blink 1s infinite;
+  color: #dc3545;
+}

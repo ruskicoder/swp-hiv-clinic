@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import apiClient from '../../services/apiClient';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import PatientRecordSection from '../../components/PatientRecordSection';

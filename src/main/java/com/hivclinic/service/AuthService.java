@@ -53,6 +53,12 @@ public class AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    
+    @Autowired
+    private LoginActivityService loginActivityService;
+    
+    @Autowired
+    private UserSessionService userSessionService;
 
     /**
      * Register a new user (Patient by default for MVP)
@@ -119,7 +125,28 @@ public class AuthService {
      * Authenticate user and generate JWT token
      */
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
+        return authenticateUser(loginRequest, null, null);
+    }
+    
+    /**
+     * Authenticate user and generate JWT token with login activity tracking
+     */
+    public AuthResponse authenticateUser(LoginRequest loginRequest, String ipAddress, String userAgent) {
         try {
+            // Check if account is locked by username before attempting authentication
+            if (loginActivityService.isAccountLockedByUsername(loginRequest.getUsername())) {
+                logger.warn("Login attempt blocked - Account locked for username: {}", loginRequest.getUsername());
+                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+                throw new RuntimeException("Account temporarily locked due to multiple failed login attempts");
+            }
+            
+            // Check for suspicious IP activity
+            if (ipAddress != null && loginActivityService.isSuspiciousIpActivity(ipAddress)) {
+                logger.warn("Login attempt blocked - Suspicious IP activity from: {}", ipAddress);
+                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+                throw new RuntimeException("Login temporarily blocked due to suspicious activity");
+            }
+
             // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -129,7 +156,7 @@ public class AuthService {
             );
 
             // Get user details from authentication
-            com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal = 
+            com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal =
                     (com.hivclinic.config.CustomUserDetailsService.UserPrincipal) authentication.getPrincipal();
 
             // Generate JWT token
@@ -138,6 +165,15 @@ public class AuthService {
                     userPrincipal.getId(),
                     userPrincipal.getRole()
             );
+
+            // Log successful login attempt
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), true, ipAddress, userAgent);
+
+            // Create session for the user
+            Optional<User> authenticatedUser = userRepository.findByUsername(loginRequest.getUsername());
+            if (authenticatedUser.isPresent()) {
+                userSessionService.createSession(authenticatedUser.get(), jwt, ipAddress, userAgent);
+            }
 
             logger.info("User authenticated successfully: {}", loginRequest.getUsername());
 
@@ -152,9 +188,17 @@ public class AuthService {
 
         } catch (AuthenticationException e) {
             logger.warn("Authentication failed for user: {} - {}", loginRequest.getUsername(), e.getMessage());
+            
+            // Log failed login attempt
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+            
             throw new RuntimeException("Invalid username or password");
         } catch (Exception e) {
             logger.error("Error during authentication: {}", e.getMessage(), e);
+            
+            // Log failed login attempt for system errors
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+            
             throw new RuntimeException("Authentication failed: " + e.getMessage());
         }
     }

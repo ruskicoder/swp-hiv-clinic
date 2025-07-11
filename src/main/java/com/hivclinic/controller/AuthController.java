@@ -7,6 +7,8 @@ import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
 import com.hivclinic.service.AuthService;
+import com.hivclinic.service.UserSessionService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,9 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    
+    @Autowired
+    private UserSessionService userSessionService;
 
     /**
      * Register a new user account
@@ -67,11 +72,15 @@ public class AuthController {
      * Authenticate user login
      */
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         try {
             logger.info("Login attempt for username: {}", loginRequest.getUsername());
             
-            AuthResponse response = authService.authenticateUser(loginRequest);
+            // Extract IP address and user agent for login activity tracking
+            String ipAddress = getClientIpAddress(request);
+            String userAgent = request.getHeader("User-Agent");
+            
+            AuthResponse response = authService.authenticateUser(loginRequest, ipAddress, userAgent);
             
             logger.info("User logged in successfully: {}", loginRequest.getUsername());
             return ResponseEntity.ok(response);
@@ -80,6 +89,50 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(MessageResponse.error("Invalid credentials: " + e.getMessage()));
         }
+    }
+    
+    /**
+     * Extract client IP address from request, considering proxy headers
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+            // X-Forwarded-For can contain multiple IPs, take the first one
+            return xForwardedFor.split(",")[0].trim();
+        }
+        
+        String xRealIp = request.getHeader("X-Real-IP");
+        if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
+            return xRealIp;
+        }
+        
+        String xForwardedForCloudflare = request.getHeader("CF-Connecting-IP");
+        if (xForwardedForCloudflare != null && !xForwardedForCloudflare.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedForCloudflare)) {
+            return xForwardedForCloudflare;
+        }
+        
+        String proxyClientIp = request.getHeader("Proxy-Client-IP");
+        if (proxyClientIp != null && !proxyClientIp.isEmpty() && !"unknown".equalsIgnoreCase(proxyClientIp)) {
+            return proxyClientIp;
+        }
+        
+        String wlProxyClientIp = request.getHeader("WL-Proxy-Client-IP");
+        if (wlProxyClientIp != null && !wlProxyClientIp.isEmpty() && !"unknown".equalsIgnoreCase(wlProxyClientIp)) {
+            return wlProxyClientIp;
+        }
+        
+        String httpClientIp = request.getHeader("HTTP_CLIENT_IP");
+        if (httpClientIp != null && !httpClientIp.isEmpty() && !"unknown".equalsIgnoreCase(httpClientIp)) {
+            return httpClientIp;
+        }
+        
+        String httpXForwardedFor = request.getHeader("HTTP_X_FORWARDED_FOR");
+        if (httpXForwardedFor != null && !httpXForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(httpXForwardedFor)) {
+            return httpXForwardedFor;
+        }
+        
+        // Fall back to remote address
+        return request.getRemoteAddr();
     }
 
     /**
@@ -218,5 +271,118 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to check email: " + e.getMessage()));
         }
+    }
+    
+    /**
+     * Check session status and remaining time
+     */
+    @GetMapping("/session/status")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> checkSessionStatus(HttpServletRequest request) {
+        try {
+            String jwtToken = extractJwtFromRequest(request);
+            if (jwtToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(MessageResponse.error("No authentication token provided"));
+            }
+            
+            UserSessionService.SessionStatusInfo status = userSessionService.getSessionStatus(jwtToken);
+            
+            return ResponseEntity.ok(java.util.Map.of(
+                "success", true,
+                "message", status.getMessage(),
+                "isActive", status.isActive(),
+                "remainingMinutes", status.getRemainingMinutes(),
+                "expiresAt", status.getExpiresAt()
+            ));
+            
+        } catch (Exception e) {
+            logger.error("Error checking session status: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to check session status: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Extend/refresh current session
+     */
+    @PostMapping("/session/extend")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> extendSession(HttpServletRequest request) {
+        try {
+            String jwtToken = extractJwtFromRequest(request);
+            if (jwtToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(MessageResponse.error("No authentication token provided"));
+            }
+            
+            boolean extended = userSessionService.extendSession(jwtToken);
+            
+            if (extended) {
+                UserSessionService.SessionStatusInfo status = userSessionService.getSessionStatus(jwtToken);
+                return ResponseEntity.ok(java.util.Map.of(
+                    "success", true,
+                    "message", "Session extended successfully",
+                    "remainingMinutes", status.getRemainingMinutes(),
+                    "expiresAt", status.getExpiresAt()
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(MessageResponse.error("Session could not be extended - may be expired"));
+            }
+            
+        } catch (Exception e) {
+            logger.error("Error extending session: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to extend session: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Invalidate current session (logout)
+     */
+    @PostMapping("/session/invalidate")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> invalidateSession(HttpServletRequest request) {
+        try {
+            String jwtToken = extractJwtFromRequest(request);
+            if (jwtToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(MessageResponse.error("No authentication token provided"));
+            }
+            
+            boolean invalidated = userSessionService.invalidateSessionByToken(jwtToken);
+            
+            if (invalidated) {
+                return ResponseEntity.ok(MessageResponse.success("Session invalidated successfully"));
+            } else {
+                return ResponseEntity.ok(MessageResponse.success("Session was already invalid"));
+            }
+            
+        } catch (Exception e) {
+            logger.error("Error invalidating session: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to invalidate session: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Logout endpoint (alias for session invalidate)
+     */
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        return invalidateSession(request);
+    }
+    
+    /**
+     * Extract JWT token from Authorization header
+     */
+    private String extractJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }

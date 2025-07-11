@@ -9,7 +9,7 @@ import './NotificationTemplateSelector.css';
 const NotificationTemplateSelector = ({ isOpen, onClose, templates = [], onRefresh }) => {
   const [activeTab, setActiveTab] = useState('browse');
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [_showCreateForm, setShowCreateForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
