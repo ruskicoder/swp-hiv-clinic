@@ -56,6 +56,15 @@ const ManagerDashboard = () => {
   const [patientSearch, setPatientSearch] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
   const navigate = useNavigate();
+  
+  // Handler for PDF download (demo only)
+  const handleDownloadPDF = () => {
+    // Replace with actual PDF file path or API endpoint as needed
+    const link = document.createElement('a');
+    link.href = '/docs/Final_Release_Document.docx'; // Change to PDF when available
+    link.download = 'Clinic_System_Overview.pdf';
+    link.click();
+  };
 
   useEffect(() => {
     if (activeTab === 'overview') {
@@ -248,6 +257,14 @@ const ManagerDashboard = () => {
     <div>
       <div className="section-header">
         <h2>System Overview</h2>
+        <button
+          className="btn-secondary"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, borderRadius: 8, padding: '0.5rem 1.25rem', fontSize: '1rem', background: '#22c55e', color: 'white', border: 'none', cursor: 'pointer', boxShadow: '0 2px 8px rgba(34,197,94,0.08)' }}
+          onClick={handleDownloadPDF}
+          aria-label="Download system overview PDF"
+        >
+          <span style={{ fontSize: '1.2em' }}>⬇️</span> Download PDF
+        </button>
       </div>
       
       {loading ? (
