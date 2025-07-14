@@ -339,7 +339,7 @@ public class ManagerService {
      */
     public String generateARVTreatmentsCSV() {
         StringBuilder csv = new StringBuilder();
-        csv.append("Treatment ID,Patient Name,Doctor Name,Start Date,End Date,Drug Name,Drug Quantity,Notes,Created At,Updated At\n");
+        csv.append("Treatment ID,Patient Name,Doctor Name,Regimen,Start Date,End Date,Adherence,Side Effects,Notes,Is Active,Created At,Updated At\n");
 
         List<ARVTreatment> treatments = arvTreatmentRepository.findAll();
         for (ARVTreatment arv : treatments) {
@@ -364,15 +364,17 @@ public class ManagerService {
                 });
             }
 
-            csv.append(String.format("%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+            csv.append(String.format("%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 arv.getArvTreatmentID(),
                 patientName[0].replace("\"", "\"\""),  // Access array element
                 doctorName[0].replace("\"", "\"\""),   // Access array element
+                arv.getRegimen() != null ? arv.getRegimen().replace("\"", "\"\"") : "",
                 arv.getStartDate(),
                 arv.getEndDate(),
-                arv.getDrugName(),
-                arv.getDrugQuantity(),
-                arv.getNotes().replace("\"", "\"\""),
+                arv.getAdherence() != null ? arv.getAdherence().replace("\"", "\"\"") : "",
+                arv.getSideEffects() != null ? arv.getSideEffects().replace("\"", "\"\"") : "",
+                arv.getNotes() != null ? arv.getNotes().replace("\"", "\"\"") : "",
+                arv.getIsActive() != null ? arv.getIsActive().toString() : "false",
                 arv.getCreatedAt(),
                 arv.getUpdatedAt()
             ));

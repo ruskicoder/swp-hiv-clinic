@@ -39,12 +39,6 @@ public class ARVTreatment {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
-    @Column(name = "DrugName", nullable = false, length = 100)
-    private String drugName;
-
-    @Column(name = "DrugQuantity", nullable = false)
-    private Integer drugQuantity;
-
     @Column(name = "Notes", columnDefinition = "NVARCHAR(MAX)")
     private String notes;
 
@@ -91,8 +85,6 @@ public class ARVTreatment {
     public Integer getDoctorUserID() { return doctorUserID; }
     public LocalDate getStartDate() { return startDate; }
     public LocalDate getEndDate() { return endDate; }
-    public String getDrugName() { return drugName; }
-    public Integer getDrugQuantity() { return drugQuantity; }
     public String getNotes() { return notes != null ? notes : ""; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
@@ -108,8 +100,6 @@ public class ARVTreatment {
     public void setDoctorUserID(Integer id) { this.doctorUserID = id; }
     public void setStartDate(LocalDate date) { this.startDate = date; }
     public void setEndDate(LocalDate date) { this.endDate = date; }
-    public void setDrugName(String name) { this.drugName = name; }
-    public void setDrugQuantity(Integer quantity) { this.drugQuantity = quantity; }
     public void setNotes(String notes) { this.notes = notes; }
     public void setCreatedAt(LocalDateTime date) { this.createdAt = date; }
     public void setUpdatedAt(LocalDateTime date) { this.updatedAt = date; }
