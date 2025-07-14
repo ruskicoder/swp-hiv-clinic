@@ -72,12 +72,33 @@ public class PatientRecord {
         updatedAt = LocalDateTime.now();
     }
 
-    // Custom getter methods for compatibility
-    public Integer getRecordID() {
-        return recordID;
-    }
+    // Getters
+    public Integer getRecordID() { return recordID; }
+    public Integer getPatientUserID() { return patientUserID; }
+    public Integer getAppointmentId() { return appointmentId; }
+    public String getMedicalHistory() { return medicalHistory; }
+    public String getAllergies() { return allergies; }
+    public String getCurrentMedications() { return currentMedications; }
+    public String getNotes() { return notes; }
+    public String getBloodType() { return bloodType; }
+    public String getEmergencyContact() { return emergencyContact; }
+    public String getEmergencyPhone() { return emergencyPhone; }
+    public String getProfileImageBase64() { return profileImageBase64; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    public void setRecordID(Integer recordID) {
-        this.recordID = recordID;
-    }
+    // Setters
+    public void setRecordID(Integer recordID) { this.recordID = recordID; }
+    public void setPatientUserID(Integer patientUserID) { this.patientUserID = patientUserID; }
+    public void setAppointmentId(Integer appointmentId) { this.appointmentId = appointmentId; }
+    public void setMedicalHistory(String medicalHistory) { this.medicalHistory = medicalHistory; }
+    public void setAllergies(String allergies) { this.allergies = allergies; }
+    public void setCurrentMedications(String currentMedications) { this.currentMedications = currentMedications; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public void setBloodType(String bloodType) { this.bloodType = bloodType; }
+    public void setEmergencyContact(String emergencyContact) { this.emergencyContact = emergencyContact; }
+    public void setEmergencyPhone(String emergencyPhone) { this.emergencyPhone = emergencyPhone; }
+    public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

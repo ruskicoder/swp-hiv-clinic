@@ -43,4 +43,16 @@ public interface ARVTreatmentRepository extends JpaRepository<ARVTreatment, Inte
      */
     @Query("SELECT arv FROM ARVTreatment arv WHERE arv.doctorUserID = :doctorUserID AND arv.isActive = true ORDER BY arv.createdAt DESC")
     List<ARVTreatment> findActiveByDoctorUserID(@Param("doctorUserID") Integer doctorUserID);
+
+    /**
+     * Find ARV treatments by notes field (exact match)
+     */
+    @Query("SELECT arv FROM ARVTreatment arv WHERE arv.notes = :notes")
+    List<ARVTreatment> findByNotes(@Param("notes") String notes);
+
+    /**
+     * Find all ARV templates (default and doctor-created)
+     */
+    @Query("SELECT arv FROM ARVTreatment arv WHERE (arv.notes = 'default template' OR arv.notes = 'template')")
+    List<ARVTreatment> findAllTemplates();
 }

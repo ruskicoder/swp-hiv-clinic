@@ -1,18 +1,12 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Entity representing doctor profiles
  */
 @Entity
 @Table(name = "DoctorProfiles")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class DoctorProfile {
 
     @Id
@@ -43,4 +37,24 @@ public class DoctorProfile {
     @Lob
     @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
     private String profileImageBase64;
+
+    // Getters
+    public Integer getDoctorProfileId() { return doctorProfileId; }
+    public User getUser() { return user; }
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public Specialty getSpecialty() { return specialty; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public String getBio() { return bio; }
+    public String getProfileImageBase64() { return profileImageBase64; }
+
+    // Setters
+    public void setDoctorProfileId(Integer id) { this.doctorProfileId = id; }
+    public void setUser(User user) { this.user = user; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setSpecialty(Specialty specialty) { this.specialty = specialty; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public void setBio(String bio) { this.bio = bio; }
+    public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
 }

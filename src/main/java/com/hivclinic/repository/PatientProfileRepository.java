@@ -5,7 +5,9 @@ import com.hivclinic.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * Repository interface for PatientProfile entity
@@ -21,4 +23,10 @@ public interface PatientProfileRepository extends JpaRepository<PatientProfile, 
      * Find patient profile by user entity
      */
     Optional<PatientProfile> findByUser(User user);
+
+    /**
+     * Find all non-dummy patient profiles
+     */
+    @Query("SELECT pp FROM PatientProfile pp WHERE pp.user.username NOT LIKE 'dummy_%'")
+    List<PatientProfile> findAllNonDummyPatientProfiles();
 }

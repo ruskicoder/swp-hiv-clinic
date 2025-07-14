@@ -33,7 +33,7 @@ const PatientRecordSection = ({
   // Add debug logging
   useEffect(() => {
     console.debug('PatientRecordSection mounted with record:', record);
-  }, []);
+  }, [record]);
 
   // Update form data when record changes
   useEffect(() => {
@@ -124,8 +124,8 @@ const PatientRecordSection = ({
     setSaveSuccess('');
 
     // Basic validation
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    if (formData.emergencyPhone && !phoneRegex.test(formData.emergencyPhone.replace(/[\s\-\(\)]/g, ''))) {
+    const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+    if (formData.emergencyPhone && !phoneRegex.test(formData.emergencyPhone.replace(/[\s\-()]/g, ''))) {
       setError('Please enter a valid emergency phone number');
       return;
     }

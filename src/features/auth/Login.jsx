@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/useAuth';
 import BackNavigation from '../../components/layout/BackNavigation';
 import './Auth.css';
 
@@ -12,7 +12,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const location = useLocation();
 
   // Get success message from registration
@@ -58,8 +58,12 @@ const Login = () => {
         return;
       }
 
-      await login(formData);
-      
+      // Call login and get response
+      const response = await login(formData);
+      // Save token to localStorage if present
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+      }
       // Navigation will be handled by the AuthContext
     } catch (error) {
       setErrors({

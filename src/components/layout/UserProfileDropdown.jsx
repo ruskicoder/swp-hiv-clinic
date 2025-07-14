@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import './UserProfileDropdown.css';
 
 const UserProfileDropdown = () => {
@@ -44,6 +44,9 @@ const UserProfileDropdown = () => {
         break;
       case 'patient':
         navigate('/customer');
+        break;
+      case 'manager':
+        navigate('/manager');
         break;
       default:
         navigate('/');

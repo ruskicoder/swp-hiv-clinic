@@ -1,7 +1,10 @@
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import UserProfileDropdown from './UserProfileDropdown';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import apiClient from '../../services/apiClient';
+import notificationService from '../../services/notificationService';
+import NotificationIcon from '../notifications/NotificationIcon';
+import NotificationPanel from '../notifications/NotificationPanel';
 import './DashboardHeader.css';
 
 const DashboardHeader = ({ title, subtitle }) => {
@@ -10,18 +13,37 @@ const DashboardHeader = ({ title, subtitle }) => {
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showPanel, setShowPanel] = useState(false);
 
   // Function to check if user is a patient
-  const isPatient = () => {
+  const isPatient = useCallback(() => {
     return user && (user.role === 'Patient' || user?.role?.roleName === 'Patient');
-  };
+  }, [user]);
 
+  // Handle notification updates from the service
+  const handleNotificationUpdate = useCallback((notificationData, isNewNotifications) => {
+    setNotifications(notificationData);
+    setUnreadCount(notificationData.filter(n => !n.isRead).length);
+    
+    // Only log when new notifications are received
+    if (isNewNotifications) {
+      console.log('New notifications received:', notificationData.filter(n => !n.isRead).length);
+    }
+  }, []);
+
+  // Separate useEffect for clock timer
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
     }, 1000);
 
-    // Load initial private mode state from API
+    return () => clearInterval(timer);
+  }, []);
+
+  // Separate useEffect for initial data loading
+  useEffect(() => {
     const loadPrivateMode = async () => {
       if (isPatient()) {
         try {
@@ -42,7 +64,34 @@ const DashboardHeader = ({ title, subtitle }) => {
     };
 
     loadPrivateMode();
-    return () => clearInterval(timer);
+  }, [isPatient]);
+
+  // Separate useEffect for notification management
+  useEffect(() => {
+    if (!user) return;
+
+    // Initial fetch of notifications on login
+    const initializeNotifications = async () => {
+      await notificationService.getInitialNotifications();
+    };
+
+    initializeNotifications();
+
+    // Subscribe to notification updates
+    const unsubscribe = notificationService.subscribeToNotifications(handleNotificationUpdate);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, handleNotificationUpdate]);
+
+  // Reset notification state on logout
+  useEffect(() => {
+    if (!user) {
+      notificationService.resetPollingState();
+      setNotifications([]);
+      setUnreadCount(0);
+    }
   }, [user]);
 
   const togglePrivacy = async () => {
@@ -72,11 +121,61 @@ const DashboardHeader = ({ title, subtitle }) => {
       console.error('Failed to update privacy settings:', error);
       setError('Failed to update privacy mode');
       // Revert the UI state if the API call failed
-      setIsPrivate(!newState);
+      const savedMode = localStorage.getItem('privateMode');
+      if (savedMode) {
+        setIsPrivate(JSON.parse(savedMode));
+      }
     } finally {
       setIsLoading(false);
     }
-  };  const formatDateTime = () => {
+  };
+
+  const handleMarkAsRead = async (notificationId) => {
+    // Store original state in case we need to revert
+    const originalNotifications = [...notifications];
+    const originalUnreadCount = unreadCount;
+    
+    // Optimistically update the UI
+    setNotifications(notifications.map(n => n.notificationId === notificationId ? { ...n, isRead: true, status: 'READ' } : n));
+    setUnreadCount(Math.max(0, unreadCount - 1));
+    
+    try {
+        const result = await notificationService.markAsRead(notificationId);
+        
+        if (!result.success) {
+            console.error('Failed to mark notification as read:', result.error);
+            // Revert the UI changes if API call failed
+            setNotifications(originalNotifications);
+            setUnreadCount(originalUnreadCount);
+        }
+    } catch (error) {
+        console.error('Exception in handleMarkAsRead:', error);
+        // Revert the UI changes if API call failed
+        setNotifications(originalNotifications);
+        setUnreadCount(originalUnreadCount);
+    }
+  };
+
+  const _handleMarkAllAsRead = async () => {
+    try {
+      const result = await notificationService.markAllAsRead();
+      
+      if (result.success) {
+        console.log('Successfully marked all notifications as read');
+        // Update UI state after successful API call
+        setNotifications(notifications.map(n => ({ ...n, isRead: true, status: 'READ' })));
+        setUnreadCount(0);
+      } else {
+        console.error('Failed to mark all notifications as read:', result.error);
+        setError('Failed to mark notifications as read');
+      }
+    } catch (error) {
+      console.error('Exception marking all notifications as read:', error);
+      setError('Failed to mark notifications as read');
+    }
+  };
+
+  const formatDateTime = () => {
     const dateOptions = {
       weekday: 'short',
       year: 'numeric',
@@ -148,6 +247,39 @@ const DashboardHeader = ({ title, subtitle }) => {
             <div className="date">{date}</div>
             <div className="time">{time}</div>
           </div>
+          <NotificationIcon count={unreadCount} onClick={async () => {
+            // ALWAYS mark all notifications as read when notification button is clicked
+            console.log('Notification button clicked - marking all as read');
+            
+            try {
+              // Wait for API response before updating UI
+              const result = await notificationService.markAllAsRead();
+              
+              if (result.success) {
+                console.log('Successfully marked all notifications as read');
+                // Update UI state immediately after successful API call
+                setNotifications(notifications.map(n => ({ ...n, isRead: true, status: 'READ' })));
+                setUnreadCount(0);
+              } else {
+                console.error('Failed to mark all notifications as read:', result.error);
+                // Show error feedback to user
+                setError('Failed to mark notifications as read');
+              }
+            } catch (error) {
+              console.error('Exception marking all notifications as read:', error);
+              setError('Failed to mark notifications as read');
+            }
+            
+            // Show panel after marking as read
+            setShowPanel(!showPanel);
+          }} />
+          {showPanel && (
+            <NotificationPanel
+              notifications={notifications}
+              onMarkAsRead={handleMarkAsRead}
+              onClose={() => setShowPanel(false)}
+            />
+          )}
           <UserProfileDropdown />
         </div>
       </div>

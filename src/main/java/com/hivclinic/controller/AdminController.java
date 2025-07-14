@@ -92,7 +92,7 @@ public class AdminController {
     }
 
     /**
-     * Create doctor account
+     * Create doctor account with improved parameter validation
      */
     @PostMapping("/doctors")
     public ResponseEntity<?> createDoctor(
@@ -102,14 +102,27 @@ public class AdminController {
             @RequestParam String firstName,
             @RequestParam String lastName,
             @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) Integer specialtyId,
+            @RequestParam(required = false) String specialtyId,
             @RequestParam(required = false) String bio,
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
         try {
             logger.info("Admin {} creating doctor account: {}", userPrincipal.getUsername(), username);
             
+            // Validate and parse specialtyId
+            Integer parsedSpecialtyId = null;
+            if (specialtyId != null && !specialtyId.trim().isEmpty() && !"NaN".equals(specialtyId) && !"null".equals(specialtyId)) {
+                try {
+                    parsedSpecialtyId = Integer.parseInt(specialtyId.trim());
+                    logger.debug("Parsed specialtyId: {}", parsedSpecialtyId);
+                } catch (NumberFormatException e) {
+                    logger.warn("Invalid specialtyId format: '{}', treating as null", specialtyId);
+                    return ResponseEntity.badRequest()
+                            .body(MessageResponse.error("Invalid specialty ID format. Please select a valid specialty."));
+                }
+            }
+            
             MessageResponse response = adminService.createDoctorAccount(
-                    username, email, password, firstName, lastName, phoneNumber, specialtyId, bio);
+                    username, email, password, firstName, lastName, phoneNumber, parsedSpecialtyId, bio);
             
             if (response.isSuccess()) {
                 logger.info("Doctor account created successfully: {}", username);

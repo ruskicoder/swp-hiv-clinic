@@ -1,0 +1,49 @@
+/* Notification Manager Tab Styles */
+.notification-manager-tab {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content-wrapper {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure the dashboard fills the available space */
+.tab-content-wrapper .notification-management-dashboard {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  min-height: unset;
+  flex: 1;
+}
+
+/* Override dashboard header to integrate with tab layout */
+.tab-content-wrapper .dashboard-header {
+  z-index:2;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+}
+
+/* Responsive adjustments for tab context */
+@media (max-width: 768px) {
+  .tab-content-wrapper .notification-management-dashboard {
+    padding: 0;
+  }
+  
+  .tab-content-wrapper .dashboard-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-content-wrapper .dashboard-header {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+}

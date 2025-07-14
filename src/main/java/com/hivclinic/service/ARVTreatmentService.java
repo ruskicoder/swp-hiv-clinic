@@ -83,7 +83,19 @@ public class ARVTreatmentService {
     }
 
     /**
-     * Add a new ARV treatment
+     * Get all ARV templates (default + doctor-created)
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getTemplates(Integer doctorUserId) {
+        // Fetch all templates (default and doctor-created), regardless of appointmentId
+        List<ARVTreatment> templates = arvTreatmentRepository.findAllTemplates();
+        return templates.stream()
+            .map(this::mapTemplateToResponse)
+            .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Add a new ARV treatment or template
      */
     @Transactional
     public MessageResponse addTreatment(Map<String, Object> treatmentData, Integer doctorUserId) {
@@ -136,7 +148,11 @@ public class ARVTreatmentService {
                 treatment.setSideEffects((String) treatmentData.get("sideEffects"));
             }
 
-            if (treatmentData.containsKey("notes")) {
+            // Set as template if requested
+            boolean setAsTemplate = treatmentData.get("setAsTemplate") != null && Boolean.TRUE.equals(treatmentData.get("setAsTemplate"));
+            if (setAsTemplate) {
+                treatment.setNotes("template");
+            } else if (treatmentData.containsKey("notes")) {
                 treatment.setNotes((String) treatmentData.get("notes"));
             }
 
@@ -179,6 +195,11 @@ public class ARVTreatmentService {
             // Verify doctor has permission to update
             if (!treatment.getDoctorUserID().equals(doctorUserId)) {
                 return MessageResponse.error("You don't have permission to update this treatment");
+            }
+
+            // Prevent editing default templates
+            if ("default template".equalsIgnoreCase(treatment.getNotes())) {
+                return MessageResponse.error("Default templates cannot be edited");
             }
 
             // Update fields if provided
@@ -315,6 +336,29 @@ public class ARVTreatmentService {
     }
 
     /**
+     * Map ARVTreatment entity to response format for templates (hide start/end dates)
+     */
+    private Map<String, Object> mapTemplateToResponse(ARVTreatment treatment) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("arvTreatmentId", treatment.getArvTreatmentID());
+        response.put("regimen", treatment.getRegimen());
+        response.put("adherence", treatment.getAdherence());
+        response.put("sideEffects", treatment.getSideEffects());
+        response.put("notes", treatment.getNotes());
+        response.put("isActive", treatment.getIsActive());
+        response.put("createdAt", treatment.getCreatedAt());
+        // Hide start/end dates for templates
+        if ("default template".equalsIgnoreCase(treatment.getNotes()) || "template".equalsIgnoreCase(treatment.getNotes())) {
+            response.put("startDate", null);
+            response.put("endDate", null);
+        } else {
+            response.put("startDate", treatment.getStartDate());
+            response.put("endDate", treatment.getEndDate());
+        }
+        return response;
+    }
+
+    /**
      * Edit an existing ARV treatment
      */
     @Transactional
@@ -330,6 +374,11 @@ public class ARVTreatmentService {
             // Verify doctor has permission to edit
             if (!treatment.getDoctorUserID().equals(doctorUserId)) {
                 return MessageResponse.error("You don't have permission to edit this treatment");
+            }
+
+            // Prevent editing default templates
+            if ("default template".equalsIgnoreCase(treatment.getNotes())) {
+                return MessageResponse.error("Default templates cannot be edited");
             }
 
             // Update fields if provided
@@ -406,9 +455,13 @@ public class ARVTreatmentService {
                 return MessageResponse.error("ARV treatment not found");
             }
             ARVTreatment treatment = treatmentOpt.get();
-            // Only the doctor who created the treatment can delete it
-            if (!treatment.getDoctorUserID().equals(doctorUserId)) {
-                return MessageResponse.error("You don't have permission to delete this treatment");
+            // Prevent deleting default templates
+            if ("default template".equalsIgnoreCase(treatment.getNotes())) {
+                return MessageResponse.error("Default templates cannot be deleted");
+            }
+            // Only the doctor who created the template can delete their own template
+            if ("template".equalsIgnoreCase(treatment.getNotes()) && !doctorUserId.equals(treatment.getDoctorUserID())) {
+                return MessageResponse.error("You can only delete your own templates");
             }
             arvTreatmentRepository.deleteById(treatmentId);
             return MessageResponse.success("ARV treatment deleted successfully");
@@ -439,3 +492,4 @@ public class ARVTreatmentService {
         }
     }
 }
+// No changes needed. Entity ARVTreatment is mapped to ARVTreatments table.

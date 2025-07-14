@@ -88,10 +88,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/health/**").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")  // Changed from hasAuthority()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/manager/**").hasRole("MANAGER") // Added for manager endpoints
                 .requestMatchers("/api/doctors/**").authenticated()
                 .requestMatchers("/api/appointments/**").authenticated()
-                .requestMatchers("/api/arv-treatments/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN")  // Changed
+                .requestMatchers("/api/arv-treatments/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN")
                 .anyRequest().authenticated()
             );
 
@@ -105,7 +106,8 @@ public class SecurityConfig {
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
         hierarchy.setHierarchy(
-            "ROLE_ADMIN > ROLE_DOCTOR\n" +
+            "ROLE_ADMIN > ROLE_MANAGER\n" +
+            "ROLE_MANAGER > ROLE_DOCTOR\n" +
             "ROLE_DOCTOR > ROLE_PATIENT"
         );
         return hierarchy;

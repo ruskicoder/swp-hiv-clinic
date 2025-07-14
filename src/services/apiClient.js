@@ -5,7 +5,7 @@ import axios from 'axios';
  */
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080/api',
-  timeout: 0, // Remove timeout restriction
+  timeout: 10000, // 10 second timeout to prevent hanging
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,7 +16,7 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.set('Authorization', `Bearer ${token}`);
     }
     return config;
   },

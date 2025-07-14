@@ -206,4 +206,19 @@ public class ARVTreatmentController {
                     .body(MessageResponse.error("Failed to delete ARV treatment: " + e.getMessage()));
         }
     }
+
+    /**
+     * Get ARV templates (default + doctor-created)
+     */
+    @GetMapping("/templates")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public ResponseEntity<?> getTemplates(@AuthenticationPrincipal com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal) {
+        try {
+            var templates = arvTreatmentService.getTemplates(userPrincipal.getId());
+            return ResponseEntity.ok(templates);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(com.hivclinic.dto.response.MessageResponse.error("Failed to fetch ARV templates: " + e.getMessage()));
+        }
+    }
 }

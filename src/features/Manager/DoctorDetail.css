@@ -1,0 +1,133 @@
+/* DoctorDetail.css - Chuyên biệt cho trang chi tiết bác sĩ */
+.doctor-detail-container {
+  max-width: 95%;
+  margin: 32px auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.doctor-detail-back {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.doctor-detail-back:hover {
+  color: #0d47a1;
+}
+.doctor-detail-card {
+  display: flex;
+  background: #f7fafd;
+  border-radius: 12px;
+  padding: 24px 20px;
+  margin-bottom: 28px;
+  align-items: flex-start;
+}
+.doctor-detail-flex {
+  display: flex;
+  width: 100%;
+}
+.doctor-detail-avatar {
+  margin-right: 36px;
+  text-align: center;
+}
+.doctor-detail-avatar-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #1976d2;
+  margin-bottom: 10px;
+}
+.doctor-detail-avatar-placeholder {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #e3eafc;
+  color: #1976d2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.doctor-detail-username {
+  font-size: 1.1rem;
+  color: #888;
+  margin-top: 2px;
+}
+.doctor-detail-info {
+  flex: 1;
+}
+.doctor-detail-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: #1976d2;
+}
+.doctor-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px 32px;
+}
+.doctor-detail-label {
+  font-size: 0.98rem;
+  color: #888;
+  margin-bottom: 2px;
+}
+.doctor-detail-value {
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: #222;
+}
+.doctor-detail-status-active {
+  color: #388e3c;
+  font-weight: bold;
+}
+.doctor-detail-status-inactive {
+  color: #d32f2f;
+  font-weight: bold;
+}
+.doctor-detail-records-card {
+  background: #f7fafd;
+  border-radius: 12px;
+  padding: 20px 18px;
+  margin-bottom: 28px;
+}
+.doctor-detail-records-title {
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: #1976d2;
+  margin-bottom: 12px;
+}
+.doctor-detail-records-empty {
+  color: #888;
+  font-style: italic;
+  padding: 10px 0 2px 4px;
+}
+.doctor-detail-table-wrapper {
+  overflow-x: auto;
+}
+.doctor-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+.doctor-detail-table th, .doctor-detail-table td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: left;
+}
+.doctor-detail-table th {
+  background: #e3eafc;
+  color: #1976d2;
+  font-weight: 600;
+}
+.doctor-detail-table tr:nth-child(even) {
+  background: #f4f8fd;
+}

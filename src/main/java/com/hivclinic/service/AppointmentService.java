@@ -4,7 +4,6 @@ import com.hivclinic.dto.request.AppointmentBookingRequest;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.model.*;
 import com.hivclinic.repository.*;
-import com.hivclinic.service.PatientPrivacyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +57,9 @@ public class AppointmentService {
 
     @Autowired
     private PatientPrivacyService patientPrivacyService;
+    
+    @Autowired
+    private NotificationSchedulingService notificationSchedulingService;
 
     /**
      * Sanitize patient data based on privacy settings
@@ -260,7 +262,17 @@ public class AppointmentService {
             // Create status history entry
             createStatusHistory(savedAppointment, null, "Scheduled", "Appointment booked", patient);
 
-            logger.info("Appointment booked successfully for patient: {} with doctor: {}", 
+            // Schedule appointment reminders
+            try {
+                notificationSchedulingService.scheduleAppointmentReminders(savedAppointment);
+                logger.info("Scheduled appointment reminders for appointment ID: {}", savedAppointment.getAppointmentId());
+            } catch (Exception e) {
+                logger.error("Failed to schedule appointment reminders for appointment ID: {}: {}",
+                           savedAppointment.getAppointmentId(), e.getMessage(), e);
+                // Don't fail the booking if reminder scheduling fails
+            }
+
+            logger.info("Appointment booked successfully for patient: {} with doctor: {}",
                         patient.getUsername(), doctor.getUsername());
             return MessageResponse.success("Appointment booked successfully!");
 

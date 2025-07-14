@@ -17,10 +17,12 @@ CREATE TABLE Roles (
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
 CREATE TABLE Users (
-    UserID INT IDENTITY(1,1) PRIMARY KEY,
-    Username NVARCHAR(255) NOT NULL UNIQUE,
+    UserID INT IDENTITY(1,1) PRIMARY KEY,    Username NVARCHAR(255) NOT NULL UNIQUE,
     PasswordHash NVARCHAR(255) NOT NULL,
     Email NVARCHAR(255) NOT NULL UNIQUE,
+    FirstName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL,
+    Specialty NVARCHAR(255) NULL,
     RoleID INT NOT NULL FOREIGN KEY REFERENCES Roles(RoleID),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
@@ -56,7 +58,8 @@ CREATE TABLE PatientProfiles (
     DateOfBirth DATE,
     PhoneNumber NVARCHAR(20),
     Address NVARCHAR(MAX),
-    ProfileImageBase64 NVARCHAR(MAX)
+    ProfileImageBase64 NVARCHAR(MAX),
+    IsPrivate BIT NOT NULL DEFAULT 0
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
@@ -153,92 +156,92 @@ CREATE TABLE ARVTreatments (
     ARVTreatmentID INT IDENTITY(1,1) PRIMARY KEY,
     PatientUserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
     DoctorUserID INT FOREIGN KEY REFERENCES Users(UserID),
+    AppointmentID INT FOREIGN KEY REFERENCES Appointments(AppointmentID),
     Regimen NVARCHAR(255) NOT NULL,
     StartDate DATE NOT NULL,
     EndDate DATE,
     Adherence NVARCHAR(255),
     SideEffects NVARCHAR(MAX),
     Notes NVARCHAR(MAX),
-    ProfileImageBase64 NVARCHAR(MAX),
+    IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
     UpdatedAt DATETIME2 DEFAULT GETDATE()
 );
 
--- Insert initial roles if they don't exist
-IF NOT EXISTS (SELECT * FROM Roles WHERE RoleName = 'Patient')
-BEGIN
-    INSERT INTO Roles (RoleName) VALUES ('Patient');
-END
 
-IF NOT EXISTS (SELECT * FROM Roles WHERE RoleName = 'Doctor')
-BEGIN
-    INSERT INTO Roles (RoleName) VALUES ('Doctor');
-END
 
-IF NOT EXISTS (SELECT * FROM Roles WHERE RoleName = 'Admin')
-BEGIN
-    INSERT INTO Roles (RoleName) VALUES ('Admin');
-END
+-- Notifications Table: Stores all types of notifications
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Notifications' AND xtype='U')
+CREATE TABLE Notifications (
+    NotificationID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    Type NVARCHAR(50) NOT NULL, -- 'APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'SYSTEM_NOTIFICATION'
+    Title NVARCHAR(255) NOT NULL,
+    Message NVARCHAR(MAX) NOT NULL,
+    IsRead BIT DEFAULT 0,
+    Priority NVARCHAR(20) DEFAULT 'MEDIUM', -- 'LOW', 'MEDIUM', 'HIGH'
+    RelatedEntityID INT NULL, -- Could be AppointmentID, MedicationRoutineID, etc.
+    RelatedEntityType NVARCHAR(50) NULL, -- 'APPOINTMENT', 'MEDICATION', 'SYSTEM'
+    ScheduledFor DATETIME2 NULL, -- When the notification should be sent
+    SentAt DATETIME2 NULL, -- When the notification was actually sent
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    CONSTRAINT CHK_NotificationType CHECK (Type IN ('APPOINTMENT_REMINDER', 'MEDICATION_REMINDER', 'GENERAL_ALERT', 'SYSTEM_NOTIFICATION'))
+);
 
--- Insert initial specialties
-IF NOT EXISTS (SELECT * FROM Specialties WHERE SpecialtyName = 'HIV/AIDS Specialist')
-BEGIN
-    INSERT INTO Specialties (SpecialtyName, Description, IsActive) 
-    VALUES ('HIV/AIDS Specialist', 'Specialist in HIV/AIDS treatment and care', 1);
-END
+-- MedicationRoutines Table: Defines daily medication schedules for patients
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationRoutines' AND xtype='U')
+CREATE TABLE MedicationRoutines (
+    RoutineID INT PRIMARY KEY IDENTITY(1,1),
+    PatientUserID INT NOT NULL,
+    DoctorUserID INT NOT NULL,
+    ARVTreatmentID INT NULL,
+    MedicationName NVARCHAR(255) NOT NULL,
+    Dosage NVARCHAR(100) NOT NULL,
+    Instructions NVARCHAR(MAX) NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NULL,
+    TimeOfDay TIME NOT NULL, -- When to take the medication daily
+    IsActive BIT DEFAULT 1,
+    ReminderEnabled BIT DEFAULT 1,
+    ReminderMinutesBefore INT DEFAULT 30, -- Minutes before medication time to send reminder
+    LastReminderSentAt DATETIME2 NULL, -- Tracks when the last reminder was sent for this routine
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (DoctorUserID) REFERENCES Users(UserID) ON DELETE NO ACTION,
+    FOREIGN KEY (ARVTreatmentID) REFERENCES ARVTreatments(ARVTreatmentID) ON DELETE SET NULL
+);
 
-IF NOT EXISTS (SELECT * FROM Specialties WHERE SpecialtyName = 'Infectious Disease')
-BEGIN
-    INSERT INTO Specialties (SpecialtyName, Description, IsActive) 
-    VALUES ('Infectious Disease', 'Specialist in infectious diseases', 1);
-END
+-- MedicationReminders Table: Tracks individual medication reminder instances
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='MedicationReminders' AND xtype='U')
+CREATE TABLE MedicationReminders (
+    ReminderID INT PRIMARY KEY IDENTITY(1,1),
+    RoutineID INT NOT NULL,
+    PatientUserID INT NOT NULL,
+    ReminderDate DATE NOT NULL,
+    ReminderTime TIME NOT NULL,
+    Status NVARCHAR(20) DEFAULT 'PENDING', -- 'PENDING', 'SENT', 'ACKNOWLEDGED', 'MISSED'
+    SentAt DATETIME2 NULL,
+    AcknowledgedAt DATETIME2 NULL,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (RoutineID) REFERENCES MedicationRoutines(RoutineID) ON DELETE CASCADE,
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
 
-IF NOT EXISTS (SELECT * FROM Specialties WHERE SpecialtyName = 'Internal Medicine')
-BEGIN
-    INSERT INTO Specialties (SpecialtyName, Description, IsActive) 
-    VALUES ('Internal Medicine', 'Internal medicine physician', 1);
-END
-
--- Insert default admin user (password: admin123)
-DECLARE @AdminRoleId INT;
-SELECT @AdminRoleId = RoleID FROM Roles WHERE RoleName = 'Admin';
-
-IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'admin')
-BEGIN
-    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
-    VALUES ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@hivclinic.com', @AdminRoleId, 1);
-END
-
--- Insert sample doctor user (password: doctor123)
-DECLARE @DoctorRoleId INT;
-DECLARE @SpecialtyId INT;
-DECLARE @DoctorUserId INT;
-
-SELECT @DoctorRoleId = RoleID FROM Roles WHERE RoleName = 'Doctor';
-SELECT @SpecialtyId = SpecialtyID FROM Specialties WHERE SpecialtyName = 'HIV/AIDS Specialist';
-
-IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'doctor1')
-BEGIN
-    INSERT INTO Users (Username, PasswordHash, Email, RoleID, IsActive) 
-    VALUES ('doctor1', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'doctor1@hivclinic.com', @DoctorRoleId, 1);
-    
-    SELECT @DoctorUserId = SCOPE_IDENTITY();
-    
-    INSERT INTO DoctorProfiles (UserID, FirstName, LastName, SpecialtyID, PhoneNumber, Bio)
-    VALUES (@DoctorUserId, 'Dr. John', 'Smith', @SpecialtyId, '+1234567890', 'Experienced HIV/AIDS specialist with 10+ years of practice.');
-END
-
--- Insert system settings
-IF NOT EXISTS (SELECT * FROM SystemSettings WHERE SettingKey = 'DefaultAppointmentDurationMinutes')
-BEGIN
-    INSERT INTO SystemSettings (SettingKey, SettingValue, Description)
-    VALUES ('DefaultAppointmentDurationMinutes', '30', 'Default duration for appointments in minutes');
-END
-
-IF NOT EXISTS (SELECT * FROM SystemSettings WHERE SettingKey = 'MaxBookingLeadDays')
-BEGIN
-    INSERT INTO SystemSettings (SettingKey, SettingValue, Description)
-    VALUES ('MaxBookingLeadDays', '30', 'Maximum number of days in advance that appointments can be booked');
-END
-
-GO
+-- AppointmentReminders Table: Tracks appointment reminder instances
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AppointmentReminders' AND xtype='U')
+CREATE TABLE AppointmentReminders (
+    ReminderID INT PRIMARY KEY IDENTITY(1,1),
+    AppointmentID INT NOT NULL,
+    PatientUserID INT NOT NULL,
+    ReminderType NVARCHAR(50) NOT NULL, -- '24_HOUR', '1_HOUR', '30_MINUTE'
+    ReminderDateTime DATETIME2 NOT NULL,
+    Status NVARCHAR(20) DEFAULT 'PENDING', -- 'PENDING', 'SENT', 'ACKNOWLEDGED'
+    SentAt DATETIME2 NULL,
+    AcknowledgedAt DATETIME2 NULL,
+    CreatedAt DATETIME2 DEFAULT GETDATE(),
+    FOREIGN KEY (AppointmentID) REFERENCES Appointments(AppointmentID) ON DELETE CASCADE,
+    FOREIGN KEY (PatientUserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);

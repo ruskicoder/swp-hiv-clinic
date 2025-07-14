@@ -1,11 +1,15 @@
 package com.hivclinic.service;
 
+import com.hivclinic.exception.ResourceNotFoundException;
+
 import com.hivclinic.config.JwtUtils;
+import com.hivclinic.dto.request.ChangePasswordRequest;
 import com.hivclinic.dto.request.LoginRequest;
 import com.hivclinic.dto.request.RegisterRequest;
 import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
+import com.hivclinic.model.DoctorProfile;
 import com.hivclinic.model.PatientProfile;
 import com.hivclinic.model.Role;
 import com.hivclinic.model.User;
@@ -50,6 +54,12 @@ public class AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    
+    @Autowired
+    private LoginActivityService loginActivityService;
+    
+    @Autowired
+    private UserSessionService userSessionService;
 
     /**
      * Register a new user (Patient by default for MVP)
@@ -82,6 +92,13 @@ public class AuthService {
             user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
             user.setRole(patientRole);
             user.setIsActive(true);
+            // Set firstname and lastname in Users table
+            user.setFirstName(registerRequest.getFirstName());
+            user.setLastName(registerRequest.getLastName());
+            // No specialty for patient registration
+            // Set createdAt and updatedAt
+            user.setCreatedAt(java.time.LocalDateTime.now());
+            user.setUpdatedAt(java.time.LocalDateTime.now());
 
             // Save user
             User savedUser = userRepository.save(user);
@@ -109,7 +126,28 @@ public class AuthService {
      * Authenticate user and generate JWT token
      */
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
+        return authenticateUser(loginRequest, null, null);
+    }
+    
+    /**
+     * Authenticate user and generate JWT token with login activity tracking
+     */
+    public AuthResponse authenticateUser(LoginRequest loginRequest, String ipAddress, String userAgent) {
         try {
+            // Check if account is locked by username before attempting authentication
+            if (loginActivityService.isAccountLockedByUsername(loginRequest.getUsername())) {
+                logger.warn("Login attempt blocked - Account locked for username: {}", loginRequest.getUsername());
+                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+                throw new RuntimeException("Account temporarily locked due to multiple failed login attempts");
+            }
+            
+            // Check for suspicious IP activity
+            if (ipAddress != null && loginActivityService.isSuspiciousIpActivity(ipAddress)) {
+                logger.warn("Login attempt blocked - Suspicious IP activity from: {}", ipAddress);
+                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+                throw new RuntimeException("Login temporarily blocked due to suspicious activity");
+            }
+
             // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -119,7 +157,7 @@ public class AuthService {
             );
 
             // Get user details from authentication
-            com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal = 
+            com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal =
                     (com.hivclinic.config.CustomUserDetailsService.UserPrincipal) authentication.getPrincipal();
 
             // Generate JWT token
@@ -128,6 +166,15 @@ public class AuthService {
                     userPrincipal.getId(),
                     userPrincipal.getRole()
             );
+
+            // Log successful login attempt
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), true, ipAddress, userAgent);
+
+            // Create session for the user
+            Optional<User> authenticatedUser = userRepository.findByUsername(loginRequest.getUsername());
+            if (authenticatedUser.isPresent()) {
+                userSessionService.createSession(authenticatedUser.get(), jwt, ipAddress, userAgent);
+            }
 
             logger.info("User authenticated successfully: {}", loginRequest.getUsername());
 
@@ -142,9 +189,17 @@ public class AuthService {
 
         } catch (AuthenticationException e) {
             logger.warn("Authentication failed for user: {} - {}", loginRequest.getUsername(), e.getMessage());
+            
+            // Log failed login attempt
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+            
             throw new RuntimeException("Invalid username or password");
         } catch (Exception e) {
             logger.error("Error during authentication: {}", e.getMessage(), e);
+            
+            // Log failed login attempt for system errors
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+            
             throw new RuntimeException("Authentication failed: " + e.getMessage());
         }
     }
@@ -204,24 +259,32 @@ public class AuthService {
 
         // Doctor profile
         if ("Doctor".equalsIgnoreCase(role)) {
-            return doctorProfileRepository.findByUser(user)
-                .map(profile -> new UserProfileResponse(
-                    user.getUserId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    role,
-                    user.getIsActive(),
-                    user.getCreatedAt(),
-                    profile.getFirstName(),
-                    profile.getLastName(),
-                    profile.getPhoneNumber(),
-                    null, // dateOfBirth
-                    null, // address
-                    profile.getSpecialty() != null ? profile.getSpecialty().getSpecialtyName() : null,
-                    profile.getBio(),
-                    profile.getProfileImageBase64()
-                ))
-                .orElseThrow(() -> new RuntimeException("Doctor profile not found"));
+            var doctorProfile = doctorProfileRepository.findByUser(user)
+                .orElseGet(() -> {
+                    // Create default doctor profile if not exists
+                    DoctorProfile newProfile = new DoctorProfile();
+                    newProfile.setUser(user);
+                    newProfile.setFirstName(user.getUsername()); // Default to username
+                    newProfile.setLastName("");
+                    return doctorProfileRepository.save(newProfile);
+                });
+
+            return new UserProfileResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                role,
+                user.getIsActive(),
+                user.getCreatedAt(),
+                doctorProfile.getFirstName(),
+                doctorProfile.getLastName(),
+                doctorProfile.getPhoneNumber(),
+                null, // dateOfBirth
+                null, // address
+                doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
+                doctorProfile.getBio(),
+                doctorProfile.getProfileImageBase64()
+            );
         }
 
         // Admin or other roles: basic info only
@@ -321,5 +384,105 @@ public class AuthService {
             logger.error("Error updating profile image: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to update profile image: " + e.getMessage());
         }
+    }
+
+    /**
+     * Change user password
+     */
+    @Transactional
+    public MessageResponse changePassword(Integer userId, ChangePasswordRequest request) {
+        try {
+            // Get user by ID
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isEmpty()) {
+                logger.warn("Change password attempt for non-existent user ID: {}", userId);
+                return MessageResponse.error("User not found");
+            }
+            
+            User user = userOpt.get();
+            
+            // Verify current password
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+                logger.warn("Change password failed - incorrect current password for user: {}", user.getUsername());
+                return MessageResponse.error("Current password is incorrect");
+            }
+            
+            // Validate new password is different from current
+            if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+                logger.warn("Change password failed - new password same as current for user: {}", user.getUsername());
+                return MessageResponse.error("New password must be different from current password");
+            }
+            
+            // Update password
+            user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+            user.setUpdatedAt(java.time.LocalDateTime.now());
+            
+            userRepository.save(user);
+            
+            logger.info("Password changed successfully for user: {}", user.getUsername());
+            return MessageResponse.success("Password changed successfully");
+            
+        } catch (Exception e) {
+            logger.error("Error changing password for user ID {}: {}", userId, e.getMessage(), e);
+            return MessageResponse.error("Failed to change password: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get user profile by User (for internal use, e.g., admin panel)
+     */
+    public UserProfileResponse getUserProfile(User user) {
+        String role = user.getRole().getRoleName();
+
+        // Doctor profile
+        if ("Doctor".equalsIgnoreCase(role)) {
+            var doctorProfile = doctorProfileRepository.findByUser(user)
+                .orElseGet(() -> {
+                    // Create default doctor profile if not exists
+                    DoctorProfile newProfile = new DoctorProfile();
+                    newProfile.setUser(user);
+                    newProfile.setFirstName(user.getUsername()); // Default to username
+                    newProfile.setLastName("");
+                    return doctorProfileRepository.save(newProfile);
+                });
+
+            return new UserProfileResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                role,
+                user.getIsActive(),
+                user.getCreatedAt(),
+                doctorProfile.getFirstName(),
+                doctorProfile.getLastName(),
+                doctorProfile.getPhoneNumber(),
+                null, // dateOfBirth
+                null, // address
+                doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
+                doctorProfile.getBio(),
+                doctorProfile.getProfileImageBase64()
+            );
+        }
+
+        // Patient profile
+        var patientProfile = patientProfileRepository.findByUser(user)
+            .orElseThrow(() -> new ResourceNotFoundException("Patient profile not found"));
+
+        return new UserProfileResponse(
+            user.getUserId(),
+            user.getUsername(),
+            user.getEmail(),
+            role,
+            user.getIsActive(),
+            user.getCreatedAt(),
+            patientProfile.getFirstName(),
+            patientProfile.getLastName(),
+            patientProfile.getPhoneNumber(),
+            patientProfile.getDateOfBirth(),
+            patientProfile.getAddress(),
+            null, // specialty (not applicable for patients)
+            null, // bio (not applicable for patients)
+            patientProfile.getProfileImageBase64()
+        );
     }
 }

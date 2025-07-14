@@ -76,4 +76,32 @@ public class Appointment {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    // Getters
+    public Integer getAppointmentId() { return appointmentId; }
+    public User getPatientUser() { return patientUser; }
+    public User getDoctorUser() { return doctorUser; }
+    public DoctorAvailabilitySlot getAvailabilitySlot() { return availabilitySlot; }
+    public LocalDateTime getAppointmentDateTime() { return appointmentDateTime; }
+    public Integer getDurationMinutes() { return durationMinutes; }
+    public String getStatus() { return status; }
+    public String getPatientCancellationReason() { return patientCancellationReason; }
+    public String getDoctorCancellationReason() { return doctorCancellationReason; }
+    public String getAppointmentNotes() { return appointmentNotes; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    // Setters
+    public void setAppointmentId(Integer appointmentId) { this.appointmentId = appointmentId; }
+    public void setPatientUser(User patientUser) { this.patientUser = patientUser; }
+    public void setDoctorUser(User doctorUser) { this.doctorUser = doctorUser; }
+    public void setAvailabilitySlot(DoctorAvailabilitySlot availabilitySlot) { this.availabilitySlot = availabilitySlot; }
+    public void setAppointmentDateTime(LocalDateTime appointmentDateTime) { this.appointmentDateTime = appointmentDateTime; }
+    public void setDurationMinutes(Integer durationMinutes) { this.durationMinutes = durationMinutes; }
+    public void setStatus(String status) { this.status = status; }
+    public void setPatientCancellationReason(String patientCancellationReason) { this.patientCancellationReason = patientCancellationReason; }
+    public void setDoctorCancellationReason(String doctorCancellationReason) { this.doctorCancellationReason = doctorCancellationReason; }
+    public void setAppointmentNotes(String appointmentNotes) { this.appointmentNotes = appointmentNotes; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

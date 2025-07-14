@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import apiClient from '../../services/apiClient';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import PatientRecordSection from '../../components/PatientRecordSection';
 import UnifiedCalendar from '../../components/schedule/UnifiedCalendar';
 import ErrorBoundary from '../../components/ErrorBoundary';
-import { formatDateTimeForAPI, createBookingData, validateBookingData, safeFormatDate, safeFormatTime } from '../../utils/dateUtils';
-import { safeRender, safeDate, safeDateTime, safeTime } from '../../utils/renderUtils';
+import { createBookingData, validateBookingData } from '../../utils/dateUtils';
+import { safeRender, safeDate, safeTime } from '../../utils/renderUtils';
 import './CustomerDashboard.css';
 
 const CustomerDashboard = () => {
@@ -433,36 +433,39 @@ const CustomerDashboard = () => {
   const renderPatientRecord = () => (
     <ErrorBoundary>
       <div className="record-content">
-        <div className="content-header">
+        <div className="content-header" style={{width: '100%'}}>
           <h2>My Medical Record</h2>
           <p>View and update your medical information</p>
-        </div>        <PatientRecordSection
-          record={patientRecord}
-          onSave={handleSavePatientRecord}
-          onImageUpload={handleUploadImage}
-          isEditable={true}
-        />
+        </div>
+        <div className="record-main">
+          <PatientRecordSection
+            record={patientRecord}
+            onSave={handleSavePatientRecord}
+            onImageUpload={handleUploadImage}
+            isEditable={true}
+          />
 
-        {arvTreatments?.length > 0 && (
-          <div className="arv-treatments-section">
-            <h3>ARV Treatment History</h3>
-            <div className="treatments-list">
-              {arvTreatments.map(treatment => (
-                <div key={treatment.arvTreatmentId} className="treatment-card">
-                  <h4>{safeRender(treatment.regimen)}</h4>
-                  <p><strong>Start Date:</strong> {safeDate(treatment.startDate)}</p>
-                  {treatment.endDate && (
-                    <p><strong>End Date:</strong> {safeDate(treatment.endDate)}</p>
-                  )}
-                  <p><strong>Adherence:</strong> {safeRender(treatment.adherence)}</p>
-                  {treatment.notes && (
-                    <p><strong>Notes:</strong> {safeRender(treatment.notes)}</p>
-                  )}
-                </div>
-              ))}
+          {arvTreatments?.length > 0 && (
+            <div className="arv-treatments-section">
+              <h3>ARV Treatment History</h3>
+              <div className="treatments-list">
+                {arvTreatments.map(treatment => (
+                  <div key={treatment.arvTreatmentId} className="treatment-card">
+                    <h4>{safeRender(treatment.regimen)}</h4>
+                    <p><strong>Start Date:</strong> {safeDate(treatment.startDate)}</p>
+                    {treatment.endDate && (
+                      <p><strong>End Date:</strong> {safeDate(treatment.endDate)}</p>
+                    )}
+                    <p><strong>Adherence:</strong> {safeRender(treatment.adherence)}</p>
+                    {treatment.notes && (
+                      <p><strong>Notes:</strong> {safeRender(treatment.notes)}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </ErrorBoundary>
   );

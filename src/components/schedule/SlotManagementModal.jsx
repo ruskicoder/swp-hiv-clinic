@@ -24,7 +24,7 @@ const SlotManagementModal = ({
   const [showConfirmBooking, setShowConfirmBooking] = useState(false);
   const [showCancelBooking, setShowCancelBooking] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [_error, _setError] = useState(null);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -254,7 +254,7 @@ const SlotManagementModal = ({
       if (!onAddSlot) throw new Error('Add slot handler not provided');
       
       setLoading(true);
-      setError(null);
+      _setError(null);
 
       const response = await onAddSlot(slotData);
       

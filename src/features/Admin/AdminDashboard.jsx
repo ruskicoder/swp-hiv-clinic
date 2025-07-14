@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../../contexts/useAuth';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import ErrorBoundary from '../../components/ErrorBoundary';
@@ -8,7 +8,7 @@ import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
@@ -18,22 +18,30 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
-const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [specialties, setSpecialties] = useState([]);
+
+  // Loading states
+  const [specialtiesLoading, setSpecialtiesLoading] = useState(true);
+  const [specialtiesError, setSpecialtiesError] = useState('');
 
   // Error states
   const [usersError, setUsersError] = useState('');
   const [appointmentsError, setAppointmentsError] = useState('');
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  // Tab transition state
+  const [isTabChanging, setIsTabChanging] = useState(false);
 
-  const loadDashboardData = async () => {
+  // Form state preservation
+  const [preservedFormData, setPreservedFormData] = useState({});
+
+  const loadDashboardData = useCallback(async () => {
     setLoading(true);
     setError('');
     setUsersError('');
     setAppointmentsError('');
+    setSpecialtiesLoading(true);
+    setSpecialtiesError('');
 
     try {
       console.log('Loading admin dashboard data...');
@@ -70,17 +78,26 @@ const [appointments, setAppointments] = useState([]);
 
       if (specialtiesResult.status === 'fulfilled' && specialtiesResult.value?.data) {
         setSpecialties(Array.isArray(specialtiesResult.value.data) ? specialtiesResult.value.data : []);
+        setSpecialtiesLoading(false);
+      } else {
+        setSpecialtiesError('Failed to load specialties');
+        setSpecialtiesLoading(false);
       }
 
     } catch (error) {
       console.error('Dashboard error:', error);
       setError('Failed to load dashboard data. Please try again.');
+      setSpecialtiesLoading(false);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleLogout = () => {
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
+
+  const _handleLogout = () => {
     logout();
     navigate('/');
   };
@@ -331,46 +348,71 @@ const [appointments, setAppointments] = useState([]);
   );
 
   const CreateDoctorForm = () => {
-    const [formData, setFormData] = useState({
-      username: '',
-      email: '',
-      password: '',
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      specialtyId: '',
-      bio: ''
-    });
+    console.log('🔍 DEBUG: CreateDoctorForm component rendering');
+    console.log('🔍 DEBUG: Available specialties:', specialties);
+    console.log('🔍 DEBUG: Specialties length:', specialties?.length);
+    console.log('🔍 DEBUG: Specialties loading:', specialtiesLoading);
+    
+    const [formData, setFormData] = useState(() => ({
+      username: preservedFormData.username || '',
+      email: preservedFormData.email || '',
+      password: preservedFormData.password || '',
+      firstName: preservedFormData.firstName || '',
+      lastName: preservedFormData.lastName || '',
+      phoneNumber: preservedFormData.phoneNumber || '',
+      specialtyId: preservedFormData.specialtyId || '',
+      bio: preservedFormData.bio || ''
+    }));
     const [formLoading, setFormLoading] = useState(false);
     const [formError, setFormError] = useState('');
+    const [formSuccess, setFormSuccess] = useState('');
 
     const handleSubmit = async (e) => {
       e.preventDefault();
+      console.log('🔍 DEBUG: Form submission started');
+      console.log('🔍 DEBUG: Current form data:', formData);
+      console.log('🔍 DEBUG: Available specialties for validation:', specialties);
+      
       setFormLoading(true);
       setFormError('');
+      setFormSuccess('');
 
       try {
-        // Use URLSearchParams for x-www-form-urlencoded, and send all fields as strings
-        const params = new URLSearchParams();
-        Object.keys(formData).forEach(key => {
-          // Always send all fields, even if empty (backend expects all params)
-          // specialtyId must be sent as a number or empty string
-          if (key === 'specialtyId' && formData[key]) {
-            params.append(key, Number(formData[key]));
-          } else {
-            params.append(key, formData[key] ?? '');
-          }
-        });
+        // Validation
+        if (!formData.username || !formData.email || !formData.password ||
+            !formData.firstName || !formData.lastName) {
+          setFormError('Please fill in all required fields');
+          setFormLoading(false);
+          return;
+        }
 
-        const response = await apiClient.post('/admin/doctors', params, {
+        // Prepare form data for x-www-form-urlencoded
+        const formDataToSend = new URLSearchParams();
+        formDataToSend.append('username', formData.username);
+        formDataToSend.append('email', formData.email);
+        formDataToSend.append('password', formData.password);
+        formDataToSend.append('firstName', formData.firstName);
+        formDataToSend.append('lastName', formData.lastName);
+        formDataToSend.append('phoneNumber', formData.phoneNumber || '');
+        formDataToSend.append('specialtyId', formData.specialtyId || '');
+        formDataToSend.append('bio', formData.bio || '');
+
+        console.log('🔍 DEBUG: Form data being sent:', Array.from(formDataToSend.entries()));
+
+        const response = await apiClient.post('/admin/doctors', formDataToSend, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
         });
+        
+        console.log('🔍 DEBUG: API response received:', response.data);
 
         if (response.data && (response.data.success || response.data.isSuccess)) {
-          alert('Doctor created successfully!');
-          setFormData({
+          console.log('🔍 DEBUG: Doctor created successfully, response:', response.data);
+          setFormSuccess('Doctor created successfully!');
+          
+          // Reset form
+          const resetData = {
             username: '',
             email: '',
             password: '',
@@ -379,30 +421,45 @@ const [appointments, setAppointments] = useState([]);
             phoneNumber: '',
             specialtyId: '',
             bio: ''
-          });
+          };
+          setFormData(resetData);
+          setPreservedFormData(resetData);
+          
+          // Reload data and switch to doctors tab
           loadDashboardData();
-          setActiveTab('doctors');
+          setTimeout(() => {
+            setActiveTab('doctors');
+          }, 1500);
         } else {
-          setFormError(response.data?.message || response.data?.msg || 'Failed to create doctor');
+          console.log('🔍 DEBUG: Doctor creation failed, response:', response.data);
+          const errorMsg = response.data?.message || response.data?.msg || 'Failed to create doctor';
+          console.log('🔍 DEBUG: Setting form error:', errorMsg);
+          setFormError(errorMsg);
         }
       } catch (error) {
-        setFormError(
-          error?.response?.data?.message ||
+        console.log('🔍 DEBUG: Exception during doctor creation:', error);
+        console.log('🔍 DEBUG: Error response:', error?.response?.data);
+        const errorMsg = error?.response?.data?.message ||
           error?.response?.data?.msg ||
           error?.response?.data?.error ||
           error?.message ||
-          'Failed to create doctor'
-        );
+          'Failed to create doctor';
+        console.log('🔍 DEBUG: Setting form error from exception:', errorMsg);
+        setFormError(errorMsg);
       } finally {
+        console.log('🔍 DEBUG: Form submission completed, loading:', false);
         setFormLoading(false);
       }
     };
 
     const handleChange = (e) => {
-      setFormData({
+      console.log('🔍 DEBUG: Form field changed:', e.target.name, '=', e.target.value);
+      const updatedData = {
         ...formData,
         [e.target.name]: e.target.value
-      });
+      };
+      setFormData(updatedData);
+      setPreservedFormData(updatedData);
     };
 
     return (
@@ -413,10 +470,22 @@ const [appointments, setAppointments] = useState([]);
             <p>Add a new doctor to the system</p>
           </div>
 
+          {specialtiesLoading && (
+            <div className="loading-message">
+              <p>Loading form data...</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="create-doctor-form">
             {formError && (
               <div className="error-message">
                 {formError}
+              </div>
+            )}
+
+            {formSuccess && (
+              <div className="success-message">
+                {formSuccess}
               </div>
             )}
 
@@ -502,14 +571,22 @@ const [appointments, setAppointments] = useState([]);
                 name="specialtyId"
                 value={formData.specialtyId}
                 onChange={handleChange}
+                disabled={specialtiesLoading}
               >
-                <option value="">Select a specialty...</option>
-                {specialties.map((specialty, index) => (
+                <option value="">
+                  {specialtiesLoading ? 'Loading specialties...' : 'Select a specialty...'}
+                </option>
+                {!specialtiesLoading && specialties.map((specialty, index) => (
                   <option key={specialty?.specialtyId || index} value={specialty?.specialtyId}>
                     {safeRender(specialty?.specialtyName)}
                   </option>
                 ))}
               </select>
+              {specialtiesError && (
+                <div className="field-error">
+                  {specialtiesError}
+                </div>
+              )}
             </div>
 
             <div className="form-group">
@@ -524,7 +601,7 @@ const [appointments, setAppointments] = useState([]);
               />
             </div>
 
-            <button type="submit" className="submit-btn" disabled={formLoading}>
+            <button type="submit" className="submit-btn" disabled={formLoading || specialtiesLoading}>
               {formLoading ? 'Creating...' : 'Create Doctor'}
             </button>
           </form>
@@ -533,22 +610,6 @@ const [appointments, setAppointments] = useState([]);
     );
   };
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return renderOverview();
-      case 'users':
-        return renderUsers();
-      case 'doctors':
-        return renderDoctors();
-      case 'appointments':
-        return renderAppointments();
-      case 'create-doctor':
-        return <CreateDoctorForm />;
-      default:
-        return renderOverview();
-    }
-  };
 
   if (loading) {
     return (
@@ -558,39 +619,48 @@ const [appointments, setAppointments] = useState([]);
     );
   }
 
+  // Use the same sidebar style as ManagerDashboard
   return (
     <div className="admin-dashboard">
-      <DashboardHeader 
-        title="Admin Portal"
-      />
-      
+      <DashboardHeader title="Admin Dashboard" subtitle="System overview and management" />
       <div className="dashboard-layout">
-        {/* Vertical Sidebar */}
-        <div className="dashboard-sidebar">
-          <div className="sidebar-header">
-            <h1>Navigation</h1>
-          </div>
-          <nav className="dashboard-nav">
-            {navigationItems.map(item => (
-              <div key={item.id} className="nav-item">
-                <button
-                  className={`nav-button ${activeTab === item.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(item.id)}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  {item.label}
-                </button>
-              </div>
-            ))}
-            {/* Remove logout button here */}
-          </nav>
-        </div>
-        {/* Main Content */}
-        <div className="dashboard-main">
-          <div className="dashboard-content">
-            {renderContent()}
-          </div>
-        </div>
+        <aside className="manager-sidebar">
+          {navigationItems.map(item => (
+            <button
+              key={item.id}
+              className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
+              onClick={() => {
+                console.log('🔍 DEBUG: Tab switching from', activeTab, 'to', item.id);
+                setIsTabChanging(true);
+                setActiveTab(item.id);
+                setTimeout(() => setIsTabChanging(false), 300);
+              }}
+            >
+              {item.icon} {item.label}
+            </button>
+          ))}
+        </aside>
+        <main className="dashboard-main">
+          {isTabChanging && (
+            <div className="tab-transition-loading">
+              <p>Loading...</p>
+            </div>
+          )}
+          {!isTabChanging && (
+            <>
+              {activeTab === 'overview' && renderOverview()}
+              {activeTab === 'users' && renderUsers()}
+              {activeTab === 'doctors' && renderDoctors()}
+              {activeTab === 'appointments' && renderAppointments()}
+              {activeTab === 'create-doctor' && (
+                <div>
+                  {console.log('🔍 DEBUG: Rendering CreateDoctorForm component')}
+                  <CreateDoctorForm />
+                </div>
+              )}
+            </>
+          )}
+        </main>
       </div>
     </div>
   );

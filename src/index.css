@@ -57,6 +57,10 @@ html {
   font-size: var(--font-size-base);
 }
 
+body, html {
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+
 body {
   min-height: 100vh;
   font-family: var(--font-family);
