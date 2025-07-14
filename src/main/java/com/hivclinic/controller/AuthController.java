@@ -181,6 +181,7 @@ public class AuthController {
                 profileData.get("firstName"),
                 profileData.get("lastName"),
                 profileData.get("phoneNumber"),
+                profileData.get("gender"),
                 profileData.get("dateOfBirth"),
                 profileData.get("address"),
                 profileData.get("bio")

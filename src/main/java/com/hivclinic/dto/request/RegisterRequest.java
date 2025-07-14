@@ -42,6 +42,9 @@ public class RegisterRequest {
     @Size(max = 20, message = "Phone number must not exceed 20 characters")
     private String phoneNumber;
 
+    // Optional: Gender selection (allows null)
+    private String gender;
+
     // For MVP, we'll default to "Patient" role during registration
     // In a more complex system, you might include a role field here
     // private String role = "Patient";
@@ -54,6 +57,7 @@ public class RegisterRequest {
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public String getPhoneNumber() { return phoneNumber; }
+    public String getGender() { return gender; }
 
     // Setters
     public void setUsername(String username) { this.username = username; }
@@ -63,4 +67,5 @@ public class RegisterRequest {
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public void setGender(String gender) { this.gender = gender; }
 }

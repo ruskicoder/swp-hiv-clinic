@@ -15,7 +15,8 @@ const Register = () => {
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    gender: ''
   });
   
   const [errors, setErrors] = useState({});
@@ -232,6 +233,22 @@ const Register = () => {
               onChange={handleChange}
               disabled={loading}
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="gender">Gender (Optional)</label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              disabled={loading}
+            >
+              <option value="">Select Gender (Optional)</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
           </div>
 
           <div className="form-group">

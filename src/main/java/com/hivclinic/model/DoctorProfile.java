@@ -34,6 +34,9 @@ public class DoctorProfile {
     @Column(name = "Bio", columnDefinition = "NVARCHAR(MAX)")
     private String bio;
 
+    @Column(name = "Gender", length = 10)
+    private String gender;
+
     @Lob
     @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
     private String profileImageBase64;
@@ -46,6 +49,7 @@ public class DoctorProfile {
     public Specialty getSpecialty() { return specialty; }
     public String getPhoneNumber() { return phoneNumber; }
     public String getBio() { return bio; }
+    public String getGender() { return gender; }
     public String getProfileImageBase64() { return profileImageBase64; }
 
     // Setters
@@ -56,5 +60,6 @@ public class DoctorProfile {
     public void setSpecialty(Specialty specialty) { this.specialty = specialty; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setBio(String bio) { this.bio = bio; }
+    public void setGender(String gender) { this.gender = gender; }
     public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
 }

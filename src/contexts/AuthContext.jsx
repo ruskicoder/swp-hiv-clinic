@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
       
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         
         if (token) {
           try {

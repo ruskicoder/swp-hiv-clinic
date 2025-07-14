@@ -1,4 +1,4 @@
-package com.hivclinic.dto.response;
+    package com.hivclinic.dto.response;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +21,7 @@ public class UserProfileResponse {
     private String firstName;
     private String lastName;
     private String phoneNumber;
+    private String gender;
     
     // Patient-specific fields
     private LocalDate dateOfBirth;
@@ -34,9 +35,9 @@ public class UserProfileResponse {
     private String profileImageBase64;
     
     // Constructor for basic user info (common fields)
-    public UserProfileResponse(Integer userId, String username, String email, String role, 
-                              Boolean isActive, LocalDateTime createdAt, String firstName, 
-                              String lastName, String phoneNumber) {
+    public UserProfileResponse(Integer userId, String username, String email, String role,
+                              Boolean isActive, LocalDateTime createdAt, String firstName,
+                              String lastName, String phoneNumber, String gender) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -46,12 +47,13 @@ public class UserProfileResponse {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
+        this.gender = gender;
     }
 
     // Constructor for all fields (Patient or Doctor)
     public UserProfileResponse(Integer userId, String username, String email, String role,
                               Boolean isActive, LocalDateTime createdAt, String firstName,
-                              String lastName, String phoneNumber, LocalDate dateOfBirth,
+                              String lastName, String phoneNumber, String gender, LocalDate dateOfBirth,
                               String address, String specialty, String bio, String profileImageBase64) {
         this.userId = userId;
         this.username = username;
@@ -62,6 +64,7 @@ public class UserProfileResponse {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
+        this.gender = gender;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.specialty = specialty;
