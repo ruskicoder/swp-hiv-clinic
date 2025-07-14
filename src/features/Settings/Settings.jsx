@@ -209,12 +209,12 @@ const Settings = () => {
     }
 
     try {
-      const response = await apiClient.put('/auth/change-password', {
+      const response = await authService.changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword
       });
 
-      if (response.data.success) {
+      if (response.success) {
         setMessage('Password changed successfully!');
         setPasswordData({
           currentPassword: '',
@@ -222,7 +222,7 @@ const Settings = () => {
           confirmPassword: ''
         });
       } else {
-        setError(response.data.message || 'Failed to change password');
+        setError(response.message || 'Failed to change password');
       }
     } catch (err) {
       console.error('Error changing password:', err);

@@ -1,6 +1,7 @@
 package com.hivclinic.controller;
 
 import com.hivclinic.config.CustomUserDetailsService;
+import com.hivclinic.dto.request.ChangePasswordRequest;
 import com.hivclinic.dto.request.LoginRequest;
 import com.hivclinic.dto.request.RegisterRequest;
 import com.hivclinic.dto.response.AuthResponse;
@@ -226,6 +227,34 @@ public class AuthController {
             logger.error("Error updating profile image for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to update profile image: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Change user password
+     */
+    @PutMapping("/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> changePassword(
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        try {
+            logger.debug("Password change request for user: {}", userPrincipal.getUsername());
+            
+            MessageResponse response = authService.changePassword(userPrincipal.getId(), request);
+            
+            if (response.isSuccess()) {
+                logger.info("Password changed successfully for user: {}", userPrincipal.getUsername());
+                return ResponseEntity.ok(response);
+            } else {
+                logger.warn("Password change failed for user {}: {}", userPrincipal.getUsername(), response.getMessage());
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+        } catch (Exception e) {
+            logger.error("Error changing password for user {}: {}", userPrincipal.getUsername(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to change password: " + e.getMessage()));
         }
     }
 

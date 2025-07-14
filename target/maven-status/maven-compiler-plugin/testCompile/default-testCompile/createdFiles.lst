@@ -1,9 +1,0 @@
-com\hivclinic\service\NotificationBulkOperationsTest.class
-com\hivclinic\integration\NotificationTemplateIntegrationTest.class
-com\hivclinic\service\NotificationPersistenceTest.class
-com\hivclinic\service\NotificationStatusFixTest.class
-com\hivclinic\controller\NotificationControllerTest.class
-com\hivclinic\service\NotificationTemplateServiceTest.class
-com\hivclinic\service\DoctorNotificationServiceTest.class
-com\hivclinic\service\NotificationVisibilityTest.class
-com\hivclinic\service\NotificationServiceTest.class
