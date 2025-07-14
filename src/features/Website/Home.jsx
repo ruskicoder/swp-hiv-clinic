@@ -98,10 +98,10 @@ const Home = () => {
               </p>
               <div className="hero-actions">
                 <Link to="/register" className="btn btn-primary btn-large">
-                  Book Appointment
+                  Register
                 </Link>
                 <Link to="/login" className="btn btn-secondary btn-large">
-                  Patient Portal
+                  Login
                 </Link>
               </div>
             </div>
