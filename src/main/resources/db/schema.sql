@@ -26,7 +26,8 @@ CREATE TABLE Users (
     RoleID INT NOT NULL FOREIGN KEY REFERENCES Roles(RoleID),
     IsActive BIT DEFAULT 1,
     CreatedAt DATETIME2 DEFAULT GETDATE(),
-    UpdatedAt DATETIME2 DEFAULT GETDATE()
+    UpdatedAt DATETIME2 DEFAULT GETDATE(),
+    LastLoginAt DATETIME2 NULL
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Specialties' AND xtype='U')

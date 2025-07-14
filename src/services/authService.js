@@ -181,6 +181,25 @@ const authService = {
   },
 
   /**
+   * Change user password
+   */
+  async changePassword(passwordData) {
+    try {
+      const response = await apiClient.put('/auth/change-password', passwordData);
+      return {
+        success: true,
+        message: response.data.message || 'Password changed successfully'
+      };
+    } catch (error) {
+      console.error('Change password error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to change password'
+      };
+    }
+  },
+
+  /**
    * Logout user (server-side session invalidation + client-side cleanup)
    */
   async logout() {

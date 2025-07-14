@@ -1,13 +1,9 @@
-
 package com.hivclinic.service;
 
-import com.hivclinic.model.User;
-import com.hivclinic.repository.UserRepository;
-import com.hivclinic.repository.ARVTreatmentRepository;
-import com.hivclinic.repository.AppointmentRepository;
-import com.hivclinic.repository.DoctorAvailabilitySlotRepository;
-import com.hivclinic.repository.PatientProfileRepository;
-import com.hivclinic.repository.PatientRecordRepository;
+import com.hivclinic.model.*;
+import com.hivclinic.model.ARVTreatment;
+import com.hivclinic.model.PatientProfile;
+import com.hivclinic.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -256,20 +252,159 @@ public class ManagerService {
                 map.put("startTime", s.getStartTime());
                 map.put("endTime", s.getEndTime());
                 map.put("status", s.getIsBooked() != null && s.getIsBooked() ? "Booked" : "Available");
+                
                 if (s.getIsBooked() != null && s.getIsBooked()) {
-                    // Find the appointment for this slot
                     var appointments = appointmentRepository.findByAvailabilitySlot(s);
                     if (!appointments.isEmpty()) {
                         var appointment = appointments.get(0); // Most recent
-                        var patient = appointment.getPatientUser();
-                        if (patient != null) {
-                            map.put("bookedByName", (patient.getFirstName() != null ? patient.getFirstName() : "") + " " + (patient.getLastName() != null ? patient.getLastName() : ""));
-                            map.put("bookedByUsername", patient.getUsername());
-                            map.put("bookedByEmail", patient.getEmail());
+                        var patientUser = appointment.getPatientUser();
+                        if (patientUser != null) {
+                            map.put("bookedByName", (patientUser.getFirstName() != null ? patientUser.getFirstName() : "") + " " + (patientUser.getLastName() != null ? patientUser.getLastName() : ""));
+                            map.put("bookedByUsername", patientUser.getUsername());
+                            map.put("bookedByEmail", patientUser.getEmail());
                         }
                     }
                 }
                 return map;
             }).toList();
+    }
+
+    /**
+     * Generate CSV content for PatientProfiles table
+     */
+    public String generatePatientProfilesCSV() {
+        StringBuilder csv = new StringBuilder();
+        csv.append("Profile ID,User ID,First Name,Last Name,Phone Number,Date of Birth,Gender,Address,Blood Type,Emergency Contact,Emergency Phone,Insurance Provider,Insurance Number,Private\n");
+
+        List<PatientProfile> profiles = patientProfileRepository.findAll();
+        for (PatientProfile profile : profiles) {
+            User user = profile.getUser();
+            csv.append(String.format("%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                profile.getPatientProfileId(),
+                user != null ? user.getUserId() : "",
+                profile.getFirstName().replace("\"", "\"\""),
+                profile.getLastName().replace("\"", "\"\""),
+                profile.getPhoneNumber() != null ? profile.getPhoneNumber().replace("\"", "\"\"") : "",
+                profile.getDateOfBirth() != null ? profile.getDateOfBirth() : "",
+                profile.getGender() != null ? profile.getGender().replace("\"", "\"\"") : "",
+                profile.getAddress() != null ? profile.getAddress().replace("\"", "\"\"") : "",
+                profile.getBloodType() != null ? profile.getBloodType().replace("\"", "\"\"") : "",
+                profile.getEmergencyContact() != null ? profile.getEmergencyContact().replace("\"", "\"\"") : "",
+                profile.getEmergencyPhone() != null ? profile.getEmergencyPhone().replace("\"", "\"\"") : "",
+                profile.getInsuranceProvider() != null ? profile.getInsuranceProvider().replace("\"", "\"\"") : "",
+                profile.getInsuranceNumber() != null ? profile.getInsuranceNumber().replace("\"", "\"\"") : "",
+                profile.getIsPrivate() != null ? profile.getIsPrivate().toString() : "false"
+            ));
+        }
+        return csv.toString();
+    }
+
+    /**
+     * Generate CSV content for DoctorAvailabilitySlots table
+     */
+    public String generateDoctorSlotsCSV() {
+        StringBuilder csv = new StringBuilder();
+        csv.append("Slot ID,Doctor ID,Doctor Name,Date,Start Time,End Time,Status,Booked By\n");
+
+        doctorAvailabilitySlotRepository.findAll().forEach(slot -> {
+            String doctorName = "";
+            String bookedBy = "";
+
+            if (slot.getDoctorUser() != null) {
+                doctorName = (slot.getDoctorUser().getFirstName() + " " + slot.getDoctorUser().getLastName()).trim();
+            }
+
+            if (slot.getIsBooked() != null && slot.getIsBooked() && slot.getAppointment() != null && slot.getAppointment().getPatientUser() != null) {
+                User patient = slot.getAppointment().getPatientUser();
+                bookedBy = (patient.getFirstName() + " " + patient.getLastName()).trim();
+            }
+
+            csv.append(String.format("%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                slot.getAvailabilitySlotId(),
+                slot.getDoctorUser() != null ? slot.getDoctorUser().getUserId() : "",
+                doctorName.replace("\"", "\"\""),
+                slot.getSlotDate(),
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getIsBooked() != null && slot.getIsBooked() ? "Booked" : "Available",
+                bookedBy.replace("\"", "\"\"")
+            ));
+        });
+
+        return csv.toString();
+    }
+
+    /**
+     * Generate CSV content for ARVTreatments table
+     */
+    public String generateARVTreatmentsCSV() {
+        StringBuilder csv = new StringBuilder();
+        csv.append("Treatment ID,Patient Name,Doctor Name,Start Date,End Date,Drug Name,Drug Quantity,Notes,Created At,Updated At\n");
+
+        List<ARVTreatment> treatments = arvTreatmentRepository.findAll();
+        for (ARVTreatment arv : treatments) {
+            final String[] patientName = {""};  // Make array to be effectively final
+            final String[] doctorName = {""};   // Make array to be effectively final
+
+            if (arv.getPatientUserID() != null) {
+                userRepository.findById(arv.getPatientUserID()).ifPresent(u -> {
+                    String name = (u.getFirstName() + " " + u.getLastName()).trim();
+                    if (!name.isEmpty()) {
+                        patientName[0] = name;
+                    }
+                });
+            }
+
+            if (arv.getDoctorUserID() != null) {
+                userRepository.findById(arv.getDoctorUserID()).ifPresent(u -> {
+                    String name = (u.getFirstName() + " " + u.getLastName()).trim();
+                    if (!name.isEmpty()) {
+                        doctorName[0] = "Dr. " + name;
+                    }
+                });
+            }
+
+            csv.append(String.format("%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                arv.getArvTreatmentID(),
+                patientName[0].replace("\"", "\"\""),  // Access array element
+                doctorName[0].replace("\"", "\"\""),   // Access array element
+                arv.getStartDate(),
+                arv.getEndDate(),
+                arv.getDrugName(),
+                arv.getDrugQuantity(),
+                arv.getNotes().replace("\"", "\"\""),
+                arv.getCreatedAt(),
+                arv.getUpdatedAt()
+            ));
+        }
+        return csv.toString();
+    }
+
+    /**
+     * Generate CSV content for Appointments table
+     */
+    public String generateAppointmentsCSV() {
+        StringBuilder csv = new StringBuilder();
+        csv.append("Appointment ID,Patient Name,Doctor Name,Date Time,Status,Notes,Created At\n");
+
+        appointmentRepository.findAll().forEach(appointment -> {
+            String patientName = appointment.getPatientUser() != null ? 
+                (appointment.getPatientUser().getFirstName() + " " + appointment.getPatientUser().getLastName()).trim() : "";
+            
+            String doctorName = appointment.getDoctorUser() != null ? 
+                (appointment.getDoctorUser().getFirstName() + " " + appointment.getDoctorUser().getLastName()).trim() : "";
+
+            csv.append(String.format("%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                appointment.getAppointmentId(),
+                patientName.replace("\"", "\"\""),
+                doctorName.replace("\"", "\"\""),
+                appointment.getAppointmentDateTime(),
+                appointment.getStatus() != null ? appointment.getStatus() : "",
+                appointment.getAppointmentNotes() != null ? appointment.getAppointmentNotes().replace("\"", "\"\"") : "",
+                appointment.getCreatedAt()
+            ));
+        });
+
+        return csv.toString();
     }
 }
