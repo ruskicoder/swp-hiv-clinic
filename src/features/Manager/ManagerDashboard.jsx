@@ -394,7 +394,7 @@ const ManagerDashboard = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search patients by name or email..."
+          placeholder="Search patients by name"
           value={patientSearch}
           onChange={handlePatientSearchChange}
           onKeyDown={handlePatientSearchKeyDown}
@@ -467,7 +467,7 @@ const ManagerDashboard = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search doctors by name or specialty..."
+          placeholder="Search doctors by name"
           value={doctorSearch}
           onChange={handleDoctorSearchChange}
           onKeyDown={handleDoctorSearchKeyDown}
