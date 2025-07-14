@@ -28,6 +28,8 @@ public class ManagerService {
     private PatientProfileRepository patientProfileRepository;
     @Autowired
     private PatientRecordRepository patientRecordRepository;
+    @Autowired
+    private DoctorProfileRepository doctorProfileRepository; // Thêm dòng này
 
     /**
      * Search ARV treatments by date range (startDate between from and to)
@@ -407,6 +409,31 @@ public class ManagerService {
             ));
         });
 
+        return csv.toString();
+    }
+
+    /**
+     * Generate CSV content for DoctorProfiles table
+     */
+    public String generateDoctorProfilesCSV() {
+        StringBuilder csv = new StringBuilder();
+        csv.append("Profile ID,User ID,First Name,Last Name,Specialty,Phone Number,Bio\n");
+
+        List<DoctorProfile> profiles = doctorProfileRepository.findAll();
+        for (DoctorProfile profile : profiles) {
+            User user = profile.getUser();
+            String specialtyName = profile.getSpecialty() != null ? profile.getSpecialty().getSpecialtyName() : "";
+            
+            csv.append(String.format("%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                profile.getDoctorProfileId(),
+                user != null ? user.getUserId() : "",
+                profile.getFirstName().replace("\"", "\"\""),
+                profile.getLastName().replace("\"", "\"\""),
+                specialtyName.replace("\"", "\"\""),
+                profile.getPhoneNumber() != null ? profile.getPhoneNumber().replace("\"", "\"\"") : "",
+                profile.getBio() != null ? profile.getBio().replace("\"", "\"\"") : ""
+            ));
+        }
         return csv.toString();
     }
 }
