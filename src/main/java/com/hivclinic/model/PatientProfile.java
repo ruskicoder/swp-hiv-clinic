@@ -1,7 +1,6 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 
 /**
@@ -45,6 +44,21 @@ public class PatientProfile {
     @Column(name = "IsPrivate", nullable = false)
     private Boolean isPrivate = false;
 
+    @Column(name = "BloodType", length = 10)
+    private String bloodType;
+
+    @Column(name = "EmergencyContact", length = 100)
+    private String emergencyContact;
+
+    @Column(name = "EmergencyPhone", length = 20)
+    private String emergencyPhone;
+
+    @Column(name = "InsuranceProvider", length = 100)
+    private String insuranceProvider;
+
+    @Column(name = "InsuranceNumber", length = 50)
+    private String insuranceNumber;
+
     // Getters
     public Integer getPatientProfileId() { return patientProfileId; }
     public User getUser() { return user; }
@@ -57,6 +71,11 @@ public class PatientProfile {
     public String getProfileImageBase64() { return profileImageBase64; }
     public Boolean isPrivate() { return isPrivate; }
     public Boolean getIsPrivate() { return isPrivate; }
+    public String getBloodType() { return bloodType; }
+    public String getEmergencyContact() { return emergencyContact; }
+    public String getEmergencyPhone() { return emergencyPhone; }
+    public String getInsuranceProvider() { return insuranceProvider; }
+    public String getInsuranceNumber() { return insuranceNumber; }
 
     // Setters
     public void setPatientProfileId(Integer id) { this.patientProfileId = id; }
@@ -70,4 +89,9 @@ public class PatientProfile {
     public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
     public void setIsPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }
     public void setPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }  // Added method to match service usage
+    public void setBloodType(String bloodType) { this.bloodType = bloodType; }
+    public void setEmergencyContact(String emergencyContact) { this.emergencyContact = emergencyContact; }
+    public void setEmergencyPhone(String emergencyPhone) { this.emergencyPhone = emergencyPhone; }
+    public void setInsuranceProvider(String insuranceProvider) { this.insuranceProvider = insuranceProvider; }
+    public void setInsuranceNumber(String insuranceNumber) { this.insuranceNumber = insuranceNumber; }
 }
