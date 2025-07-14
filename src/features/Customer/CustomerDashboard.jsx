@@ -534,22 +534,22 @@ const CustomerDashboard = () => {
       
       {/* Gender Update Notification Banner */}
       {showGenderNotification && (
-        <div className="notification-banner gender-notification">
-          <div className="notification-content">
-            <span className="notification-icon">⚠️</span>
-            <div className="notification-text">
+        <div className="gender-notification-banner">
+          <div className="gender-notification-content">
+            <span className="gender-notification-icon">⚠️</span>
+            <div className="gender-notification-text">
               <strong>Profile Incomplete:</strong> Please update your gender in Settings to complete your profile.
             </div>
-            <div className="notification-actions">
+            <div className="gender-notification-actions">
               <button
                 onClick={handleGoToSettings}
-                className="notification-btn primary"
+                className="gender-btn primary"
               >
                 Go to Settings
               </button>
               <button
                 onClick={dismissGenderNotification}
-                className="notification-btn secondary"
+                className="gender-btn secondary"
               >
                 Dismiss
               </button>

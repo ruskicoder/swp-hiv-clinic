@@ -1,7 +1,8 @@
-    package com.hivclinic.dto.response;
+package com.hivclinic.dto.response;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.hivclinic.model.Gender;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +22,8 @@ public class UserProfileResponse {
     private String firstName;
     private String lastName;
     private String phoneNumber;
-    private String gender;
+    private String gender; // Store as string for JSON serialization
+    private Boolean hasGender; // Flag to indicate if user has selected gender
     
     // Patient-specific fields
     private LocalDate dateOfBirth;
@@ -48,6 +50,7 @@ public class UserProfileResponse {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
+        this.hasGender = gender != null;
     }
 
     // Constructor for all fields (Patient or Doctor)
@@ -65,10 +68,17 @@ public class UserProfileResponse {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.gender = gender;
+        this.hasGender = gender != null;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.specialty = specialty;
         this.bio = bio;
         this.profileImageBase64 = profileImageBase64;
+    }
+    
+    // Helper method to set gender from enum
+    public void setGenderFromEnum(Gender genderEnum) {
+        this.gender = genderEnum != null ? genderEnum.getDisplayName() : null;
+        this.hasGender = genderEnum != null;
     }
 }

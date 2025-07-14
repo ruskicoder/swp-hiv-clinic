@@ -47,7 +47,9 @@ CREATE TABLE DoctorProfiles (
     SpecialtyID INT FOREIGN KEY REFERENCES Specialties(SpecialtyID),
     PhoneNumber NVARCHAR(20),
     Bio NVARCHAR(MAX),
-    ProfileImageBase64 NVARCHAR(MAX)
+    Gender NVARCHAR(20) NULL,
+    ProfileImageBase64 NVARCHAR(MAX),
+    CONSTRAINT CHK_DoctorProfile_Gender CHECK (Gender IN ('Male', 'Female'))
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PatientProfiles' AND xtype='U')
@@ -59,8 +61,15 @@ CREATE TABLE PatientProfiles (
     DateOfBirth DATE,
     PhoneNumber NVARCHAR(20),
     Address NVARCHAR(MAX),
+    Gender NVARCHAR(20) NULL,
     ProfileImageBase64 NVARCHAR(MAX),
-    IsPrivate BIT NOT NULL DEFAULT 0
+    IsPrivate BIT NOT NULL DEFAULT 0,
+    BloodType NVARCHAR(10),
+    EmergencyContact NVARCHAR(100),
+    EmergencyPhone NVARCHAR(20),
+    InsuranceProvider NVARCHAR(100),
+    InsuranceNumber NVARCHAR(50),
+    CONSTRAINT CHK_PatientProfile_Gender CHECK (Gender IN ('Male', 'Female'))
 );
 
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DoctorAvailabilitySlots' AND xtype='U')
@@ -307,4 +316,55 @@ END
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_medication_routines_patient_active')
 BEGIN
     CREATE INDEX idx_medication_routines_patient_active ON MedicationRoutines(PatientUserID, isActive);
+END
+
+-- Add Gender column to existing DoctorProfiles table if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[DoctorProfiles]') AND name = 'Gender')
+BEGIN
+    ALTER TABLE DoctorProfiles
+    ADD Gender NVARCHAR(20) NULL;
+    
+    ALTER TABLE DoctorProfiles
+    ADD CONSTRAINT CHK_DoctorProfile_Gender CHECK (Gender IN ('Male', 'Female'));
+END
+
+-- Add Gender column to existing PatientProfiles table if it doesn't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[PatientProfiles]') AND name = 'Gender')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD Gender NVARCHAR(20) NULL;
+    
+    ALTER TABLE PatientProfiles
+    ADD CONSTRAINT CHK_PatientProfile_Gender CHECK (Gender IN ('Male', 'Female'));
+END
+
+-- Add missing columns to existing PatientProfiles table if they don't exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[PatientProfiles]') AND name = 'BloodType')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD BloodType NVARCHAR(10);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[PatientProfiles]') AND name = 'EmergencyContact')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD EmergencyContact NVARCHAR(100);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[PatientProfiles]') AND name = 'EmergencyPhone')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD EmergencyPhone NVARCHAR(20);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[PatientProfiles]') AND name = 'InsuranceProvider')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD InsuranceProvider NVARCHAR(100);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[PatientProfiles]') AND name = 'InsuranceNumber')
+BEGIN
+    ALTER TABLE PatientProfiles
+    ADD InsuranceNumber NVARCHAR(50);
 END

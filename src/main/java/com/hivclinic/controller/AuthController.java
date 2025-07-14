@@ -8,6 +8,7 @@ import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
 import com.hivclinic.service.AuthService;
+import com.hivclinic.service.SessionStatusInfo;
 import com.hivclinic.service.UserSessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -316,7 +317,7 @@ public class AuthController {
                         .body(MessageResponse.error("No authentication token provided"));
             }
             
-            UserSessionService.SessionStatusInfo status = userSessionService.getSessionStatus(jwtToken);
+            SessionStatusInfo status = userSessionService.getSessionStatus(jwtToken);
             
             return ResponseEntity.ok(java.util.Map.of(
                 "success", true,
@@ -349,7 +350,7 @@ public class AuthController {
             boolean extended = userSessionService.extendSession(jwtToken);
             
             if (extended) {
-                UserSessionService.SessionStatusInfo status = userSessionService.getSessionStatus(jwtToken);
+                SessionStatusInfo status = userSessionService.getSessionStatus(jwtToken);
                 return ResponseEntity.ok(java.util.Map.of(
                     "success", true,
                     "message", "Session extended successfully",

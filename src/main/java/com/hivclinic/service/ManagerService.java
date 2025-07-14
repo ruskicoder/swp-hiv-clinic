@@ -286,7 +286,7 @@ public class ManagerService {
                 profile.getLastName().replace("\"", "\"\""),
                 profile.getPhoneNumber() != null ? profile.getPhoneNumber().replace("\"", "\"\"") : "",
                 profile.getDateOfBirth() != null ? profile.getDateOfBirth() : "",
-                profile.getGender() != null ? profile.getGender().replace("\"", "\"\"") : "",
+                profile.getGender() != null ? profile.getGender().toString().replace("\"", "\"\"") : "",
                 profile.getAddress() != null ? profile.getAddress().replace("\"", "\"\"") : "",
                 profile.getBloodType() != null ? profile.getBloodType().replace("\"", "\"\"") : "",
                 profile.getEmergencyContact() != null ? profile.getEmergencyContact().replace("\"", "\"\"") : "",

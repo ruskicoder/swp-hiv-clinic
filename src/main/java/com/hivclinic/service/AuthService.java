@@ -10,6 +10,7 @@ import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
 import com.hivclinic.model.DoctorProfile;
+import com.hivclinic.model.Gender;
 import com.hivclinic.model.PatientProfile;
 import com.hivclinic.model.Role;
 import com.hivclinic.model.User;
@@ -109,7 +110,10 @@ public class AuthService {
             patientProfile.setFirstName(registerRequest.getFirstName());
             patientProfile.setLastName(registerRequest.getLastName());
             patientProfile.setPhoneNumber(registerRequest.getPhoneNumber());
-            patientProfile.setGender(registerRequest.getGender()); // Set gender (allows null)
+            // Set gender (allows null) - convert String to Gender enum
+            if (registerRequest.getGender() != null && !registerRequest.getGender().isEmpty()) {
+                patientProfile.setGender(Gender.fromString(registerRequest.getGender()));
+            }
 
             // Save patient profile
             patientProfileRepository.save(patientProfile);
@@ -249,7 +253,7 @@ public class AuthService {
                     profile.getFirstName(),
                     profile.getLastName(),
                     profile.getPhoneNumber(),
-                    profile.getGender(),
+                    profile.getGender() != null ? profile.getGender().toString() : null,
                     profile.getDateOfBirth(),
                     profile.getAddress(),
                     null, // specialty
@@ -281,7 +285,7 @@ public class AuthService {
                 doctorProfile.getFirstName(),
                 doctorProfile.getLastName(),
                 doctorProfile.getPhoneNumber(),
-                doctorProfile.getGender(),
+                doctorProfile.getGender() != null ? doctorProfile.getGender().toString() : null,
                 null, // dateOfBirth
                 null, // address
                 doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
@@ -334,15 +338,16 @@ public class AuthService {
                 
                 // Gender business logic: once set, cannot be null
                 if (gender != null) {
-                    // Validate gender values
-                    if (!gender.isEmpty() && !java.util.Arrays.asList("Male", "Female", "Other", "Prefer not to say").contains(gender)) {
-                        return MessageResponse.error("Invalid gender value");
+                    // Validate gender values - only Male and Female allowed
+                    if (!gender.isEmpty() && !java.util.Arrays.asList("Male", "Female").contains(gender)) {
+                        return MessageResponse.error("Invalid gender value. Only 'Male' and 'Female' are allowed.");
                     }
                     // If current gender is not null and we're trying to set it to empty, reject
-                    if (profile.getGender() != null && !profile.getGender().isEmpty() && gender.isEmpty()) {
+                    if (profile.getGender() != null && gender.isEmpty()) {
                         return MessageResponse.error("Gender cannot be unselected once it has been set");
                     }
-                    profile.setGender(gender.isEmpty() ? null : gender);
+                    // Convert String to Gender enum
+                    profile.setGender(gender.isEmpty() ? null : Gender.fromString(gender));
                 }
                 
                 if (dateOfBirth != null) {
@@ -363,15 +368,16 @@ public class AuthService {
                 
                 // Gender business logic: once set, cannot be null
                 if (gender != null) {
-                    // Validate gender values
-                    if (!gender.isEmpty() && !java.util.Arrays.asList("Male", "Female", "Other", "Prefer not to say").contains(gender)) {
-                        return MessageResponse.error("Invalid gender value");
+                    // Validate gender values - only Male and Female allowed
+                    if (!gender.isEmpty() && !java.util.Arrays.asList("Male", "Female").contains(gender)) {
+                        return MessageResponse.error("Invalid gender value. Only 'Male' and 'Female' are allowed.");
                     }
                     // If current gender is not null and we're trying to set it to empty, reject
-                    if (profile.getGender() != null && !profile.getGender().isEmpty() && gender.isEmpty()) {
+                    if (profile.getGender() != null && gender.isEmpty()) {
                         return MessageResponse.error("Gender cannot be unselected once it has been set");
                     }
-                    profile.setGender(gender.isEmpty() ? null : gender);
+                    // Convert String to Gender enum
+                    profile.setGender(gender.isEmpty() ? null : Gender.fromString(gender));
                 }
                 
                 if (bio != null) profile.setBio(bio);
@@ -490,7 +496,7 @@ public class AuthService {
                 doctorProfile.getFirstName(),
                 doctorProfile.getLastName(),
                 doctorProfile.getPhoneNumber(),
-                doctorProfile.getGender(),
+                doctorProfile.getGender() != null ? doctorProfile.getGender().toString() : null,
                 null, // dateOfBirth
                 null, // address
                 doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
@@ -513,7 +519,7 @@ public class AuthService {
             patientProfile.getFirstName(),
             patientProfile.getLastName(),
             patientProfile.getPhoneNumber(),
-            patientProfile.getGender(),
+            patientProfile.getGender() != null ? patientProfile.getGender().toString() : null,
             patientProfile.getDateOfBirth(),
             patientProfile.getAddress(),
             null, // specialty (not applicable for patients)
