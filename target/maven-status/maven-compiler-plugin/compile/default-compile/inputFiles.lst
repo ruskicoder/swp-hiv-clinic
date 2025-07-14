@@ -18,6 +18,7 @@ D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\ManagerCont
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\AppointmentRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\NotificationTemplate.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\DoctorController.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\ExportController.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\Appointment.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\MedicationRoutine.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\SpecialtyRepository.java

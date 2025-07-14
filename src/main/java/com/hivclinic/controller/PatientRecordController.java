@@ -192,6 +192,35 @@ public class PatientRecordController {
     }
 
     /**
+     * Update patient record by patient ID (for doctors) - Alternative endpoint
+     * This endpoint handles the URL pattern /patient-records/patient/{id} that the frontend uses
+     */
+    @PutMapping("/patient/{patientId}")
+    @PreAuthorize("hasAnyAuthority('ROLE_DOCTOR', 'ROLE_ADMIN')")
+    public ResponseEntity<?> updatePatientRecordByPatientId(
+            @PathVariable Integer patientId,
+            @RequestBody Map<String, Object> recordData,
+            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+        try {
+            logger.info("Doctor {} updating medical record for patient ID: {} via /patient/{} endpoint",
+                userPrincipal.getUsername(), patientId, patientId);
+
+            MessageResponse response = patientRecordService.updatePatientRecordWithResponse(patientId, recordData);
+
+            if (response.isSuccess()) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error updating patient record for patient ID {}: {}", patientId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to update patient record: " + e.getMessage()));
+        }
+    }
+
+    /**
      * Get patient record by appointment ID (for doctors)
      */
     @GetMapping("/appointment/{appointmentId}")
@@ -200,7 +229,7 @@ public class PatientRecordController {
             @PathVariable Integer appointmentId,
             @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
         try {
-            logger.debug("Doctor {} fetching patient record for appointment ID: {}", 
+            logger.debug("Doctor {} fetching patient record for appointment ID: {}",
                 userPrincipal.getUsername(), appointmentId);
 
             Map<String, Object> record = patientRecordService.getPatientRecordForAppointment(
