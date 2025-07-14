@@ -50,8 +50,6 @@ public class ARVTreatmentService {
      */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getPatientTreatments(Integer patientUserId) {
-        logger.debug("Fetching ARV treatments for patient ID: {}", patientUserId);
-        
         // Return empty list if patient doesn't exist
         if (!checkPatientExists(patientUserId)) {
             return List.of();
@@ -73,8 +71,6 @@ public class ARVTreatmentService {
      */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getActivePatientTreatments(Integer patientUserId) {
-        logger.debug("Fetching active ARV treatments for patient ID: {}", patientUserId);
-        
         List<ARVTreatment> treatments = arvTreatmentRepository.findActiveByPatientUserID(patientUserId);
         
         return treatments.stream()
@@ -285,8 +281,6 @@ public class ARVTreatmentService {
      */
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getTreatmentsByAppointment(Integer appointmentId) {
-        logger.debug("Fetching ARV treatments for appointment ID: {}", appointmentId);
-        
         List<ARVTreatment> treatments = arvTreatmentRepository.findByAppointmentID(appointmentId);
         
         return treatments.stream()
@@ -473,9 +467,7 @@ public class ARVTreatmentService {
 
     public List<ARVTreatment> getPatientTreatmentsRaw(Integer patientUserID) {
         try {
-            logger.debug("Fetching ARV treatments for patient ID: {}", patientUserID);
             List<ARVTreatment> treatments = arvTreatmentRepository.findByPatientUserIDOrderByCreatedAtDesc(patientUserID);
-            logger.debug("Found {} treatments for patient ID: {}", treatments.size(), patientUserID);
             return treatments;
         } catch (Exception e) {
             logger.error("Error fetching ARV treatments for patient ID {}: {}", patientUserID, e.getMessage());

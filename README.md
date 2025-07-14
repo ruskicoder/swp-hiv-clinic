@@ -23,6 +23,7 @@ The HIV Clinic Management System is designed to streamline clinic operations, en
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Framework**: Spring Boot 3.2.0
 - **Language**: Java 17
 - **Database**: Microsoft SQL Server
@@ -33,6 +34,7 @@ The HIV Clinic Management System is designed to streamline clinic operations, en
 - **Testing**: JUnit 5, Spring Boot Test
 
 ### Frontend
+
 - **Framework**: React 18.2.0
 - **Build Tool**: Vite 5.0.8
 - **UI Components**: Custom components with CSS modules
@@ -42,6 +44,7 @@ The HIV Clinic Management System is designed to streamline clinic operations, en
 - **Linting**: ESLint 8.55.0
 
 ### Database
+
 - **Primary Database**: Microsoft SQL Server
 - **Schema Management**: SQL scripts with T-SQL syntax
 - **Indexing**: Optimized for performance
@@ -70,17 +73,22 @@ cd swp-hiv-clinic
 ### 2. Database Setup
 
 #### Option A: Using the automated setup script (Windows)
+
 ```bash
 ./setup-database.bat
 ```
 
 #### Option B: Manual setup
+
 1. Create a new database named `hiv_clinic`
 2. Execute the schema creation script:
+
    ```sql
    -- Run src/main/resources/db/schema.sql
    ```
+
 3. Execute the data population script:
+
    ```sql
    -- Run src/main/resources/db/data.sql
    ```
@@ -118,11 +126,13 @@ VITE_APP_NAME=HIV Clinic Management System
 ### 5. Install Dependencies
 
 #### Backend Dependencies
+
 ```bash
 mvn clean install
 ```
 
 #### Frontend Dependencies
+
 ```bash
 npm install
 ```
@@ -130,6 +140,7 @@ npm install
 ### 6. Start the Application
 
 #### Option A: Using the automated start script (Unix/Linux/Mac)
+
 ```bash
 ./start-application.sh
 ```
@@ -137,29 +148,33 @@ npm install
 #### Option B: Manual startup
 
 **Start Backend (Terminal 1):**
+
 ```bash
 mvn spring-boot:run
 ```
 
 **Start Frontend (Terminal 2):**
+
 ```bash
 npm run dev
 ```
 
 ### 7. Access the Application
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8080/api
-- **Health Check**: http://localhost:8080/api/health
+- **Frontend**: <http://localhost:3000>
+- **Backend API**: <http://localhost:8080/api>
+- **Health Check**: <http://localhost:8080/api/health>
 
 ## 👥 User Roles & Access
 
 ### Guest User
+
 - View public information
 - Register for new account
 - Access login page
 
 ### Patient User
+
 - View personal medical records
 - Book and manage appointments
 - View ARV treatment history
@@ -168,6 +183,7 @@ npm run dev
 - Update profile information
 
 ### Doctor User
+
 - View assigned patients
 - Manage appointments
 - Prescribe and monitor ARV treatments
@@ -176,6 +192,7 @@ npm run dev
 - Manage availability schedules
 
 ### Admin User
+
 - Manage all users (patients, doctors)
 - System administration
 - View system statistics
@@ -216,11 +233,13 @@ POST /api/auth/login
 ## 📚 API Documentation
 
 ### Base URL
-```
+
+``
 http://localhost:8080/api
-```
+``
 
 ### Authentication Endpoints
+
 - `POST /auth/login` - User login
 - `POST /auth/register` - User registration
 - `GET /auth/me` - Get current user
@@ -229,12 +248,14 @@ http://localhost:8080/api
 - `GET /auth/check-email` - Check email availability
 
 ### Patient Endpoints
+
 - `GET /patients` - List all patients (Admin only)
 - `GET /patient-record/my-record` - Get patient's own record
 - `PUT /patient-record/my-record` - Update patient record
 - `POST /patient-record/upload-image` - Upload patient image
 
 ### Doctor Endpoints
+
 - `GET /doctors` - List all doctors
 - `GET /doctors/{id}` - Get doctor details
 - `POST /doctors/availability` - Set doctor availability
@@ -242,6 +263,7 @@ http://localhost:8080/api
 - `PUT /doctors/availability/{slotId}` - Update availability slot
 
 ### Appointment Endpoints
+
 - `POST /appointments/book` - Book new appointment
 - `GET /appointments/patient/my-appointments` - Get patient appointments
 - `GET /appointments/doctor/my-appointments` - Get doctor appointments
@@ -249,18 +271,21 @@ http://localhost:8080/api
 - `PUT /appointments/{id}/status` - Update appointment status
 
 ### ARV Treatment Endpoints
+
 - `GET /arv-treatments/my-treatments` - Get patient's treatments
 - `POST /arv-treatments/add` - Add new treatment
 - `PUT /arv-treatments/{id}` - Update treatment
 - `PUT /arv-treatments/{id}/deactivate` - Deactivate treatment
 
 ### Notification Endpoints
+
 - `GET /notifications` - Get user notifications
 - `POST /notifications/{id}/read` - Mark notification as read
 - `POST /notifications/read-all` - Mark all notifications as read
 - `POST /notifications/doctor/send` - Send notification to patient
 
 ### Admin Endpoints
+
 - `GET /admin/users` - Get all users
 - `GET /admin/patients` - Get all patients
 - `GET /admin/doctors` - Get all doctors
@@ -270,6 +295,7 @@ http://localhost:8080/api
 ## 🧪 Testing
 
 ### Backend Testing
+
 ```bash
 # Run all tests
 mvn test
@@ -282,6 +308,7 @@ mvn test -Dtest=UserServiceTest
 ```
 
 ### Frontend Testing
+
 ```bash
 # Run all tests
 npm test
@@ -294,13 +321,14 @@ npm run test:watch
 ```
 
 ### Test Coverage
+
 - **Backend**: 85% coverage
 - **Frontend**: 78% coverage
 - **Integration Tests**: 92% coverage
 
 ## 📁 Project Structure
 
-```
+``
 swp-hiv-clinic/
 ├── src/
 │   ├── main/
@@ -335,23 +363,27 @@ swp-hiv-clinic/
 ├── vite.config.js                   # Vite Configuration
 ├── setup-database.bat               # Database Setup Script
 └── start-application.sh             # Application Start Script
-```
+``
 
 ## 🔧 Development
 
 ### Code Style
+
 - **Java**: Follow Google Java Style Guide
 - **JavaScript/React**: ESLint configuration included
 - **SQL**: Use T-SQL syntax for SQL Server compatibility
 
 ### Git Workflow
+
 1. Create feature branch from `main`
 2. Make changes and commit with descriptive messages
 3. Create pull request
 4. Code review and merge
 
 ### Environment Variables
+
 Create `.env` file for frontend configuration:
+
 ```env
 VITE_API_BASE_URL=http://localhost:8080/api
 VITE_APP_NAME=HIV Clinic Management System
@@ -372,6 +404,7 @@ Complete documentation is available in the `docs/` directory:
 ## 🛡️ Security
 
 ### Security Features
+
 - JWT-based authentication
 - Password hashing with BCrypt
 - Role-based access control (RBAC)
@@ -381,6 +414,7 @@ Complete documentation is available in the `docs/` directory:
 - HTTPS enforcement (production)
 
 ### Security Configuration
+
 ```java
 @Configuration
 @EnableWebSecurity
@@ -394,16 +428,20 @@ public class SecurityConfig {
 ## 🚀 Deployment
 
 ### Production Deployment
+
 1. Update database configuration for production
 2. Set production environment variables
 3. Build the application:
+
    ```bash
    mvn clean package
    npm run build
    ```
+
 4. Deploy to your preferred hosting platform
 
 ### Docker Support (Optional)
+
 ```dockerfile
 # Dockerfile for containerized deployment
 FROM openjdk:17-jdk-slim
@@ -439,11 +477,13 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 ## 📊 Performance
 
 ### Database Performance
+
 - Optimized queries with proper indexing
 - Connection pooling configured
 - Query performance monitoring
 
 ### Frontend Performance
+
 - Code splitting with React.lazy
 - Optimized bundle size
 - Caching strategies implemented
@@ -459,6 +499,7 @@ We welcome contributions! Please follow these steps:
 5. Open a Pull Request
 
 ### Development Guidelines
+
 - Write tests for new features
 - Follow existing code style
 - Update documentation as needed
@@ -467,6 +508,7 @@ We welcome contributions! Please follow these steps:
 ## 📞 Support
 
 For support and questions:
+
 - Create an issue on GitHub
 - Contact the development team
 - Check the documentation in `/docs` folder
@@ -483,5 +525,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Healthcare professionals who provided domain expertise
 
 ---
-
-**Built with ❤️ for better healthcare management**

@@ -30,12 +30,13 @@ const NotificationPanel = ({
           n.priority === 'HIGH' || n.priority === 'URGENT'
         );
         break;
-      case 'today':
+      case 'today': {
         const today = new Date().toDateString();
         filtered = notifications.filter(n =>
           new Date(n.createdAt).toDateString() === today
         );
         break;
+      }
       default:
         filtered = notifications;
     }
@@ -45,9 +46,10 @@ const NotificationPanel = ({
       switch (sortBy) {
         case 'oldest':
           return new Date(a.createdAt) - new Date(b.createdAt);
-        case 'priority':
+        case 'priority': {
           const priorityOrder = { 'URGENT': 4, 'HIGH': 3, 'MEDIUM': 2, 'LOW': 1 };
           return (priorityOrder[b.priority] || 2) - (priorityOrder[a.priority] || 2);
+        }
         case 'newest':
         default:
           return new Date(b.createdAt) - new Date(a.createdAt);

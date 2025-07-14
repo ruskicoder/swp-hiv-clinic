@@ -1,11 +1,14 @@
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\request\RegisterRequest.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\DoctorAvailabilitySlotRepositoryCustom.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\AppointmentStatusHistoryRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\exception\ResourceNotFoundException.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\validation\PasswordMatchValidator.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\Specialty.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\RegisterRequest.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\SystemSettingRepository.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\UserSessionService.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\ARVTreatmentRepository.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\DoctorAvailabilitySlotRepositoryImpl.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\response\AuthResponse.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\PatientRecordService.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\PatientProfile.java
@@ -15,6 +18,7 @@ D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\ManagerCont
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\AppointmentRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\NotificationTemplate.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\DoctorController.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\ExportController.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\Appointment.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\MedicationRoutine.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\SpecialtyRepository.java
@@ -22,8 +26,10 @@ D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\AdminService.j
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\PasswordResetTokenRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\UserRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\NotificationSchedulingService.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\LoginActivityController.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\DoctorAvailabilitySlot.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\NotificationTemplateService.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\UserSession.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\ARVTreatmentController.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\SystemSetting.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\DoctorNotificationService.java
@@ -51,9 +57,12 @@ D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\response\MessageRe
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\PatientRecord.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\request\LoginRequest.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\config\DataInitializer.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\LoginActivityService.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\DoctorProfile.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\service\DoctorAvailabilityService.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\request\ChangePasswordRequest.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\controller\AppointmentController.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\UserSessionRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\ARVTreatment.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\PatientProfileRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\config\CustomUserDetailsService.java
@@ -75,6 +84,7 @@ D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\NotificationDto.ja
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\User.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\model\Profile.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\DoctorProfileRepository.java
+D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\repository\LoginActivityRepository.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\mapper\DoctorAvailabilityMapper.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\validation\PasswordMatch.java
 D:\DATA\Github\swp-hiv-clinic\src\main\java\com\hivclinic\dto\MedicationRoutineDto.java

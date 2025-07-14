@@ -268,7 +268,7 @@ const WeeklySchedule = ({
               
               {timeSlots.map(time => {
                 const slotData = getSlotData(day, time);
-                const isAvailable = isSlotAvailable(day, time);
+                const _isAvailable = isSlotAvailable(day, time);
                 const isSelected = selectedSlot && 
                   selectedSlot.slotDate === day.toISOString().split('T')[0] && 
                   selectedSlot.startTime === time + ':00';

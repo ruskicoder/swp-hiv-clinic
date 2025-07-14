@@ -46,12 +46,44 @@ const ManagerDashboard = () => {
   const [arvTreatments, setArvTreatments] = useState([]);
   const [arvLoading, setArvLoading] = useState(true);
   const [arvError, setArvError] = useState('');
+  const [arvFrom, setArvFrom] = useState("");
+  const [arvTo, setArvTo] = useState("");
   const [schedules, setSchedules] = useState([]);
   const [schedulesLoading, setSchedulesLoading] = useState(true);
   const [schedulesError, setSchedulesError] = useState('');
+  const [scheduleFrom, setScheduleFrom] = useState("");
+  const [scheduleTo, setScheduleTo] = useState("");
   const [patientSearch, setPatientSearch] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
   const navigate = useNavigate();
+
+  // Handle CSV exports
+  const handleExportCSV = async (endpoint) => {
+    try {
+        const response = await apiClient.get(`/export/${endpoint}`, {
+            responseType: 'blob'
+        });
+        
+        // Create a URL for the blob
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${endpoint}.csv`);
+        
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        
+        // Clean up the URL
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error(`Error downloading ${endpoint} CSV:`, error);
+        alert(`Failed to download ${endpoint} CSV. Please try again later.`);
+    }
+};
 
   useEffect(() => {
     if (activeTab === 'overview') {
@@ -109,77 +141,134 @@ const ManagerDashboard = () => {
 
   useEffect(() => {
     if (activeTab === 'arv') {
-      setArvLoading(true);
-      setArvError('');
-      apiClient.get('/manager/arv-treatments')
-        .then(res => setArvTreatments(res.data))
-        .catch(() => setArvError('Failed to load ARV regimens.'))
-        .finally(() => setArvLoading(false));
+      fetchARVTreatments();
     }
+    // eslint-disable-next-line
   }, [activeTab]);
+
+  const fetchARVTreatments = async () => {
+    setArvLoading(true);
+    setArvError("");
+    try {
+      let res;
+      if (arvFrom && arvTo) {
+        res = await apiClient.get(`/manager/arv-treatments/search?from=${encodeURIComponent(arvFrom)}&to=${encodeURIComponent(arvTo)}`);
+      } else {
+        res = await apiClient.get('/manager/arv-treatments');
+      }
+      setArvTreatments(res.data);
+    } catch {
+      setArvError('Failed to load ARV regimens.');
+    } finally {
+      setArvLoading(false);
+    }
+  };
+
+  const handleARVFromChange = (e) => setArvFrom(e.target.value);
+  const handleARVToChange = (e) => setArvTo(e.target.value);
+  const handleARVSearch = (e) => {
+    e.preventDefault();
+    fetchARVTreatments();
+  };
 
   useEffect(() => {
     if (activeTab === 'schedules') {
-      setSchedulesLoading(true);
-      setSchedulesError('');
-      apiClient.get('/manager/schedules')
-        .then(res => setSchedules(res.data))
-        .catch(() => setSchedulesError('Failed to load schedules.'))
-        .finally(() => setSchedulesLoading(false));
+      fetchSchedules();
     }
+    // eslint-disable-next-line
   }, [activeTab]);
 
+  const fetchSchedules = async () => {
+    setSchedulesLoading(true);
+    setSchedulesError('');
+    try {
+      let res;
+      if (scheduleFrom && scheduleTo) {
+        res = await apiClient.get(`/manager/schedules/search?from=${encodeURIComponent(scheduleFrom)}&to=${encodeURIComponent(scheduleTo)}`);
+      } else {
+        res = await apiClient.get('/manager/schedules');
+      }
+      setSchedules(res.data);
+    } catch {
+      setSchedulesError('Failed to load schedules.');
+    } finally {
+      setSchedulesLoading(false);
+    }
+  };
+
+  const handleScheduleFromChange = (e) => setScheduleFrom(e.target.value);
+  const handleScheduleToChange = (e) => setScheduleTo(e.target.value);
+  const handleScheduleSearch = (e) => {
+    e.preventDefault();
+    fetchSchedules();
+  };
+
   // Search patients
-  const handlePatientSearch = async (e) => {
-    const value = e.target.value;
-    setPatientSearch(value);
-    if (value.trim() === "") {
+  // Only update state on change
+  const handlePatientSearchChange = (e) => {
+    setPatientSearch(e.target.value);
+  };
+
+  const handlePatientSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setPatientsLoading(true);
+        setPatientsError("");
+        try {
+          const res = await apiClient.get('/manager/patients');
+          setPatients(res.data);
+        } catch {
+          setPatientsError('Failed to load patient list.');
+        } finally {
+          setPatientsLoading(false);
+        }
+        return;
+      }
       setPatientsLoading(true);
+      setPatientsError("");
       try {
-        const res = await apiClient.get('/manager/patients');
+        const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
         setPatients(res.data);
       } catch {
-        setPatientsError('Failed to load patient list.');
+        setPatientsError('Failed to search patients.');
       } finally {
         setPatientsLoading(false);
       }
-      return;
-    }
-    setPatientsLoading(true);
-    try {
-      const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
-      setPatients(res.data);
-    } catch {
-      setPatientsError('Failed to search patients.');
-    } finally {
-      setPatientsLoading(false);
     }
   };
 
   // Search doctors
-  const handleDoctorSearch = async (e) => {
-    const value = e.target.value;
-    setDoctorSearch(value);
-    if (value.trim() === "") {
+  const handleDoctorSearchChange = (e) => {
+    setDoctorSearch(e.target.value);
+  };
+
+  const handleDoctorSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setDoctorsLoading(true);
+        setDoctorsError("");
+        try {
+          const res = await apiClient.get('/manager/doctors');
+          setDoctors(res.data);
+        } catch {
+          setDoctorsError('Failed to load doctor list.');
+        } finally {
+          setDoctorsLoading(false);
+        }
+        return;
+      }
       setDoctorsLoading(true);
+      setDoctorsError("");
       try {
-        const res = await apiClient.get('/manager/doctors');
+        const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
         setDoctors(res.data);
       } catch {
-        setDoctorsError('Failed to load doctor list.');
+        setDoctorsError('Failed to search doctors.');
       } finally {
         setDoctorsLoading(false);
       }
-      return;
-    }
-    setDoctorsLoading(true);
-    try {
-      const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
-      setDoctors(res.data);
-    } catch {
-      setDoctorsError('Failed to search doctors.');
-    } finally {
-      setDoctorsLoading(false);
     }
   };
 
@@ -187,6 +276,103 @@ const ManagerDashboard = () => {
     <div>
       <div className="section-header">
         <h2>System Overview</h2>
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('patient-profiles')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Patient Profiles
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('doctor-slots')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Doctor Slots
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('arv-treatments')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export ARV Treatments
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('appointments')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Appointments
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('doctor-profiles')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem', 
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Doctor Profiles
+          </button>
+        </div>
       </div>
       
       {loading ? (
@@ -200,22 +386,18 @@ const ManagerDashboard = () => {
           <div className="stat-card">
             <h3>Total Patients</h3>
             <div className="stat-number">{stats.totalPatients || 0}</div>
-            <div className="stat-change positive">+12% from last month</div>
           </div>
           <div className="stat-card">
             <h3>Active Doctors</h3>
             <div className="stat-number">{stats.totalDoctors || 0}</div>
-            <div className="stat-change positive">+5% from last month</div>
           </div>
           <div className="stat-card">
             <h3>Total Appointments</h3>
             <div className="stat-number">{stats.totalAppointments || 0}</div>
-            <div className="stat-change positive">+18% from last week</div>
           </div>
           <div className="stat-card">
             <h3>ARV Treatments</h3>
             <div className="stat-number">{stats.totalARVTreatments || 0}</div>
-            <div className="stat-change positive">Active regimens</div>
           </div>
         </div>
       )}
@@ -231,9 +413,10 @@ const ManagerDashboard = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search patients by name or email..."
+          placeholder="Search patients by name"
           value={patientSearch}
-          onChange={handlePatientSearch}
+          onChange={handlePatientSearchChange}
+          onKeyDown={handlePatientSearchKeyDown}
           className="search-input"
         />
       </div>
@@ -303,9 +486,10 @@ const ManagerDashboard = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search doctors by name or specialty..."
+          placeholder="Search doctors by name"
           value={doctorSearch}
-          onChange={handleDoctorSearch}
+          onChange={handleDoctorSearchChange}
+          onKeyDown={handleDoctorSearchKeyDown}
           className="search-input"
         />
       </div>
@@ -371,7 +555,18 @@ const ManagerDashboard = () => {
       <div className="section-header">
         <h2>ARV Treatment Management</h2>
       </div>
-
+      <form className="arv-search-form" onSubmit={handleARVSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <label>
+          From:
+          <input type="date" value={arvFrom} onChange={handleARVFromChange} />
+        </label>
+        <label>
+          To:
+          <input type="date" value={arvTo} onChange={handleARVToChange} />
+        </label>
+        <button type="submit" className="search-btn">Search</button>
+        <button type="button" className="reset-btn" onClick={() => { setArvFrom(""); setArvTo(""); fetchARVTreatments(); }}>Reset</button>
+      </form>
       {arvLoading ? (
         <div className="loading-state">Loading ARV treatment data...</div>
       ) : arvError ? (
@@ -423,7 +618,18 @@ const ManagerDashboard = () => {
       <div className="section-header">
         <h2>Schedule Management</h2>
       </div>
-
+      <form className="schedule-search-form" onSubmit={handleScheduleSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <label>
+          From:
+          <input type="date" value={scheduleFrom} onChange={handleScheduleFromChange} />
+        </label>
+        <label>
+          To:
+          <input type="date" value={scheduleTo} onChange={handleScheduleToChange} />
+        </label>
+        <button type="submit" className="search-btn">Search</button>
+        <button type="button" className="reset-btn" onClick={() => { setScheduleFrom(""); setScheduleTo(""); fetchSchedules(); }}>Reset</button>
+      </form>
       {schedulesLoading ? (
         <div className="loading-state">Loading schedule data...</div>
       ) : schedulesError ? (

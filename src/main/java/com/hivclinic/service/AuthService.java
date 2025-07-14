@@ -3,6 +3,7 @@ package com.hivclinic.service;
 import com.hivclinic.exception.ResourceNotFoundException;
 
 import com.hivclinic.config.JwtUtils;
+import com.hivclinic.dto.request.ChangePasswordRequest;
 import com.hivclinic.dto.request.LoginRequest;
 import com.hivclinic.dto.request.RegisterRequest;
 import com.hivclinic.dto.response.AuthResponse;
@@ -53,6 +54,12 @@ public class AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+    
+    @Autowired
+    private LoginActivityService loginActivityService;
+    
+    @Autowired
+    private UserSessionService userSessionService;
 
     /**
      * Register a new user (Patient by default for MVP)
@@ -119,7 +126,28 @@ public class AuthService {
      * Authenticate user and generate JWT token
      */
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
+        return authenticateUser(loginRequest, null, null);
+    }
+    
+    /**
+     * Authenticate user and generate JWT token with login activity tracking
+     */
+    public AuthResponse authenticateUser(LoginRequest loginRequest, String ipAddress, String userAgent) {
         try {
+            // Check if account is locked by username before attempting authentication
+            if (loginActivityService.isAccountLockedByUsername(loginRequest.getUsername())) {
+                logger.warn("Login attempt blocked - Account locked for username: {}", loginRequest.getUsername());
+                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+                throw new RuntimeException("Account temporarily locked due to multiple failed login attempts");
+            }
+            
+            // Check for suspicious IP activity
+            if (ipAddress != null && loginActivityService.isSuspiciousIpActivity(ipAddress)) {
+                logger.warn("Login attempt blocked - Suspicious IP activity from: {}", ipAddress);
+                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+                throw new RuntimeException("Login temporarily blocked due to suspicious activity");
+            }
+
             // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -129,7 +157,7 @@ public class AuthService {
             );
 
             // Get user details from authentication
-            com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal = 
+            com.hivclinic.config.CustomUserDetailsService.UserPrincipal userPrincipal =
                     (com.hivclinic.config.CustomUserDetailsService.UserPrincipal) authentication.getPrincipal();
 
             // Generate JWT token
@@ -138,6 +166,15 @@ public class AuthService {
                     userPrincipal.getId(),
                     userPrincipal.getRole()
             );
+
+            // Log successful login attempt
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), true, ipAddress, userAgent);
+
+            // Create session for the user
+            Optional<User> authenticatedUser = userRepository.findByUsername(loginRequest.getUsername());
+            if (authenticatedUser.isPresent()) {
+                userSessionService.createSession(authenticatedUser.get(), jwt, ipAddress, userAgent);
+            }
 
             logger.info("User authenticated successfully: {}", loginRequest.getUsername());
 
@@ -152,9 +189,17 @@ public class AuthService {
 
         } catch (AuthenticationException e) {
             logger.warn("Authentication failed for user: {} - {}", loginRequest.getUsername(), e.getMessage());
+            
+            // Log failed login attempt
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+            
             throw new RuntimeException("Invalid username or password");
         } catch (Exception e) {
             logger.error("Error during authentication: {}", e.getMessage(), e);
+            
+            // Log failed login attempt for system errors
+            loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
+            
             throw new RuntimeException("Authentication failed: " + e.getMessage());
         }
     }
@@ -338,6 +383,48 @@ public class AuthService {
         } catch (Exception e) {
             logger.error("Error updating profile image: {}", e.getMessage(), e);
             return MessageResponse.error("Failed to update profile image: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Change user password
+     */
+    @Transactional
+    public MessageResponse changePassword(Integer userId, ChangePasswordRequest request) {
+        try {
+            // Get user by ID
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isEmpty()) {
+                logger.warn("Change password attempt for non-existent user ID: {}", userId);
+                return MessageResponse.error("User not found");
+            }
+            
+            User user = userOpt.get();
+            
+            // Verify current password
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+                logger.warn("Change password failed - incorrect current password for user: {}", user.getUsername());
+                return MessageResponse.error("Current password is incorrect");
+            }
+            
+            // Validate new password is different from current
+            if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+                logger.warn("Change password failed - new password same as current for user: {}", user.getUsername());
+                return MessageResponse.error("New password must be different from current password");
+            }
+            
+            // Update password
+            user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+            user.setUpdatedAt(java.time.LocalDateTime.now());
+            
+            userRepository.save(user);
+            
+            logger.info("Password changed successfully for user: {}", user.getUsername());
+            return MessageResponse.success("Password changed successfully");
+            
+        } catch (Exception e) {
+            logger.error("Error changing password for user ID {}: {}", userId, e.getMessage(), e);
+            return MessageResponse.error("Failed to change password: " + e.getMessage());
         }
     }
 
