@@ -1,0 +1,170 @@
+graph TB
+    %% Appointment States
+    subgraph "Appointment Lifecycle"
+        A1[Requested]
+        A2[Scheduled]
+        A3[Confirmed]
+        A4[In Progress]
+        A5[Completed]
+        A6[Cancelled]
+        A7[No Show]
+        A8[Rescheduled]
+        
+        A1 -->|Doctor Approves| A2
+        A1 -->|Doctor Rejects| A6
+        A2 -->|Patient Confirms| A3
+        A2 -->|Patient Cancels| A6
+        A2 -->|Doctor Cancels| A6
+        A2 -->|Reschedule Request| A8
+        A3 -->|Appointment Starts| A4
+        A3 -->|Patient Cancels| A6
+        A3 -->|Patient No Show| A7
+        A4 -->|Appointment Ends| A5
+        A8 -->|New Time Scheduled| A2
+        A8 -->|No New Time| A6
+        A7 -->|Rescheduled| A8
+    end
+    
+    %% ARV Treatment States
+    subgraph "ARV Treatment Lifecycle"
+        T1[Prescribed]
+        T2[Active]
+        T3[Paused]
+        T4[Modified]
+        T5[Completed]
+        T6[Discontinued]
+        T7[Under Review]
+        
+        T1 -->|Patient Starts| T2
+        T1 -->|Side Effects| T7
+        T2 -->|Side Effects| T3
+        T2 -->|Dosage Change| T4
+        T2 -->|Treatment Complete| T5
+        T2 -->|Medical Review| T7
+        T3 -->|Resume Treatment| T2
+        T3 -->|Discontinue| T6
+        T4 -->|Continue Modified| T2
+        T4 -->|Further Review| T7
+        T7 -->|Approved Continue| T2
+        T7 -->|Approved Modify| T4
+        T7 -->|Discontinue| T6
+    end
+    
+    %% User Account States
+    subgraph "User Account Lifecycle"
+        U1[Registered]
+        U2[Pending Verification]
+        U3[Active]
+        U4[Suspended]
+        U5[Inactive]
+        U6[Locked]
+        U7[Deactivated]
+        
+        U1 -->|Email Verification Sent| U2
+        U2 -->|Email Verified| U3
+        U2 -->|Verification Expired| U1
+        U3 -->|Policy Violation| U4
+        U3 -->|Inactivity| U5
+        U3 -->|Failed Login Attempts| U6
+        U3 -->|User Request| U7
+        U4 -->|Appeal Approved| U3
+        U4 -->|Admin Decision| U7
+        U5 -->|User Returns| U3
+        U6 -->|Password Reset| U3
+        U6 -->|Admin Unlock| U3
+        U7 -->|Reactivation Request| U1
+    end
+    
+    %% Notification States
+    subgraph "Notification Lifecycle"
+        N1[Created]
+        N2[Queued]
+        N3[Sending]
+        N4[Delivered]
+        N5[Failed]
+        N6[Read]
+        N7[Archived]
+        
+        N1 -->|Scheduled| N2
+        N2 -->|Processing| N3
+        N3 -->|Successfully Sent| N4
+        N3 -->|Send Failed| N5
+        N4 -->|User Opens| N6
+        N4 -->|Auto Archive| N7
+        N5 -->|Retry| N2
+        N5 -->|Max Retries| N7
+        N6 -->|User Archives| N7
+    end
+    
+    %% Patient Privacy States
+    subgraph "Privacy Settings Lifecycle"
+        P1[Default]
+        P2[Restricted]
+        P3[Private]
+        P4[Public]
+        P5[Custom]
+        
+        P1 -->|User Modifies| P2
+        P1 -->|User Modifies| P3
+        P1 -->|User Modifies| P4
+        P1 -->|User Modifies| P5
+        P2 -->|User Changes| P3
+        P2 -->|User Changes| P4
+        P2 -->|User Changes| P5
+        P3 -->|User Changes| P2
+        P3 -->|User Changes| P4
+        P3 -->|User Changes| P5
+        P4 -->|User Changes| P2
+        P4 -->|User Changes| P3
+        P4 -->|User Changes| P5
+        P5 -->|Reset to Default| P1
+        P5 -->|Simplified Settings| P2
+        P5 -->|Simplified Settings| P3
+        P5 -->|Simplified Settings| P4
+    end
+    
+    %% System Session States
+    subgraph "Session Lifecycle"
+        S1[Created]
+        S2[Active]
+        S3[Idle]
+        S4[Extended]
+        S5[Expired]
+        S6[Terminated]
+        
+        S1 -->|User Activity| S2
+        S2 -->|No Activity| S3
+        S2 -->|Logout| S6
+        S3 -->|User Returns| S2
+        S3 -->|Timeout| S5
+        S3 -->|Extension Request| S4
+        S4 -->|User Activity| S2
+        S4 -->|Timeout| S5
+        S5 -->|Re-login Required| S6
+        S6 -->|New Login| S1
+    end
+    
+    %% Styling
+    classDef appointment fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef treatment fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef user fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef notification fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef privacy fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef session fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    
+    class A1,A2,A3,A4,A5,A6,A7,A8 appointment
+    class T1,T2,T3,T4,T5,T6,T7 treatment
+    class U1,U2,U3,U4,U5,U6,U7 user
+    class N1,N2,N3,N4,N5,N6,N7 notification
+    class P1,P2,P3,P4,P5 privacy
+    class S1,S2,S3,S4,S5,S6 session
+    
+    %% State Descriptions
+    subgraph "State Types"
+        L1[Appointment States]:::appointment
+        L2[Treatment States]:::treatment
+        L3[User States]:::user
+        L4[Notification States]:::notification
+        L5[Privacy States]:::privacy
+        L6[Session States]:::session
+    end
