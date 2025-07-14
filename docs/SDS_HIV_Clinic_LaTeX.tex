@@ -196,7 +196,6 @@ The HIV Clinic Management System follows a layered architecture pattern with cle
 
 The HIV Clinic Management System uses Microsoft SQL Server as the primary database. The schema follows 3rd Normal Form (3NF) design principles with proper referential integrity constraints.
 
-% Placeholder for database schema diagram
 \begin{figure}[H]
 \centering
 \fbox{
@@ -205,9 +204,9 @@ The HIV Clinic Management System uses Microsoft SQL Server as the primary databa
 \vspace{2cm}
 \textbf{Database Schema Diagram}\\
 \vspace{0.5cm}
-\textit{Complex ERD showing relationships between all 15+ tables}\\
+\textit{Comprehensive ERD showing relationships between all database tables including Users, Appointments, Patient Records, ARV Treatments, Notifications, and system audit tables with proper foreign key constraints and normalization}\\
 \vspace{0.5cm}
-\textit{Dimensions: 12" x 8"}\\
+\textit{Dimensions: 14" x 10"}\\
 \vspace{0.5cm}
 \textit{Generated from: database\_schema\_erd.mermaid}\\
 \vspace{2cm}
@@ -854,7 +853,6 @@ This section provides an overview of the complete system architecture including 
 
 \subsubsection{System Architecture Diagram}
 
-% Placeholder for system architecture diagram
 \begin{figure}[H]
 \centering
 \fbox{
@@ -863,9 +861,9 @@ This section provides an overview of the complete system architecture including 
 \vspace{3cm}
 \textbf{HIV Clinic System Architecture}\\
 \vspace{0.5cm}
-\textit{Complete system architecture showing React frontend, Spring Boot backend, and MS SQL Server database}\\
+\textit{Complete three-tier system architecture showing React 18.2.0 frontend with component hierarchy, Spring Boot 3.2.0 backend with microservice-style architecture, MS SQL Server database layer, and external service integrations including monitoring and security components}\\
 \vspace{0.5cm}
-\textit{Dimensions: 14" x 10"}\\
+\textit{Dimensions: 16" x 12"}\\
 \vspace{0.5cm}
 \textit{Generated from: system\_architecture.mermaid}\\
 \vspace{3cm}
@@ -937,6 +935,52 @@ API Endpoint Security & Method-level security with @PreAuthorize annotations \\
 \end{tabularx}
 \end{table}
 
+\subsection{Component Architecture}
+
+\subsubsection{Component Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Component Diagram}\\
+\vspace{0.5cm}
+\textit{Detailed component architecture showing the modular design of frontend React application with UI components, feature modules, and services, backend Spring Boot application with controllers, services, repositories, and entities, plus external service integrations}\\
+\vspace{0.5cm}
+\textit{Dimensions: 18" x 14"}\\
+\vspace{0.5cm}
+\textit{Generated from: component\_diagram.plantuml}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{System Component Architecture}
+\label{fig:component-diagram}
+\end{figure}
+
+\subsubsection{Deployment Architecture}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Deployment Diagram}\\
+\vspace{0.5cm}
+\textit{Physical deployment architecture showing client devices, load balancers, web server clusters, application server clusters, database servers, cache servers, file storage, monitoring infrastructure, and external service integrations across different security zones and network tiers}\\
+\vspace{0.5cm}
+\textit{Dimensions: 20" x 16"}\\
+\vspace{0.5cm}
+\textit{Generated from: deployment\_diagram.plantuml}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{System Deployment Architecture}
+\label{fig:deployment-diagram}
+\end{figure}
+
 \section{API Documentation}
 
 \subsection{REST API Endpoints}
@@ -980,6 +1024,52 @@ POST & /api/admin/doctors & Admin & Create doctor profile \\
 GET & /api/manager/stats & Manager & Get system statistics \\
 \hline
 \end{longtable}
+
+\section{System Behavior and Network Architecture}
+
+\subsection{State Transition Diagrams}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - State Transition Diagram}\\
+\vspace{0.5cm}
+\textit{Comprehensive state lifecycle diagrams showing the state transitions for key system entities including Appointment lifecycle (Requested → Scheduled → Confirmed → In Progress → Completed), ARV Treatment lifecycle (Prescribed → Active → Modified → Completed), User Account lifecycle (Registered → Active → Suspended), Notification lifecycle (Created → Delivered → Read), Privacy Settings, and Session management with proper state validation and transition rules}\\
+\vspace{0.5cm}
+\textit{Dimensions: 18" x 14"}\\
+\vspace{0.5cm}
+\textit{Generated from: state\_transition\_diagram.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{System State Transition Diagrams}
+\label{fig:state-transition-diagram}
+\end{figure}
+
+\subsection{Network Architecture}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Network Architecture Diagram}\\
+\vspace{0.5cm}
+\textit{Detailed network topology showing security zones (DMZ, Web Tier, Application Tier, Data Tier, Management Tier), network subnets and IP ranges, load balancers, firewalls, intrusion detection systems, VPN access, monitoring infrastructure, and external service integrations with proper security controls, encryption protocols, and network segmentation for HIPAA compliance}\\
+\vspace{0.5cm}
+\textit{Dimensions: 20" x 16"}\\
+\vspace{0.5cm}
+\textit{Generated from: network\_architecture.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Network Architecture and Security Zones}
+\label{fig:network-architecture-diagram}
+\end{figure}
 
 \section{Deployment Architecture}
 
