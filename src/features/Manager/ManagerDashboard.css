@@ -316,6 +316,27 @@
   font-weight: 500;
 }
 
+/* Export Buttons */
+.btn-secondary {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+.export-buttons-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .dashboard-layout {
@@ -370,6 +391,16 @@
   .data-table th,
   .data-table td {
     padding: 0.75rem 0.5rem;
+  }
+  
+  .export-buttons-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .btn-secondary {
+    width: 100%;
+    justify-content: center;
   }
 }
 
