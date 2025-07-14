@@ -353,6 +353,25 @@ const ManagerDashboard = () => {
           >
             <span>⬇️</span> Export Appointments
           </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('doctor-profiles')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem', 
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Doctor Profiles
+          </button>
         </div>
       </div>
       

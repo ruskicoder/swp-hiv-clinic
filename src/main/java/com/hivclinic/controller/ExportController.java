@@ -44,6 +44,12 @@ public class ExportController {
         return createCSVResponse(csv, "appointments.csv");
     }
 
+    @GetMapping("/doctor-profiles")
+    public ResponseEntity<byte[]> exportDoctorProfiles() {
+        String csv = managerService.generateDoctorProfilesCSV();
+        return createCSVResponse(csv, "doctor_profiles.csv");
+    }
+
     private ResponseEntity<byte[]> createCSVResponse(String csv, String filename) {
         byte[] bytes = csv.getBytes(StandardCharsets.UTF_8);
         HttpHeaders headers = new HttpHeaders();
