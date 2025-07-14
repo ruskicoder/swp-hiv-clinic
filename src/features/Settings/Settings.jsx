@@ -30,6 +30,7 @@ const Settings = () => {
     dateOfBirth: '',
     address: '',
     bio: '',
+    gender: '',
     profileImageBase64: ''
   });
 
@@ -65,6 +66,7 @@ const Settings = () => {
             dateOfBirth: response.dateOfBirth || '',
             address: response.address || '',
             bio: response.bio || '',
+            gender: response.gender || '',
             profileImageBase64: response.profileImageBase64 || ''
           });
         }
@@ -427,6 +429,28 @@ const Settings = () => {
               disabled={!isEditing || loading}
             />
           </div>
+        </div>
+
+        {/* Gender field for all users */}
+        <div className="form-group">
+          <label htmlFor="gender">Gender</label>
+          <select
+            id="gender"
+            name="gender"
+            value={profileData.gender}
+            onChange={handleProfileChange}
+            disabled={!isEditing || loading}
+          >
+            <option value="">Select Gender (Optional)</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+          {profileData.gender && (
+            <small className="form-help">
+              Note: Once selected, gender cannot be left empty. You can change your selection but cannot unselect it.
+            </small>
+          )}
         </div>
 
         {/* Patient-specific fields */}

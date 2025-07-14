@@ -59,6 +59,7 @@ const authService = {
         firstName: response.data.firstName || '',
         lastName: response.data.lastName || '',
         phoneNumber: response.data.phoneNumber || '',
+        gender: response.data.gender || '',
         dateOfBirth: response.data.dateOfBirth || '',
         address: response.data.address || '',
         profileImageBase64: response.data.profileImageBase64 || '',

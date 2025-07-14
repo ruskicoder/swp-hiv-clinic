@@ -5,7 +5,7 @@ import axios from 'axios';
  */
 const apiClient = axios.create({
   baseURL: 'http://localhost:8080/api',
-  timeout: 10000, // 10 second timeout to prevent hanging
+  timeout: 0, // Remove timeout restriction
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,29 +16,26 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`);
+      // Use standard header assignment for Axios
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor
 apiClient.interceptors.response.use(
   (response) => {
-    // Handle successful responses
+    // Only dispatch dataUpdated event for successful non-GET requests
     if (response.config.method !== 'get') {
-      // For non-GET requests, check if we need to trigger a refresh
       const needsRefresh = [
         '/doctors/availability',
         '/appointments',
         '/patient-records'
       ].some(path => response.config.url.includes(path));
 
-      if (needsRefresh) {
-        // Emit custom event for components to reload data
+      if (needsRefresh && response.status >= 200 && response.status < 300) {
         window.dispatchEvent(new CustomEvent('dataUpdated', {
           detail: { path: response.config.url }
         }));
@@ -48,8 +45,6 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     console.error('API Error:', error);
-    
-    // Add detailed error logging
     if (error.response) {
       console.error('Response data:', error.response.data);
       console.error('Response status:', error.response.status);
@@ -62,22 +57,21 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         localStorage.removeItem('token');
-        // Only redirect if we're not already on login page
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
-        // Remove userData from sessionStorage on 401
         sessionStorage.removeItem('userData');
       } catch (e) {
         console.error('Error handling 401:', e);
       }
     }
-    
-    // Handle network errors
-    if (!error.response) {
-      console.error('Network error - server may be down');
+
+    // Handle forbidden errors (403)
+    if (error.response?.status === 403) {
+      alert('You do not have permission to access this resource.');
     }
-    
+
+    // Prevent further processing to avoid loops
     return Promise.reject(error);
   }
 );
