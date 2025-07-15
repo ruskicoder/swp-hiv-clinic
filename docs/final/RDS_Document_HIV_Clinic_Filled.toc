@@ -1,0 +1,56 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}Overview}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}User Requirements}{4}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}Actors}{4}{subsubsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.2}Use Cases}{4}{subsubsection.1.1.2}%
+\contentsline {paragraph}{a. Diagram(s)}{4}{figure.1}%
+\contentsline {paragraph}{b. Descriptions}{4}{section*.4}%
+\contentsline {subsection}{\numberline {1.2}Overall Functionalities}{5}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Screens Flow}{5}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.2.2}Screen Descriptions}{5}{subsubsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.2.3}Screen Authorization}{6}{subsubsection.1.2.3}%
+\contentsline {subsubsection}{\numberline {1.2.4}Non-UI Functions}{7}{subsubsection.1.2.4}%
+\contentsline {subsection}{\numberline {1.3}System High Level Design}{7}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}Database Design}{7}{subsubsection.1.3.1}%
+\contentsline {paragraph}{a. Database Schema}{7}{section*.5}%
+\contentsline {paragraph}{b. Table Descriptions}{9}{section*.6}%
+\contentsline {subsubsection}{\numberline {1.3.2}Code Packages}{10}{subsubsection.1.3.2}%
+\contentsline {subsubsection}{\numberline {1.3.3}Data Flow Architecture}{11}{subsubsection.1.3.3}%
+\contentsline {section}{\numberline {2}Requirement Specifications}{11}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Authentication \& User Management}{11}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}UC-001\_User Registration}{11}{subsubsection.2.1.1}%
+\contentsline {paragraph}{a. Functionalities}{11}{section*.7}%
+\contentsline {paragraph}{b. Business Rules}{12}{section*.8}%
+\contentsline {subsubsection}{\numberline {2.1.2}UC-002\_User Login}{12}{subsubsection.2.1.2}%
+\contentsline {paragraph}{a. Functional Description}{12}{section*.9}%
+\contentsline {paragraph}{b. Business Rules}{13}{section*.10}%
+\contentsline {subsection}{\numberline {2.2}Appointment Management}{14}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}UC-004\_Book Appointment}{14}{subsubsection.2.2.1}%
+\contentsline {paragraph}{a. Functional Description}{14}{section*.11}%
+\contentsline {paragraph}{b. Business Rules}{15}{section*.12}%
+\contentsline {subsection}{\numberline {2.3}Patient Care Management}{15}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}UC-007\_Manage Patient Records}{15}{subsubsection.2.3.1}%
+\contentsline {paragraph}{a. Functional Description}{15}{section*.13}%
+\contentsline {paragraph}{b. Business Rules}{16}{section*.14}%
+\contentsline {subsection}{\numberline {2.4}Notification System}{17}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}UC-010\_Appointment Reminders}{17}{subsubsection.2.4.1}%
+\contentsline {paragraph}{a. Functional Description}{17}{section*.15}%
+\contentsline {paragraph}{b. Business Rules}{18}{section*.16}%
+\contentsline {section}{\numberline {3}Design Specifications}{18}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Authentication System}{18}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}User Login}{18}{subsubsection.3.1.1}%
+\contentsline {paragraph}{UI Design}{18}{section*.17}%
+\contentsline {paragraph}{Database Access}{18}{section*.18}%
+\contentsline {subsection}{\numberline {3.2}Appointment Management}{19}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Appointment Booking}{19}{subsubsection.3.2.1}%
+\contentsline {paragraph}{UI Design}{19}{section*.20}%
+\contentsline {paragraph}{Database Access}{19}{section*.21}%
+\contentsline {subsection}{\numberline {3.3}Patient Care System}{20}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Patient Records Management}{20}{subsubsection.3.3.1}%
+\contentsline {paragraph}{UI Design}{20}{section*.23}%
+\contentsline {paragraph}{Database Access}{20}{section*.24}%
+\contentsline {section}{\numberline {4}Appendix}{21}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Assumptions \& Dependencies}{21}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Limitations \& Exclusions}{22}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Business Rules}{22}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Technical Specifications}{22}{subsection.4.4}%

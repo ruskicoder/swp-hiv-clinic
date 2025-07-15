@@ -1,5 +1,4 @@
 @startuml
-!theme aws-orange
 skinparam backgroundColor #FAFAFA
 skinparam nodeBackgroundColor #E3F2FD
 skinparam nodeBorderColor #1976D2
@@ -7,102 +6,109 @@ skinparam componentBackgroundColor #F1F8E9
 skinparam componentBorderColor #388E3C
 skinparam databaseBackgroundColor #FFF3E0
 skinparam databaseBorderColor #F57C00
+skinparam fontColor #000000
 
 title HIV Clinic Management System - Deployment Diagram
 
-node "Client Devices" as ClientNode {
-    component "Web Browser\n(Chrome, Firefox, Safari)" as Browser
-    component "Mobile Browser\n(iOS Safari, Android Chrome)" as MobileBrowser
-    
-    Browser -[hidden]- MobileBrowser
-}
-
 cloud "Internet" as Internet
 
-node "Load Balancer\n(Production)" as LoadBalancer {
-    component "Nginx\n(Reverse Proxy)" as Nginx
-    component "SSL Termination" as SSL
-    
-    SSL --> Nginx
-}
+package "Public Zone" {
+    node "Client Devices" as ClientNode {
+        component "Web Browser\n(Chrome, Firefox, Safari)" as Browser
+        component "Mobile Browser\n(iOS Safari, Android Chrome)" as MobileBrowser
+        
+        Browser -[hidden]- MobileBrowser
+    }
 
-node "Web Server Cluster" as WebServerCluster {
-    node "Web Server 1\n(Ubuntu 20.04 LTS)" as WebServer1 {
-        component "React App\n(Static Files)" as ReactApp1
-        component "Nginx\n(Web Server)" as WebNginx1
+    node "Load Balancer\n(Production)" as LoadBalancer {
+        component "Nginx\n(Reverse Proxy)" as Nginx
+        component "SSL Termination" as SSL
         
-        WebNginx1 --> ReactApp1
+        SSL --> Nginx
     }
-    
-    node "Web Server 2\n(Ubuntu 20.04 LTS)" as WebServer2 {
-        component "React App\n(Static Files)" as ReactApp2
-        component "Nginx\n(Web Server)" as WebNginx2
-        
-        WebNginx2 --> ReactApp2
-    }
-}
 
-node "Application Server Cluster" as AppServerCluster {
-    node "App Server 1\n(Ubuntu 20.04 LTS)" as AppServer1 {
-        component "Spring Boot App\n(Port 8080)" as SpringApp1
-        component "Java 17 Runtime" as Java1
-        component "Application Logs" as Logs1
+    node "Web Server Cluster" as WebServerCluster {
+        node "Web Server 1\n(Ubuntu 20.04 LTS)" as WebServer1 {
+            component "React App\n(Static Files)" as ReactApp1
+            component "Nginx\n(Web Server)" as WebNginx1
+            
+            WebNginx1 --> ReactApp1
+        }
         
-        Java1 --> SpringApp1
-        SpringApp1 --> Logs1
-    }
-    
-    node "App Server 2\n(Ubuntu 20.04 LTS)" as AppServer2 {
-        component "Spring Boot App\n(Port 8080)" as SpringApp2
-        component "Java 17 Runtime" as Java2
-        component "Application Logs" as Logs2
-        
-        Java2 --> SpringApp2
-        SpringApp2 --> Logs2
+        node "Web Server 2\n(Ubuntu 20.04 LTS)" as WebServer2 {
+            component "React App\n(Static Files)" as ReactApp2
+            component "Nginx\n(Web Server)" as WebNginx2
+            
+            WebNginx2 --> ReactApp2
+        }
     }
 }
 
-node "Database Server\n(Windows Server 2019)" as DatabaseNode {
-    database "MS SQL Server 2019\n(Primary Database)" as SQLServer
-    database "Backup Database\n(Read Replica)" as BackupDB
-    component "SQL Server Agent\n(Backup Jobs)" as SQLAgent
-    
-    SQLServer --> BackupDB : "Replication"
-    SQLAgent --> SQLServer : "Maintenance"
+package "Private Zone" {
+    node "Application Server Cluster" as AppServerCluster {
+        node "App Server 1\n(Ubuntu 20.04 LTS)" as AppServer1 {
+            component "Spring Boot App\n(Port 8080)" as SpringApp1
+            component "Java 17 Runtime" as Java1
+            component "Application Logs" as Logs1
+            
+            Java1 --> SpringApp1
+            SpringApp1 --> Logs1
+        }
+        
+        node "App Server 2\n(Ubuntu 20.04 LTS)" as AppServer2 {
+            component "Spring Boot App\n(Port 8080)" as SpringApp2
+            component "Java 17 Runtime" as Java2
+            component "Application Logs" as Logs2
+            
+            Java2 --> SpringApp2
+            SpringApp2 --> Logs2
+        }
+    }
+
+    node "Database Server\n(Windows Server 2019)" as DatabaseNode {
+        database "MS SQL Server 2019\n(Primary Database)" as SQLServer
+        database "Backup Database\n(Read Replica)" as BackupDB
+        component "SQL Server Agent\n(Backup Jobs)" as SQLAgent
+        
+        SQLServer --> BackupDB : "Replication"
+        SQLAgent --> SQLServer : "Maintenance"
+    }
+
+    node "Cache Server\n(Ubuntu 20.04 LTS)" as CacheNode {
+        component "Redis Cache\n(Session Storage)" as Redis
+        component "Application Cache\n(Query Results)" as AppCache
+        
+        Redis --> AppCache
+    }
+
+    node "File Storage Server\n(Ubuntu 20.04 LTS)" as FileNode {
+        component "File System\n(Profile Images)" as FileSystem
+        component "Backup Storage\n(Document Archives)" as BackupStorage
+        
+        FileSystem --> BackupStorage : "Backup"
+    }
+
+    node "Monitoring Server\n(Ubuntu 20.04 LTS)" as MonitoringNode {
+        component "Application Monitoring\n(Spring Boot Actuator)" as AppMonitoring
+        component "System Monitoring\n(Prometheus)" as SysMonitoring
+        component "Log Aggregation\n(ELK Stack)" as LogAggregation
+        
+        AppMonitoring --> LogAggregation
+        SysMonitoring --> LogAggregation
+    }
 }
 
-node "Cache Server\n(Ubuntu 20.04 LTS)" as CacheNode {
-    component "Redis Cache\n(Session Storage)" as Redis
-    component "Application Cache\n(Query Results)" as AppCache
-    
-    Redis --> AppCache
-}
+package "External Services" {
+    node "Email Service\n(External)" as EmailNode {
+        component "SMTP Provider\n(SendGrid/AWS SES)" as EmailProvider
+        component "Email Templates" as EmailTemplates
+        
+        EmailProvider --> EmailTemplates
+    }
 
-node "File Storage Server\n(Ubuntu 20.04 LTS)" as FileNode {
-    component "File System\n(Profile Images)" as FileSystem
-    component "Backup Storage\n(Document Archives)" as BackupStorage
-    
-    FileSystem --> BackupStorage : "Backup"
-}
-
-node "Email Service\n(External)" as EmailNode {
-    component "SMTP Provider\n(SendGrid/AWS SES)" as EmailProvider
-    component "Email Templates" as EmailTemplates
-    
-    EmailProvider --> EmailTemplates
-}
-
-node "SMS Service\n(External)" as SMSNode {
-    component "SMS Gateway\n(Twilio)" as SMSProvider
-}
-
-node "Monitoring Server\n(Ubuntu 20.04 LTS)" as MonitoringNode {
-    component "Application Monitoring\n(Spring Boot Actuator)" as AppMonitoring
-    component "System Monitoring\n(Prometheus)" as SysMonitoring
-    component "Log Aggregation\n(ELK Stack)" as LogAggregation
-    
-    AppMonitoring --> LogAggregation
-    SysMonitoring --> LogAggregation
+    node "SMS Service\n(External)" as SMSNode {
+        component "SMS Gateway\n(Twilio)" as SMSProvider
+    }
 }
 
 ' Client Connections
@@ -158,25 +164,5 @@ note top of WebServerCluster : "Web Tier\n(Public Subnet)"
 note top of AppServerCluster : "Application Tier\n(Private Subnet)"
 note top of DatabaseNode : "Data Tier\n(Private Subnet)"
 note top of MonitoringNode : "Management Tier\n(Private Subnet)"
-
-' Security Zones
-package "Public Zone" {
-    ClientNode
-    LoadBalancer
-    WebServerCluster
-}
-
-package "Private Zone" {
-    AppServerCluster
-    DatabaseNode
-    CacheNode
-    FileNode
-    MonitoringNode
-}
-
-package "External Services" {
-    EmailNode
-    SMSNode
-}
 
 @enduml

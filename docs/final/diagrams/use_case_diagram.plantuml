@@ -1,0 +1,104 @@
+@startuml
+left to right direction
+
+' Style settings for clarity
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor #F3E5F5
+    BorderColor #4A148C
+    ArrowColor #4A148C
+}
+skinparam actor {
+    BackgroundColor #E1F5FE
+    BorderColor #01579B
+}
+skinparam note {
+    BackgroundColor #FFF9C4
+    BorderColor #F57F17
+}
+
+' ====== ACTORS ======
+actor "Unauthenticated User" as Guest
+actor User
+actor Patient
+actor Doctor
+actor Manager
+actor "Administrator" as Admin
+
+' Actor Generalization: Specific users are types of authenticated users.
+User <|-- Patient
+User <|-- Doctor
+User <|-- Manager
+User <|-- Admin
+
+package "HIV Clinic Management System" {
+
+    package "Authentication & Profile" {
+        usecase "Login to System" as UC_Login
+        usecase "Register Account" as UC_Register
+        usecase "Logout" as UC_Logout
+        usecase "Manage Profile" as UC_ManageProfile
+        usecase "Reset Password" as UC_ResetPassword
+    }
+
+    package "Patient-Facing Services" {
+        usecase "Manage Appointments" as UC_ManageAppointments
+        usecase "View Own Medical Records" as UC_ViewRecords
+        usecase "Track Medication Adherence" as UC_TrackAdherence
+    }
+
+    package "Clinical & Staff Functions" {
+        usecase "Manage All Patient Records" as UC_ManageAllRecords
+        usecase "Manage ARV Treatment Plans" as UC_ManageARV
+        usecase "Manage Doctor Availability" as UC_ManageAvailability
+    }
+    
+    package "High-Level Management" {
+        usecase "Manage Users & Roles" as UC_ManageUsers
+        usecase "View Analytics Dashboard" as UC_ViewDashboard
+        usecase "Generate System Reports" as UC_GenerateReports
+        usecase "Configure System Settings" as UC_ConfigureSystem
+    }
+}
+
+' ====== RELATIONSHIPS ======
+
+' --- Associations: Actor -> Use Case ---
+Guest --|> UC_Register
+Guest --|> UC_Login
+
+User --|> UC_Logout
+User --|> UC_ManageProfile
+
+Patient --|> UC_ManageAppointments
+Patient --|> UC_ViewRecords
+Patient --|> UC_TrackAdherence
+
+Doctor --|> UC_ManageAllRecords
+Doctor --|> UC_ManageARV
+Doctor --|> UC_ManageAvailability
+
+Manager --|> UC_ViewDashboard
+Admin --|> UC_ManageUsers
+Admin --|> UC_ConfigureSystem
+
+' --- Include: A use case that requires another ---
+(UC_ManageProfile) .> (UC_Login) : <<include>>
+(UC_ManageAppointments) .> (UC_Login) : <<include>>
+(UC_ManageAllRecords) .> (UC_Login) : <<include>>
+(UC_ViewDashboard) .> (UC_Login) : <<include>>
+
+' --- Extend: Optional functionality from a base use case ---
+(UC_Login) <. (UC_ResetPassword) : <<extend>>
+(UC_ViewDashboard) <. (UC_GenerateReports) : <<extend>>
+
+
+' --- Use Case Generalization: A specific use case is a type of a general one ---
+usecase "Manage Records" as Base_ManageRecords
+note top of Base_ManageRecords : Abstract Use Case
+Base_ManageRecords <|-- UC_ViewRecords
+Base_ManageRecords <|-- UC_ManageAllRecords
+
+
+@enduml
