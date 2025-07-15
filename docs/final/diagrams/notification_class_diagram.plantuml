@@ -1,0 +1,322 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam classBackgroundColor lightblue
+skinparam interfaceBackgroundColor lightgreen
+
+package "Controller Layer" {
+    class NotificationController {
+        -notificationService: NotificationService
+        -notificationTemplateService: NotificationTemplateService
+        -doctorNotificationService: DoctorNotificationService
+        +getUserNotifications(Authentication, Pageable): ResponseEntity
+        +markAsRead(Long, Authentication): ResponseEntity
+        +markAllAsRead(Authentication): ResponseEntity
+        +getNotificationTemplates(): ResponseEntity
+        +getTemplatesByType(NotificationType): ResponseEntity
+        +createTemplate(NotificationTemplateRequest): ResponseEntity
+        +updateTemplate(Long, NotificationTemplateRequest): ResponseEntity
+        +deleteTemplate(Long): ResponseEntity
+        +getDoctorTemplates(Authentication): ResponseEntity
+        +sendDoctorNotification(NotificationSendRequest): ResponseEntity
+        +getDoctorNotificationHistory(Long, Authentication): ResponseEntity
+        +unsendNotification(Long, Authentication): ResponseEntity
+        +getPatientsWithAppointments(Authentication): ResponseEntity
+    }
+}
+
+package "Service Layer" {
+    class NotificationService {
+        -notificationRepository: NotificationRepository
+        -notificationTemplateRepository: NotificationTemplateRepository
+        -userRepository: UserRepository
+        +createNotification(NotificationCreateRequest): Notification
+        +sendNotification(Notification): void
+        +getNotificationsByUser(Integer, Pageable): Page<Notification>
+        +markNotificationAsRead(Long, Integer): void
+        +markAllNotificationsAsRead(Integer): void
+        +processScheduledNotifications(): void
+        +createAppointmentReminder(Appointment): void
+        +createMedicationReminder(MedicationRoutine): void
+        +sendAppointmentConfirmation(Appointment): void
+        +sendCancellationNotification(Appointment, String): void
+        +deleteExpiredNotifications(): void
+        -processNotificationTemplate(NotificationTemplate, Map<String, Object>): String
+    }
+    
+    class NotificationTemplateService {
+        -notificationTemplateRepository: NotificationTemplateRepository
+        +getAllTemplates(): List<NotificationTemplate>
+        +getTemplatesByType(NotificationType): List<NotificationTemplate>
+        +getTemplateById(Long): Optional<NotificationTemplate>
+        +createTemplate(NotificationTemplateRequest): NotificationTemplate
+        +updateTemplate(Long, NotificationTemplateRequest): NotificationTemplate
+        +deleteTemplate(Long): void
+        +getActiveTemplates(): List<NotificationTemplate>
+        +validateTemplate(NotificationTemplate): boolean
+        +processTemplate(NotificationTemplate, Map<String, Object>): String
+    }
+    
+    class DoctorNotificationService {
+        -notificationService: NotificationService
+        -notificationTemplateService: NotificationTemplateService
+        -userRepository: UserRepository
+        -appointmentRepository: AppointmentRepository
+        +sendNotificationToPatient(NotificationSendRequest, Integer): void
+        +getNotificationHistory(Integer, Integer): List<Notification>
+        +unsendNotification(Long, Integer): void
+        +getPatientsWithAppointments(Integer): List<PatientSummary>
+        +validateDoctorPatientRelationship(Integer, Integer): boolean
+        -createDoctorNotification(NotificationTemplate, Integer, Integer, Map<String, Object>): Notification
+    }
+    
+    class NotificationSchedulingService {
+        -notificationService: NotificationService
+        -appointmentRepository: AppointmentRepository
+        -medicationRoutineRepository: MedicationRoutineRepository
+        -appointmentReminderRepository: AppointmentReminderRepository
+        -medicationReminderRepository: MedicationReminderRepository
+        +processAppointmentReminders(): void
+        +processMedicationReminders(): void
+        +cleanupExpiredNotifications(): void
+        +generateDailyMedicationReminders(): void
+        +updateReminderStatus(Long, String): void
+        -shouldSendAppointmentReminder(Appointment): boolean
+        -shouldSendMedicationReminder(MedicationRoutine): boolean
+        -createAppointmentReminderInstances(Appointment): void
+    }
+}
+
+package "Entity Layer" {
+    class Notification {
+        -notificationId: Integer
+        -user: User
+        -type: NotificationType
+        -title: String
+        -message: String
+        -isRead: Boolean
+        -priority: Priority
+        -relatedEntityId: Integer
+        -relatedEntityType: String
+        -scheduledFor: LocalDateTime
+        -sentAt: LocalDateTime
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        -template: NotificationTemplate
+        -status: String
+        +prePersist(): void
+        +preUpdate(): void
+        +isOverdue(): boolean
+        +canBeUnsent(): boolean
+        +markAsRead(): void
+    }
+    
+    class NotificationTemplate {
+        -templateId: Long
+        -name: String
+        -type: NotificationType
+        -subject: String
+        -body: String
+        -priority: Priority
+        -isActive: Boolean
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +prePersist(): void
+        +preUpdate(): void
+        +processTemplate(Map<String, Object>): String
+        +validateTemplate(): boolean
+    }
+    
+    class MedicationRoutine {
+        -routineId: Integer
+        -patient: User
+        -doctor: User
+        -arvTreatment: ARVTreatment
+        -medicationName: String
+        -dosage: String
+        -instructions: String
+        -startDate: LocalDate
+        -endDate: LocalDate
+        -timeOfDay: LocalTime
+        -isActive: Boolean
+        -reminderEnabled: Boolean
+        -reminderMinutesBefore: Integer
+        -lastReminderSentAt: LocalDateTime
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +shouldSendReminder(): boolean
+        +getNextReminderTime(): LocalDateTime
+    }
+    
+    class AppointmentReminder {
+        -reminderId: Integer
+        -appointment: Appointment
+        -patient: User
+        -reminderType: String
+        -reminderDateTime: LocalDateTime
+        -status: String
+        -sentAt: LocalDateTime
+        -acknowledgedAt: LocalDateTime
+        -createdAt: LocalDateTime
+        +canBeSent(): boolean
+        +isOverdue(): boolean
+    }
+    
+    class MedicationReminder {
+        -reminderId: Integer
+        -routine: MedicationRoutine
+        -patient: User
+        -reminderDate: LocalDate
+        -reminderTime: LocalTime
+        -status: String
+        -sentAt: LocalDateTime
+        -acknowledgedAt: LocalDateTime
+        -createdAt: LocalDateTime
+        +getScheduledDateTime(): LocalDateTime
+        +canBeSent(): boolean
+    }
+    
+    enum NotificationType {
+        APPOINTMENT_REMINDER
+        MEDICATION_REMINDER
+        GENERAL_ALERT
+        SYSTEM_NOTIFICATION
+    }
+    
+    enum Priority {
+        LOW
+        MEDIUM
+        HIGH
+        URGENT
+    }
+}
+
+package "Repository Layer" {
+    interface NotificationRepository {
+        +findByUserUserIdAndIsReadFalse(Integer, Pageable): Page<Notification>
+        +findByUserUserIdOrderByCreatedAtDesc(Integer, Pageable): Page<Notification>
+        +findScheduledNotifications(LocalDateTime): List<Notification>
+        +findByRelatedEntityIdAndRelatedEntityType(Integer, String): List<Notification>
+        +countUnreadByUserId(Integer): Long
+        +deleteByCreatedAtBefore(LocalDateTime): void
+        +markAllAsReadByUserId(Integer): void
+    }
+    
+    interface NotificationTemplateRepository {
+        +findByTypeAndIsActiveTrue(NotificationType): List<NotificationTemplate>
+        +findByIsActiveTrue(): List<NotificationTemplate>
+        +findByNameContainingIgnoreCase(String): List<NotificationTemplate>
+        +existsByName(String): boolean
+    }
+    
+    interface AppointmentReminderRepository {
+        +findByStatusAndReminderDateTimeBefore(String, LocalDateTime): List<AppointmentReminder>
+        +findByAppointmentAppointmentIdAndStatus(Integer, String): List<AppointmentReminder>
+        +findByPatientUserIdAndStatus(Integer, String): List<AppointmentReminder>
+        +deleteByAppointmentAppointmentId(Integer): void
+    }
+    
+    interface MedicationReminderRepository {
+        +findByStatusAndReminderDateAndReminderTimeBefore(String, LocalDate, LocalTime): List<MedicationReminder>
+        +findByRoutineRoutineIdAndStatus(Integer, String): List<MedicationReminder>
+        +findByPatientUserIdAndStatus(Integer, String): List<MedicationReminder>
+        +deleteByRoutineRoutineId(Integer): void
+    }
+}
+
+package "DTO Layer" {
+    class NotificationResponse {
+        -notificationId: Integer
+        -title: String
+        -message: String
+        -type: String
+        -priority: String
+        -isRead: Boolean
+        -createdAt: LocalDateTime
+        -relatedEntityId: Integer
+        -relatedEntityType: String
+        -templateName: String
+    }
+    
+    class NotificationSendRequest {
+        -patientId: Integer
+        -templateId: Long
+        -customMessage: String
+        -priority: String
+        -scheduledFor: LocalDateTime
+        +validate(): boolean
+    }
+    
+    class NotificationTemplateRequest {
+        -name: String
+        -type: String
+        -subject: String
+        -body: String
+        -priority: String
+        -isActive: Boolean
+        +validate(): boolean
+    }
+}
+
+' Relationships
+NotificationController *-- NotificationService
+NotificationController *-- NotificationTemplateService
+NotificationController *-- DoctorNotificationService
+
+NotificationService *-- NotificationRepository
+NotificationService *-- NotificationTemplateRepository
+NotificationTemplateService *-- NotificationTemplateRepository
+DoctorNotificationService *-- NotificationService
+DoctorNotificationService *-- NotificationTemplateService
+
+NotificationSchedulingService *-- NotificationService
+NotificationSchedulingService *-- AppointmentReminderRepository
+NotificationSchedulingService *-- MedicationReminderRepository
+
+Notification }o--|| User : "sent to"
+Notification }o--|| NotificationTemplate : "uses"
+Notification ..> NotificationType : "has"
+Notification ..> Priority : "has"
+
+NotificationTemplate ..> NotificationType : "has"
+NotificationTemplate ..> Priority : "has"
+
+MedicationRoutine }o--|| User : "patient"
+MedicationRoutine }o--|| User : "doctor"
+MedicationRoutine ||--o{ MedicationReminder : "generates"
+
+AppointmentReminder }o--|| Appointment : "for"
+AppointmentReminder }o--|| User : "sent to"
+
+MedicationReminder }o--|| MedicationRoutine : "for"
+MedicationReminder }o--|| User : "sent to"
+
+NotificationController ..> NotificationResponse : "returns"
+NotificationController ..> NotificationSendRequest : "uses"
+NotificationController ..> NotificationTemplateRequest : "uses"
+
+note right of NotificationService
+    Core notification management service
+    - Creates and sends notifications
+    - Processes scheduled notifications
+    - Manages notification templates
+    - Handles notification lifecycle
+end note
+
+note right of NotificationSchedulingService
+    Scheduled task service (@Scheduled)
+    - Processes appointment reminders
+    - Processes medication reminders
+    - Cleans up expired notifications
+    - Generates daily reminders
+end note
+
+note right of DoctorNotificationService
+    Doctor-specific notification service
+    - Sends notifications to patients
+    - Manages doctor-patient relationships
+    - Tracks notification history
+    - Handles notification unsending
+end note
+
+@enduml

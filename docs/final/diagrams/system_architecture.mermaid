@@ -1,0 +1,217 @@
+graph TB
+    %% Frontend Layer
+    subgraph "Frontend Layer (React 18.2.0)"
+        UI[React Application]
+        Router[React Router]
+        AuthCtx[Authentication Context]
+        Components[Components]
+        Features[Feature Modules]
+        Services[API Services]
+        
+        UI --> Router
+        UI --> AuthCtx
+        UI --> Components
+        UI --> Features
+        Router --> Features
+        Features --> Components
+        Features --> Services
+        AuthCtx --> Services
+    end
+    
+    %% Component Details
+    subgraph "React Components"
+        Layout[Layout Components]
+        Notifications[Notification Components]
+        Schedule[Scheduling Components]
+        ARV[ARV Treatment Components]
+        Forms[Form Components]
+        
+        Components --> Layout
+        Components --> Notifications
+        Components --> Schedule
+        Components --> ARV
+        Components --> Forms
+    end
+    
+    %% Feature Modules
+    subgraph "Feature Modules"
+        AdminDash[Admin Dashboard]
+        DoctorDash[Doctor Dashboard]
+        PatientDash[Patient Dashboard]
+        ManagerDash[Manager Dashboard]
+        Auth[Authentication]
+        Settings[Settings]
+        
+        Features --> AdminDash
+        Features --> DoctorDash
+        Features --> PatientDash
+        Features --> ManagerDash
+        Features --> Auth
+        Features --> Settings
+    end
+    
+    %% API Layer
+    subgraph "API Communication"
+        HTTP[HTTP Client - Axios]
+        AuthService[Authentication Service]
+        NotificationService[Notification Service]
+        AppointmentService[Appointment Service]
+        UserService[User Service]
+        
+        Services --> HTTP
+        Services --> AuthService
+        Services --> NotificationService
+        Services --> AppointmentService
+        Services --> UserService
+        
+        HTTP --> |HTTPS/JSON| Gateway
+    end
+    
+    %% Gateway/Load Balancer
+    Gateway[API Gateway / Load Balancer]
+    
+    %% Backend Layer
+    subgraph "Backend Layer (Spring Boot 3.2.0)"
+        App[HIV Clinic Application]
+        Security[Spring Security + JWT]
+        Controllers[REST Controllers]
+        BusinessLogic[Service Layer]
+        DataAccess[Repository Layer]
+        Config[Configuration Layer]
+        
+        App --> Security
+        App --> Controllers
+        App --> BusinessLogic
+        App --> DataAccess
+        App --> Config
+        
+        Security --> Controllers
+        Controllers --> BusinessLogic
+        BusinessLogic --> DataAccess
+    end
+    
+    %% Controller Details
+    subgraph "REST Controllers"
+        AuthCtrl[Authentication Controller]
+        AppointmentCtrl[Appointment Controller]
+        NotificationCtrl[Notification Controller]
+        ARVCtrl[ARV Treatment Controller]
+        AdminCtrl[Admin Controller]
+        DoctorCtrl[Doctor Controller]
+        
+        Controllers --> AuthCtrl
+        Controllers --> AppointmentCtrl
+        Controllers --> NotificationCtrl
+        Controllers --> ARVCtrl
+        Controllers --> AdminCtrl
+        Controllers --> DoctorCtrl
+    end
+    
+    %% Service Layer Details
+    subgraph "Business Logic Services"
+        AuthSvc[Authentication Service]
+        AppointmentSvc[Appointment Service]
+        NotificationSvc[Notification Service]
+        ARVSvc[ARV Treatment Service]
+        UserSvc[User Service]
+        SchedulingSvc[Scheduling Service]
+        
+        BusinessLogic --> AuthSvc
+        BusinessLogic --> AppointmentSvc
+        BusinessLogic --> NotificationSvc
+        BusinessLogic --> ARVSvc
+        BusinessLogic --> UserSvc
+        BusinessLogic --> SchedulingSvc
+    end
+    
+    %% Repository Layer Details
+    subgraph "Data Access Layer (Spring Data JPA)"
+        UserRepo[User Repository]
+        AppointmentRepo[Appointment Repository]
+        NotificationRepo[Notification Repository]
+        ARVRepo[ARV Treatment Repository]
+        SlotRepo[Availability Slot Repository]
+        
+        DataAccess --> UserRepo
+        DataAccess --> AppointmentRepo
+        DataAccess --> NotificationRepo
+        DataAccess --> ARVRepo
+        DataAccess --> SlotRepo
+    end
+    
+    %% Database Layer
+    subgraph "Database Layer"
+        DB[(Microsoft SQL Server)]
+        Tables[Database Tables]
+        Indexes[Indexes & Constraints]
+        Procedures[Stored Procedures]
+        
+        DB --> Tables
+        DB --> Indexes
+        DB --> Procedures
+    end
+    
+    %% Security Components
+    subgraph "Security Layer"
+        JWT[JWT Token Management]
+        RBAC[Role-Based Access Control]
+        CORS[CORS Configuration]
+        Encryption[Password Encryption]
+        
+        Security --> JWT
+        Security --> RBAC
+        Security --> CORS
+        Security --> Encryption
+    end
+    
+    %% Scheduled Tasks
+    subgraph "Background Processing"
+        Scheduler[Spring Scheduler]
+        AppointmentTask[Appointment Reminders]
+        MedicationTask[Medication Reminders]
+        CleanupTask[Data Cleanup]
+        
+        SchedulingSvc --> Scheduler
+        Scheduler --> AppointmentTask
+        Scheduler --> MedicationTask
+        Scheduler --> CleanupTask
+    end
+    
+    %% External Integrations
+    subgraph "External Services"
+        Email[Email Service]
+        SMS[SMS Service]
+        Logging[Logging Service]
+        Monitoring[Monitoring Service]
+        
+        NotificationSvc --> Email
+        NotificationSvc --> SMS
+        App --> Logging
+        App --> Monitoring
+    end
+    
+    %% Data Flow Connections
+    Gateway --> Security
+    
+    UserRepo --> |JPA/Hibernate| DB
+    AppointmentRepo --> |JPA/Hibernate| DB
+    NotificationRepo --> |JPA/Hibernate| DB
+    ARVRepo --> |JPA/Hibernate| DB
+    SlotRepo --> |JPA/Hibernate| DB
+    
+    AppointmentTask --> |Creates| NotificationRepo
+    MedicationTask --> |Creates| NotificationRepo
+    CleanupTask --> |Deletes| NotificationRepo
+    
+    %% Styling
+    classDef frontend fill:#e1f5fe
+    classDef backend fill:#f3e5f5
+    classDef database fill:#e8f5e8
+    classDef security fill:#fff3e0
+    classDef external fill:#fce4ec
+    
+    class UI,Router,AuthCtx,Components,Features,Services frontend
+    class App,Security,Controllers,BusinessLogic,DataAccess,Config backend
+    class DB,Tables,Indexes,Procedures database
+    class JWT,RBAC,CORS,Encryption security
+    class Email,SMS,Logging,Monitoring external

@@ -1,0 +1,98 @@
+sequenceDiagram
+    participant Client as React Frontend
+    participant AuthCtrl as AuthController
+    participant AuthSvc as AuthService
+    participant UserSvc as CustomUserDetailsService
+    participant JwtUtils as JwtUtils
+    participant UserRepo as UserRepository
+    participant DB as SQL Server Database
+    participant LoginRepo as LoginActivityRepository
+
+    Note over Client, DB: User Authentication Flow
+
+    Client->>AuthCtrl: POST /api/auth/login
+    Note right of Client: {username, password}
+    
+    AuthCtrl->>AuthSvc: authenticate(loginRequest)
+    AuthSvc->>UserSvc: loadUserByUsername(username)
+    UserSvc->>UserRepo: findByUsername(username)
+    UserRepo->>DB: SELECT user with role
+    DB-->>UserRepo: User entity with Role
+    UserRepo-->>UserSvc: Optional<User>
+    
+    alt User found and active
+        UserSvc->>UserSvc: convertToUserDetails(user)
+        UserSvc-->>AuthSvc: UserPrincipal
+        AuthSvc->>AuthSvc: passwordEncoder.matches(password, hashedPassword)
+        
+        alt Password valid
+            AuthSvc->>JwtUtils: generateToken(userDetails)
+            JwtUtils->>JwtUtils: createToken(claims, username)
+            JwtUtils-->>AuthSvc: JWT Token
+            
+            AuthSvc->>LoginRepo: save(LoginActivity)
+            Note right of AuthSvc: Record successful login
+            LoginRepo->>DB: INSERT INTO LoginActivity
+            DB-->>LoginRepo: Success
+            
+            AuthSvc-->>AuthCtrl: LoginResponse with token
+            AuthCtrl-->>Client: 200 OK with JWT token
+            Note left of Client: Store token for future requests
+        else Password invalid
+            AuthSvc->>LoginRepo: save(LoginActivity)
+            Note right of AuthSvc: Record failed login attempt
+            LoginRepo->>DB: INSERT INTO LoginActivity
+            DB-->>LoginRepo: Success
+            
+            AuthSvc-->>AuthCtrl: AuthenticationException
+            AuthCtrl-->>Client: 401 Unauthorized
+        end
+    else User not found or inactive
+        UserSvc-->>AuthSvc: UserNotFoundException
+        AuthSvc->>LoginRepo: save(LoginActivity)
+        Note right of AuthSvc: Record failed login attempt
+        LoginRepo->>DB: INSERT INTO LoginActivity
+        DB-->>LoginRepo: Success
+        
+        AuthSvc-->>AuthCtrl: AuthenticationException
+        AuthCtrl-->>Client: 401 Unauthorized
+    end
+
+    Note over Client, DB: Subsequent Authenticated Requests
+
+    Client->>AuthCtrl: GET /api/auth/me
+    Note right of Client: Authorization: Bearer <token>
+    
+    AuthCtrl->>JwtUtils: validateToken(token)
+    JwtUtils->>JwtUtils: parseClaimsFromToken(token)
+    
+    alt Token valid
+        JwtUtils-->>AuthCtrl: Claims
+        AuthCtrl->>UserSvc: loadUserByUsername(username)
+        UserSvc->>UserRepo: findByUsername(username)
+        UserRepo->>DB: SELECT user with role
+        DB-->>UserRepo: User entity
+        UserRepo-->>UserSvc: Optional<User>
+        UserSvc-->>AuthCtrl: UserPrincipal
+        
+        AuthCtrl-->>Client: 200 OK with user profile
+    else Token invalid/expired
+        JwtUtils-->>AuthCtrl: JwtException
+        AuthCtrl-->>Client: 401 Unauthorized
+        Note left of Client: Redirect to login page
+    end
+
+    Note over Client, DB: Role-based Access Control
+
+    Client->>AuthCtrl: GET /api/admin/users
+    Note right of Client: Authorization: Bearer <token>
+    
+    AuthCtrl->>JwtUtils: validateToken(token)
+    JwtUtils-->>AuthCtrl: Claims with roles
+    
+    alt Has ADMIN role
+        AuthCtrl->>AuthCtrl: @PreAuthorize("hasRole('ADMIN')")
+        AuthCtrl-->>Client: 200 OK with admin data
+    else Insufficient permissions
+        AuthCtrl-->>Client: 403 Forbidden
+    end
