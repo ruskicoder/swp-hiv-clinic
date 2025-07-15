@@ -1,7 +1,7 @@
 graph TB
     %% Internet and External
     subgraph "Internet"
-        Internet([Internet])
+        Client([User/Client])
         DNS[DNS Servers]
         CDN[Content Delivery Network]
         EmailSrv[External Email Services]
@@ -65,9 +65,9 @@ graph TB
     end
     
     %% Network Connections
-    Internet --> DNS
-    Internet --> CDN
-    Internet --> FW1
+    Client --> DNS
+    Client --> CDN
+    Client --> FW1
     FW1 --> SSL
     
     LB --> WebLB
@@ -148,7 +148,7 @@ graph TB
     classDef mgmt fill:#e0f2f1,stroke:#00695c,stroke-width:2px
     classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px
     
-    class Internet,DNS,CDN,EmailSrv,SMSSrv internet
+    class Client,DNS,CDN,EmailSrv,SMSSrv internet
     class LB,WAF,SSL dmz
     class WEB1,WEB2,WebLB web
     class APP1,APP2,AppLB app
