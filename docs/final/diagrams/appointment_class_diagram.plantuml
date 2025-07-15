@@ -1,0 +1,274 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam classBackgroundColor lightblue
+skinparam interfaceBackgroundColor lightgreen
+
+package "Controller Layer" {
+    class AppointmentController {
+        -appointmentService: AppointmentService
+        -patientRecordService: PatientRecordService
+        +bookAppointment(AppointmentBookingRequest): ResponseEntity
+        +getMyAppointments(Authentication): ResponseEntity
+        +getUpcomingAppointments(Authentication): ResponseEntity
+        +getDoctorAppointments(Authentication): ResponseEntity
+        +cancelAppointment(Long, CancellationRequest): ResponseEntity
+        +updateAppointmentStatus(Long, StatusUpdateRequest): ResponseEntity
+        +getPatientRecord(Long, Authentication): ResponseEntity
+    }
+    
+    class DoctorController {
+        -doctorService: DoctorService
+        -doctorAvailabilityService: DoctorAvailabilityService
+        +getAllDoctors(): ResponseEntity
+        +getDoctorById(Long): ResponseEntity
+        +createAvailabilitySlots(AvailabilityRequest): ResponseEntity
+        +getMyAvailabilitySlots(Authentication): ResponseEntity
+        +getDoctorAvailableSlots(Long, LocalDate, LocalDate): ResponseEntity
+        +getDoctorAvailability(Long): ResponseEntity
+        +updateAvailabilitySlot(Long, SlotUpdateRequest): ResponseEntity
+        +deleteAvailabilitySlot(Long, Authentication): ResponseEntity
+    }
+}
+
+package "Service Layer" {
+    class AppointmentService {
+        -appointmentRepository: AppointmentRepository
+        -doctorAvailabilityRepository: DoctorAvailabilityRepository
+        -appointmentStatusHistoryRepository: AppointmentStatusHistoryRepository
+        -notificationService: NotificationService
+        +createAppointment(AppointmentBookingRequest, Integer): Appointment
+        +findAppointmentsByPatient(Integer, Pageable): Page<Appointment>
+        +findAppointmentsByDoctor(Integer, Pageable): Page<Appointment>
+        +findUpcomingAppointments(Integer): List<Appointment>
+        +updateAppointmentStatus(Long, String, String, Integer): Appointment
+        +cancelAppointment(Long, String, Integer): void
+        +validateAppointmentSlot(Long, Integer): boolean
+        +scheduleAppointmentReminders(Appointment): void
+        -recordStatusChange(Appointment, String, String, Integer): void
+    }
+    
+    class DoctorAvailabilityService {
+        -doctorAvailabilityRepository: DoctorAvailabilityRepository
+        -userRepository: UserRepository
+        +createAvailabilitySlots(AvailabilityRequest, Integer): List<DoctorAvailabilitySlot>
+        +getDoctorAvailableSlots(Integer, LocalDate, LocalDate): List<DoctorAvailabilitySlot>
+        +getMyAvailabilitySlots(Integer): List<DoctorAvailabilitySlot>
+        +updateAvailabilitySlot(Long, SlotUpdateRequest): DoctorAvailabilitySlot
+        +deleteAvailabilitySlot(Long, Integer): void
+        +isSlotAvailable(Long): boolean
+        +bookSlot(Long): void
+        +releaseSlot(Long): void
+        -validateSlotOwnership(Long, Integer): boolean
+    }
+    
+    class NotificationService {
+        -notificationRepository: NotificationRepository
+        -appointmentReminderRepository: AppointmentReminderRepository
+        +createAppointmentReminder(Appointment): void
+        +scheduleAppointmentReminders(Appointment): void
+        +sendAppointmentConfirmation(Appointment): void
+        +sendCancellationNotification(Appointment, String): void
+        +sendStatusUpdateNotification(Appointment, String): void
+    }
+}
+
+package "Entity Layer" {
+    class Appointment {
+        -appointmentId: Integer
+        -patient: User
+        -doctor: User
+        -availabilitySlot: DoctorAvailabilitySlot
+        -appointmentDateTime: LocalDateTime
+        -durationMinutes: Integer
+        -status: String
+        -patientCancellationReason: String
+        -doctorCancellationReason: String
+        -appointmentNotes: String
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +prePersist(): void
+        +preUpdate(): void
+        +isUpcoming(): boolean
+        +canBeCancelled(): boolean
+    }
+    
+    class DoctorAvailabilitySlot {
+        -availabilitySlotId: Integer
+        -doctor: User
+        -slotDate: LocalDate
+        -startTime: LocalTime
+        -endTime: LocalTime
+        -isBooked: Boolean
+        -notes: String
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +prePersist(): void
+        +preUpdate(): void
+        +isAvailable(): boolean
+        +getDurationMinutes(): int
+        +overlaps(DoctorAvailabilitySlot): boolean
+    }
+    
+    class AppointmentStatusHistory {
+        -statusHistoryId: Integer
+        -appointment: Appointment
+        -oldStatus: String
+        -newStatus: String
+        -changeReason: String
+        -changedAt: LocalDateTime
+        -changedBy: User
+        +prePersist(): void
+    }
+    
+    class User {
+        -userId: Integer
+        -username: String
+        -email: String
+        -firstName: String
+        -lastName: String
+        -role: Role
+        -isActive: Boolean
+        +getFullName(): String
+        +isDoctor(): boolean
+        +isPatient(): boolean
+    }
+    
+    class AppointmentReminder {
+        -reminderId: Integer
+        -appointment: Appointment
+        -patient: User
+        -reminderType: String
+        -reminderDateTime: LocalDateTime
+        -status: String
+        -sentAt: LocalDateTime
+        -acknowledgedAt: LocalDateTime
+        -createdAt: LocalDateTime
+        +isOverdue(): boolean
+        +canBeSent(): boolean
+    }
+}
+
+package "Repository Layer" {
+    interface AppointmentRepository {
+        +findByPatientUserIdAndStatusNot(Integer, String, Pageable): Page<Appointment>
+        +findByDoctorUserIdAndStatusNot(Integer, String, Pageable): Page<Appointment>
+        +findUpcomingAppointmentsByPatient(Integer, LocalDateTime): List<Appointment>
+        +findUpcomingAppointmentsByDoctor(Integer, LocalDateTime): List<Appointment>
+        +findConflictingAppointments(Integer, LocalDateTime, LocalDateTime): List<Appointment>
+        +countAppointmentsByStatus(String): Long
+        +findAppointmentsByDateRange(LocalDate, LocalDate): List<Appointment>
+    }
+    
+    interface DoctorAvailabilityRepository {
+        +findByDoctorUserIdAndSlotDateBetween(Integer, LocalDate, LocalDate): List<DoctorAvailabilitySlot>
+        +findByDoctorUserIdAndIsBookedFalse(Integer): List<DoctorAvailabilitySlot>
+        +findByAvailabilitySlotIdAndDoctorUserId(Long, Integer): Optional<DoctorAvailabilitySlot>
+        +findOverlappingSlots(Integer, LocalDate, LocalTime, LocalTime): List<DoctorAvailabilitySlot>
+        +deleteByDoctorUserIdAndAvailabilitySlotId(Integer, Long): void
+    }
+    
+    interface AppointmentStatusHistoryRepository {
+        +findByAppointmentOrderByChangedAtDesc(Appointment): List<AppointmentStatusHistory>
+        +findByAppointmentAndNewStatus(Appointment, String): List<AppointmentStatusHistory>
+    }
+    
+    interface AppointmentReminderRepository {
+        +findByAppointmentAndStatus(Appointment, String): List<AppointmentReminder>
+        +findPendingReminders(LocalDateTime): List<AppointmentReminder>
+        +findByPatientUserIdAndStatus(Integer, String): List<AppointmentReminder>
+    }
+}
+
+package "DTO Layer" {
+    class AppointmentBookingRequest {
+        -doctorId: Integer
+        -availabilitySlotId: Long
+        -appointmentDateTime: LocalDateTime
+        -notes: String
+        +validate(): boolean
+    }
+    
+    class AppointmentResponse {
+        -appointmentId: Integer
+        -doctorName: String
+        -doctorSpecialty: String
+        -appointmentDateTime: LocalDateTime
+        -status: String
+        -notes: String
+        -canCancel: boolean
+    }
+    
+    class AvailabilityRequest {
+        -slotDate: LocalDate
+        -startTime: LocalTime
+        -endTime: LocalTime
+        -notes: String
+        +validate(): boolean
+        +isValidTimeRange(): boolean
+    }
+    
+    class SlotUpdateRequest {
+        -startTime: LocalTime
+        -endTime: LocalTime
+        -notes: String
+        +validate(): boolean
+    }
+}
+
+' Relationships
+AppointmentController *-- AppointmentService
+DoctorController *-- DoctorAvailabilityService
+DoctorController *-- DoctorService
+
+AppointmentService *-- AppointmentRepository
+AppointmentService *-- DoctorAvailabilityRepository
+AppointmentService *-- AppointmentStatusHistoryRepository
+AppointmentService *-- NotificationService
+
+DoctorAvailabilityService *-- DoctorAvailabilityRepository
+DoctorAvailabilityService *-- UserRepository
+
+NotificationService *-- AppointmentReminderRepository
+
+Appointment }o--|| User : "patient"
+Appointment }o--|| User : "doctor"
+Appointment }o--|| DoctorAvailabilitySlot : "uses"
+Appointment ||--o{ AppointmentStatusHistory : "has history"
+Appointment ||--o{ AppointmentReminder : "generates"
+
+AppointmentStatusHistory }o--|| User : "changed by"
+AppointmentReminder }o--|| User : "sent to"
+
+DoctorAvailabilitySlot }o--|| User : "belongs to"
+
+AppointmentController ..> AppointmentBookingRequest : "uses"
+AppointmentController ..> AppointmentResponse : "returns"
+DoctorController ..> AvailabilityRequest : "uses"
+DoctorController ..> SlotUpdateRequest : "uses"
+
+note right of AppointmentService
+    Core business logic for appointment management
+    - Validates appointment conflicts
+    - Manages appointment lifecycle
+    - Schedules automatic reminders
+    - Records status change history
+end note
+
+note right of DoctorAvailabilityService
+    Manages doctor availability slots
+    - Creates and manages time slots
+    - Handles slot booking/releasing
+    - Validates slot conflicts
+    - Enforces doctor ownership
+end note
+
+note right of Appointment
+    Main appointment entity
+    - Links patient and doctor
+    - Tracks appointment status
+    - Maintains audit trail
+    - Supports cancellation reasons
+end note
+
+@enduml
