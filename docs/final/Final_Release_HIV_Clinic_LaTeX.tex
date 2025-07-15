@@ -12,32 +12,16 @@
 \usepackage{listings}
 \usepackage{enumitem}
 \usepackage{float}
-\usepackage{microtype}
 
-% Fix headheight
-\setlength{\headheight}{14.5pt}
-
-% Add microtype for better text fitting
-\usepackage{microtype}
-
-% Add proper quotes
-\newcommand{\qq}[1]{``#1''}
-
-% Add missing author
-\title{%
-    \vspace{-1cm}
-    \textbf{Final Release Document\\HIV Clinic Management System}
-}
-\author{Development Team}
-\date{January 2025 --- Ho Chi Minh City}
-
-% Adjust margins for better text fit
-\geometry{margin=1in,top=1.2in}
-
+\geometry{margin=1in}
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{\thepage}
 \lhead{HIV Clinic Final Release}
+
+\title{\textbf{Final Release Document\\HIV Clinic Management System}}
+\author{Version: 1.0}
+\date{January 2025}
 
 \begin{document}
 
@@ -48,7 +32,7 @@
 
 \section*{Record of Changes}
 
-\begin{longtable}{@{}|p{2cm}|p{2cm}|p{1cm}|p{3cm}|p{6cm}|@{}}
+\begin{longtable}{|p{2cm}|p{2cm}|p{1cm}|p{3cm}|p{6cm}|}
 \hline
 \textbf{Version} & \textbf{Date} & \textbf{A*M, D} & \textbf{In charge} & \textbf{Change Description} \\
 \hline
@@ -68,7 +52,7 @@ V1.0 & 07/01/2025 & A & Development Team & Initial Final Release document for HI
 
 This section lists all source programs, scripts, and documents included in the HIV Clinic Management System release.
 
-\begin{longtable}{@{}|p{1cm}|p{6cm}|p{7cm}|@{}}
+\begin{longtable}{|p{1cm}|p{6cm}|p{7cm}|}
 \hline
 \textbf{No.} & \textbf{File} & \textbf{Notes} \\
 \hline
@@ -127,7 +111,7 @@ This section provides comprehensive installation instructions for setting up the
 
 \subsection{System Requirements}
 
-\begin{longtable}{@{}|p{3cm}|p{3cm}|p{8cm}|@{}}
+\begin{longtable}{|p{3cm}|p{3cm}|p{8cm}|}
 \hline
 \textbf{Component} & \textbf{Version} & \textbf{Description} \\
 \hline
@@ -272,7 +256,7 @@ The HIV Clinic Management System is a comprehensive web application designed to 
 
 \subsubsection{User Roles}
 
-\begin{longtable}{@{}|p{2cm}|p{4cm}|p{8cm}|@{}}
+\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
 \hline
 \textbf{Role} & \textbf{Primary Functions} & \textbf{Key Responsibilities} \\
 \hline
@@ -299,7 +283,7 @@ Manager & Clinic operations & Oversee operations, generate reports, manage staff
 
 \subsubsection{Default User Accounts}
 
-\begin{longtable}{@{}|p{2cm}|p{3cm}|p{3cm}|p{6cm}|@{}}
+\begin{longtable}{|p{2cm}|p{3cm}|p{3cm}|p{6cm}|}
 \hline
 \textbf{Role} & \textbf{Username} & \textbf{Password} & \textbf{Description} \\
 \hline
@@ -347,38 +331,29 @@ Manager & manager1 & manager123 & Test manager account for demonstration \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/patient_login.png}
-\caption{Patient Login Interface}
-\label{fig:patient-login}
-\end{figure}
-
-\begin{figure}[H]
+\fbox{
+\begin{minipage}{0.8\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{images/patient_register.png}
-\caption{Patient Registration Interface}
-\label{fig:patient-register}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\textwidth]{images/patient_booking.png}
-\caption{Patient Appointment Booking Interface}
-\label{fig:patient-booking}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\textwidth]{images/patient_dashboard.png}
+\vspace{1.5cm}
+\textbf{Patient Dashboard Screenshot}\\
+\vspace{0.5cm}
+\textit{Shows upcoming appointments, medication reminders, and navigation}\\
+\vspace{1.5cm}
+\end{minipage}
+}
 \caption{Patient Dashboard Interface}
-\label{fig:patient-dashboard}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\textwidth]{images/patient_records.png}
-\caption{Patient Medical Records Interface}
-\label{fig:patient-records}
-\end{figure}
+\subsubsection{Medical Records Access}
+
+\begin{enumerate}
+    \item Navigate to "My Records" section
+    \item View medical history and current treatments
+    \item Access ARV treatment information
+    \item View prescribed medications
+    \item Update personal information
+    \item Set privacy preferences
+\end{enumerate}
 
 \subsection{Doctor Workflow}
 
@@ -393,64 +368,73 @@ Manager & manager1 & manager123 & Test manager account for demonstration \\
     \item View and edit existing slots
 \end{enumerate}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\textwidth]{images/doctor_login.png}
-\caption{Doctor Login Interface}
-\label{fig:doctor-login}
-\end{figure}
+\subsubsection{Patient Care Management}
+
+\begin{enumerate}
+    \item Access "My Appointments" section
+    \item View daily appointment schedule
+    \item Click on appointment to view patient details
+    \item Access patient medical records
+    \item Update treatment notes
+    \item Prescribe or modify ARV treatments
+    \item Schedule follow-up appointments
+\end{enumerate}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/doctor_availability.png}
-\caption{Doctor Availability Management Interface}
-\label{fig:doctor-availability}
-\end{figure}
-
-\begin{figure}[H]
+\fbox{
+\begin{minipage}{0.8\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{images/doctor_dashboard.png}
+\vspace{1.5cm}
+\textbf{Doctor Dashboard Screenshot}\\
+\vspace{0.5cm}
+\textit{Shows daily appointments, patient notifications, and availability management}\\
+\vspace{1.5cm}
+\end{minipage}
+}
 \caption{Doctor Dashboard Interface}
-\label{fig:doctor-dashboard}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\textwidth]{images/doctor_patientview.png}
-\caption{Doctor Patient View Interface}
-\label{fig:doctor-patientview}
-\end{figure}
+\subsubsection{ARV Treatment Management}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.9\textwidth]{images/doctor_treatment.png}
-\caption{Doctor Treatment Management Interface}
-\label{fig:doctor-treatment}
-\end{figure}
+\begin{enumerate}
+    \item Access patient record during appointment
+    \item Click "ARV Treatments" tab
+    \item Add new treatment regimen:
+    \begin{itemize}
+        \item Select ARV medications
+        \item Set dosage and frequency
+        \item Add treatment notes
+        \item Set start and end dates
+    \end{itemize}
+    \item Create medication routine
+    \item Enable medication reminders
+    \item Monitor treatment adherence
+\end{enumerate}
 
 \subsection{Administrative Functions}
 
+\subsubsection{User Management}
+
 \begin{enumerate}
-    \item \textbf{User Management:}
-    \begin{itemize}
-        \item Login as admin user
-        \item Navigate to "User Management"
-        \item View all system users
-        \item Create new user accounts
-        \item Modify user roles and permissions
-        \item Deactivate or delete users
-        \item Reset user passwords
-    \end{itemize}
-    
-    \item \textbf{System Settings:}
-    \begin{itemize}
-        \item Access "System Settings" menu
-        \item Configure notification templates
-        \item Set system-wide preferences
-        \item Manage notification schedules
-        \item Configure email settings
-        \item Update system parameters
-    \end{itemize}
+    \item Login as admin user
+    \item Navigate to "User Management"
+    \item View all system users
+    \item Create new user accounts
+    \item Modify user roles and permissions
+    \item Deactivate or delete users
+    \item Reset user passwords
+\end{enumerate}
+
+\subsubsection{System Settings}
+
+\begin{enumerate}
+    \item Access "System Settings" menu
+    \item Configure notification templates
+    \item Set system-wide preferences
+    \item Manage notification schedules
+    \item Configure email settings
+    \item Update system parameters
 \end{enumerate}
 
 \subsection{Notification System}
@@ -500,7 +484,7 @@ Patients receive daily medication reminders:
 
 \subsection{Common Issues}
 
-\begin{longtable}{@{}|p{4cm}|p{5cm}|p{5cm}|@{}}
+\begin{longtable}{|p{4cm}|p{5cm}|p{5cm}|}
 \hline
 \textbf{Issue} & \textbf{Cause} & \textbf{Solution} \\
 \hline
@@ -529,7 +513,7 @@ API requests failing & CORS configuration & Check backend CORS settings \\
 
 \subsection{Technical Requirements}
 
-\begin{longtable}{@{}|p{3cm}|p{4cm}|p{7cm}|@{}}
+\begin{longtable}{|p{3cm}|p{4cm}|p{7cm}|}
 \hline
 \textbf{Component} & \textbf{Specification} & \textbf{Notes} \\
 \hline
