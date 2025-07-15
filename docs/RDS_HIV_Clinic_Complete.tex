@@ -1,0 +1,798 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\geometry{margin=1in}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{HIV Clinic RDS}
+
+\title{\textbf{Requirement \& Design Specification\\HIV Clinic Management System}}
+\author{Version: 1.0}
+\date{January 2025}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+
+\section*{Record of Changes}
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{1cm}|p{3cm}|p{6cm}|}
+\hline
+\textbf{Version} & \textbf{Date} & \textbf{A*M, D} & \textbf{In charge} & \textbf{Change Description} \\
+\hline
+V1.0 & 07/01/2025 & A & Development Team & Initial HIV Clinic System RDS document based on implemented codebase \\
+\hline
+\end{longtable}
+
+\textit{*A - Added M - Modified D - Deleted}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Overview}
+
+\subsection{User Requirements}
+
+\subsubsection{Actors}
+
+The HIV Clinic Management System involves four main actors who interact with the system to perform various healthcare-related tasks:
+
+\begin{longtable}{|p{1cm}|p{3cm}|p{10cm}|}
+\hline
+\textbf{\#} & \textbf{Actor} & \textbf{Description} \\
+\hline
+1 & Patient & Registered HIV patients who book appointments, manage their medical records, view treatment information, and receive medication reminders \\
+\hline
+2 & Doctor & HIV/AIDS specialists and healthcare providers who manage patient appointments, update medical records, prescribe ARV treatments, and access patient information during consultations \\
+\hline
+3 & Admin & System administrators who manage user accounts, system settings, and have full access to all system functionalities for maintenance and oversight \\
+\hline
+4 & Manager & Healthcare facility managers who oversee operations, generate reports, and manage clinic resources and staff schedules \\
+\hline
+\end{longtable}
+
+\subsubsection{Use Cases}
+
+\paragraph{a. Diagram(s)}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Use Case Diagram}\\
+\vspace{0.5cm}
+\textit{Comprehensive use case diagram showing all actors (Patient, Doctor, Admin, Manager, Guest, System) and their interactions with 35 distinct use cases across authentication, appointment management, patient records, ARV treatment, and administrative functions}\\
+\vspace{0.5cm}
+\textit{Dimensions: 16" x 12"}\\
+\vspace{0.5cm}
+\textit{Generated from: use\_case\_diagram.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{HIV Clinic Management System Use Case Diagram}
+\label{fig:use-case-diagram}
+\end{figure}
+
+The system provides comprehensive use cases covering patient care, appointment management, and administrative functions for an HIV clinic environment.
+
+\paragraph{b. Descriptions}
+
+\begin{longtable}{|p{1cm}|p{3cm}|p{3cm}|p{7cm}|}
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+UC-001 & User Management & User Registration & New users (patients/doctors) create accounts with role-based access to the HIV clinic system \\
+\hline
+UC-002 & Authentication & User Login & Existing users authenticate using username/password with JWT token-based security \\
+\hline
+UC-003 & Profile Management & Update Profile & Users update personal information, contact details, and profile images \\
+\hline
+UC-004 & Appointment Management & Book Appointment & Patients schedule appointments with available doctors based on doctor availability slots \\
+\hline
+UC-005 & Doctor Operations & Manage Availability & Doctors create, update, and manage their availability time slots for patient appointments \\
+\hline
+UC-006 & Appointment Management & Cancel Appointment & Patients or doctors cancel scheduled appointments with cancellation reasons \\
+\hline
+UC-007 & Patient Care & Manage Patient Records & Doctors access and update patient medical records including history, allergies, and current medications \\
+\hline
+UC-008 & HIV Treatment & ARV Treatment Management & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, and track side effects \\
+\hline
+UC-009 & Medication Management & Medication Routine Management & Doctors create medication schedules and patients receive automated reminders for ARV adherence \\
+\hline
+UC-010 & Notification System & Appointment Reminders & System sends automated reminders to patients for upcoming appointments (24-hour, 1-hour, 30-minute) \\
+\hline
+UC-011 & Notification System & Medication Reminders & System sends daily medication reminders to patients based on their prescribed ARV routine \\
+\hline
+UC-012 & Patient Privacy & Privacy Settings & Patients control the visibility of their medical information and set privacy preferences \\
+\hline
+UC-013 & Admin Operations & User Management & Administrators manage user accounts, roles, and system permissions \\
+\hline
+UC-014 & Manager Operations & System Analytics & Managers generate reports and view system analytics for operational insights \\
+\hline
+UC-015 & Security & Session Management & System manages user sessions, token validation, and secure logout procedures \\
+\hline
+\end{longtable}
+
+\subsection{Overall Functionalities}
+
+\subsubsection{Screens Flow}
+
+The HIV Clinic system provides role-based screen flows ensuring appropriate access to sensitive medical information:
+
+\begin{itemize}
+    \item \textbf{Patient Flow}: Login → Patient Dashboard → Book Appointment → View Medical Records → Medication Reminders
+    \item \textbf{Doctor Flow}: Login → Doctor Dashboard → Manage Availability → View Patient Records → Update Treatment Plans
+    \item \textbf{Admin Flow}: Login → Admin Dashboard → User Management → System Settings → Reports
+    \item \textbf{Manager Flow}: Login → Manager Dashboard → Clinic Operations → Staff Management → Analytics
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - User Interface Flow Diagram}\\
+\vspace{0.5cm}
+\textit{Comprehensive UI navigation flow showing screen transitions, user journeys for different roles (Patient, Doctor, Admin, Manager), authentication flow, error handling, and common page interactions with proper role-based access control}\\
+\vspace{0.5cm}
+\textit{Dimensions: 18" x 14"}\\
+\vspace{0.5cm}
+\textit{Generated from: user\_interface\_flow.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{User Interface Flow Diagram}
+\label{fig:ui-flow-diagram}
+\end{figure}
+
+\subsubsection{Screen Descriptions}
+
+\begin{longtable}{|p{1cm}|p{3cm}|p{3cm}|p{7cm}|}
+\hline
+\textbf{\#} & \textbf{Feature} & \textbf{Screen} & \textbf{Description} \\
+\hline
+1 & Authentication & Login Screen & Secure login with username/password authentication and JWT token generation \\
+\hline
+2 & Authentication & Registration Screen & User registration with role selection, profile information, and email verification \\
+\hline
+3 & Patient Dashboard & Patient Home & Overview of upcoming appointments, medication reminders, and treatment status \\
+\hline
+4 & Appointment Management & Book Appointment & Search available doctors, view time slots, and schedule appointments \\
+\hline
+5 & Appointment Management & My Appointments & View scheduled, completed, and cancelled appointments with details \\
+\hline
+6 & Doctor Dashboard & Doctor Home & Overview of daily appointments, patient notifications, and availability management \\
+\hline
+7 & Doctor Operations & Availability Management & Create, update, and manage doctor availability time slots \\
+\hline
+8 & Patient Records & Medical Records & Comprehensive patient medical history, allergies, current medications, and emergency contacts \\
+\hline
+9 & ARV Treatment & Treatment Management & HIV treatment regimens, adherence tracking, and side effect monitoring \\
+\hline
+10 & Medication Management & Medication Routine & Daily medication schedules, dosage information, and reminder settings \\
+\hline
+11 & Notification System & Notification Center & View and manage appointment reminders and medication alerts \\
+\hline
+12 & Admin Panel & User Management & Manage user accounts, roles, and system permissions \\
+\hline
+13 & Manager Panel & Analytics Dashboard & View system statistics, generate reports, and monitor clinic operations \\
+\hline
+14 & Settings & Profile Settings & Update personal information, change password, and manage privacy preferences \\
+\hline
+\end{longtable}
+
+\subsubsection{Screen Authorization}
+
+\begin{longtable}{|p{4cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+\textbf{Screen} & \textbf{Patient} & \textbf{Doctor} & \textbf{Admin} & \textbf{Manager} \\
+\hline
+Login Screen & X & X & X & X \\
+\hline
+Registration Screen & X & X & X & X \\
+\hline
+Patient Dashboard & X & & & \\
+\hline
+\quad View Own Records & X & & & \\
+\hline
+\quad Update Own Profile & X & & & \\
+\hline
+\quad Book Appointments & X & & & \\
+\hline
+Doctor Dashboard & & X & & \\
+\hline
+\quad Manage Availability & & X & & \\
+\hline
+\quad View Patient Records & & X & X & \\
+\hline
+\quad Update Treatment Plans & & X & & \\
+\hline
+Admin Dashboard & & & X & \\
+\hline
+\quad User Management & & & X & \\
+\hline
+\quad System Settings & & & X & \\
+\hline
+Manager Dashboard & & & & X \\
+\hline
+\quad Generate Reports & & & X & X \\
+\hline
+\quad View Analytics & & & X & X \\
+\hline
+Appointment Management & X & X & X & X \\
+\hline
+\quad Cancel Appointments & X & X & X & \\
+\hline
+Notification System & X & X & X & X \\
+\hline
+ARV Treatment Management & X & X & X & X \\
+\hline
+Medication Routine Management & X & X & X & X \\
+\hline
+\end{longtable}
+
+\subsubsection{Non-UI Functions}
+
+\begin{longtable}{|p{1cm}|p{4cm}|p{4cm}|p{5cm}|}
+\hline
+\textbf{\#} & \textbf{Feature} & \textbf{System Function} & \textbf{Description} \\
+\hline
+1 & Notification Scheduling & Automated Reminder Service & Background service that schedules and sends appointment and medication reminders based on configured templates \\
+\hline
+2 & Security & JWT Token Management & Automatic token generation, validation, and refresh for secure API access \\
+\hline
+3 & Data Validation & Input Sanitization & Server-side validation and sanitization of all user inputs to prevent SQL injection and XSS attacks \\
+\hline
+4 & Audit Logging & Activity Tracking & Automatic logging of user actions, login attempts, and data modifications for security and compliance \\
+\hline
+5 & Database Management & Automated Backups & Scheduled database backups and maintenance operations \\
+\hline
+6 & Email Service & SMTP Integration & Email delivery service for notifications and system communications \\
+\hline
+7 & Session Management & User Session Tracking & Track user sessions, handle session timeouts, and manage concurrent login restrictions \\
+\hline
+8 & Health Monitoring & System Health Checks & Monitor system performance, database connectivity, and service availability \\
+\hline
+\end{longtable}
+
+\subsection{System High Level Design}
+
+\subsubsection{Database Design}
+
+\paragraph{a. Database Schema}
+
+The HIV Clinic system uses Microsoft SQL Server with the following core tables:
+
+\begin{itemize}
+    \item \textbf{Users}: Central user management with role-based access
+    \item \textbf{Roles}: System roles (Patient, Doctor, Admin, Manager)
+    \item \textbf{PatientProfiles}: Extended patient information
+    \item \textbf{DoctorProfiles}: Extended doctor information with specialties
+    \item \textbf{Appointments}: Appointment scheduling and management
+    \item \textbf{DoctorAvailabilitySlots}: Doctor availability management
+    \item \textbf{PatientRecords}: Medical records and patient history
+    \item \textbf{ARVTreatments}: HIV antiretroviral treatment tracking
+    \item \textbf{MedicationRoutines}: Daily medication schedules
+    \item \textbf{Notifications}: System notification management
+    \item \textbf{NotificationTemplates}: Reusable notification templates
+    \item \textbf{UserSessions}: User session management
+    \item \textbf{LoginActivity}: Login activity tracking
+    \item \textbf{SystemSettings}: System configuration settings
+\end{itemize}
+
+\paragraph{b. Table Descriptions}
+
+\begin{longtable}{|p{1cm}|p{3cm}|p{10cm}|}
+\hline
+\textbf{No} & \textbf{Table} & \textbf{Description} \\
+\hline
+01 & Users & Central user authentication and profile management table storing username, password hash, email, and role associations \\
+& & - Primary keys: UserID \\
+& & - Foreign keys: RoleID (references Roles) \\
+\hline
+02 & Roles & System role definitions for access control \\
+& & - Primary keys: RoleID \\
+& & - Contains: Patient, Doctor, Admin, Manager roles \\
+\hline
+03 & PatientProfiles & Extended patient information including demographics and privacy settings \\
+& & - Primary keys: PatientProfileID \\
+& & - Foreign keys: UserID (references Users) \\
+\hline
+04 & DoctorProfiles & Doctor professional information including specialties and qualifications \\
+& & - Primary keys: DoctorProfileID \\
+& & - Foreign keys: UserID (references Users), SpecialtyID (references Specialties) \\
+\hline
+05 & Appointments & Appointment scheduling between patients and doctors \\
+& & - Primary keys: AppointmentID \\
+& & - Foreign keys: PatientUserID, DoctorUserID (references Users), AvailabilitySlotID \\
+\hline
+06 & DoctorAvailabilitySlots & Doctor availability time slot management \\
+& & - Primary keys: AvailabilitySlotID \\
+& & - Foreign keys: DoctorUserID (references Users) \\
+\hline
+07 & PatientRecords & Comprehensive medical records including history, allergies, medications \\
+& & - Primary keys: RecordID \\
+& & - Foreign keys: PatientUserID (references Users) \\
+\hline
+08 & ARVTreatments & HIV antiretroviral treatment regimens and monitoring \\
+& & - Primary keys: ARVTreatmentID \\
+& & - Foreign keys: PatientUserID, DoctorUserID (references Users), AppointmentID \\
+\hline
+09 & MedicationRoutines & Daily medication schedules and reminder configurations \\
+& & - Primary keys: RoutineID \\
+& & - Foreign keys: PatientUserID, DoctorUserID (references Users), ARVTreatmentID \\
+\hline
+10 & Notifications & System notifications for appointments and medication reminders \\
+& & - Primary keys: NotificationID \\
+& & - Foreign keys: UserID (references Users), templateId (references NotificationTemplates) \\
+\hline
+11 & NotificationTemplates & Reusable notification message templates \\
+& & - Primary keys: templateId \\
+& & - Contains: appointment reminder, medication reminder, and system notification templates \\
+\hline
+12 & UserSessions & User session management and tracking \\
+& & - Primary keys: SessionID \\
+& & - Foreign keys: UserID (references Users) \\
+\hline
+13 & LoginActivity & Login activity tracking for security monitoring \\
+& & - Primary keys: ActivityID \\
+& & - Foreign keys: UserID (references Users) \\
+\hline
+14 & SystemSettings & System configuration and settings management \\
+& & - Primary keys: SettingID \\
+& & - Contains: application settings, feature flags, and system parameters \\
+\hline
+\end{longtable}
+
+\subsubsection{Code Packages}
+
+The HIV Clinic system follows a layered Spring Boot architecture:
+
+\begin{longtable}{|p{1cm}|p{4cm}|p{9cm}|}
+\hline
+\textbf{No} & \textbf{Package} & \textbf{Description} \\
+\hline
+01 & com.hivclinic.controller & REST API controllers handling HTTP requests for appointments, authentication, patient records, doctor operations, and notifications \\
+\hline
+02 & com.hivclinic.service & Business logic layer containing services for appointment management, user authentication, patient care, ARV treatment, and notification scheduling \\
+\hline
+03 & com.hivclinic.repository & Data access layer with JPA repositories for database operations \\
+\hline
+04 & com.hivclinic.model & Entity classes representing database tables including User, Appointment, PatientRecord, ARVTreatment, and Notification models \\
+\hline
+05 & com.hivclinic.dto & Data Transfer Objects for request/response handling and API communication \\
+\hline
+06 & com.hivclinic.config & Configuration classes for security (JWT), database, and application settings \\
+\hline
+07 & com.hivclinic.exception & Custom exception handling for application-specific errors \\
+\hline
+08 & com.hivclinic.validation & Input validation and sanitization utilities \\
+\hline
+09 & com.hivclinic.mapper & Object mapping utilities for converting between entities and DTOs \\
+\hline
+\end{longtable}
+
+\subsubsection{Data Flow Architecture}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Data Flow Diagram}\\
+\vspace{0.5cm}
+\textit{Comprehensive data flow diagram showing how information moves through the system from external entities (Patient, Doctor, Admin, Manager) through various processes (Authentication, Appointment Management, Patient Records, ARV Treatment, Notifications, Administration) to data stores (User Database, Appointments, Medical Records, Treatment Data, Notifications, System Logs) with proper security and audit controls}\\
+\vspace{0.5cm}
+\textit{Dimensions: 20" x 16"}\\
+\vspace{0.5cm}
+\textit{Generated from: data\_flow\_diagram.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{System Data Flow Diagram}
+\label{fig:data-flow-diagram}
+\end{figure}
+
+\section{Requirement Specifications}
+
+\subsection{Authentication \& User Management}
+
+\subsubsection{UC-001\_User Registration}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-001 User Registration
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} January 2025
+
+\textbf{Primary Actor:} Guest User (future Patient/Doctor)
+
+\textbf{Secondary Actors:} System Administrator
+
+\textbf{Preconditions:}
+\begin{itemize}
+    \item User has access to the registration page
+    \item System is operational and database is accessible
+\end{itemize}
+
+\textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item User navigates to registration page
+    \item User fills in required information (username, email, password, role)
+    \item System validates input data
+    \item System checks for username/email uniqueness
+    \item System creates user account with encrypted password
+    \item System assigns appropriate role permissions
+    \item System sends confirmation message
+    \item User receives successful registration notification
+\end{enumerate}
+
+\textbf{Extensions:}
+\begin{itemize}
+    \item Username already exists → Display error message
+    \item Email already exists → Display error message
+    \item Invalid input data → Display validation errors
+    \item System error → Display technical error message
+\end{itemize}
+
+\paragraph{b. Input/Output}
+
+\textbf{Input:}
+\begin{itemize}
+    \item Username (String, required, unique)
+    \item Email (String, required, unique, valid format)
+    \item Password (String, required, minimum 8 characters)
+    \item Confirm Password (String, required, must match password)
+    \item Role (Enum: PATIENT, DOCTOR, ADMIN, MANAGER)
+    \item First Name (String, optional)
+    \item Last Name (String, optional)
+\end{itemize}
+
+\textbf{Output:}
+\begin{itemize}
+    \item Success: User account created with role assignment
+    \item Error: Validation error messages or system error
+\end{itemize}
+
+\subsubsection{UC-002\_User Login}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-002 User Login
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} January 2025
+
+\textbf{Primary Actor:} Registered User
+
+\textbf{Secondary Actors:} System Administrator
+
+\textbf{Preconditions:}
+\begin{itemize}
+    \item User has a valid account
+    \item User knows username and password
+    \item System is operational
+\end{itemize}
+
+\textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item User navigates to login page
+    \item User enters username and password
+    \item System validates credentials
+    \item System generates JWT token
+    \item System logs login activity
+    \item System redirects to appropriate dashboard based on role
+    \item User receives authentication token
+\end{enumerate}
+
+\textbf{Extensions:}
+\begin{itemize}
+    \item Invalid credentials → Display error message
+    \item Account locked → Display account status message
+    \item System error → Display technical error message
+\end{itemize}
+
+\paragraph{b. Input/Output}
+
+\textbf{Input:}
+\begin{itemize}
+    \item Username (String, required)
+    \item Password (String, required)
+\end{itemize}
+
+\textbf{Output:}
+\begin{itemize}
+    \item Success: JWT token, user profile, role information
+    \item Error: Authentication error message
+\end{itemize}
+
+\subsection{Appointment Management}
+
+\subsubsection{UC-004\_Book Appointment}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-004 Book Appointment
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} January 2025
+
+\textbf{Primary Actor:} Patient
+
+\textbf{Secondary Actors:} Doctor, System
+
+\textbf{Preconditions:}
+\begin{itemize}
+    \item Patient is authenticated and logged in
+    \item Doctor has available time slots
+    \item Patient has valid medical records
+\end{itemize}
+
+\textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item Patient navigates to appointment booking page
+    \item Patient selects preferred doctor
+    \item System displays available time slots
+    \item Patient selects appointment time
+    \item Patient provides appointment reason
+    \item System validates appointment request
+    \item System creates appointment record
+    \item System sends confirmation to patient
+    \item System notifies doctor of new appointment
+    \item System schedules reminder notifications
+\end{enumerate}
+
+\textbf{Extensions:}
+\begin{itemize}
+    \item No available slots → Display alternative times
+    \item Time slot already booked → Display error message
+    \item Invalid appointment time → Display validation error
+    \item System error → Display technical error message
+\end{itemize}
+
+\paragraph{b. Input/Output}
+
+\textbf{Input:}
+\begin{itemize}
+    \item Doctor ID (Integer, required)
+    \item Appointment Date/Time (DateTime, required)
+    \item Appointment Reason (String, optional)
+    \item Patient ID (Integer, from authentication)
+\end{itemize}
+
+\textbf{Output:}
+\begin{itemize}
+    \item Success: Appointment confirmation with details
+    \item Error: Booking error message or validation errors
+\end{itemize}
+
+\subsection{ARV Treatment Management}
+
+\subsubsection{UC-008\_ARV Treatment Management}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-008 ARV Treatment Management
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} January 2025
+
+\textbf{Primary Actor:} Doctor
+
+\textbf{Secondary Actors:} Patient, System
+
+\textbf{Preconditions:}
+\begin{itemize}
+    \item Doctor is authenticated and logged in
+    \item Patient has valid medical records
+    \item Doctor has permission to prescribe treatments
+\end{itemize}
+
+\textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item Doctor accesses patient treatment records
+    \item Doctor reviews current treatment status
+    \item Doctor prescribes new ARV medication
+    \item Doctor sets dosage and frequency
+    \item Doctor configures medication reminders
+    \item System validates treatment prescription
+    \item System creates treatment record
+    \item System schedules medication reminders
+    \item System notifies patient of new treatment
+    \item System logs treatment activity
+\end{enumerate}
+
+\textbf{Extensions:}
+\begin{itemize}
+    \item Invalid medication → Display error message
+    \item Drug interaction warning → Display warning
+    \item Patient allergy → Display allergy alert
+    \item System error → Display technical error message
+\end{itemize}
+
+\paragraph{b. Input/Output}
+
+\textbf{Input:}
+\begin{itemize}
+    \item Patient ID (Integer, required)
+    \item Medication Name (String, required)
+    \item Dosage (String, required)
+    \item Frequency (String, required)
+    \item Start Date (Date, required)
+    \item End Date (Date, optional)
+    \item Side Effects (String, optional)
+    \item Doctor Notes (String, optional)
+\end{itemize}
+
+\textbf{Output:}
+\begin{itemize}
+    \item Success: Treatment record created with reminder schedule
+    \item Error: Treatment error message or validation errors
+\end{itemize}
+
+\subsection{Notification System}
+
+\subsubsection{UC-010\_Appointment Reminders}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-010 Appointment Reminders
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} January 2025
+
+\textbf{Primary Actor:} System
+
+\textbf{Secondary Actors:} Patient, Doctor
+
+\textbf{Preconditions:}
+\begin{itemize}
+    \item Appointment is scheduled
+    \item Patient has valid contact information
+    \item Notification system is operational
+\end{itemize}
+
+\textbf{Main Success Scenario:}
+\begin{enumerate}
+    \item System identifies upcoming appointments
+    \item System checks reminder schedule (24h, 1h, 30min)
+    \item System generates reminder message
+    \item System sends notification to patient
+    \item System logs notification activity
+    \item Patient receives reminder notification
+\end{enumerate}
+
+\textbf{Extensions:}
+\begin{itemize}
+    \item Patient contact unavailable → Log notification failure
+    \item System error → Retry notification
+    \item Appointment cancelled → Cancel pending reminders
+\end{itemize}
+
+\paragraph{b. Input/Output}
+
+\textbf{Input:}
+\begin{itemize}
+    \item Appointment ID (Integer, required)
+    \item Reminder Type (Enum: 24H, 1H, 30MIN)
+    \item Patient Contact Info (String, required)
+\end{itemize}
+
+\textbf{Output:}
+\begin{itemize}
+    \item Success: Notification sent and logged
+    \item Error: Notification failure logged
+\end{itemize}
+
+\section{Technical Requirements}
+
+\subsection{Performance Requirements}
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{9cm}|}
+\hline
+\textbf{Requirement} & \textbf{Metric} & \textbf{Description} \\
+\hline
+Response Time & < 2 seconds & API endpoints should respond within 2 seconds for 95\% of requests \\
+\hline
+Throughput & 1000 requests/min & System should handle 1000 concurrent requests per minute \\
+\hline
+Availability & 99.9\% uptime & System should be available 99.9\% of the time excluding scheduled maintenance \\
+\hline
+Database Performance & < 500ms queries & Database queries should execute within 500ms for 95\% of operations \\
+\hline
+\end{longtable}
+
+\subsection{Security Requirements}
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{9cm}|}
+\hline
+\textbf{Requirement} & \textbf{Standard} & \textbf{Description} \\
+\hline
+Authentication & JWT Tokens & Secure token-based authentication with configurable expiration \\
+\hline
+Authorization & Role-based Access & Role-based access control for all system functions \\
+\hline
+Data Encryption & AES-256 & All sensitive data encrypted at rest and in transit \\
+\hline
+Input Validation & Server-side & All user inputs validated and sanitized to prevent injection attacks \\
+\hline
+Session Management & Secure Sessions & Secure session management with timeout and logout capabilities \\
+\hline
+Audit Logging & Comprehensive & All user actions logged for security and compliance \\
+\hline
+\end{longtable}
+
+\subsection{Compatibility Requirements}
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{9cm}|}
+\hline
+\textbf{Requirement} & \textbf{Specification} & \textbf{Description} \\
+\hline
+Browser Support & Modern Browsers & Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ \\
+\hline
+Mobile Support & Responsive Design & Mobile-responsive interface for tablets and smartphones \\
+\hline
+Database & SQL Server 2019+ & Microsoft SQL Server 2019 or higher \\
+\hline
+Java Version & Java 17 & Java 17 or higher for backend services \\
+\hline
+Node.js Version & Node.js 18+ & Node.js 18 or higher for frontend development \\
+\hline
+\end{longtable}
+
+\section{Implementation Guidelines}
+
+\subsection{Development Standards}
+
+\begin{itemize}
+    \item \textbf{Code Style}: Follow Google Java Style Guide for backend, ESLint for frontend
+    \item \textbf{Documentation}: Comprehensive API documentation with OpenAPI/Swagger
+    \item \textbf{Testing}: Unit tests with 85\%+ coverage, integration tests for critical paths
+    \item \textbf{Version Control}: Git workflow with feature branches and pull requests
+    \item \textbf{Error Handling}: Consistent error handling with meaningful error messages
+    \item \textbf{Logging}: Structured logging with appropriate log levels
+\end{itemize}
+
+\subsection{Deployment Requirements}
+
+\begin{itemize}
+    \item \textbf{Environment}: Production-ready deployment with Docker support
+    \item \textbf{Monitoring}: Application performance monitoring and health checks
+    \item \textbf{Backup}: Automated database backups and disaster recovery procedures
+    \item \textbf{Security}: HTTPS enforcement, security headers, and vulnerability scanning
+    \item \textbf{Scaling}: Horizontal scaling capabilities for high availability
+\end{itemize}
+
+\end{document}
