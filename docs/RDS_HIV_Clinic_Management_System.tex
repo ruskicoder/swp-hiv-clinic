@@ -1,0 +1,693 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\geometry{margin=1in}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{HIV Clinic RDS}
+
+\title{\textbf{Requirements \& Design Specification\\HIV Clinic Management System}}
+\author{Version: 1.0}
+\date{January 2025}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+
+\section*{Record of Changes}
+
+\begin{longtable}{|p{2cm}|p{2cm}|p{1cm}|p{3cm}|p{6cm}|}
+\hline
+\textbf{Version} & \textbf{Date} & \textbf{A*M, D} & \textbf{In charge} & \textbf{Change Description} \\
+\hline
+V1.0 & 07/01/2025 & A & Development Team & Initial HIV Clinic System RDS document based on implemented codebase \\
+\hline
+\end{longtable}
+
+\textit{*A - Added M - Modified D - Deleted}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Overview}
+
+\subsection{Project Description}
+
+The HIV Clinic Management System is a comprehensive web-based application designed to streamline clinic operations, enhance patient care, and improve treatment management for HIV patients. The system provides a centralized platform for managing patient records, appointment scheduling, ARV treatment tracking, and administrative functions.
+
+\subsection{System Purpose}
+
+The primary purpose of this system is to:
+\begin{itemize}
+    \item Digitize and centralize patient medical records
+    \item Streamline appointment scheduling and management
+    \item Track ARV treatment adherence and outcomes
+    \item Facilitate communication between healthcare providers and patients
+    \item Provide comprehensive reporting and analytics for clinic management
+    \item Ensure data security and compliance with healthcare regulations
+\end{itemize}
+
+\subsection{Target Users}
+
+The system is designed for multiple user types within the HIV clinic ecosystem:
+\begin{itemize}
+    \item \textbf{Patients:} HIV patients seeking care and treatment management
+    \item \textbf{Doctors:} Healthcare providers managing patient care
+    \item \textbf{Administrators:} System administrators managing user accounts and settings
+    \item \textbf{Managers:} Clinic managers overseeing operations and generating reports
+\end{itemize}
+
+\section{User Requirements}
+
+\subsection{Actors}
+
+\begin{longtable}{|p{1cm}|p{3cm}|p{10cm}|}
+\hline
+\textbf{\#} & \textbf{Actor} & \textbf{Description} \\
+\hline
+1 & Patient & Registered HIV patients who book appointments, manage their medical records, view treatment information, and receive medication reminders \\
+\hline
+2 & Doctor & HIV/AIDS specialists and healthcare providers who manage patient appointments, update medical records, prescribe ARV treatments, and access patient information during consultations \\
+\hline
+3 & Admin & System administrators who manage user accounts, system settings, and have full access to all system functionalities for maintenance and oversight \\
+\hline
+4 & Manager & Healthcare facility managers who oversee operations, generate reports, and manage clinic resources and staff schedules \\
+\hline
+\end{longtable}
+
+\subsection{Use Cases}
+
+\subsubsection{Use Case Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Use Case Diagram}\\
+\vspace{0.5cm}
+\textit{Comprehensive use case diagram showing all actors and their interactions with system functionalities}\\
+\vspace{0.5cm}
+\textit{Ref: use\_case\_diagram.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{HIV Clinic Management System Use Case Diagram}
+\label{fig:use-case-diagram}
+\end{figure}
+
+\subsubsection{Use Case Specifications}
+
+\paragraph{UC-001: User Authentication}
+\begin{longtable}{|p{3cm}|p{11cm}|}
+\hline
+\textbf{Use Case ID} & UC-001 \\
+\hline
+\textbf{Use Case Name} & User Authentication \\
+\hline
+\textbf{Actors} & Patient, Doctor, Admin, Manager \\
+\hline
+\textbf{Description} & Users authenticate themselves to access system functionalities \\
+\hline
+\textbf{Preconditions} & User has valid credentials \\
+\hline
+\textbf{Main Flow} & 1. User enters username and password\\
+& 2. System validates credentials\\
+& 3. System generates JWT token\\
+& 4. User is redirected to appropriate dashboard \\
+\hline
+\textbf{Alternative Flows} & Invalid credentials: System displays error message \\
+\hline
+\textbf{Postconditions} & User is authenticated and has access to authorized functionalities \\
+\hline
+\end{longtable}
+
+\paragraph{UC-002: Patient Registration}
+\begin{longtable}{|p{3cm}|p{11cm}|}
+\hline
+\textbf{Use Case ID} & UC-002 \\
+\hline
+\textbf{Use Case Name} & Patient Registration \\
+\hline
+\textbf{Actors} & Admin, Manager \\
+\hline
+\textbf{Description} & Register new HIV patients in the system \\
+\hline
+\textbf{Preconditions} & Admin/Manager is authenticated \\
+\hline
+\textbf{Main Flow} & 1. Admin/Manager accesses patient registration form\\
+& 2. Enters patient personal information\\
+& 3. Enters medical history and HIV status\\
+& 4. System validates data\\
+& 5. System creates patient record\\
+& 6. System generates patient ID \\
+\hline
+\textbf{Alternative Flows} & Duplicate patient: System displays error message \\
+\hline
+\textbf{Postconditions} & Patient record is created and available in the system \\
+\hline
+\end{longtable}
+
+\paragraph{UC-003: Appointment Scheduling}
+\begin{longtable}{|p{3cm}|p{11cm}|}
+\hline
+\textbf{Use Case ID} & UC-003 \\
+\hline
+\textbf{Use Case Name} & Appointment Scheduling \\
+\hline
+\textbf{Actors} & Patient, Doctor, Admin \\
+\hline
+\textbf{Description} & Schedule appointments between patients and doctors \\
+\hline
+\textbf{Preconditions} & User is authenticated, Doctor schedule is available \\
+\hline
+\textbf{Main Flow} & 1. User selects appointment date and time\\
+& 2. System checks doctor availability\\
+& 3. User provides appointment details\\
+& 4. System creates appointment record\\
+& 5. System sends confirmation notification \\
+\hline
+\textbf{Alternative Flows} & Time slot unavailable: System suggests alternative times \\
+\hline
+\textbf{Postconditions} & Appointment is scheduled and both parties are notified \\
+\hline
+\end{longtable}
+
+\paragraph{UC-004: ARV Treatment Management}
+\begin{longtable}{|p{3cm}|p{11cm}|}
+\hline
+\textbf{Use Case ID} & UC-004 \\
+\hline
+\textbf{Use Case Name} & ARV Treatment Management \\
+\hline
+\textbf{Actors} & Doctor, Patient \\
+\hline
+\textbf{Description} & Manage ARV treatment plans and monitor patient adherence \\
+\hline
+\textbf{Preconditions} & Doctor is authenticated, Patient record exists \\
+\hline
+\textbf{Main Flow} & 1. Doctor accesses patient medical record\\
+& 2. Doctor creates/updates ARV treatment plan\\
+& 3. System stores treatment information\\
+& 4. Patient receives treatment notifications\\
+& 5. System tracks adherence metrics \\
+\hline
+\textbf{Alternative Flows} & Treatment conflict: System alerts doctor about drug interactions \\
+\hline
+\textbf{Postconditions} & ARV treatment plan is updated and patient is notified \\
+\hline
+\end{longtable}
+
+\section{System Requirements}
+
+\subsection{Functional Requirements}
+
+\subsubsection{Authentication and Authorization}
+\begin{longtable}{|p{2cm}|p{12cm}|}
+\hline
+\textbf{Req ID} & \textbf{Requirement Description} \\
+\hline
+FR-001 & The system shall provide secure user authentication using JWT tokens \\
+\hline
+FR-002 & The system shall implement role-based access control (RBAC) \\
+\hline
+FR-003 & The system shall support password encryption and secure storage \\
+\hline
+FR-004 & The system shall provide session management and token expiration \\
+\hline
+FR-005 & The system shall log all authentication attempts for security monitoring \\
+\hline
+\end{longtable}
+
+\subsubsection{Patient Management}
+\begin{longtable}{|p{2cm}|p{12cm}|}
+\hline
+\textbf{Req ID} & \textbf{Requirement Description} \\
+\hline
+FR-006 & The system shall allow registration of new patients with complete medical history \\
+\hline
+FR-007 & The system shall maintain comprehensive patient medical records \\
+\hline
+FR-008 & The system shall provide search and filter capabilities for patient records \\
+\hline
+FR-009 & The system shall track patient demographics and contact information \\
+\hline
+FR-010 & The system shall maintain patient HIV status and diagnosis information \\
+\hline
+\end{longtable}
+
+\subsubsection{Appointment Management}
+\begin{longtable}{|p{2cm}|p{12cm}|}
+\hline
+\textbf{Req ID} & \textbf{Requirement Description} \\
+\hline
+FR-011 & The system shall provide appointment scheduling functionality \\
+\hline
+FR-012 & The system shall check doctor availability before scheduling \\
+\hline
+FR-013 & The system shall send appointment reminders to patients \\
+\hline
+FR-014 & The system shall allow appointment rescheduling and cancellation \\
+\hline
+FR-015 & The system shall maintain appointment history and records \\
+\hline
+\end{longtable}
+
+\subsubsection{ARV Treatment Management}
+\begin{longtable}{|p{2cm}|p{12cm}|}
+\hline
+\textbf{Req ID} & \textbf{Requirement Description} \\
+\hline
+FR-016 & The system shall manage ARV treatment plans and prescriptions \\
+\hline
+FR-017 & The system shall track medication adherence and compliance \\
+\hline
+FR-018 & The system shall provide medication reminder notifications \\
+\hline
+FR-019 & The system shall monitor treatment effectiveness and side effects \\
+\hline
+FR-020 & The system shall generate treatment progress reports \\
+\hline
+\end{longtable}
+
+\subsection{Non-Functional Requirements}
+
+\subsubsection{Performance Requirements}
+\begin{longtable}{|p{2cm}|p{12cm}|}
+\hline
+\textbf{Req ID} & \textbf{Requirement Description} \\
+\hline
+NFR-001 & The system shall support concurrent access by up to 100 users \\
+\hline
+NFR-002 & The system shall respond to user requests within 3 seconds \\
+\hline
+NFR-003 & The system shall have 99.5\% uptime availability \\
+\hline
+NFR-004 & The system shall handle database operations efficiently using connection pooling \\
+\hline
+NFR-005 & The system shall provide paginated results for large datasets \\
+\hline
+\end{longtable}
+
+\subsubsection{Security Requirements}
+\begin{longtable}{|p{2cm}|p{12cm}|}
+\hline
+\textbf{Req ID} & \textbf{Requirement Description} \\
+\hline
+NFR-006 & The system shall encrypt all sensitive data in transit and at rest \\
+\hline
+NFR-007 & The system shall implement secure API endpoints with proper authentication \\
+\hline
+NFR-008 & The system shall comply with healthcare data protection regulations \\
+\hline
+NFR-009 & The system shall provide audit trails for all data access and modifications \\
+\hline
+NFR-010 & The system shall implement proper input validation to prevent injection attacks \\
+\hline
+\end{longtable}
+
+\section{System Design}
+
+\subsection{Architecture Overview}
+
+The HIV Clinic Management System employs a three-tier architecture:
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - System Architecture}\\
+\vspace{0.5cm}
+\textit{High-level system architecture showing the three-tier structure}\\
+\vspace{0.5cm}
+\textit{Ref: system\_architecture.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{System Architecture}
+\label{fig:system-architecture}
+\end{figure}
+
+\subsection{Database Design}
+
+\subsubsection{Entity Relationship Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Database Schema}\\
+\vspace{0.5cm}
+\textit{Complete entity relationship diagram showing all database tables and relationships}\\
+\vspace{0.5cm}
+\textit{Ref: database\_schema\_erd.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Database Schema ERD}
+\label{fig:database-schema}
+\end{figure}
+
+\subsubsection{Table Specifications}
+
+\paragraph{Users Table}
+\begin{longtable}{|p{3cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|}
+\hline
+\textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Description} \\
+\hline
+id & BIGINT & NO & PK & Primary key, auto-increment \\
+\hline
+username & VARCHAR(50) & NO & UQ & Unique username for authentication \\
+\hline
+password & VARCHAR(255) & NO & & Encrypted password \\
+\hline
+email & VARCHAR(100) & YES & & User email address \\
+\hline
+full\_name & VARCHAR(100) & YES & & User's full name \\
+\hline
+role & VARCHAR(20) & NO & & User role (ADMIN, DOCTOR, PATIENT, MANAGER) \\
+\hline
+active & BOOLEAN & NO & & Account active status \\
+\hline
+created\_at & DATETIME & NO & & Account creation timestamp \\
+\hline
+updated\_at & DATETIME & YES & & Last update timestamp \\
+\hline
+\end{longtable}
+
+\paragraph{Patients Table}
+\begin{longtable}{|p{3cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|}
+\hline
+\textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Description} \\
+\hline
+id & BIGINT & NO & PK & Primary key, auto-increment \\
+\hline
+user\_id & BIGINT & NO & FK & Foreign key to users table \\
+\hline
+patient\_code & VARCHAR(20) & NO & UQ & Unique patient identifier \\
+\hline
+national\_id & VARCHAR(20) & YES & & National identification number \\
+\hline
+phone\_number & VARCHAR(20) & YES & & Patient contact number \\
+\hline
+address & TEXT & YES & & Patient address \\
+\hline
+date\_of\_birth & DATE & YES & & Patient birth date \\
+\hline
+gender & VARCHAR(10) & YES & & Patient gender \\
+\hline
+diagnosis\_date & DATE & YES & & HIV diagnosis date \\
+\hline
+hiv\_status & VARCHAR(20) & YES & & Current HIV status \\
+\hline
+emergency\_contact & VARCHAR(100) & YES & & Emergency contact information \\
+\hline
+medical\_history & TEXT & YES & & Patient medical history \\
+\hline
+\end{longtable}
+
+\paragraph{Appointments Table}
+\begin{longtable}{|p{3cm}|p{2cm}|p{2cm}|p{2cm}|p{5cm}|}
+\hline
+\textbf{Column} & \textbf{Type} & \textbf{Null} & \textbf{Key} & \textbf{Description} \\
+\hline
+id & BIGINT & NO & PK & Primary key, auto-increment \\
+\hline
+patient\_id & BIGINT & NO & FK & Foreign key to patients table \\
+\hline
+doctor\_id & BIGINT & NO & FK & Foreign key to users table (doctor) \\
+\hline
+appointment\_date & DATETIME & NO & & Appointment date and time \\
+\hline
+status & VARCHAR(20) & NO & & Appointment status (SCHEDULED, COMPLETED, CANCELLED) \\
+\hline
+reason & TEXT & YES & & Appointment reason \\
+\hline
+notes & TEXT & YES & & Appointment notes \\
+\hline
+created\_at & DATETIME & NO & & Creation timestamp \\
+\hline
+updated\_at & DATETIME & YES & & Last update timestamp \\
+\hline
+\end{longtable}
+
+\subsection{User Interface Design}
+
+\subsubsection{Interface Flow Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - User Interface Flow}\\
+\vspace{0.5cm}
+\textit{Complete user interface flow diagram showing navigation between different screens}\\
+\vspace{0.5cm}
+\textit{Ref: user\_interface\_flow.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{User Interface Flow}
+\label{fig:ui-flow}
+\end{figure}
+
+\subsubsection{Role-Based Dashboards}
+
+\paragraph{Patient Dashboard}
+\begin{itemize}
+    \item Personal profile management
+    \item Appointment scheduling and history
+    \item Medical record viewing
+    \item ARV treatment information
+    \item Medication reminders
+    \item Notification center
+\end{itemize}
+
+\paragraph{Doctor Dashboard}
+\begin{itemize}
+    \item Patient list and search
+    \item Appointment management
+    \item Medical record updates
+    \item ARV treatment planning
+    \item Clinical notes and reports
+    \item Patient communication
+\end{itemize}
+
+\paragraph{Admin Dashboard}
+\begin{itemize}
+    \item User account management
+    \item System configuration
+    \item Security settings
+    \item Audit logs
+    \item Backup and maintenance
+    \item System monitoring
+\end{itemize}
+
+\paragraph{Manager Dashboard}
+\begin{itemize}
+    \item Clinic operations overview
+    \item Staff management
+    \item Report generation
+    \item Resource allocation
+    \item Performance metrics
+    \item Financial reports
+\end{itemize}
+
+\section{Technical Specifications}
+
+\subsection{Technology Stack}
+
+\subsubsection{Frontend Technologies}
+\begin{itemize}
+    \item \textbf{Framework:} React 18.2.0
+    \item \textbf{Build Tool:} Vite
+    \item \textbf{Routing:} React Router DOM 6.8.0
+    \item \textbf{HTTP Client:} Axios 1.6.0
+    \item \textbf{State Management:} React Context API
+    \item \textbf{Styling:} CSS3 with custom stylesheets
+    \item \textbf{Testing:} Vitest with React Testing Library
+\end{itemize}
+
+\subsubsection{Backend Technologies}
+\begin{itemize}
+    \item \textbf{Framework:} Spring Boot 3.2.0
+    \item \textbf{Language:} Java 17
+    \item \textbf{Security:} Spring Security with JWT
+    \item \textbf{Data Access:} Spring Data JPA with Hibernate
+    \item \textbf{Database:} Microsoft SQL Server
+    \item \textbf{Build Tool:} Maven
+    \item \textbf{Testing:} JUnit 5, Mockito
+\end{itemize}
+
+\subsection{System Configuration}
+
+\subsubsection{Database Configuration}
+\begin{lstlisting}[caption=Database Configuration]
+# Database Configuration
+spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=hiv_clinic
+spring.datasource.username=sa
+spring.datasource.password=12345
+spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.SQLServerDialect
+\end{lstlisting}
+
+\subsubsection{Security Configuration}
+\begin{lstlisting}[caption=Security Configuration]
+# JWT Configuration
+app.jwt.secret=mySecretKey123456789012345678901234567890
+app.jwt.expiration-ms=86400000
+
+# CORS Configuration
+app.cors.allowed-origins=http://localhost:3000,http://localhost:5173
+\end{lstlisting}
+
+\section{Implementation Plan}
+
+\subsection{Development Phases}
+
+\subsubsection{Phase 1: Core Infrastructure (Weeks 1-2)}
+\begin{itemize}
+    \item Database schema design and implementation
+    \item Backend framework setup (Spring Boot)
+    \item Frontend framework setup (React)
+    \item Basic authentication and authorization
+    \item Development environment configuration
+\end{itemize}
+
+\subsubsection{Phase 2: User Management (Weeks 3-4)}
+\begin{itemize}
+    \item User registration and login functionality
+    \item Role-based access control implementation
+    \item User profile management
+    \item Password reset and recovery
+    \item Session management
+\end{itemize}
+
+\subsubsection{Phase 3: Patient Management (Weeks 5-6)}
+\begin{itemize}
+    \item Patient registration and profile creation
+    \item Medical record management
+    \item Patient search and filtering
+    \item Patient demographic tracking
+    \item Medical history documentation
+\end{itemize}
+
+\subsubsection{Phase 4: Appointment System (Weeks 7-8)}
+\begin{itemize}
+    \item Appointment scheduling functionality
+    \item Calendar integration
+    \item Appointment notifications
+    \item Rescheduling and cancellation
+    \item Appointment history tracking
+\end{itemize}
+
+\subsubsection{Phase 5: ARV Treatment Management (Weeks 9-10)}
+\begin{itemize}
+    \item Treatment plan creation and management
+    \item Medication tracking and reminders
+    \item Adherence monitoring
+    \item Treatment progress reporting
+    \item Side effect tracking
+\end{itemize}
+
+\subsubsection{Phase 6: Testing and Deployment (Weeks 11-12)}
+\begin{itemize}
+    \item Unit testing implementation
+    \item Integration testing
+    \item User acceptance testing
+    \item Performance optimization
+    \item Production deployment
+\end{itemize}
+
+\subsection{Testing Strategy}
+
+\subsubsection{Testing Levels}
+\begin{itemize}
+    \item \textbf{Unit Testing:} Individual component testing
+    \item \textbf{Integration Testing:} API and database integration testing
+    \item \textbf{System Testing:} End-to-end functionality testing
+    \item \textbf{User Acceptance Testing:} Stakeholder validation testing
+    \item \textbf{Security Testing:} Authentication and authorization testing
+    \item \textbf{Performance Testing:} Load and stress testing
+\end{itemize}
+
+\section{Risk Assessment}
+
+\subsection{Technical Risks}
+
+\begin{longtable}{|p{1cm}|p{4cm}|p{2cm}|p{7cm}|}
+\hline
+\textbf{ID} & \textbf{Risk} & \textbf{Impact} & \textbf{Mitigation Strategy} \\
+\hline
+R-001 & Database performance issues & High & Implement connection pooling, query optimization, and indexing \\
+\hline
+R-002 & Security vulnerabilities & High & Regular security audits, penetration testing, and secure coding practices \\
+\hline
+R-003 & Third-party dependency issues & Medium & Version control, dependency monitoring, and fallback options \\
+\hline
+R-004 & Scalability limitations & Medium & Load testing, performance monitoring, and scalable architecture design \\
+\hline
+R-005 & Data integration challenges & Medium & Comprehensive testing, data validation, and backup strategies \\
+\hline
+\end{longtable}
+
+\subsection{Operational Risks}
+
+\begin{longtable}{|p{1cm}|p{4cm}|p{2cm}|p{7cm}|}
+\hline
+\textbf{ID} & \textbf{Risk} & \textbf{Impact} & \textbf{Mitigation Strategy} \\
+\hline
+R-006 & User adoption challenges & Medium & User training, documentation, and support systems \\
+\hline
+R-007 & Data migration issues & High & Thorough testing, backup procedures, and rollback plans \\
+\hline
+R-008 & Compliance violations & High & Regular compliance audits and legal consultation \\
+\hline
+R-009 & System downtime & High & Redundancy, backup systems, and disaster recovery plans \\
+\hline
+R-010 & Staff training requirements & Medium & Comprehensive training programs and user manuals \\
+\hline
+\end{longtable}
+
+\section{Conclusion}
+
+The HIV Clinic Management System represents a comprehensive solution for managing HIV patient care and clinic operations. The system's design incorporates modern web technologies, robust security measures, and user-friendly interfaces to ensure effective healthcare delivery.
+
+The implementation of this system will significantly improve clinic efficiency, patient care quality, and data management capabilities. The modular architecture allows for future enhancements and scalability to meet evolving healthcare needs.
+
+Regular monitoring, maintenance, and updates will ensure the system continues to meet the highest standards of healthcare information management and patient care support.
+
+\end{document}

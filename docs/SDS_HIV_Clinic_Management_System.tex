@@ -1,0 +1,703 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{forest}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% Page setup
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{HIV Clinic Management System}
+\lhead{Software Design Specification}
+\cfoot{\thepage}
+
+% Code listing style
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    language=Java,
+    numbers=left,
+    numberstyle=\tiny,
+    showstringspaces=false,
+    tabsize=2,
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+
+% TikZ libraries
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds}
+
+% Define colors
+\definecolor{packagecolor}{RGB}{173, 216, 230}
+\definecolor{classcolor}{RGB}{255, 218, 185}
+\definecolor{interfacecolor}{RGB}{221, 160, 221}
+
+% Title page
+\title{
+    \vspace{-2cm}
+    \Huge\textbf{HIV Clinic Management System}\\
+    \vspace{1cm}
+    \Large\textbf{Software Design Specification}\\
+    \vspace{2cm}
+    \normalsize Version 1.0
+}
+
+\author{}
+\date{
+    \vspace{4cm}
+    – Ho Chi Minh City, January 2025 –
+}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+
+% Record of changes
+\section*{Record of Changes}
+\begin{longtable}{|p{3cm}|p{2cm}|p{3cm}|p{6cm}|}
+\hline
+\textbf{Date} & \textbf{A*M, D} & \textbf{In charge} & \textbf{Change Description} \\
+\hline
+2025-01-07 & A & System Architect & Initial creation of SDS document \\
+\hline
+2025-01-07 & A & System Architect & Added comprehensive system architecture \\
+\hline
+2025-01-07 & A & System Architect & Added detailed class diagrams and specifications \\
+\hline
+2025-01-07 & A & System Architect & Added database design and API documentation \\
+\hline
+\end{longtable}
+
+\textit{*A - Added M - Modified D - Deleted}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+\subsection{Purpose}
+This Software Design Specification (SDS) document provides a comprehensive overview of the software design for the HIV Clinic Management System. It serves as a detailed guide for developers, architects, and stakeholders to understand the system's architecture, design patterns, and technical implementation details.
+
+\subsection{Scope}
+The HIV Clinic Management System is a web-based application designed to manage HIV clinic operations including patient management, appointment scheduling, ARV treatment tracking, and administrative functions. The system implements a multi-tier architecture with Spring Boot backend and React frontend.
+
+\subsection{References}
+\begin{itemize}
+    \item Requirements and Design Specification (RDS) Document
+    \item Software Requirements Specification (SRS) Document
+    \item Database Schema Documentation
+    \item API Documentation
+\end{itemize}
+
+\section{System Architecture}
+
+\subsection{Overall System Architecture}
+
+The HIV Clinic Management System follows a three-tier architecture pattern:
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - System Architecture}\\
+\vspace{0.5cm}
+\textit{Three-tier architecture showing Frontend (React), Backend (Spring Boot), and Database (MS SQL Server) layers with their interactions}\\
+\vspace{0.5cm}
+\textit{Ref: system\_architecture.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{System Architecture Overview}
+\label{fig:system-architecture}
+\end{figure}
+
+\subsubsection{Presentation Layer}
+\begin{itemize}
+    \item \textbf{Technology:} React 18.2.0 with Vite
+    \item \textbf{Routing:} React Router DOM 6.8.0
+    \item \textbf{HTTP Client:} Axios 1.6.0
+    \item \textbf{State Management:} React Context API
+    \item \textbf{Testing:} Vitest with React Testing Library
+\end{itemize}
+
+\subsubsection{Business Logic Layer}
+\begin{itemize}
+    \item \textbf{Framework:} Spring Boot 3.2.0
+    \item \textbf{Language:} Java 17
+    \item \textbf{Security:} Spring Security with JWT
+    \item \textbf{Data Access:} Spring Data JPA with Hibernate
+    \item \textbf{Build Tool:} Maven
+\end{itemize}
+
+\subsubsection{Data Layer}
+\begin{itemize}
+    \item \textbf{Database:} Microsoft SQL Server
+    \item \textbf{ORM:} Hibernate 6.x
+    \item \textbf{Connection Pool:} HikariCP
+    \item \textbf{Migration:} JPA DDL Auto-update
+\end{itemize}
+
+\subsection{Component Architecture}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Component Diagram}\\
+\vspace{0.5cm}
+\textit{Detailed component diagram showing all system modules and their dependencies}\\
+\vspace{0.5cm}
+\textit{Ref: component\_diagram.plantuml}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Component Architecture}
+\label{fig:component-diagram}
+\end{figure}
+
+\section{Backend Design}
+
+\subsection{Package Structure}
+
+The backend follows a layered architecture pattern with the following package structure:
+
+\begin{lstlisting}[language=text, caption=Backend Package Structure]
+com.hivclinic
+├── HivClinicBackendApplication.java
+├── config/
+│   ├── CorsConfig.java
+│   ├── SecurityConfig.java
+│   └── JwtConfig.java
+├── controller/
+│   ├── AuthController.java
+│   ├── PatientController.java
+│   ├── AppointmentController.java
+│   ├── ARVController.java
+│   └── NotificationController.java
+├── dto/
+│   ├── request/
+│   └── response/
+├── exception/
+│   ├── GlobalExceptionHandler.java
+│   └── CustomExceptions.java
+├── mapper/
+│   ├── PatientMapper.java
+│   └── AppointmentMapper.java
+├── model/
+│   ├── User.java
+│   ├── Patient.java
+│   ├── Appointment.java
+│   ├── ARVTreatment.java
+│   └── Notification.java
+├── repository/
+│   ├── UserRepository.java
+│   ├── PatientRepository.java
+│   ├── AppointmentRepository.java
+│   ├── ARVRepository.java
+│   └── NotificationRepository.java
+├── service/
+│   ├── UserService.java
+│   ├── PatientService.java
+│   ├── AppointmentService.java
+│   ├── ARVService.java
+│   └── NotificationService.java
+└── validation/
+    ├── UserValidator.java
+    └── AppointmentValidator.java
+\end{lstlisting}
+
+\subsection{Database Design}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Database Schema ERD}\\
+\vspace{0.5cm}
+\textit{Entity Relationship Diagram showing all database tables and their relationships}\\
+\vspace{0.5cm}
+\textit{Ref: database\_schema\_erd.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Database Schema ERD}
+\label{fig:database-schema}
+\end{figure}
+
+\subsubsection{Core Entities}
+
+\paragraph{User Entity}
+\begin{lstlisting}[language=Java, caption=User Entity]
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
+    private String username;
+    
+    @Column(nullable = false)
+    private String password;
+    
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    
+    private String email;
+    private String fullName;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Boolean active;
+}
+\end{lstlisting}
+
+\paragraph{Patient Entity}
+\begin{lstlisting}[language=Java, caption=Patient Entity]
+@Entity
+@Table(name = "patients")
+public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    
+    private String patientCode;
+    private String nationalId;
+    private String phoneNumber;
+    private String address;
+    private LocalDate dateOfBirth;
+    private String gender;
+    private LocalDate diagnosisDate;
+    private String hivStatus;
+    private String emergencyContact;
+    private String medicalHistory;
+}
+\end{lstlisting}
+
+\subsection{Security Architecture}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Authentication Flow}\\
+\vspace{0.5cm}
+\textit{Authentication sequence diagram showing JWT token-based authentication process}\\
+\vspace{0.5cm}
+\textit{Ref: authentication\_sequence.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Authentication Flow}
+\label{fig:authentication-flow}
+\end{figure}
+
+\subsubsection{JWT Configuration}
+\begin{lstlisting}[language=Java, caption=JWT Configuration]
+@Configuration
+public class JwtConfig {
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;
+    
+    @Value("${app.jwt.expiration-ms}")
+    private int jwtExpirationMs;
+    
+    public String generateJwtToken(Authentication authentication) {
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+}
+\end{lstlisting}
+
+\section{Frontend Design}
+
+\subsection{Component Architecture}
+
+The frontend follows a feature-based architecture with the following structure:
+
+\begin{lstlisting}[language=text, caption=Frontend Component Structure]
+src/
+├── main.jsx
+├── App.jsx
+├── index.css
+├── App.css
+├── components/
+│   ├── ui/
+│   │   ├── Button.jsx
+│   │   ├── Modal.jsx
+│   │   └── Table.jsx
+│   ├── layout/
+│   │   ├── Header.jsx
+│   │   ├── Sidebar.jsx
+│   │   └── Footer.jsx
+│   ├── notifications/
+│   │   ├── NotificationList.jsx
+│   │   └── NotificationItem.jsx
+│   ├── arv/
+│   │   ├── ARVList.jsx
+│   │   └── ARVForm.jsx
+│   ├── schedule/
+│   │   ├── Calendar.jsx
+│   │   └── AppointmentForm.jsx
+│   └── manager/
+│       ├── UserManagement.jsx
+│       └── SystemSettings.jsx
+├── features/
+│   ├── auth/
+│   │   ├── Login.jsx
+│   │   ├── Register.jsx
+│   │   └── AuthContext.jsx
+│   ├── Admin/
+│   │   ├── Dashboard.jsx
+│   │   └── UserManagement.jsx
+│   ├── Doctor/
+│   │   ├── PatientList.jsx
+│   │   └── MedicalRecords.jsx
+│   ├── Manager/
+│   │   ├── Reports.jsx
+│   │   └── Analytics.jsx
+│   └── Customer/
+│       ├── Profile.jsx
+│       └── Appointments.jsx
+├── contexts/
+│   ├── AuthContext.jsx
+│   └── ThemeContext.jsx
+├── services/
+│   ├── api.js
+│   ├── authService.js
+│   └── patientService.js
+└── utils/
+    ├── constants.js
+    └── helpers.js
+\end{lstlisting}
+
+\subsection{State Management}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Data Flow Diagram}\\
+\vspace{0.5cm}
+\textit{Data flow diagram showing how data moves through the React application}\\
+\vspace{0.5cm}
+\textit{Ref: data\_flow\_diagram.mermaid}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Frontend Data Flow}
+\label{fig:data-flow}
+\end{figure}
+
+\subsubsection{Authentication Context}
+\begin{lstlisting}[language=JavaScript, caption=Authentication Context]
+import { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '../services/authService';
+
+const AuthContext = createContext();
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within AuthProvider');
+    }
+    return context;
+};
+
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const initializeAuth = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const userData = await authService.validateToken(token);
+                    setUser(userData);
+                } catch (error) {
+                    localStorage.removeItem('token');
+                }
+            }
+            setLoading(false);
+        };
+        initializeAuth();
+    }, []);
+
+    const login = async (credentials) => {
+        const response = await authService.login(credentials);
+        localStorage.setItem('token', response.token);
+        setUser(response.user);
+        return response;
+    };
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        setUser(null);
+    };
+
+    const value = {
+        user,
+        login,
+        logout,
+        loading
+    };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
+\end{lstlisting}
+
+\section{API Design}
+
+\subsection{RESTful API Structure}
+
+The system implements a RESTful API with the following endpoints:
+
+\begin{longtable}{|p{1.5cm}|p{4cm}|p{8cm}|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
+\hline
+POST & /api/auth/login & User authentication \\
+\hline
+POST & /api/auth/register & User registration \\
+\hline
+GET & /api/auth/me & Get current user info \\
+\hline
+GET & /api/patients & Get all patients \\
+\hline
+POST & /api/patients & Create new patient \\
+\hline
+PUT & /api/patients/\{id\} & Update patient \\
+\hline
+DELETE & /api/patients/\{id\} & Delete patient \\
+\hline
+GET & /api/appointments & Get appointments \\
+\hline
+POST & /api/appointments & Create appointment \\
+\hline
+PUT & /api/appointments/\{id\} & Update appointment \\
+\hline
+DELETE & /api/appointments/\{id\} & Cancel appointment \\
+\hline
+GET & /api/arv-treatments & Get ARV treatments \\
+\hline
+POST & /api/arv-treatments & Create ARV treatment \\
+\hline
+PUT & /api/arv-treatments/\{id\} & Update ARV treatment \\
+\hline
+GET & /api/notifications & Get notifications \\
+\hline
+POST & /api/notifications & Create notification \\
+\hline
+PUT & /api/notifications/\{id\}/read & Mark as read \\
+\hline
+\end{longtable}
+
+\subsection{Request/Response Patterns}
+
+\subsubsection{Authentication Request}
+\begin{lstlisting}[language=JSON, caption=Login Request]
+{
+    "username": "patient123",
+    "password": "securePassword"
+}
+\end{lstlisting}
+
+\subsubsection{Authentication Response}
+\begin{lstlisting}[language=JSON, caption=Login Response]
+{
+    "token": "eyJhbGciOiJIUzUxMiJ9...",
+    "user": {
+        "id": 1,
+        "username": "patient123",
+        "role": "PATIENT",
+        "fullName": "John Doe",
+        "email": "john.doe@example.com"
+    }
+}
+\end{lstlisting}
+
+\section{Security Design}
+
+\subsection{Authentication and Authorization}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Security Architecture}\\
+\vspace{0.5cm}
+\textit{Security architecture diagram showing authentication, authorization, and data protection layers}\\
+\vspace{0.5cm}
+\textit{Ref: authentication\_class\_diagram.plantuml}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Security Architecture}
+\label{fig:security-architecture}
+\end{figure}
+
+\subsection{Role-Based Access Control}
+
+\begin{longtable}{|p{2cm}|p{3cm}|p{9cm}|}
+\hline
+\textbf{Role} & \textbf{Level} & \textbf{Permissions} \\
+\hline
+ADMIN & Full Access & Complete system access, user management, system configuration \\
+\hline
+MANAGER & Management & User oversight, reports, clinic management, limited system settings \\
+\hline
+DOCTOR & Clinical & Patient records, appointments, ARV treatments, medical data \\
+\hline
+PATIENT & User & Personal profile, appointments, medical records (own), notifications \\
+\hline
+\end{longtable}
+
+\section{Performance and Scalability}
+
+\subsection{Performance Considerations}
+
+\begin{itemize}
+    \item \textbf{Database Optimization:} Connection pooling with HikariCP
+    \item \textbf{Caching Strategy:} Application-level caching for frequently accessed data
+    \item \textbf{Lazy Loading:} JPA lazy loading for related entities
+    \item \textbf{Frontend Optimization:} Code splitting and lazy loading of React components
+    \item \textbf{API Pagination:} Paginated responses for large datasets
+\end{itemize}
+
+\subsection{Scalability Architecture}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\centering
+\vspace{3cm}
+\textbf{HIV Clinic Management System - Deployment Architecture}\\
+\vspace{0.5cm}
+\textit{Deployment diagram showing production environment setup with load balancing and database clustering}\\
+\vspace{0.5cm}
+\textit{Ref: deployment\_diagram.plantuml}\\
+\vspace{3cm}
+\end{minipage}
+}
+\caption{Deployment Architecture}
+\label{fig:deployment-architecture}
+\end{figure}
+
+\section{Testing Strategy}
+
+\subsection{Backend Testing}
+
+\begin{itemize}
+    \item \textbf{Unit Testing:} JUnit 5 for service layer testing
+    \item \textbf{Integration Testing:} Spring Boot Test for controller testing
+    \item \textbf{Repository Testing:} @DataJpaTest for repository layer
+    \item \textbf{Security Testing:} Spring Security Test for authentication
+\end{itemize}
+
+\subsection{Frontend Testing}
+
+\begin{itemize}
+    \item \textbf{Unit Testing:} Vitest for component testing
+    \item \textbf{Integration Testing:} React Testing Library for user interactions
+    \item \textbf{E2E Testing:} Planned Cypress integration
+    \item \textbf{Coverage:} Minimum 80\% code coverage requirement
+\end{itemize}
+
+\section{Deployment and Configuration}
+
+\subsection{Environment Configuration}
+
+\begin{lstlisting}[language=properties, caption=Production Configuration]
+# Production Database Configuration
+spring.datasource.url=jdbc:sqlserver://prod-db-server:1433;databaseName=hiv_clinic_prod
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+
+# Security Configuration
+app.jwt.secret=${JWT_SECRET}
+app.jwt.expiration-ms=3600000
+
+# CORS Configuration
+app.cors.allowed-origins=${FRONTEND_URL}
+
+# Logging Configuration
+logging.level.com.hivclinic=INFO
+logging.level.org.springframework.security=WARN
+\end{lstlisting}
+
+\subsection{Build and Deployment}
+
+\begin{itemize}
+    \item \textbf{Backend Build:} Maven for Java application packaging
+    \item \textbf{Frontend Build:} Vite for React application bundling
+    \item \textbf{Containerization:} Docker containers for deployment
+    \item \textbf{CI/CD:} GitHub Actions for automated testing and deployment
+\end{itemize}
+
+\section{Conclusion}
+
+The HIV Clinic Management System implements a robust, scalable architecture using modern technologies and best practices. The system provides comprehensive functionality for managing HIV clinic operations while maintaining security, performance, and usability standards.
+
+The modular design allows for easy maintenance and future enhancements, while the comprehensive testing strategy ensures system reliability and quality.
+
+\end{document}
