@@ -88,29 +88,97 @@ The system provides comprehensive use cases covering patient care, appointment m
 \hline
 \textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
 \hline
+\multicolumn{4}{|c|}{\textbf{Authentication \& Profile Management}} \\
+\hline
 UC-001 & User Management & User Registration & New users (patients/doctors) create accounts with role-based access to the HIV clinic system \\
 \hline
 UC-002 & Authentication & User Login & Existing users authenticate using username/password with JWT token-based security \\
 \hline
 UC-003 & Profile Management & Update Profile & Users update personal information, contact details, and profile images \\
 \hline
-UC-004 & Appointment Management & Book Appointment & Patients schedule appointments with available doctors based on doctor availability slots \\
+UC-004 & Authentication & Change Password & Users change their account passwords with validation and security checks \\
 \hline
-UC-005 & Doctor Operations & Manage Availability & Doctors create, update, and manage their availability time slots for patient appointments \\
+UC-005 & Authentication & Logout & Users securely logout from the system and invalidate their session \\
 \hline
-UC-006 & Appointment Management & Cancel Appointment & Patients or doctors cancel scheduled appointments with cancellation reasons \\
+\multicolumn{4}{|c|}{\textbf{Patient Services}} \\
 \hline
-UC-007 & Patient Care & Manage Patient Records & Doctors access and update patient medical records including history, allergies, and current medications \\
+UC-006 & Patient Dashboard & View Dashboard & Patients access their personal dashboard with overview of appointments and treatments \\
 \hline
-UC-008 & HIV Treatment & ARV Treatment Management & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, and track side effects \\
+UC-007 & Appointment Management & Book Appointment & Patients schedule appointments with available doctors based on doctor availability slots \\
 \hline
-UC-009 & Medication Management & Medication Routine Management & Doctors create medication schedules and patients receive automated reminders for ARV adherence \\
+UC-008 & Appointment Management & View Appointments & Patients view their scheduled, completed, and cancelled appointments with details \\
 \hline
-UC-010 & Notification System & Appointment Reminders & System sends automated reminders to patients for upcoming appointments (24-hour, 1-hour, 30-minute) \\
+UC-009 & Appointment Management & Cancel Appointment & Patients cancel scheduled appointments with cancellation reasons \\
 \hline
-UC-011 & Notification System & Medication Reminders & System sends daily medication reminders to patients based on their prescribed ARV routine \\
+UC-010 & Patient Care & View Patient Records & Patients access their own medical records, treatment history, and current medications \\
 \hline
-UC-012 & Patient Privacy & Privacy Settings & Patients control the visibility of their medical information and set privacy preferences \\
+UC-011 & Patient Care & Update Patient Records & Patients update their personal medical information and emergency contacts \\
+\hline
+UC-012 & HIV Treatment & View ARV Treatments & Patients view their HIV antiretroviral treatment regimens and adherence status \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Doctor Services}} \\
+\hline
+UC-013 & Doctor Dashboard & View Doctor Dashboard & Doctors access their professional dashboard with patient appointments and notifications \\
+\hline
+UC-014 & Appointment Management & Manage Appointments & Doctors view and manage their scheduled appointments with patients \\
+\hline
+UC-015 & Appointment Management & Update Appointment Status & Doctors update appointment status (completed, cancelled, rescheduled) \\
+\hline
+UC-016 & Doctor Operations & Manage Availability Slots & Doctors create, update, and manage their availability time slots for patient appointments \\
+\hline
+UC-017 & Patient Care & Access Patient Records & Doctors access comprehensive patient medical records during consultations \\
+\hline
+UC-018 & HIV Treatment & Manage ARV Treatments & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, and track side effects \\
+\hline
+UC-019 & Notification System & Send Notifications & Doctors send custom notifications to patients regarding appointments and treatments \\
+\hline
+UC-020 & Notification System & View Notification History & Doctors review history of notifications sent to patients \\
+\hline
+UC-021 & Notification System & Manage Notification Templates & Doctors create and manage templates for common notifications \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Admin Services}} \\
+\hline
+UC-022 & Admin Dashboard & View Admin Dashboard & Administrators access system-wide dashboard with user and system management \\
+\hline
+UC-023 & User Management & Manage Users & Administrators manage all user accounts across the system \\
+\hline
+UC-024 & User Management & Manage Patients & Administrators specifically manage patient accounts and information \\
+\hline
+UC-025 & User Management & Manage Doctors & Administrators manage doctor accounts and professional information \\
+\hline
+UC-026 & User Management & Create Doctor Accounts & Administrators create new doctor accounts with specialized permissions \\
+\hline
+UC-027 & User Management & Toggle User Status & Administrators activate or deactivate user accounts across the system \\
+\hline
+UC-028 & User Management & Reset User Passwords & Administrators reset passwords for users who cannot access their accounts \\
+\hline
+UC-029 & System Management & Manage Specialties & Administrators manage medical specialties for doctor categorization \\
+\hline
+UC-030 & System Management & View All Appointments & Administrators view all appointments across the system for oversight \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Manager Services}} \\
+\hline
+UC-031 & Manager Dashboard & View Manager Dashboard & Managers access operational dashboard with clinic statistics and analytics \\
+\hline
+UC-032 & Analytics & View Statistics & Managers view comprehensive clinic statistics and performance metrics \\
+\hline
+UC-033 & Operations & Manage Patient Records & Managers oversee patient records management and data integrity \\
+\hline
+UC-034 & Operations & Manage Doctor Records & Managers oversee doctor records and professional information \\
+\hline
+UC-035 & Operations & Manage ARV Treatments & Managers monitor and oversee ARV treatment programs across the clinic \\
+\hline
+UC-036 & Operations & Manage Schedules & Managers oversee clinic scheduling and appointment distribution \\
+\hline
+UC-037 & Search & Search Patients & Managers search for specific patients across the clinic database \\
+\hline
+UC-038 & Search & Search Doctors & Managers search for specific doctors in the clinic system \\
+\hline
+UC-039 & Data Export & Export Data (CSV) & Managers export various clinic data in CSV format for reporting and analysis \\
+\hline
+UC-040 & Detail Views & View Patient Details & Managers access detailed patient information for operational oversight \\
+\hline
+UC-041 & Detail Views & View Doctor Details & Managers access detailed doctor information for operational oversight \\
 \hline
 \end{longtable}
 
