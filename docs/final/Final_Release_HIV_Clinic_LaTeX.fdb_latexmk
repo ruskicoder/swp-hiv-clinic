@@ -1,10 +1,10 @@
 # Fdb version 4
-["pdflatex"] 1752572221.93203 "d:/DATA/Github/swp-hiv-clinic/docs/final/Final_Release_HIV_Clinic_LaTeX.tex" "Final_Release_HIV_Clinic_LaTeX.pdf" "Final_Release_HIV_Clinic_LaTeX" 1752572223.37698 0
-  "Final_Release_HIV_Clinic_LaTeX.aux" 1752572223 6522 752aac4cf88a9867c247f953dd7471a3 "pdflatex"
-  "Final_Release_HIV_Clinic_LaTeX.out" 1752572223 6144 107c692c4787fbbbed57b52c982239dd "pdflatex"
-  "Final_Release_HIV_Clinic_LaTeX.tex" 1752572215 16916 477aa99ab562b0bc7aacccb114d06c39 ""
-  "Final_Release_HIV_Clinic_LaTeX.toc" 1752572223 3512 8276c75695b9edec25263b7ed2748b41 "pdflatex"
-  "d:/DATA/Github/swp-hiv-clinic/docs/final/Final_Release_HIV_Clinic_LaTeX.tex" 1752572215 16916 477aa99ab562b0bc7aacccb114d06c39 ""
+["pdflatex"] 1752578898.40781 "d:/DATA/Github/swp-hiv-clinic/docs/final/Final_Release_HIV_Clinic_LaTeX.tex" "Final_Release_HIV_Clinic_LaTeX.pdf" "Final_Release_HIV_Clinic_LaTeX" 1752578899.89605 0
+  "Final_Release_HIV_Clinic_LaTeX.aux" 1752578899 7266 9db2c61200e8b69fc4accd5bd9f294b9 "pdflatex"
+  "Final_Release_HIV_Clinic_LaTeX.out" 1752578899 5668 06cf321e1f7b8da9abb1ba9163ecd968 "pdflatex"
+  "Final_Release_HIV_Clinic_LaTeX.tex" 1752578891 19630 e73641bbe25ec1a16045a3a19fc115d1 ""
+  "Final_Release_HIV_Clinic_LaTeX.toc" 1752578899 3233 60b9380a804c98b41f34907ddd69b2a8 "pdflatex"
+  "d:/DATA/Github/swp-hiv-clinic/docs/final/Final_Release_HIV_Clinic_LaTeX.tex" 1752578891 19630 e73641bbe25ec1a16045a3a19fc115d1 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1752502691 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1752503757 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm" 1752503286 1536 74b7293ec3713bb7fdca8dd1bd1f469c ""
@@ -78,6 +78,10 @@
   "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty" 1752505164 206518 4eb59a801ad842a713fa168c34227290 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/listings/lstmisc.sty" 1752505164 77051 be68720e5402397a830abb9eed5a2cb4 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/listings/lstpatch.sty" 1752505164 353 9024412f43e92cd5b21fe9ded82d0610 ""
+  "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/microtype/microtype-pdftex.def" 1752505651 49656 229fb67764dc0abf5c6f072ee0d27147 ""
+  "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/microtype/microtype.cfg" 1752505651 27628 65e257a6863987c0e5097054c917d02d ""
+  "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/microtype/microtype.sty" 1752505651 102775 cc4629d7100508b1ba679322aef9b545 ""
+  "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/microtype/mt-cmr.cfg" 1752505651 22906 b0be544692bb405a84d147a96af5d777 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/refcount/refcount.sty" 1752506822 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1752506836 9684 a33a14b82ce60d6e77cb9be689d79ee6 ""
   "d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/tools/array.sty" 1752507945 15698 f5f20b24886bb50156054c53e19b13fd ""
