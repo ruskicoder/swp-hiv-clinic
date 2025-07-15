@@ -1,0 +1,168 @@
+graph TB
+    %% Internet and External
+    subgraph "Internet"
+        Internet([Internet])
+        DNS[DNS Servers]
+        CDN[Content Delivery Network]
+        EmailSrv[External Email Services]
+        SMSSrv[SMS Gateway Services]
+    end
+    
+    %% DMZ (Demilitarized Zone)
+    subgraph "DMZ - Public Subnet (10.0.1.0/24)"
+        LB[Load Balancer<br/>nginx<br/>10.0.1.10]
+        WAF[Web Application Firewall<br/>ModSecurity<br/>10.0.1.11]
+        SSL[SSL Termination<br/>Let's Encrypt<br/>10.0.1.12]
+        
+        SSL --> WAF
+        WAF --> LB
+    end
+    
+    %% Web Tier
+    subgraph "Web Tier - Public Subnet (10.0.2.0/24)"
+        WEB1[Web Server 1<br/>nginx + React<br/>10.0.2.10]
+        WEB2[Web Server 2<br/>nginx + React<br/>10.0.2.11]
+        WebLB[Web Load Balancer<br/>Round Robin<br/>10.0.2.5]
+        
+        WebLB --> WEB1
+        WebLB --> WEB2
+    end
+    
+    %% Application Tier
+    subgraph "Application Tier - Private Subnet (10.0.3.0/24)"
+        APP1[App Server 1<br/>Spring Boot<br/>10.0.3.10:8080]
+        APP2[App Server 2<br/>Spring Boot<br/>10.0.3.11:8080]
+        AppLB[App Load Balancer<br/>Sticky Sessions<br/>10.0.3.5]
+        
+        AppLB --> APP1
+        AppLB --> APP2
+    end
+    
+    %% Data Tier
+    subgraph "Data Tier - Private Subnet (10.0.4.0/24)"
+        DB1[Primary Database<br/>MS SQL Server<br/>10.0.4.10:1433]
+        DB2[Read Replica<br/>MS SQL Server<br/>10.0.4.11:1433]
+        CACHE[Redis Cache<br/>Session Store<br/>10.0.4.20:6379]
+        FILE[File Storage<br/>NFS Server<br/>10.0.4.30]
+        
+        DB1 -.-> DB2
+    end
+    
+    %% Management Tier
+    subgraph "Management Tier - Private Subnet (10.0.5.0/24)"
+        MON[Monitoring Server<br/>Prometheus/Grafana<br/>10.0.5.10]
+        LOG[Log Server<br/>ELK Stack<br/>10.0.5.11]
+        BACKUP[Backup Server<br/>Automated Backups<br/>10.0.5.12]
+        BASTION[Bastion Host<br/>SSH Gateway<br/>10.0.5.20]
+    end
+    
+    %% Security Components
+    subgraph "Security Layer"
+        FW1[Internet Firewall<br/>iptables]
+        FW2[Internal Firewall<br/>Network ACLs]
+        IDS[Intrusion Detection<br/>Snort]
+        VPN[VPN Gateway<br/>OpenVPN]
+    end
+    
+    %% Network Connections
+    Internet --> DNS
+    Internet --> CDN
+    Internet --> FW1
+    FW1 --> SSL
+    
+    LB --> WebLB
+    WebLB --> AppLB
+    AppLB --> DB1
+    AppLB --> DB2
+    AppLB --> CACHE
+    AppLB --> FILE
+    
+    %% External Service Connections
+    APP1 --> EmailSrv
+    APP2 --> EmailSrv
+    APP1 --> SMSSrv
+    APP2 --> SMSSrv
+    
+    %% Monitoring Connections
+    WEB1 -.-> MON
+    WEB2 -.-> MON
+    APP1 -.-> MON
+    APP2 -.-> MON
+    DB1 -.-> MON
+    
+    WEB1 -.-> LOG
+    WEB2 -.-> LOG
+    APP1 -.-> LOG
+    APP2 -.-> LOG
+    
+    %% Backup Connections
+    DB1 -.-> BACKUP
+    FILE -.-> BACKUP
+    
+    %% Security Monitoring
+    FW1 -.-> IDS
+    FW2 -.-> IDS
+    IDS -.-> MON
+    
+    %% Admin Access
+    VPN --> BASTION
+    BASTION -.-> MON
+    BASTION -.-> LOG
+    BASTION -.-> BACKUP
+    
+    %% Network Security Rules
+    subgraph "Firewall Rules"
+        R1[Port 443: Internet → DMZ]
+        R2[Port 80/443: DMZ → Web Tier]
+        R3[Port 8080: Web → App Tier]
+        R4[Port 1433: App → Database]
+        R5[Port 6379: App → Cache]
+        R6[Port 22: VPN → Bastion Only]
+        R7[All Management: Bastion → Internal]
+    end
+    
+    %% SSL/TLS Encryption
+    subgraph "Encryption"
+        E1[TLS 1.3: Client ↔ Load Balancer]
+        E2[TLS 1.2: Internal Communications]
+        E3[SSH: Administrative Access]
+        E4[Database Encryption: TDE]
+    end
+    
+    %% Network Protocols
+    subgraph "Protocols"
+        P1[HTTPS/HTTP: Web Traffic]
+        P2[SQL/TDS: Database Traffic]
+        P3[Redis Protocol: Cache Traffic]
+        P4[SMTP: Email Notifications]
+        P5[HTTPS API: SMS Services]
+        P6[SNMP: Monitoring Traffic]
+    end
+    
+    %% Security Zones
+    classDef internet fill:#ffcdd2,stroke:#d32f2f,stroke-width:3px
+    classDef dmz fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef web fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef app fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef data fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef mgmt fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px
+    
+    class Internet,DNS,CDN,EmailSrv,SMSSrv internet
+    class LB,WAF,SSL dmz
+    class WEB1,WEB2,WebLB web
+    class APP1,APP2,AppLB app
+    class DB1,DB2,CACHE,FILE data
+    class MON,LOG,BACKUP,BASTION mgmt
+    class FW1,FW2,IDS,VPN security
+    
+    %% Network Annotations
+    subgraph "Legend"
+        L1[Internet Zone]:::internet
+        L2[DMZ Zone]:::dmz
+        L3[Web Tier]:::web
+        L4[Application Tier]:::app
+        L5[Data Tier]:::data
+        L6[Management Tier]:::mgmt
+        L7[Security Components]:::security
+    end

@@ -1,0 +1,127 @@
+graph TD
+    %% External Entities
+    Patient([Patient])
+    Doctor([Doctor])
+    Admin([Administrator])
+    Manager([Manager])
+    EmailSystem[Email System]
+    SMSSystem[SMS System]
+    
+    %% Processes
+    P1[1.0<br/>User Authentication<br/>& Authorization]
+    P2[2.0<br/>Appointment<br/>Management]
+    P3[3.0<br/>Patient Record<br/>Management]
+    P4[4.0<br/>ARV Treatment<br/>Management]
+    P5[5.0<br/>Notification<br/>Processing]
+    P6[6.0<br/>User Profile<br/>Management]
+    P7[7.0<br/>System<br/>Administration]
+    P8[8.0<br/>Reporting &<br/>Analytics]
+    
+    %% Data Stores
+    DS1[(1 - User Database<br/>Users, Roles, Sessions)]
+    DS2[(2 - Appointment Database<br/>Appointments, Schedules)]
+    DS3[(3 - Patient Records<br/>Medical History, Privacy)]
+    DS4[(4 - ARV Treatment<br/>Prescriptions, Routines)]
+    DS5[(5 - Notifications<br/>Messages, Templates)]
+    DS6[(6 - System Logs<br/>Audit Trail, Events)]
+    DS7[(7 - File Storage<br/>Images, Documents)]
+    
+    %% Patient Data Flows
+    Patient -->|Login Credentials| P1
+    P1 -->|Authentication Token| Patient
+    Patient -->|Book/Cancel Appointment| P2
+    P2 -->|Appointment Confirmation| Patient
+    Patient -->|View Medical Records| P3
+    P3 -->|Patient Information| Patient
+    Patient -->|Treatment Adherence Data| P4
+    P4 -->|Medication Reminders| Patient
+    Patient -->|View Notifications| P5
+    P5 -->|Personal Notifications| Patient
+    Patient -->|Update Profile| P6
+    P6 -->|Profile Confirmation| Patient
+    
+    %% Doctor Data Flows
+    Doctor -->|Login Credentials| P1
+    P1 -->|Authentication Token| Doctor
+    Doctor -->|Manage Availability| P2
+    P2 -->|Schedule Updates| Doctor
+    Doctor -->|Update Patient Records| P3
+    P3 -->|Patient History| Doctor
+    Doctor -->|Create Treatment Plan| P4
+    P4 -->|Treatment Guidelines| Doctor
+    Doctor -->|Send Notifications| P5
+    P5 -->|Notification Status| Doctor
+    Doctor -->|Update Profile| P6
+    P6 -->|Profile Confirmation| Doctor
+    
+    %% Admin Data Flows
+    Admin -->|Login Credentials| P1
+    P1 -->|Admin Token| Admin
+    Admin -->|Manage Users| P7
+    P7 -->|User Management Reports| Admin
+    Admin -->|System Configuration| P7
+    P7 -->|Configuration Status| Admin
+    Admin -->|View Reports| P8
+    P8 -->|System Analytics| Admin
+    
+    %% Manager Data Flows
+    Manager -->|Login Credentials| P1
+    P1 -->|Manager Token| Manager
+    Manager -->|View Clinic Analytics| P8
+    P8 -->|Operational Reports| Manager
+    Manager -->|Staff Management| P7
+    P7 -->|Staff Reports| Manager
+    
+    %% Process to Data Store Flows
+    P1 <-->|User Data, Sessions| DS1
+    P2 <-->|Appointment Data| DS2
+    P3 <-->|Medical Records| DS3
+    P4 <-->|Treatment Data| DS4
+    P5 <-->|Notification Data| DS5
+    P6 <-->|Profile Images| DS7
+    P7 <-->|System Events| DS6
+    P8 <-->|Analytics Data| DS6
+    
+    %% Cross-Process Data Flows
+    P1 -->|User Authentication| P2
+    P1 -->|User Authentication| P3
+    P1 -->|User Authentication| P4
+    P1 -->|User Authentication| P5
+    P1 -->|User Authentication| P6
+    P1 -->|Admin Authentication| P7
+    P1 -->|Manager Authentication| P8
+    
+    P2 -->|Appointment Events| P5
+    P3 -->|Privacy Settings| P5
+    P4 -->|Treatment Schedules| P5
+    P6 -->|Profile Updates| DS1
+    
+    %% External System Flows
+    P5 -->|Email Notifications| EmailSystem
+    EmailSystem -->|Delivery Status| P5
+    P5 -->|SMS Notifications| SMSSystem
+    SMSSystem -->|Delivery Status| P5
+    
+    %% Data Flow Types
+    classDef process fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef datastore fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef entity fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    
+    class P1,P2,P3,P4,P5,P6,P7,P8 process
+    class DS1,DS2,DS3,DS4,DS5,DS6,DS7 datastore
+    class EmailSystem,SMSSystem external
+    class Patient,Doctor,Admin,Manager entity
+    
+    %% Annotations
+    subgraph "Legend"
+        L1[Process]:::process
+        L2[(Data Store)]:::datastore  
+        L3[External System]:::external
+        L4([Entity]):::entity
+    end
+    
+    %% Security Annotations
+    note1[Note: All data flows are encrypted<br/>and authenticated via JWT tokens]
+    note2[Note: Patient medical data follows<br/>HIPAA compliance requirements]
+    note3[Note: Audit trails are maintained<br/>for all data modifications]
