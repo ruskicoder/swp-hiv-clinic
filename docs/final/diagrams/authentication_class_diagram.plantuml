@@ -1,0 +1,175 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam classBackgroundColor lightblue
+skinparam interfaceBackgroundColor lightgreen
+
+package "Authentication Configuration" {
+    class SecurityConfig {
+        -userDetailsService: CustomUserDetailsService
+        -jwtAuthenticationFilter: JwtAuthenticationFilter
+        +passwordEncoder(): PasswordEncoder
+        +authenticationProvider(): DaoAuthenticationProvider
+        +authenticationManager(): AuthenticationManager
+        +corsConfigurationSource(): CorsConfigurationSource
+        +filterChain(): SecurityFilterChain
+        +roleHierarchy(): RoleHierarchy
+    }
+    
+    class JwtAuthenticationFilter {
+        -jwtUtils: JwtUtils
+        -userDetailsService: CustomUserDetailsService
+        +doFilterInternal()
+        -getJwtFromRequest(): String
+        -validateToken(): boolean
+    }
+    
+    class JwtUtils {
+        -secretKey: String
+        -jwtExpirationMs: int
+        +generateToken(UserDetails): String
+        +validateToken(String): boolean
+        +getUsernameFromToken(String): String
+        +getClaimsFromToken(String): Claims
+        +isTokenExpired(String): boolean
+        -createToken(Map<String, Object>, String): String
+        -getAllClaimsFromToken(String): Claims
+    }
+    
+    class CustomUserDetailsService {
+        -userRepository: UserRepository
+        +loadUserByUsername(String): UserDetails
+        -convertToUserDetails(User): UserPrincipal
+    }
+    
+    class UserPrincipal {
+        -user: User
+        -authorities: Collection<GrantedAuthority>
+        +getAuthorities(): Collection<GrantedAuthority>
+        +getPassword(): String
+        +getUsername(): String
+        +isAccountNonExpired(): boolean
+        +isAccountNonLocked(): boolean
+        +isCredentialsNonExpired(): boolean
+        +isEnabled(): boolean
+    }
+}
+
+package "Spring Security" {
+    interface UserDetailsService {
+        +loadUserByUsername(String): UserDetails
+    }
+    
+    interface UserDetails {
+        +getAuthorities(): Collection<GrantedAuthority>
+        +getPassword(): String
+        +getUsername(): String
+        +isAccountNonExpired(): boolean
+        +isAccountNonLocked(): boolean
+        +isCredentialsNonExpired(): boolean
+        +isEnabled(): boolean
+    }
+    
+    class BCryptPasswordEncoder {
+        +encode(String): String
+        +matches(String, String): boolean
+    }
+    
+    class DaoAuthenticationProvider {
+        +authenticate(Authentication): Authentication
+        +supports(Class<?>): boolean
+    }
+}
+
+package "Entity Layer" {
+    class User {
+        -userId: Integer
+        -username: String
+        -passwordHash: String
+        -email: String
+        -firstName: String
+        -lastName: String
+        -role: Role
+        -isActive: Boolean
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        +getAuthorities(): Collection<GrantedAuthority>
+    }
+    
+    class Role {
+        -roleId: Integer
+        -roleName: String
+        +getAuthority(): String
+    }
+    
+    class LoginActivity {
+        -logId: Long
+        -userId: Integer
+        -usernameAttempted: String
+        -attemptTime: LocalDateTime
+        -isSuccess: Boolean
+        -ipAddress: String
+        -userAgent: String
+    }
+}
+
+package "Repository Layer" {
+    interface UserRepository {
+        +findByUsername(String): Optional<User>
+        +findByEmail(String): Optional<User>
+        +existsByUsername(String): boolean
+        +existsByEmail(String): boolean
+    }
+    
+    interface LoginActivityRepository {
+        +save(LoginActivity): LoginActivity
+        +findByUserIdOrderByAttemptTimeDesc(Integer): List<LoginActivity>
+    }
+}
+
+' Relationships
+SecurityConfig *-- CustomUserDetailsService
+SecurityConfig *-- JwtAuthenticationFilter
+SecurityConfig *-- BCryptPasswordEncoder
+SecurityConfig *-- DaoAuthenticationProvider
+
+JwtAuthenticationFilter *-- JwtUtils
+JwtAuthenticationFilter *-- CustomUserDetailsService
+
+CustomUserDetailsService ..|> UserDetailsService
+CustomUserDetailsService *-- UserRepository
+CustomUserDetailsService ..> UserPrincipal
+
+UserPrincipal ..|> UserDetails
+UserPrincipal *-- User
+
+User *-- Role
+User ||--o{ LoginActivity
+
+DaoAuthenticationProvider *-- CustomUserDetailsService
+DaoAuthenticationProvider *-- BCryptPasswordEncoder
+
+note right of SecurityConfig
+    Main configuration class for Spring Security
+    - Configures JWT authentication
+    - Sets up role hierarchy
+    - Defines security filter chain
+    - Configures CORS for frontend
+end note
+
+note right of JwtUtils
+    Utility class for JWT operations
+    - Token generation with 24h expiry
+    - Token validation and parsing
+    - Claims extraction
+    - Security key management
+end note
+
+note right of UserPrincipal
+    Spring Security UserDetails implementation
+    - Wraps User entity
+    - Provides authorities from role
+    - Implements account status checks
+end note
+
+@enduml

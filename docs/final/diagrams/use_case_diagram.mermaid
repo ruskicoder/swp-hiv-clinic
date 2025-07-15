@@ -1,0 +1,133 @@
+graph TB
+    %% Actors
+    Patient([Patient])
+    Doctor([Doctor])
+    Admin([Administrator])
+    Manager([Manager])
+    Guest([Guest])
+    System([System])
+    
+    %% Use Cases
+    subgraph "HIV Clinic Management System"
+        subgraph "Authentication & User Management"
+            UC01[Register Account]
+            UC02[Login/Logout]
+            UC03[Update Profile]
+            UC04[Change Password]
+            UC05[Reset Password]
+        end
+        
+        subgraph "Appointment Management"
+            UC06[Book Appointment]
+            UC07[View Appointments]
+            UC08[Cancel Appointment]
+            UC09[Reschedule Appointment]
+            UC10[Update Appointment Status]
+            UC11[Manage Doctor Availability]
+        end
+        
+        subgraph "Patient Records Management"
+            UC12[View Patient Records]
+            UC13[Update Medical History]
+            UC14[Manage Privacy Settings]
+            UC15[View Lab Results]
+            UC16[Access Treatment History]
+        end
+        
+        subgraph "ARV Treatment Management"
+            UC17[Create Treatment Plan]
+            UC18[Monitor Treatment Progress]
+            UC19[Update Medication Routine]
+            UC20[Track Medication Adherence]
+            UC21[Manage Side Effects]
+        end
+        
+        subgraph "Notification System"
+            UC22[Send Appointment Reminders]
+            UC23[Send Medication Reminders]
+            UC24[View Notifications]
+            UC25[Configure Notification Settings]
+            UC26[Create Custom Templates]
+        end
+        
+        subgraph "Administrative Functions"
+            UC27[Manage Users]
+            UC28[View System Reports]
+            UC29[Configure System Settings]
+            UC30[Manage Clinic Information]
+            UC31[Monitor System Performance]
+        end
+        
+        subgraph "Manager Functions"
+            UC32[View Clinic Analytics]
+            UC33[Manage Staff Schedules]
+            UC34[Generate Reports]
+            UC35[Monitor Operations]
+        end
+    end
+    
+    %% Patient Relationships
+    Patient --> UC01
+    Patient --> UC02
+    Patient --> UC03
+    Patient --> UC04
+    Patient --> UC06
+    Patient --> UC07
+    Patient --> UC08
+    Patient --> UC09
+    Patient --> UC14
+    Patient --> UC15
+    Patient --> UC16
+    Patient --> UC20
+    Patient --> UC24
+    Patient --> UC25
+    
+    %% Doctor Relationships
+    Doctor --> UC02
+    Doctor --> UC03
+    Doctor --> UC04
+    Doctor --> UC07
+    Doctor --> UC10
+    Doctor --> UC11
+    Doctor --> UC12
+    Doctor --> UC13
+    Doctor --> UC17
+    Doctor --> UC18
+    Doctor --> UC19
+    Doctor --> UC21
+    Doctor --> UC24
+    Doctor --> UC26
+    
+    %% Admin Relationships
+    Admin --> UC02
+    Admin --> UC03
+    Admin --> UC27
+    Admin --> UC28
+    Admin --> UC29
+    Admin --> UC30
+    Admin --> UC31
+    
+    %% Manager Relationships
+    Manager --> UC02
+    Manager --> UC03
+    Manager --> UC32
+    Manager --> UC33
+    Manager --> UC34
+    Manager --> UC35
+    
+    %% Guest Relationships
+    Guest --> UC01
+    Guest --> UC02
+    Guest --> UC05
+    
+    %% System Relationships (Automated)
+    System --> UC22
+    System --> UC23
+    
+    %% Styling
+    classDef actor fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef usecase fill:#f3e5f5,stroke:#4a148c,stroke-width:1px
+    classDef system fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    
+    class Patient,Doctor,Admin,Manager,Guest actor
+    class System system

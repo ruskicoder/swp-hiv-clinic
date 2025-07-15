@@ -1,114 +1,76 @@
 @startuml
-!theme aws-orange
-skinparam componentStyle rectangle
-skinparam backgroundColor #FAFAFA
-skinparam componentBackgroundColor #E8F5E8
-skinparam componentBorderColor #4CAF50
-skinparam interfaceBackgroundColor #FFF3E0
-skinparam interfaceBorderColor #FF9800
-
 title HIV Clinic Management System - Component Diagram
 
 package "Frontend Layer" {
-    component [React Application] as ReactApp {
-        component [Authentication Context] as AuthContext
-        component [User Interface Components] as UIComponents
-        component [Feature Modules] as FeatureModules
-        component [API Service Layer] as APIServices
-        component [Router Module] as Router
-    }
+    [React Application] as ReactApp
+    [Authentication Context] as AuthContext
+    [User Interface Components] as UIComponents
+    [Feature Modules] as FeatureModules
+    [API Service Layer] as APIServices
+    [Router Module] as Router
     
-    package "UI Components" {
-        component [Layout Components] as Layout
-        component [Form Components] as Forms
-        component [Notification Components] as NotifComponents
-        component [ARV Treatment Components] as ARVComponents
-        component [Schedule Components] as ScheduleComponents
-    }
+    [Admin Dashboard] as AdminDash
+    [Doctor Dashboard] as DoctorDash
+    [Patient Dashboard] as PatientDash
+    [Manager Dashboard] as ManagerDash
+    [Authentication Module] as AuthModule
+    [Settings Module] as SettingsModule
     
-    package "Feature Modules" {
-        component [Admin Dashboard] as AdminDash
-        component [Doctor Dashboard] as DoctorDash
-        component [Patient Dashboard] as PatientDash
-        component [Manager Dashboard] as ManagerDash
-        component [Authentication Module] as AuthModule
-        component [Settings Module] as SettingsModule
-    }
-    
-    package "Services" {
-        component [Auth Service] as AuthService
-        component [Notification Service] as NotificationService
-        component [API Client] as APIClient
-    }
+    [Auth Service] as AuthService
+    [Notification Service] as NotificationService
+    [API Client] as APIClient
 }
 
 package "Backend Layer" {
-    component [Spring Boot Application] as SpringApp {
-        component [Security Configuration] as SecurityConfig
-        component [JWT Authentication] as JWTAuth
-        component [REST Controllers] as Controllers
-        component [Service Layer] as Services
-        component [Data Access Layer] as DataAccess
-    }
+    [Spring Boot Application] as SpringApp
+    [Security Configuration] as SecurityConfig
+    [JWT Authentication] as JWTAuth
+    [REST Controllers] as Controllers
+    [Service Layer] as Services
+    [Data Access Layer] as DataAccess
     
-    package "Controllers" {
-        component [Auth Controller] as AuthController
-        component [Appointment Controller] as AppointmentController
-        component [Notification Controller] as NotificationController
-        component [ARV Treatment Controller] as ARVController
-        component [User Controller] as UserController
-    }
+    [Auth Controller] as AuthController
+    [Appointment Controller] as AppointmentController
+    [Notification Controller] as NotificationController
+    [ARV Treatment Controller] as ARVController
+    [User Controller] as UserController
     
-    package "Services" {
-        component [Authentication Service] as AuthServiceBackend
-        component [Appointment Service] as AppointmentService
-        component [Notification Service] as NotificationServiceBackend
-        component [ARV Treatment Service] as ARVService
-        component [User Service] as UserService
-        component [Email Service] as EmailService
-    }
+    [Authentication Service] as AuthServiceBackend
+    [Appointment Service] as AppointmentService
+    [Notification Service] as NotificationServiceBackend
+    [ARV Treatment Service] as ARVService
+    [User Service] as UserService
+    [Email Service] as EmailService
     
-    package "Repositories" {
-        component [User Repository] as UserRepo
-        component [Appointment Repository] as AppointmentRepo
-        component [Notification Repository] as NotificationRepo
-        component [ARV Treatment Repository] as ARVRepo
-    }
+    [User Repository] as UserRepo
+    [Appointment Repository] as AppointmentRepo
+    [Notification Repository] as NotificationRepo
+    [ARV Treatment Repository] as ARVRepo
     
-    package "Entities" {
-        component [User Entity] as UserEntity
-        component [Appointment Entity] as AppointmentEntity
-        component [Notification Entity] as NotificationEntity
-        component [ARV Treatment Entity] as ARVEntity
-    }
+    [User Entity] as UserEntity
+    [Appointment Entity] as AppointmentEntity
+    [Notification Entity] as NotificationEntity
+    [ARV Treatment Entity] as ARVEntity
 }
 
 package "Database Layer" {
-    database "MS SQL Server" as Database {
-        component [User Tables] as UserTables
-        component [Appointment Tables] as AppointmentTables
-        component [Notification Tables] as NotificationTables
-        component [ARV Treatment Tables] as ARVTables
-    }
+    database [MS SQL Server] as Database
+    [User Tables] as UserTables
+    [Appointment Tables] as AppointmentTables
+    [Notification Tables] as NotificationTables
+    [ARV Treatment Tables] as ARVTables
 }
 
 package "External Services" {
-    component [Email Provider] as EmailProvider
-    component [SMS Provider] as SMSProvider
+    [Email Provider] as EmailProvider
+    [SMS Provider] as SMSProvider
 }
 
-' Frontend Internal Connections
 ReactApp --> UIComponents
 ReactApp --> FeatureModules
 ReactApp --> APIServices
 ReactApp --> AuthContext
 ReactApp --> Router
-
-UIComponents --> Layout
-UIComponents --> Forms
-UIComponents --> NotifComponents
-UIComponents --> ARVComponents
-UIComponents --> ScheduleComponents
 
 FeatureModules --> AdminDash
 FeatureModules --> DoctorDash
@@ -121,12 +83,10 @@ APIServices --> AuthService
 APIServices --> NotificationService
 APIServices --> APIClient
 
-' Frontend to Backend Connections
-APIClient --> SpringApp : "HTTPS/REST API"
-AuthService --> AuthController : "Authentication Requests"
-NotificationService --> NotificationController : "Notification Requests"
+APIClient --> SpringApp
+AuthService --> AuthController
+NotificationService --> NotificationController
 
-' Backend Internal Connections
 SpringApp --> SecurityConfig
 SpringApp --> JWTAuth
 SpringApp --> Controllers
@@ -151,32 +111,27 @@ DataAccess --> AppointmentRepo
 DataAccess --> NotificationRepo
 DataAccess --> ARVRepo
 
-' Service to Repository Connections
 AuthServiceBackend --> UserRepo
 AppointmentService --> AppointmentRepo
 NotificationServiceBackend --> NotificationRepo
 ARVService --> ARVRepo
 UserService --> UserRepo
 
-' Repository to Entity Connections
 UserRepo --> UserEntity
 AppointmentRepo --> AppointmentEntity
 NotificationRepo --> NotificationEntity
 ARVRepo --> ARVEntity
 
-' Backend to Database Connections
-DataAccess --> Database : "JPA/Hibernate"
+DataAccess --> Database
 UserEntity --> UserTables
 AppointmentEntity --> AppointmentTables
 NotificationEntity --> NotificationTables
 ARVEntity --> ARVTables
 
-' External Service Connections
-EmailService --> EmailProvider : "SMTP"
-NotificationServiceBackend --> SMSProvider : "SMS API"
+EmailService --> EmailProvider
+NotificationServiceBackend --> SMSProvider
 
-' Cross-layer Dependencies
-AuthContext --> JWTAuth : "Token Validation"
-SecurityConfig --> JWTAuth : "Authentication Filter"
+AuthContext --> JWTAuth
+SecurityConfig --> JWTAuth
 
 @enduml

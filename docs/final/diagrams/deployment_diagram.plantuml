@@ -1,0 +1,182 @@
+@startuml
+!theme aws-orange
+skinparam backgroundColor #FAFAFA
+skinparam nodeBackgroundColor #E3F2FD
+skinparam nodeBorderColor #1976D2
+skinparam componentBackgroundColor #F1F8E9
+skinparam componentBorderColor #388E3C
+skinparam databaseBackgroundColor #FFF3E0
+skinparam databaseBorderColor #F57C00
+
+title HIV Clinic Management System - Deployment Diagram
+
+node "Client Devices" as ClientNode {
+    component "Web Browser\n(Chrome, Firefox, Safari)" as Browser
+    component "Mobile Browser\n(iOS Safari, Android Chrome)" as MobileBrowser
+    
+    Browser -[hidden]- MobileBrowser
+}
+
+cloud "Internet" as Internet
+
+node "Load Balancer\n(Production)" as LoadBalancer {
+    component "Nginx\n(Reverse Proxy)" as Nginx
+    component "SSL Termination" as SSL
+    
+    SSL --> Nginx
+}
+
+node "Web Server Cluster" as WebServerCluster {
+    node "Web Server 1\n(Ubuntu 20.04 LTS)" as WebServer1 {
+        component "React App\n(Static Files)" as ReactApp1
+        component "Nginx\n(Web Server)" as WebNginx1
+        
+        WebNginx1 --> ReactApp1
+    }
+    
+    node "Web Server 2\n(Ubuntu 20.04 LTS)" as WebServer2 {
+        component "React App\n(Static Files)" as ReactApp2
+        component "Nginx\n(Web Server)" as WebNginx2
+        
+        WebNginx2 --> ReactApp2
+    }
+}
+
+node "Application Server Cluster" as AppServerCluster {
+    node "App Server 1\n(Ubuntu 20.04 LTS)" as AppServer1 {
+        component "Spring Boot App\n(Port 8080)" as SpringApp1
+        component "Java 17 Runtime" as Java1
+        component "Application Logs" as Logs1
+        
+        Java1 --> SpringApp1
+        SpringApp1 --> Logs1
+    }
+    
+    node "App Server 2\n(Ubuntu 20.04 LTS)" as AppServer2 {
+        component "Spring Boot App\n(Port 8080)" as SpringApp2
+        component "Java 17 Runtime" as Java2
+        component "Application Logs" as Logs2
+        
+        Java2 --> SpringApp2
+        SpringApp2 --> Logs2
+    }
+}
+
+node "Database Server\n(Windows Server 2019)" as DatabaseNode {
+    database "MS SQL Server 2019\n(Primary Database)" as SQLServer
+    database "Backup Database\n(Read Replica)" as BackupDB
+    component "SQL Server Agent\n(Backup Jobs)" as SQLAgent
+    
+    SQLServer --> BackupDB : "Replication"
+    SQLAgent --> SQLServer : "Maintenance"
+}
+
+node "Cache Server\n(Ubuntu 20.04 LTS)" as CacheNode {
+    component "Redis Cache\n(Session Storage)" as Redis
+    component "Application Cache\n(Query Results)" as AppCache
+    
+    Redis --> AppCache
+}
+
+node "File Storage Server\n(Ubuntu 20.04 LTS)" as FileNode {
+    component "File System\n(Profile Images)" as FileSystem
+    component "Backup Storage\n(Document Archives)" as BackupStorage
+    
+    FileSystem --> BackupStorage : "Backup"
+}
+
+node "Email Service\n(External)" as EmailNode {
+    component "SMTP Provider\n(SendGrid/AWS SES)" as EmailProvider
+    component "Email Templates" as EmailTemplates
+    
+    EmailProvider --> EmailTemplates
+}
+
+node "SMS Service\n(External)" as SMSNode {
+    component "SMS Gateway\n(Twilio)" as SMSProvider
+}
+
+node "Monitoring Server\n(Ubuntu 20.04 LTS)" as MonitoringNode {
+    component "Application Monitoring\n(Spring Boot Actuator)" as AppMonitoring
+    component "System Monitoring\n(Prometheus)" as SysMonitoring
+    component "Log Aggregation\n(ELK Stack)" as LogAggregation
+    
+    AppMonitoring --> LogAggregation
+    SysMonitoring --> LogAggregation
+}
+
+' Client Connections
+Browser --> Internet : "HTTPS (443)"
+MobileBrowser --> Internet : "HTTPS (443)"
+
+' Internet to Load Balancer
+Internet --> LoadBalancer : "HTTPS (443)"
+
+' Load Balancer to Web Servers
+LoadBalancer --> WebServer1 : "HTTP (80)"
+LoadBalancer --> WebServer2 : "HTTP (80)"
+
+' Web Servers to App Servers
+ReactApp1 --> SpringApp1 : "REST API (8080)"
+ReactApp1 --> SpringApp2 : "REST API (8080)"
+ReactApp2 --> SpringApp1 : "REST API (8080)"
+ReactApp2 --> SpringApp2 : "REST API (8080)"
+
+' App Servers to Database
+SpringApp1 --> SQLServer : "SQL (1433)"
+SpringApp2 --> SQLServer : "SQL (1433)"
+SpringApp1 --> BackupDB : "Read Operations"
+SpringApp2 --> BackupDB : "Read Operations"
+
+' App Servers to Cache
+SpringApp1 --> Redis : "Redis Protocol (6379)"
+SpringApp2 --> Redis : "Redis Protocol (6379)"
+
+' App Servers to File Storage
+SpringApp1 --> FileSystem : "File Operations"
+SpringApp2 --> FileSystem : "File Operations"
+
+' App Servers to External Services
+SpringApp1 --> EmailProvider : "SMTP (587)"
+SpringApp2 --> EmailProvider : "SMTP (587)"
+SpringApp1 --> SMSProvider : "HTTPS API"
+SpringApp2 --> SMSProvider : "HTTPS API"
+
+' Monitoring Connections
+SpringApp1 --> AppMonitoring : "Metrics Export"
+SpringApp2 --> AppMonitoring : "Metrics Export"
+WebServer1 --> SysMonitoring : "System Metrics"
+WebServer2 --> SysMonitoring : "System Metrics"
+AppServer1 --> SysMonitoring : "System Metrics"
+AppServer2 --> SysMonitoring : "System Metrics"
+DatabaseNode --> SysMonitoring : "DB Metrics"
+
+' Deployment Environment Labels
+note top of ClientNode : "User Environment\n(Any Device with Browser)"
+note top of LoadBalancer : "DMZ\n(Public Subnet)"
+note top of WebServerCluster : "Web Tier\n(Public Subnet)"
+note top of AppServerCluster : "Application Tier\n(Private Subnet)"
+note top of DatabaseNode : "Data Tier\n(Private Subnet)"
+note top of MonitoringNode : "Management Tier\n(Private Subnet)"
+
+' Security Zones
+package "Public Zone" {
+    ClientNode
+    LoadBalancer
+    WebServerCluster
+}
+
+package "Private Zone" {
+    AppServerCluster
+    DatabaseNode
+    CacheNode
+    FileNode
+    MonitoringNode
+}
+
+package "External Services" {
+    EmailNode
+    SMSNode
+}
+
+@enduml
