@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/useAuth';
 import BackNavigation from '../../components/layout/BackNavigation';
@@ -11,19 +11,12 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState('');
   const { login } = useAuth();
+  // const navigate = useNavigate();
   const location = useLocation();
 
   // Get success message from registration
   const successMessage = location.state?.message;
-
-  // Clear error when form changes
-  useEffect(() => {
-    if (loginError) {
-      setLoginError('');
-    }
-  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,7 +51,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setLoginError(''); // Clear any existing errors
     
     try {
       const isValid = validateForm();
@@ -68,19 +60,15 @@ const Login = () => {
 
       // Call login and get response
       const response = await login(formData);
-      
-      if (response.success) {
-        // Save token to sessionStorage if present
-        if (response.token) {
-          sessionStorage.setItem('token', response.token);
-        }
-        // Login successful - navigation handled by AuthContext
-      } else {
-        // Set error message from response
-        setLoginError(response.message || 'Login failed. Please try again.');
+      // Save token to localStorage if present
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
       }
+      // Navigation will be handled by the AuthContext
     } catch (error) {
-      setLoginError(error.message || 'Login failed. Please try again.');
+      setErrors({
+        submit: error.message || 'Login failed. Please try again.'
+      });
     } finally {
       setLoading(false);
     }
@@ -101,9 +89,9 @@ const Login = () => {
           </div>
         )}
 
-        {loginError && (
-          <div className="error-message" role="alert">
-            {loginError}
+        {errors.submit && (
+          <div className="error-message">
+            {errors.submit}
           </div>
         )}
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.14)  15 JUL 2025 18:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.14)  15 JUL 2025 19:20
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -338,24 +338,24 @@ File: l3backend-pdftex.def 2025-06-09 L3 backend support: PDF output (pdfTeX)
 ) (./Final_Release_HIV_Clinic_LaTeX.aux)
 \openout1 = `Final_Release_HIV_Clinic_LaTeX.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 45.
+LaTeX Font Info:    ... okay on input line 45.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -410,19 +410,19 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (d:/DATA/Programs/texlive/2025/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring OFF on input line 42.
+Package hyperref Info: Link coloring OFF on input line 45.
  (./Final_Release_HIV_Clinic_LaTeX.out) (./Final_Release_HIV_Clinic_LaTeX.out)
 \@outlinefile=\write3
 \openout3 = `Final_Release_HIV_Clinic_LaTeX.out'.
 
 \c@lstlisting=\count329
-LaTeX Info: Redefining \microtypecontext on input line 42.
-Package microtype Info: Applying patch `item' on input line 42.
-Package microtype Info: Applying patch `toc' on input line 42.
-Package microtype Info: Applying patch `eqnum' on input line 42.
-Package microtype Info: Applying patch `footnote' on input line 42.
-Package microtype Info: Applying patch `verbatim' on input line 42.
-LaTeX Info: Redefining \microtypesetup on input line 42.
+LaTeX Info: Redefining \microtypecontext on input line 45.
+Package microtype Info: Applying patch `item' on input line 45.
+Package microtype Info: Applying patch `toc' on input line 45.
+Package microtype Info: Applying patch `eqnum' on input line 45.
+Package microtype Info: Applying patch `footnote' on input line 45.
+Package microtype Info: Applying patch `verbatim' on input line 45.
+LaTeX Info: Redefining \microtypesetup on input line 45.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -437,30 +437,55 @@ Package microtype Info: No adjustment of character kerning.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman (RS)
 )
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 45.
+(Font)              <14.4> on input line 48.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 45.
+(Font)              <7> on input line 48.
 
 
 [1
 
 {d:/DATA/Programs/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (2.50078pt too wide) in paragraph at lines 53--53
+Overfull \hbox (2.50078pt too wide) in paragraph at lines 56--56
 []|\OT1/cmr/bx/n/12 (-20) A*M,
  []
 
 
-Overfull \hbox (0.66896pt too wide) in paragraph at lines 55--55
+Overfull \hbox (0.66896pt too wide) in paragraph at lines 58--58
 []|\OT1/cmr/m/n/12 (-20) 07/01/2025| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 55--55
-[]|\OT1/cmr/m/n/12 (+20) Development
+Overfull \hbox (7.87015pt too wide) in paragraph at lines 58--58
+[]|\OT1/cmr/m/n/12 (-20) KhoaDDSE192357| 
  []
 
 
-Overfull \hbox (7.7706pt too wide) in alignment at lines 51--57
+Overfull \hbox (0.66896pt too wide) in paragraph at lines 60--60
+[]|\OT1/cmr/m/n/12 (-20) 07/01/2025| 
+ []
+
+
+Overfull \hbox (8.17448pt too wide) in paragraph at lines 60--60
+[]|\OT1/cmr/m/n/12 (-20) TuanTMSE192397| 
+ []
+
+
+Overfull \hbox (0.66896pt too wide) in paragraph at lines 62--62
+[]|\OT1/cmr/m/n/12 (-20) 07/01/2025| 
+ []
+
+
+Underfull \hbox (badness 1168) in paragraph at lines 62--63
+[]|\OT1/cmr/m/n/12 (+20) Added user man-ual and trou-
+ []
+
+
+Overfull \hbox (0.66896pt too wide) in paragraph at lines 64--64
+[]|\OT1/cmr/m/n/12 (-20) 07/01/2025| 
+ []
+
+
+Overfull \hbox (7.7706pt too wide) in alignment at lines 54--66
  [] [] [] [] [] 
  []
 
@@ -480,22 +505,22 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
 
 [3]
-Overfull \hbox (19.86566pt too wide) in paragraph at lines 79--79
+Overfull \hbox (19.86566pt too wide) in paragraph at lines 88--88
 []|\OT1/cmr/m/n/12 (-20) RDS[]Document[]HIV[]Clinic[]Filled.tex| 
  []
 
 
-Overfull \hbox (30.7082pt too wide) in paragraph at lines 83--83
+Overfull \hbox (30.7082pt too wide) in paragraph at lines 92--92
 []|\OT1/cmr/m/n/12 (-20) Project[]Tracking[]HIV[]Clinic[]LaTeX.tex| 
  []
 
 
-Overfull \hbox (14.28299pt too wide) in paragraph at lines 85--85
+Overfull \hbox (14.28299pt too wide) in paragraph at lines 94--94
 []|\OT1/cmr/m/n/12 (-20) Issues[]Report[]HIV[]Clinic[]LaTeX.tex| 
  []
 
 
-Overfull \hbox (0.84438pt too wide) in paragraph at lines 91--91
+Overfull \hbox (0.84438pt too wide) in paragraph at lines 100--100
 []|\OT1/cmr/m/n/12 (-20) HivClinicBackendApplication.java| 
  []
 
@@ -512,148 +537,149 @@ File: lstlang1.sty 2024/09/23 1.10c listings language file
 )
 
 [6]
-Underfull \hbox (badness 10000) in paragraph at lines 281--282
+Underfull \hbox (badness 10000) in paragraph at lines 290--291
 []|\OT1/cmr/m/n/12 (+20) Manage ap-point-ments, up-date pa-tient
  []
 
 
 
 [7]
-<images/patient_login.png, id=272, 1288.0622pt x 702.37407pt>
+<images/patient_login.png, id=283, 1288.0622pt x 702.37407pt>
 File: images/patient_login.png Graphic file (type png)
 <use images/patient_login.png>
-Package pdftex.def Info: images/patient_login.png  used on input line 350.
-(pdftex.def)             Requested size: 407.66833pt x 222.2993pt.
+Package pdftex.def Info: images/patient_login.png  used on input line 359.
+(pdftex.def)             Requested size: 385.02547pt x 209.95291pt.
 
 
 [8]
-<images/patient_register.png, id=293, 1283.54532pt x 696.35156pt>
+<images/patient_register.png, id=303, 1283.54532pt x 696.35156pt>
 File: images/patient_register.png Graphic file (type png)
 <use images/patient_register.png>
-Package pdftex.def Info: images/patient_register.png  used on input line 357.
-(pdftex.def)             Requested size: 407.66833pt x 221.16885pt.
-<images/patient_booking.png, id=294, 1282.7925pt x 696.35156pt>
+Package pdftex.def Info: images/patient_register.png  used on input line 366.
+(pdftex.def)             Requested size: 385.02547pt x 208.88582pt.
+<images/patient_booking.png, id=304, 1282.7925pt x 696.35156pt>
 File: images/patient_booking.png Graphic file (type png)
 <use images/patient_booking.png>
-Package pdftex.def Info: images/patient_booking.png  used on input line 364.
-(pdftex.def)             Requested size: 407.66833pt x 221.29636pt.
+Package pdftex.def Info: images/patient_booking.png  used on input line 373.
+(pdftex.def)             Requested size: 385.02547pt x 209.0027pt.
 
 
 [9
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.368 
+l.377 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.368 
+l.377 
        <./images/patient_login.png> <./images/patient_register.png>]
-<images/patient_dashboard.png, id=303, 1290.32062pt x 703.87968pt>
+<images/patient_dashboard.png, id=313, 1290.32062pt x 703.87968pt>
 File: images/patient_dashboard.png Graphic file (type png)
 <use images/patient_dashboard.png>
-Package pdftex.def Info: images/patient_dashboard.png  used on input line 371.
-(pdftex.def)             Requested size: 407.66833pt x 222.37843pt.
-<images/patient_records.png, id=304, 1294.08469pt x 707.64375pt>
+Package pdftex.def Info: images/patient_dashboard.png  used on input line 380.
+(pdftex.def)             Requested size: 385.02547pt x 210.02705pt.
+<images/patient_records.png, id=314, 1294.08469pt x 707.64375pt>
 File: images/patient_records.png Graphic file (type png)
 <use images/patient_records.png>
-Package pdftex.def Info: images/patient_records.png  used on input line 378.
-(pdftex.def)             Requested size: 407.66833pt x 222.91975pt.
+Package pdftex.def Info: images/patient_records.png  used on input line 387.
+(pdftex.def)             Requested size: 385.02547pt x 210.54552pt.
 
 
 [10
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.382 
+l.391 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.382 
+l.391 
        <./images/patient_booking.png> <./images/patient_dashboard.png>]
-<images/doctor_login.png, id=313, 1283.54532pt x 719.68875pt>
+<images/doctor_login.png, id=323, 1283.54532pt x 719.68875pt>
 File: images/doctor_login.png Graphic file (type png)
 <use images/doctor_login.png>
-Package pdftex.def Info: images/doctor_login.png  used on input line 398.
-(pdftex.def)             Requested size: 407.66833pt x 228.581pt.
+Package pdftex.def Info: images/doctor_login.png  used on input line 407.
+(pdftex.def)             Requested size: 385.02547pt x 215.88632pt.
 
 
 [11
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.402 
+l.411 
        <./images/patient_records.png>]
-<images/doctor_availability.png, id=326, 1281.28688pt x 718.93594pt>
+<images/doctor_availability.png, id=336, 1281.28688pt x 718.93594pt>
 File: images/doctor_availability.png Graphic file (type png)
 <use images/doctor_availability.png>
-Package pdftex.def Info: images/doctor_availability.png  used on input line 405.
-(pdftex.def)             Requested size: 407.66833pt x 228.73682pt.
-<images/doctor_dashboard.png, id=327, 1276.77pt x 697.10437pt>
-File: images/doctor_dashboard.png Graphic file (type png)
-<use images/doctor_dashboard.png>
-Package pdftex.def Info: images/doctor_dashboard.png  used on input line 412.
-(pdftex.def)             Requested size: 407.66833pt x 222.57802pt.
+Package pdftex.def Info: images/doctor_availability.png  used on input line 414.
+(pdftex.def)             Requested size: 385.02547pt x 216.03348pt.
 
 
 [12
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.416 
-      
+l.429 \end{enumerate}
+                     
 pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.416 
-       <./images/doctor_login.png> <./images/doctor_availability.png>]
-<images/doctor_patientview.png, id=336, 1280.53406pt x 705.38531pt>
+l.429 \end{enumerate}
+                      <./images/doctor_login.png> <./images/doctor_availability.png>]
+<images/doctor_dashboard.png, id=351, 1276.77pt x 697.10437pt>
+File: images/doctor_dashboard.png Graphic file (type png)
+<use images/doctor_dashboard.png>
+Package pdftex.def Info: images/doctor_dashboard.png  used on input line 433.
+(pdftex.def)             Requested size: 385.02547pt x 210.21788pt.
+<images/doctor_patientview.png, id=352, 1280.53406pt x 705.38531pt>
 File: images/doctor_patientview.png Graphic file (type png)
 <use images/doctor_patientview.png>
-Package pdftex.def Info: images/doctor_patientview.png  used on input line 419.
-(pdftex.def)             Requested size: 407.66833pt x 224.56548pt.
-<images/doctor_treatment.png, id=337, 1291.07344pt x 700.86844pt>
-File: images/doctor_treatment.png Graphic file (type png)
-<use images/doctor_treatment.png>
-Package pdftex.def Info: images/doctor_treatment.png  used on input line 426.
-(pdftex.def)             Requested size: 407.66833pt x 221.29875pt.
+Package pdftex.def Info: images/doctor_patientview.png  used on input line 457.
+(pdftex.def)             Requested size: 385.02547pt x 212.0908pt.
 
 
 [13
 pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.430 
-      
+l.461 
+       <./images/doctor_dashboard.png>]
+<images/doctor_treatment.png, id=367, 1291.07344pt x 700.86844pt>
+File: images/doctor_treatment.png Graphic file (type png)
+<use images/doctor_treatment.png>
+Package pdftex.def Info: images/doctor_treatment.png  used on input line 464.
+(pdftex.def)             Requested size: 385.02547pt x 209.01091pt.
+
+
+[14
 pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.430 
-       <./images/doctor_dashboard.png> <./images/doctor_patientview.png>]
-
-[14
+l.485         \item A
+                     ccess "System Settings" menu
 pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.465 \end{itemize}
-                    <./images/doctor_treatment.png>]
-Underfull \hbox (badness 2165) in paragraph at lines 509--509
+l.485         \item A
+                     ccess "System Settings" menu <./images/doctor_patientview.png> <./images/doctor_treatment.png>]
+
+[15]
+Underfull \hbox (badness 2165) in paragraph at lines 547--547
 []|\OT1/cmr/m/n/12 (+20) Database con-nec-tion
  []
 
 
-Underfull \hbox (badness 4391) in paragraph at lines 513--514
+Underfull \hbox (badness 4391) in paragraph at lines 551--552
 []|\OT1/cmr/m/n/12 (+20) Stop ex-ist-ing ser-vice or
  []
 
-[15]
-Underfull \hbox (badness 10000) in paragraph at lines 536--536
+
+Underfull \hbox (badness 10000) in paragraph at lines 574--574
 []|\OT1/cmr/m/n/12 (+20) Operating Sys-
  []
-
-
 
 [16]
 
@@ -663,21 +689,21 @@ LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-07-11>
  ***********
 Package rerunfilecheck Info: File `Final_Release_HIV_Clinic_LaTeX.out' has not changed.
-(rerunfilecheck)             Checksum: EE4E67414314844FD464650121E08C52;5285.
+(rerunfilecheck)             Checksum: 06CF321E1F7B8DA9ABB1BA9163ECD968;5668.
  ) 
 Here is how much of TeX's memory you used:
- 15681 strings out of 469753
- 247897 string characters out of 5480518
- 903075 words of memory out of 5000000
- 43687 multiletter control sequences out of 15000+600000
- 635135 words of font info for 97 fonts, out of 8000000 for 9000
+ 15720 strings out of 469753
+ 248598 string characters out of 5480518
+ 903086 words of memory out of 5000000
+ 43709 multiletter control sequences out of 15000+600000
+ 635184 words of font info for 98 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
  75i,12n,79p,1068b,1937s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
-Output written on Final_Release_HIV_Clinic_LaTeX.pdf (17 pages, 1507001 bytes).
+Output written on Final_Release_HIV_Clinic_LaTeX.pdf (17 pages, 1508666 bytes).
 PDF statistics:
- 425 PDF objects out of 1000 (max. 8388607)
- 372 compressed objects within 4 object streams
- 144 named destinations out of 1000 (max. 500000)
- 29515 words of extra memory for PDF output out of 29859 (max. 10000000)
+ 452 PDF objects out of 1000 (max. 8388607)
+ 399 compressed objects within 4 object streams
+ 159 named destinations out of 1000 (max. 500000)
+ 29531 words of extra memory for PDF output out of 29859 (max. 10000000)
 

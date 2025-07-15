@@ -39,6 +39,9 @@
 \rhead{\thepage}
 \lhead{HIV Clinic Final Release}
 
+% Configure graphics path
+\graphicspath{{images/}}
+
 \begin{document}
 
 \maketitle
@@ -52,7 +55,13 @@
 \hline
 \textbf{Version} & \textbf{Date} & \textbf{A*M, D} & \textbf{In charge} & \textbf{Change Description} \\
 \hline
-V1.0 & 07/01/2025 & A & Development Team & Initial Final Release document for HIV Clinic Management System \\
+V1.0 & 07/01/2025 & A & KhoaDDSE192357 & Initial Final Release document structure and overview \\
+\hline
+V1.0 & 07/01/2025 & A & TuanTMSE192397 & Added installation guides and system requirements \\
+\hline
+V1.0 & 07/01/2025 & A & DatNTSE194083 & Added user manual and troubleshooting sections \\
+\hline
+V1.0 & 07/01/2025 & A & AnPPSE196260 & Added technical specifications and screenshots \\
 \hline
 \end{longtable}
 
@@ -347,35 +356,35 @@ Manager & manager1 & manager123 & Test manager account for demonstration \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/patient_login.png}
+\includegraphics[width=0.85\textwidth]{patient_login.png}
 \caption{Patient Login Interface}
 \label{fig:patient-login}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/patient_register.png}
+\includegraphics[width=0.85\textwidth]{patient_register.png}
 \caption{Patient Registration Interface}
 \label{fig:patient-register}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/patient_booking.png}
+\includegraphics[width=0.85\textwidth]{patient_booking.png}
 \caption{Patient Appointment Booking Interface}
 \label{fig:patient-booking}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/patient_dashboard.png}
+\includegraphics[width=0.85\textwidth]{patient_dashboard.png}
 \caption{Patient Dashboard Interface}
 \label{fig:patient-dashboard}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/patient_records.png}
+\includegraphics[width=0.85\textwidth]{patient_records.png}
 \caption{Patient Medical Records Interface}
 \label{fig:patient-records}
 \end{figure}
@@ -395,35 +404,64 @@ Manager & manager1 & manager123 & Test manager account for demonstration \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/doctor_login.png}
+\includegraphics[width=0.85\textwidth]{doctor_login.png}
 \caption{Doctor Login Interface}
 \label{fig:doctor-login}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/doctor_availability.png}
+\includegraphics[width=0.85\textwidth]{doctor_availability.png}
 \caption{Doctor Availability Management Interface}
 \label{fig:doctor-availability}
 \end{figure}
 
+\subsubsection{Patient Care Management}
+
+\begin{enumerate}
+    \item Access "My Appointments" section
+    \item View daily appointment schedule
+    \item Click on appointment to view patient details
+    \item Access patient medical records
+    \item Update treatment notes
+    \item Prescribe or modify ARV treatments
+    \item Schedule follow-up appointments
+\end{enumerate}
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/doctor_dashboard.png}
+\includegraphics[width=0.85\textwidth]{doctor_dashboard.png}
 \caption{Doctor Dashboard Interface}
 \label{fig:doctor-dashboard}
 \end{figure}
 
+\subsubsection{ARV Treatment Management}
+
+\begin{enumerate}
+    \item Access patient record during appointment
+    \item Click "ARV Treatments" tab
+    \item Add new treatment regimen:
+    \begin{itemize}
+        \item Select ARV medications
+        \item Set dosage and frequency
+        \item Add treatment notes
+        \item Set start and end dates
+    \end{itemize}
+    \item Create medication routine
+    \item Enable medication reminders
+    \item Monitor treatment adherence
+\end{enumerate}
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/doctor_patientview.png}
+\includegraphics[width=0.85\textwidth]{doctor_patientview.png}
 \caption{Doctor Patient View Interface}
 \label{fig:doctor-patientview}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/doctor_treatment.png}
+\includegraphics[width=0.85\textwidth]{doctor_treatment.png}
 \caption{Doctor Treatment Management Interface}
 \label{fig:doctor-treatment}
 \end{figure}
