@@ -1,0 +1,137 @@
+@startuml
+title HIV Clinic Management System - Component Diagram
+
+package "Frontend Layer" {
+    [React Application] as ReactApp
+    [Authentication Context] as AuthContext
+    [User Interface Components] as UIComponents
+    [Feature Modules] as FeatureModules
+    [API Service Layer] as APIServices
+    [Router Module] as Router
+    
+    [Admin Dashboard] as AdminDash
+    [Doctor Dashboard] as DoctorDash
+    [Patient Dashboard] as PatientDash
+    [Manager Dashboard] as ManagerDash
+    [Authentication Module] as AuthModule
+    [Settings Module] as SettingsModule
+    
+    [Auth Service] as AuthService
+    [Notification Service] as NotificationService
+    [API Client] as APIClient
+}
+
+package "Backend Layer" {
+    [Spring Boot Application] as SpringApp
+    [Security Configuration] as SecurityConfig
+    [JWT Authentication] as JWTAuth
+    [REST Controllers] as Controllers
+    [Service Layer] as Services
+    [Data Access Layer] as DataAccess
+    
+    [Auth Controller] as AuthController
+    [Appointment Controller] as AppointmentController
+    [Notification Controller] as NotificationController
+    [ARV Treatment Controller] as ARVController
+    [User Controller] as UserController
+    
+    [Authentication Service] as AuthServiceBackend
+    [Appointment Service] as AppointmentService
+    [Notification Service] as NotificationServiceBackend
+    [ARV Treatment Service] as ARVService
+    [User Service] as UserService
+    [Email Service] as EmailService
+    
+    [User Repository] as UserRepo
+    [Appointment Repository] as AppointmentRepo
+    [Notification Repository] as NotificationRepo
+    [ARV Treatment Repository] as ARVRepo
+    
+    [User Entity] as UserEntity
+    [Appointment Entity] as AppointmentEntity
+    [Notification Entity] as NotificationEntity
+    [ARV Treatment Entity] as ARVEntity
+}
+
+package "Database Layer" {
+    database [MS SQL Server] as Database
+    [User Tables] as UserTables
+    [Appointment Tables] as AppointmentTables
+    [Notification Tables] as NotificationTables
+    [ARV Treatment Tables] as ARVTables
+}
+
+package "External Services" {
+    [Email Provider] as EmailProvider
+    [SMS Provider] as SMSProvider
+}
+
+ReactApp --> UIComponents
+ReactApp --> FeatureModules
+ReactApp --> APIServices
+ReactApp --> AuthContext
+ReactApp --> Router
+
+FeatureModules --> AdminDash
+FeatureModules --> DoctorDash
+FeatureModules --> PatientDash
+FeatureModules --> ManagerDash
+FeatureModules --> AuthModule
+FeatureModules --> SettingsModule
+
+APIServices --> AuthService
+APIServices --> NotificationService
+APIServices --> APIClient
+
+APIClient --> SpringApp
+AuthService --> AuthController
+NotificationService --> NotificationController
+
+SpringApp --> SecurityConfig
+SpringApp --> JWTAuth
+SpringApp --> Controllers
+SpringApp --> Services
+SpringApp --> DataAccess
+
+Controllers --> AuthController
+Controllers --> AppointmentController
+Controllers --> NotificationController
+Controllers --> ARVController
+Controllers --> UserController
+
+Services --> AuthServiceBackend
+Services --> AppointmentService
+Services --> NotificationServiceBackend
+Services --> ARVService
+Services --> UserService
+Services --> EmailService
+
+DataAccess --> UserRepo
+DataAccess --> AppointmentRepo
+DataAccess --> NotificationRepo
+DataAccess --> ARVRepo
+
+AuthServiceBackend --> UserRepo
+AppointmentService --> AppointmentRepo
+NotificationServiceBackend --> NotificationRepo
+ARVService --> ARVRepo
+UserService --> UserRepo
+
+UserRepo --> UserEntity
+AppointmentRepo --> AppointmentEntity
+NotificationRepo --> NotificationEntity
+ARVRepo --> ARVEntity
+
+DataAccess --> Database
+UserEntity --> UserTables
+AppointmentEntity --> AppointmentTables
+NotificationEntity --> NotificationTables
+ARVEntity --> ARVTables
+
+EmailService --> EmailProvider
+NotificationServiceBackend --> SMSProvider
+
+AuthContext --> JWTAuth
+SecurityConfig --> JWTAuth
+
+@enduml

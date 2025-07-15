@@ -28,7 +28,7 @@ const DoctorDetail = () => {
         setAppointments(appRes.data);
         setSlots(slotRes.data);
       } catch (err) {
-        setError('Không thể tải thông tin chi tiết bác sĩ.');
+        setError('Doctor record not found');
       } finally {
         setLoading(false);
       }
@@ -36,14 +36,14 @@ const DoctorDetail = () => {
     fetchData();
   }, [userId]);
 
-  if (loading) return <div>Đang tải thông tin...</div>;
+  if (loading) return <div>Loading doctor infromation...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
-  if (!profile) return <div>Không tìm thấy hồ sơ bác sĩ.</div>;
+  if (!profile) return <div>Doctor information not found</div>;
 
   return (
     <div className="patient-detail-container">
       <Link to="/manager" className="patient-detail-back">
-        <span style={{ fontSize: 20, marginRight: 8 }}>&larr;</span> Quay lại danh sách
+        <span style={{ fontSize: 20, marginRight: 8 }}>&larr;</span> Return to dashboard
       </Link>
       <div className="patient-detail-card">
         <div className="patient-detail-flex">
@@ -62,10 +62,10 @@ const DoctorDetail = () => {
             <div className="patient-detail-username">{profile.username}</div>
           </div>
           <div className="patient-detail-info">
-            <h2 className="patient-detail-title">Thông tin bác sĩ</h2>
+            <h2 className="patient-detail-title">Doctor information</h2>
             <div className="patient-detail-grid">
               <div>
-                <div className="patient-detail-label">Họ tên</div>
+                <div className="patient-detail-label">Full name</div>
                 <div className="patient-detail-value">{profile.firstName} {profile.lastName}</div>
               </div>
               <div>
@@ -73,15 +73,15 @@ const DoctorDetail = () => {
                 <div className="patient-detail-value">{profile.email}</div>
               </div>
               <div>
-                <div className="patient-detail-label">Chuyên khoa</div>
+                <div className="patient-detail-label">Specialty</div>
                 <div className="patient-detail-value">{profile.specialty || '-'}</div>
               </div>
               <div>
-                <div className="patient-detail-label">Số điện thoại</div>
+                <div className="patient-detail-label">Phone number</div>
                 <div className="patient-detail-value">{profile.phoneNumber || '-'}</div>
               </div>
               <div>
-                <div className="patient-detail-label">Trạng thái</div>
+                <div className="patient-detail-label">Status</div>
                 <div className="patient-detail-value">
                   {profile.isActive === true ? <span className="patient-detail-status-active">Active</span> : profile.isActive === false ? <span className="patient-detail-status-inactive">Inactive</span> : '-'}
                 </div>
@@ -91,21 +91,21 @@ const DoctorDetail = () => {
         </div>
       </div>
       <div className="patient-detail-records-card">
-        <h3 className="patient-detail-records-title">Phác đồ ARV do bác sĩ tạo</h3>
+        <h3 className="patient-detail-records-title">ARV regimen made by this doctor</h3>
         {arvTreatments.length === 0 ? (
-          <div className="patient-detail-records-empty">Không có phác đồ ARV.</div>
+          <div className="patient-detail-records-empty">There is no ARV regimen</div>
         ) : (
           <div className="patient-detail-table-wrapper">
             <table className="patient-detail-table">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Bệnh nhân</th>
-                  <th>Phác đồ</th>
-                  <th>Ngày bắt đầu</th>
-                  <th>Ngày kết thúc</th>
-                  <th>Ghi chú</th>
-                  <th>Loại</th>
+                  <th>Patient</th>
+                  <th>Regimen</th>
+                  <th>Start date</th>
+                  <th>End date</th>
+                  <th>Note</th>
+                  <th>Type</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,17 +134,17 @@ const DoctorDetail = () => {
       <div className="patient-detail-records-card">
         <h3 className="patient-detail-records-title">Appointments</h3>
         {appointments.length === 0 ? (
-          <div className="patient-detail-records-empty">Không có appointment.</div>
+          <div className="patient-detail-records-empty">There is no appointment</div>
         ) : (
           <div className="patient-detail-table-wrapper">
             <table className="patient-detail-table">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Bệnh nhân</th>
-                  <th>Thời gian</th>
-                  <th>Trạng thái</th>
-                  <th>Ghi chú</th>
+                  <th>Patient</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Note</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,17 +165,17 @@ const DoctorDetail = () => {
       <div className="patient-detail-records-card">
         <h3 className="patient-detail-records-title">Doctor Availability Slots</h3>
         {slots.length === 0 ? (
-          <div className="patient-detail-records-empty">Không có slot nào.</div>
+          <div className="patient-detail-records-empty">There is no available slot</div>
         ) : (
           <div className="patient-detail-table-wrapper">
             <table className="patient-detail-table">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Ngày</th>
-                  <th>Giờ bắt đầu</th>
-                  <th>Giờ kết thúc</th>
-                  <th>Trạng thái</th>
+                  <th>Date</th>
+                  <th>Start time</th>
+                  <th>End time</th>
+                  <th>Status</th>
                   <th>Booked By (Name)</th>
                   <th>Username</th>
                   <th>Email</th>

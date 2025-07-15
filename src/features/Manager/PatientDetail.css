@@ -100,55 +100,6 @@
   color: #dc2626;
 }
 
-.patient-detail-records-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px #e5e7eb;
-  padding: 32px;
-}
-.patient-detail-records-title {
-  color: #059669;
-  font-weight: 700;
-  font-size: 22px;
-  margin-bottom: 18px;
-}
-.patient-detail-records-empty {
-  color: #6b7280;
-  font-size: 16px;
-}
-.patient-detail-table-wrapper {
-  overflow-x: auto;
-}
-.patient-detail-table {
-  width: 100%;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px #e2e8f0;
-  margin-bottom: 0;
-  border-collapse: collapse;
-}
-.patient-detail-table thead tr {
-  background: #f1f5f9;
-}
-.patient-detail-table th {
-  padding: 10px;
-  font-weight: 600;
-  color: #374151;
-  font-size: 15px;
-}
-.patient-detail-table td {
-  padding: 10px;
-}
-.patient-detail-table tbody tr {
-  border-bottom: 1px solid #f1f5f9;
-}
-.patient-detail-table td {
-  text-align: left;
-}
-.patient-detail-table td:first-child {
-  text-align: center;
-}
-
 /* Responsive */
 @media (max-width: 700px) {
   .patient-detail-flex {
@@ -156,14 +107,11 @@
     gap: 18px;
     align-items: flex-start;
   }
-  .patient-detail-card, .patient-detail-records-card {
+  .patient-detail-card {
     padding: 16px;
   }
   .patient-detail-title {
     font-size: 22px;
-  }
-  .patient-detail-records-title {
-    font-size: 18px;
   }
   .patient-detail-avatar-img, .patient-detail-avatar-placeholder {
     width: 100px;

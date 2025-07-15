@@ -1,0 +1,258 @@
+erDiagram
+    %% Core User Management
+    Users {
+        int UserID PK
+        string Username UK
+        string PasswordHash
+        string Email UK
+        string FirstName
+        string LastName
+        string Specialty
+        int RoleID FK
+        bit IsActive
+        datetime2 CreatedAt
+        datetime2 UpdatedAt
+    }
+    
+    Roles {
+        int RoleID PK
+        string RoleName UK
+    }
+    
+    DoctorProfiles {
+        int DoctorProfileID PK
+        int UserID FK,UK
+        string FirstName
+        string LastName
+        int SpecialtyID FK
+        string PhoneNumber
+        string Bio
+        string ProfileImageBase64
+    }
+    
+    PatientProfiles {
+        int PatientProfileID PK
+        int UserID FK,UK
+        string FirstName
+        string LastName
+        date DateOfBirth
+        string PhoneNumber
+        string Address
+        string ProfileImageBase64
+        bit IsPrivate
+    }
+    
+    Specialties {
+        int SpecialtyID PK
+        string SpecialtyName UK
+        string Description
+        bit IsActive
+    }
+    
+    %% Appointment Management
+    DoctorAvailabilitySlots {
+        int AvailabilitySlotID PK
+        int DoctorUserID FK
+        date SlotDate
+        time StartTime
+        time EndTime
+        bit IsBooked
+        string Notes
+        datetime2 CreatedAt
+        datetime2 UpdatedAt
+    }
+    
+    Appointments {
+        int AppointmentID PK
+        int PatientUserID FK
+        int DoctorUserID FK
+        int AvailabilitySlotID FK
+        datetime2 AppointmentDateTime
+        int DurationMinutes
+        string Status
+        string PatientCancellationReason
+        string DoctorCancellationReason
+        string AppointmentNotes
+        datetime2 CreatedAt
+        datetime2 UpdatedAt
+    }
+    
+    AppointmentStatusHistory {
+        int StatusHistoryID PK
+        int AppointmentID FK
+        string OldStatus
+        string NewStatus
+        string ChangeReason
+        datetime2 ChangedAt
+        int ChangedByUserID FK
+    }
+    
+    %% Patient Records & Treatment
+    PatientRecords {
+        int RecordID PK
+        int PatientUserID FK
+        string MedicalHistory
+        string Allergies
+        string CurrentMedications
+        string Notes
+        string BloodType
+        string EmergencyContact
+        string EmergencyPhone
+        string ProfileImageBase64
+        datetime2 CreatedAt
+        datetime2 UpdatedAt
+    }
+    
+    ARVTreatments {
+        int ARVTreatmentID PK
+        int PatientUserID FK
+        int DoctorUserID FK
+        int AppointmentID FK
+        string Regimen
+        date StartDate
+        date EndDate
+        string Adherence
+        string SideEffects
+        string Notes
+        bit IsActive
+        datetime2 CreatedAt
+        datetime2 UpdatedAt
+    }
+    
+    %% Notification System
+    Notifications {
+        int NotificationID PK
+        int UserID FK
+        string Type
+        string Title
+        string Message
+        bit IsRead
+        string Priority
+        int RelatedEntityID
+        string RelatedEntityType
+        datetime2 ScheduledFor
+        datetime2 SentAt
+        datetime2 CreatedAt
+        datetime2 UpdatedAt
+        bigint templateId FK
+        string status
+    }
+    
+    NotificationTemplates {
+        bigint templateId PK
+        string name
+        string type
+        string subject
+        string body
+        string Priority
+        bit isActive
+        datetime2 createdAt
+        datetime2 updatedAt
+    }
+    
+    %% Medication Management
+    MedicationRoutines {
+        int RoutineID PK
+        int PatientUserID FK
+        int DoctorUserID FK
+        int ARVTreatmentID FK
+        string MedicationName
+        string Dosage
+        string Instructions
+        date StartDate
+        date EndDate
+        time TimeOfDay
+        bit IsActive
+        bit ReminderEnabled
+        int ReminderMinutesBefore
+        datetime2 LastReminderSentAt
+        datetime2 CreatedAt
+        datetime2 UpdatedAt
+    }
+    
+    MedicationReminders {
+        int ReminderID PK
+        int RoutineID FK
+        int PatientUserID FK
+        date ReminderDate
+        time ReminderTime
+        string Status
+        datetime2 SentAt
+        datetime2 AcknowledgedAt
+        datetime2 CreatedAt
+    }
+    
+    AppointmentReminders {
+        int ReminderID PK
+        int AppointmentID FK
+        int PatientUserID FK
+        string ReminderType
+        datetime2 ReminderDateTime
+        string Status
+        datetime2 SentAt
+        datetime2 AcknowledgedAt
+        datetime2 CreatedAt
+    }
+    
+    %% Security & System
+    LoginActivity {
+        bigint LogID PK
+        int UserID FK
+        string UsernameAttempted
+        datetime2 AttemptTime
+        bit IsSuccess
+        string IPAddress
+        string UserAgent
+    }
+    
+    PasswordResetTokens {
+        int TokenID PK
+        int UserID FK
+        string Token UK
+        datetime2 ExpiryDateTime
+        bit IsUsed
+        datetime2 CreatedAt
+    }
+    
+    SystemSettings {
+        int SettingID PK
+        string SettingKey UK
+        string SettingValue
+        string Description
+        datetime2 UpdatedAt
+        int UpdatedByUserID FK
+    }
+    
+    %% Relationships
+    Users ||--o{ DoctorProfiles : "has"
+    Users ||--o{ PatientProfiles : "has"
+    Users }o--|| Roles : "belongs to"
+    DoctorProfiles }o--|| Specialties : "has"
+    
+    Users ||--o{ DoctorAvailabilitySlots : "creates"
+    Users ||--o{ Appointments : "patient"
+    Users ||--o{ Appointments : "doctor"
+    DoctorAvailabilitySlots ||--o{ Appointments : "uses"
+    
+    Appointments ||--o{ AppointmentStatusHistory : "has history"
+    Users ||--o{ AppointmentStatusHistory : "changed by"
+    
+    Users ||--o{ PatientRecords : "has"
+    Users ||--o{ ARVTreatments : "patient"
+    Users ||--o{ ARVTreatments : "doctor"
+    Appointments ||--o{ ARVTreatments : "prescribed in"
+    
+    Users ||--o{ Notifications : "receives"
+    NotificationTemplates ||--o{ Notifications : "uses"
+    
+    Users ||--o{ MedicationRoutines : "patient"
+    Users ||--o{ MedicationRoutines : "doctor"
+    ARVTreatments ||--o{ MedicationRoutines : "includes"
+    MedicationRoutines ||--o{ MedicationReminders : "generates"
+    
+    Appointments ||--o{ AppointmentReminders : "generates"
+    Users ||--o{ AppointmentReminders : "receives"
+    
+    Users ||--o{ LoginActivity : "logs"
+    Users ||--o{ PasswordResetTokens : "requests"
+    Users ||--o{ SystemSettings : "updates"

@@ -1,0 +1,145 @@
+sequenceDiagram
+    participant Scheduler as NotificationSchedulingService
+    participant NotifSvc as NotificationService
+    participant TemplSvc as NotificationTemplateService
+    participant DoctorSvc as DoctorNotificationService
+    participant NotifRepo as NotificationRepository
+    participant TemplRepo as NotificationTemplateRepository
+    participant AppRepo as AppointmentRepository
+    participant MedRepo as MedicationRoutineRepository
+    participant DB as SQL Server Database
+    participant Patient as Patient (React)
+
+    Note over Scheduler, Patient: Scheduled Notification Processing
+
+    Scheduler->>NotifSvc: processScheduledNotifications()
+    NotifSvc->>NotifRepo: findScheduledNotifications(currentDateTime)
+    NotifRepo->>DB: SELECT notifications WHERE scheduledFor <= NOW()
+    DB-->>NotifRepo: List<Notification>
+    NotifRepo-->>NotifSvc: Pending notifications
+    
+    loop For each pending notification
+        NotifSvc->>NotifSvc: sendNotification(notification)
+        NotifSvc->>NotifRepo: updateNotificationStatus(notificationId, "SENT")
+        NotifRepo->>DB: UPDATE Notifications SET status = 'SENT', sentAt = NOW()
+        DB-->>NotifRepo: Success
+    end
+    
+    NotifSvc-->>Scheduler: Processing complete
+
+    Note over Scheduler, Patient: Appointment Reminder Generation
+
+    Scheduler->>Scheduler: processAppointmentReminders()
+    Scheduler->>AppRepo: findUpcomingAppointments(next24Hours)
+    AppRepo->>DB: SELECT appointments WHERE appointmentDateTime BETWEEN NOW() AND NOW() + 24 HOURS
+    DB-->>AppRepo: List<Appointment>
+    AppRepo-->>Scheduler: Upcoming appointments
+    
+    loop For each upcoming appointment
+        Scheduler->>NotifSvc: createAppointmentReminder(appointment)
+        NotifSvc->>TemplSvc: getTemplatesByType(APPOINTMENT_REMINDER)
+        TemplSvc->>TemplRepo: findByTypeAndIsActiveTrue(APPOINTMENT_REMINDER)
+        TemplRepo->>DB: SELECT templates WHERE type = 'APPOINTMENT_REMINDER'
+        DB-->>TemplRepo: List<NotificationTemplate>
+        TemplRepo-->>TemplSvc: Templates
+        TemplSvc-->>NotifSvc: Default appointment template
+        
+        NotifSvc->>NotifSvc: processTemplate(template, appointmentData)
+        NotifSvc->>NotifRepo: save(appointmentReminder)
+        NotifRepo->>DB: INSERT INTO Notifications
+        DB-->>NotifRepo: Notification created
+    end
+
+    Note over Scheduler, Patient: Medication Reminder Generation
+
+    Scheduler->>Scheduler: processMedicationReminders()
+    Scheduler->>MedRepo: findActiveRoutinesForToday()
+    MedRepo->>DB: SELECT routines WHERE isActive = 1 AND reminderEnabled = 1
+    DB-->>MedRepo: List<MedicationRoutine>
+    MedRepo-->>Scheduler: Active medication routines
+    
+    loop For each medication routine
+        Scheduler->>NotifSvc: createMedicationReminder(routine)
+        NotifSvc->>TemplSvc: getTemplatesByType(MEDICATION_REMINDER)
+        TemplSvc->>TemplRepo: findByTypeAndIsActiveTrue(MEDICATION_REMINDER)
+        TemplRepo->>DB: SELECT templates WHERE type = 'MEDICATION_REMINDER'
+        DB-->>TemplRepo: List<NotificationTemplate>
+        TemplRepo-->>TemplSvc: Templates
+        TemplSvc-->>NotifSvc: Default medication template
+        
+        NotifSvc->>NotifSvc: processTemplate(template, medicationData)
+        NotifSvc->>NotifRepo: save(medicationReminder)
+        NotifRepo->>DB: INSERT INTO Notifications
+        DB-->>NotifRepo: Notification created
+    end
+
+    Note over Scheduler, Patient: Doctor-to-Patient Notification
+
+    Patient->>DoctorSvc: sendNotificationToPatient(request)
+    Note right of Patient: Doctor sends custom notification
+    DoctorSvc->>DoctorSvc: validateDoctorPatientRelationship(doctorId, patientId)
+    DoctorSvc->>AppRepo: findAppointmentsBetween(doctorId, patientId)
+    AppRepo->>DB: SELECT appointments WHERE doctorId = ? AND patientId = ?
+    DB-->>AppRepo: List<Appointment>
+    AppRepo-->>DoctorSvc: Appointment history found
+    
+    alt Doctor-patient relationship exists
+        DoctorSvc->>TemplSvc: getTemplateById(templateId)
+        TemplSvc->>TemplRepo: findById(templateId)
+        TemplRepo->>DB: SELECT template WHERE templateId = ?
+        DB-->>TemplRepo: NotificationTemplate
+        TemplRepo-->>TemplSvc: Template
+        TemplSvc-->>DoctorSvc: NotificationTemplate
+        
+        DoctorSvc->>NotifSvc: createNotification(notificationRequest)
+        NotifSvc->>NotifSvc: processTemplate(template, customData)
+        NotifSvc->>NotifRepo: save(notification)
+        NotifRepo->>DB: INSERT INTO Notifications
+        DB-->>NotifRepo: Notification created
+        
+        DoctorSvc-->>Patient: Notification sent successfully
+    else No doctor-patient relationship
+        DoctorSvc-->>Patient: 403 Forbidden - No relationship
+    end
+
+    Note over Scheduler, Patient: Patient Notification Retrieval
+
+    Patient->>NotifSvc: getNotificationsByUser(userId, pageable)
+    NotifSvc->>NotifRepo: findByUserIdAndIsReadFalse(userId, pageable)
+    NotifRepo->>DB: SELECT notifications WHERE userId = ? AND isRead = 0
+    DB-->>NotifRepo: Page<Notification>
+    NotifRepo-->>NotifSvc: Unread notifications
+    NotifSvc-->>Patient: Paginated notification list
+
+    Patient->>NotifSvc: markNotificationAsRead(notificationId, userId)
+    NotifSvc->>NotifRepo: updateNotificationAsRead(notificationId, userId)
+    NotifRepo->>DB: UPDATE Notifications SET isRead = 1 WHERE id = ? AND userId = ?
+    DB-->>NotifRepo: Success
+    NotifSvc-->>Patient: Notification marked as read
+
+    Note over Scheduler, Patient: Template Management
+
+    Patient->>TemplSvc: createTemplate(templateRequest)
+    Note right of Patient: Admin creates new template
+    TemplSvc->>TemplSvc: validateTemplate(templateRequest)
+    TemplSvc->>TemplRepo: save(template)
+    TemplRepo->>DB: INSERT INTO NotificationTemplates
+    DB-->>TemplRepo: Template created
+    TemplRepo-->>TemplSvc: NotificationTemplate
+    TemplSvc-->>Patient: Template created successfully
+
+    Patient->>TemplSvc: getTemplatesByType(type)
+    TemplSvc->>TemplRepo: findByTypeAndIsActiveTrue(type)
+    TemplRepo->>DB: SELECT templates WHERE type = ? AND isActive = 1
+    DB-->>TemplRepo: List<NotificationTemplate>
+    TemplRepo-->>TemplSvc: Templates
+    TemplSvc-->>Patient: Available templates
+
+    Note over Scheduler, Patient: Cleanup Process
+
+    Scheduler->>Scheduler: cleanupExpiredNotifications()
+    Scheduler->>NotifSvc: deleteExpiredNotifications()
+    NotifSvc->>NotifRepo: deleteByCreatedAtBefore(30DaysAgo)
+    NotifRepo->>DB: DELETE FROM Notifications WHERE createdAt < ?
+    DB-->>NotifRepo: Cleanup completed
+    NotifSvc-->>Scheduler: Expired notifications cleaned up

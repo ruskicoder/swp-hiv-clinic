@@ -353,6 +353,25 @@ const ManagerDashboard = () => {
           >
             <span>⬇️</span> Export Appointments
           </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('doctor-profiles')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem', 
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Doctor Profiles
+          </button>
         </div>
       </div>
       
@@ -394,7 +413,7 @@ const ManagerDashboard = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search patients by name or email..."
+          placeholder="Search patients by name"
           value={patientSearch}
           onChange={handlePatientSearchChange}
           onKeyDown={handlePatientSearchKeyDown}
@@ -467,7 +486,7 @@ const ManagerDashboard = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search doctors by name or specialty..."
+          placeholder="Search doctors by name"
           value={doctorSearch}
           onChange={handleDoctorSearchChange}
           onKeyDown={handleDoctorSearchKeyDown}
