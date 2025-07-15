@@ -15,7 +15,8 @@ const Register = () => {
     confirmPassword: '',
     firstName: '',
     lastName: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    gender: ''
   });
   
   const [errors, setErrors] = useState({});
@@ -69,6 +70,10 @@ const Register = () => {
 
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = 'Gender selection is required';
     }
 
     // Check username availability
@@ -232,6 +237,28 @@ const Register = () => {
               onChange={handleChange}
               disabled={loading}
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="gender">Gender *</label>
+            <select
+              id="gender"
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              disabled={loading}
+              required
+              aria-describedby={errors.gender ? 'gender-error' : undefined}
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            {errors.gender && (
+              <span id="gender-error" className="field-error" role="alert">
+                {errors.gender}
+              </span>
+            )}
           </div>
 
           <div className="form-group">

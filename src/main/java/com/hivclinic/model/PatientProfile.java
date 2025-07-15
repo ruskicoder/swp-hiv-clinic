@@ -1,6 +1,7 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
@@ -34,8 +35,9 @@ public class PatientProfile {
     @Column(name = "Address", columnDefinition = "NVARCHAR(MAX)")
     private String address;
 
-    @Column(name = "Gender", length = 10)
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Gender", length = 20)
+    private Gender gender;
 
     @Lob
     @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
@@ -67,7 +69,7 @@ public class PatientProfile {
     public String getPhoneNumber() { return phoneNumber; }
     public LocalDate getDateOfBirth() { return dateOfBirth; }
     public String getAddress() { return address; }
-    public String getGender() { return gender; }
+    public Gender getGender() { return gender; }
     public String getProfileImageBase64() { return profileImageBase64; }
     public Boolean isPrivate() { return isPrivate; }
     public Boolean getIsPrivate() { return isPrivate; }
@@ -85,7 +87,17 @@ public class PatientProfile {
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
     public void setAddress(String address) { this.address = address; }
-    public void setGender(String gender) { this.gender = gender; }
+    public void setGender(Gender gender) { this.gender = gender; }
+    
+    // Helper method for string conversion (for compatibility)
+    public void setGenderFromString(String genderString) {
+        this.gender = Gender.fromString(genderString);
+    }
+    
+    // Helper method for string conversion (for compatibility)
+    public String getGenderAsString() {
+        return gender != null ? gender.getDisplayName() : null;
+    }
     public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
     public void setIsPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }
     public void setPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }  // Added method to match service usage

@@ -1,0 +1,162 @@
+@startuml
+left to right direction
+
+' Style settings for clarity
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor #F3E5F5
+    BorderColor #4A148C
+    ArrowColor #4A148C
+}
+skinparam actor {
+    BackgroundColor #E1F5FE
+    BorderColor #01579B
+}
+skinparam note {
+    BackgroundColor #FFF9C4
+    BorderColor #F57F17
+}
+
+' ====== ACTORS ======
+actor "Unauthenticated User" as Guest
+actor "Patient" as Patient
+actor "Doctor" as Doctor
+actor "Admin" as Admin
+actor "Manager" as Manager
+
+package "HIV Clinic Management System" {
+
+    package "Authentication & Profile Management" {
+        usecase "UC_001: User Registration" as UC_001
+        usecase "UC_002: User Login" as UC_002
+        usecase "UC_003: Update Profile" as UC_003
+        usecase "UC_004: Change Password" as UC_004
+        usecase "UC_005: Logout" as UC_005
+    }
+
+    package "Patient Services" {
+        usecase "UC_006: View Dashboard" as UC_006
+        usecase "UC_007: Book Appointment" as UC_007
+        usecase "UC_008: View Appointments" as UC_008
+        usecase "UC_009: Cancel Appointment" as UC_009
+        usecase "UC_010: View Patient Records" as UC_010
+        usecase "UC_011: Update Patient Records" as UC_011
+        usecase "UC_012: View ARV Treatments" as UC_012
+    }
+
+    package "Doctor Services" {
+        usecase "UC_013: View Doctor Dashboard" as UC_013
+        usecase "UC_014: Manage Appointments" as UC_014
+        usecase "UC_015: Update Appointment Status" as UC_015
+        usecase "UC_016: Manage Availability Slots" as UC_016
+        usecase "UC_017: Access Patient Records" as UC_017
+        usecase "UC_018: Manage ARV Treatments" as UC_018
+        usecase "UC_019: Send Notifications" as UC_019
+        usecase "UC_020: View Notification History" as UC_020
+        usecase "UC_021: Manage Notification Templates" as UC_021
+    }
+
+    package "Admin Services" {
+        usecase "UC_022: View Admin Dashboard" as UC_022
+        usecase "UC_023: Manage Users" as UC_023
+        usecase "UC_024: Manage Patients" as UC_024
+        usecase "UC_025: Manage Doctors" as UC_025
+        usecase "UC_026: Create Doctor Accounts" as UC_026
+        usecase "UC_027: Toggle User Status" as UC_027
+        usecase "UC_028: Reset User Passwords" as UC_028
+        usecase "UC_029: Manage Specialties" as UC_029
+        usecase "UC_030: View All Appointments" as UC_030
+    }
+
+    package "Manager Services" {
+        usecase "UC_031: View Manager Dashboard" as UC_031
+        usecase "UC_032: View Statistics" as UC_032
+        usecase "UC_033: Manage Patient Records" as UC_033
+        usecase "UC_034: Manage Doctor Records" as UC_034
+        usecase "UC_035: Manage ARV Treatments" as UC_035
+        usecase "UC_036: Manage Schedules" as UC_036
+        usecase "UC_037: Search Patients" as UC_037
+        usecase "UC_038: Search Doctors" as UC_038
+        usecase "UC_039: Export Data (CSV)" as UC_039
+        usecase "UC_040: View Patient Details" as UC_040
+        usecase "UC_041: View Doctor Details" as UC_041
+    }
+}
+
+' ====== RELATIONSHIPS ======
+
+' --- Unauthenticated User ---
+Guest --> UC_001
+Guest --> UC_002
+
+' --- Patient User ---
+Patient --> UC_003
+Patient --> UC_004
+Patient --> UC_005
+Patient --> UC_006
+Patient --> UC_007
+Patient --> UC_008
+Patient --> UC_009
+Patient --> UC_010
+Patient --> UC_011
+Patient --> UC_012
+
+' --- Doctor User ---
+Doctor --> UC_003
+Doctor --> UC_004
+Doctor --> UC_005
+Doctor --> UC_013
+Doctor --> UC_014
+Doctor --> UC_015
+Doctor --> UC_016
+Doctor --> UC_017
+Doctor --> UC_018
+Doctor --> UC_019
+Doctor --> UC_020
+Doctor --> UC_021
+
+' --- Admin User ---
+Admin --> UC_003
+Admin --> UC_004
+Admin --> UC_005
+Admin --> UC_022
+Admin --> UC_023
+Admin --> UC_024
+Admin --> UC_025
+Admin --> UC_026
+Admin --> UC_027
+Admin --> UC_028
+Admin --> UC_029
+Admin --> UC_030
+
+' --- Manager User ---
+Manager --> UC_003
+Manager --> UC_004
+Manager --> UC_005
+Manager --> UC_031
+Manager --> UC_032
+Manager --> UC_033
+Manager --> UC_034
+Manager --> UC_035
+Manager --> UC_036
+Manager --> UC_037
+Manager --> UC_038
+Manager --> UC_039
+Manager --> UC_040
+Manager --> UC_041
+
+' --- Include Relationships ---
+UC_003 ..> UC_002 : <<include>>
+UC_006 ..> UC_002 : <<include>>
+UC_007 ..> UC_002 : <<include>>
+UC_013 ..> UC_002 : <<include>>
+UC_022 ..> UC_002 : <<include>>
+UC_031 ..> UC_002 : <<include>>
+
+' --- Extend Relationships ---
+UC_002 <.. UC_004 : <<extend>>
+UC_008 <.. UC_009 : <<extend>>
+UC_014 <.. UC_015 : <<extend>>
+
+@enduml

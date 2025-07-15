@@ -136,7 +136,7 @@ const SlotActionModal = ({
       const response = await fetch(`/api/appointments/${selectedSlot.appointment.appointmentId}/cancel?reason=${encodeURIComponent(reason)}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         }
       });

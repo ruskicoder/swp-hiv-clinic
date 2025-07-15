@@ -10,6 +10,7 @@ import com.hivclinic.dto.response.AuthResponse;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.dto.response.UserProfileResponse;
 import com.hivclinic.model.DoctorProfile;
+import com.hivclinic.model.Gender;
 import com.hivclinic.model.PatientProfile;
 import com.hivclinic.model.Role;
 import com.hivclinic.model.User;
@@ -109,6 +110,10 @@ public class AuthService {
             patientProfile.setFirstName(registerRequest.getFirstName());
             patientProfile.setLastName(registerRequest.getLastName());
             patientProfile.setPhoneNumber(registerRequest.getPhoneNumber());
+            // Set gender (allows null) - convert String to Gender enum
+            if (registerRequest.getGender() != null && !registerRequest.getGender().isEmpty()) {
+                patientProfile.setGender(Gender.fromString(registerRequest.getGender()));
+            }
 
             // Save patient profile
             patientProfileRepository.save(patientProfile);
@@ -248,6 +253,7 @@ public class AuthService {
                     profile.getFirstName(),
                     profile.getLastName(),
                     profile.getPhoneNumber(),
+                    profile.getGender() != null ? profile.getGender().toString() : null,
                     profile.getDateOfBirth(),
                     profile.getAddress(),
                     null, // specialty
@@ -279,6 +285,7 @@ public class AuthService {
                 doctorProfile.getFirstName(),
                 doctorProfile.getLastName(),
                 doctorProfile.getPhoneNumber(),
+                doctorProfile.getGender() != null ? doctorProfile.getGender().toString() : null,
                 null, // dateOfBirth
                 null, // address
                 doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
@@ -298,6 +305,7 @@ public class AuthService {
             null, // firstName
             null, // lastName
             null, // phoneNumber
+            null, // gender
             null, // dateOfBirth
             null, // address
             null, // specialty
@@ -307,10 +315,10 @@ public class AuthService {
     }
 
     /**
-     * Update user profile (firstName, lastName, phoneNumber, etc.)
+     * Update user profile (firstName, lastName, phoneNumber, gender, etc.)
      */
     @Transactional
-    public MessageResponse updateUserProfile(Integer userId, String firstName, String lastName, String phoneNumber, String dateOfBirth, String address, String bio) {
+    public MessageResponse updateUserProfile(Integer userId, String firstName, String lastName, String phoneNumber, String gender, String dateOfBirth, String address, String bio) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return MessageResponse.error("User not found");
@@ -323,9 +331,25 @@ public class AuthService {
                 var profileOpt = patientProfileRepository.findByUser(user);
                 if (profileOpt.isEmpty()) return MessageResponse.error("Patient profile not found");
                 var profile = profileOpt.get();
+                
                 if (firstName != null) profile.setFirstName(firstName);
                 if (lastName != null) profile.setLastName(lastName);
                 if (phoneNumber != null) profile.setPhoneNumber(phoneNumber);
+                
+                // Gender business logic: once set, cannot be null
+                if (gender != null) {
+                    // Validate gender values - only Male and Female allowed
+                    if (!gender.isEmpty() && !java.util.Arrays.asList("Male", "Female").contains(gender)) {
+                        return MessageResponse.error("Invalid gender value. Only 'Male' and 'Female' are allowed.");
+                    }
+                    // If current gender is not null and we're trying to set it to empty, reject
+                    if (profile.getGender() != null && gender.isEmpty()) {
+                        return MessageResponse.error("Gender cannot be unselected once it has been set");
+                    }
+                    // Convert String to Gender enum
+                    profile.setGender(gender.isEmpty() ? null : Gender.fromString(gender));
+                }
+                
                 if (dateOfBirth != null) {
                     try {
                         profile.setDateOfBirth(java.time.LocalDate.parse(dateOfBirth));
@@ -337,9 +361,25 @@ public class AuthService {
                 var profileOpt = doctorProfileRepository.findByUser(user);
                 if (profileOpt.isEmpty()) return MessageResponse.error("Doctor profile not found");
                 var profile = profileOpt.get();
+                
                 if (firstName != null) profile.setFirstName(firstName);
                 if (lastName != null) profile.setLastName(lastName);
                 if (phoneNumber != null) profile.setPhoneNumber(phoneNumber);
+                
+                // Gender business logic: once set, cannot be null
+                if (gender != null) {
+                    // Validate gender values - only Male and Female allowed
+                    if (!gender.isEmpty() && !java.util.Arrays.asList("Male", "Female").contains(gender)) {
+                        return MessageResponse.error("Invalid gender value. Only 'Male' and 'Female' are allowed.");
+                    }
+                    // If current gender is not null and we're trying to set it to empty, reject
+                    if (profile.getGender() != null && gender.isEmpty()) {
+                        return MessageResponse.error("Gender cannot be unselected once it has been set");
+                    }
+                    // Convert String to Gender enum
+                    profile.setGender(gender.isEmpty() ? null : Gender.fromString(gender));
+                }
+                
                 if (bio != null) profile.setBio(bio);
                 doctorProfileRepository.save(profile); // ensure save after update
             }
@@ -456,6 +496,7 @@ public class AuthService {
                 doctorProfile.getFirstName(),
                 doctorProfile.getLastName(),
                 doctorProfile.getPhoneNumber(),
+                doctorProfile.getGender() != null ? doctorProfile.getGender().toString() : null,
                 null, // dateOfBirth
                 null, // address
                 doctorProfile.getSpecialty() != null ? doctorProfile.getSpecialty().getSpecialtyName() : null,
@@ -478,6 +519,7 @@ public class AuthService {
             patientProfile.getFirstName(),
             patientProfile.getLastName(),
             patientProfile.getPhoneNumber(),
+            patientProfile.getGender() != null ? patientProfile.getGender().toString() : null,
             patientProfile.getDateOfBirth(),
             patientProfile.getAddress(),
             null, // specialty (not applicable for patients)

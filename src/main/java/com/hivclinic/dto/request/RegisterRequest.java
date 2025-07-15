@@ -2,11 +2,14 @@ package com.hivclinic.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.hivclinic.validation.PasswordMatch;
+import com.hivclinic.validation.ValidGender;
+import com.hivclinic.model.Gender;
 
 @Data
 @NoArgsConstructor
@@ -42,6 +45,11 @@ public class RegisterRequest {
     @Size(max = 20, message = "Phone number must not exceed 20 characters")
     private String phoneNumber;
 
+    // Required: Gender selection (new users must select gender)
+    @NotNull(message = "Gender selection is required")
+    @ValidGender
+    private String gender;
+
     // For MVP, we'll default to "Patient" role during registration
     // In a more complex system, you might include a role field here
     // private String role = "Patient";
@@ -54,6 +62,7 @@ public class RegisterRequest {
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public String getPhoneNumber() { return phoneNumber; }
+    public String getGender() { return gender; }
 
     // Setters
     public void setUsername(String username) { this.username = username; }
@@ -63,4 +72,21 @@ public class RegisterRequest {
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public void setGender(String gender) { this.gender = gender; }
+    
+    // Helper method to convert to Gender enum
+    public Gender getGenderEnum() {
+        return Gender.fromString(gender);
+    }
+    
+    // Validation method to check if gender is valid
+    public boolean isValidGender() {
+        if (gender == null) return false;
+        try {
+            Gender.fromString(gender);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 }

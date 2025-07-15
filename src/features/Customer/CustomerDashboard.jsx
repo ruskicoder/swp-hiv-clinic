@@ -24,6 +24,8 @@ const CustomerDashboard = () => {
   const [arvTreatments, setArvTreatments] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [doctorSlots, setDoctorSlots] = useState([]);
+  const [userProfile, setUserProfile] = useState(null);
+  const [showGenderNotification, setShowGenderNotification] = useState(false);
 
   // Load dashboard data
   const loadDashboardData = async () => {
@@ -63,6 +65,21 @@ const CustomerDashboard = () => {
       setArvTreatments(response.data || []);
     } catch (err) {
       console.error('Error loading ARV treatments:', err);
+    }
+  };
+
+  // Load user profile to check gender
+  const loadUserProfile = async () => {
+    try {
+      const response = await apiClient.get('/auth/profile');
+      setUserProfile(response.data);
+      
+      // Check if gender is null or empty and show notification
+      if (!response.data?.gender) {
+        setShowGenderNotification(true);
+      }
+    } catch (err) {
+      console.error('Error loading user profile:', err);
     }
   };
 
@@ -210,9 +227,20 @@ const CustomerDashboard = () => {
     navigate('/');
   };
 
+  // Handle navigation to settings
+  const handleGoToSettings = () => {
+    navigate('/settings');
+  };
+
+  // Dismiss gender notification (user acknowledges but doesn't want to update now)
+  const dismissGenderNotification = () => {
+    setShowGenderNotification(false);
+  };
+
   // Load data on component mount
   useEffect(() => {
     loadDashboardData();
+    loadUserProfile(); // Load profile to check gender
     if (activeTab === 'record') {
       loadPatientRecord();
       loadARVTreatments();
@@ -498,11 +526,37 @@ const CustomerDashboard = () => {
 
   return (
     <div className="customer-dashboard">
-      <DashboardHeader 
-        user={user} 
+      <DashboardHeader
+        user={user}
         onLogout={handleLogout}
         title="Patient Dashboard"
       />
+      
+      {/* Gender Update Notification Banner */}
+      {showGenderNotification && (
+        <div className="gender-notification-banner">
+          <div className="gender-notification-content">
+            <span className="gender-notification-icon">⚠️</span>
+            <div className="gender-notification-text">
+              <strong>Profile Incomplete:</strong> Please update your gender in Settings to complete your profile.
+            </div>
+            <div className="gender-notification-actions">
+              <button
+                onClick={handleGoToSettings}
+                className="gender-btn primary"
+              >
+                Go to Settings
+              </button>
+              <button
+                onClick={dismissGenderNotification}
+                className="gender-btn secondary"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="dashboard-layout">
         <div className="dashboard-sidebar">

@@ -46,6 +46,7 @@ CREATE TABLE DoctorProfiles (
     SpecialtyID INT FOREIGN KEY REFERENCES Specialties(SpecialtyID),
     PhoneNumber NVARCHAR(20),
     Bio NVARCHAR(MAX),
+    Gender NVARCHAR(10),
     ProfileImageBase64 NVARCHAR(MAX)
 );
 
@@ -58,6 +59,7 @@ CREATE TABLE PatientProfiles (
     DateOfBirth DATE,
     PhoneNumber NVARCHAR(20),
     Address NVARCHAR(MAX),
+    Gender NVARCHAR(10),
     ProfileImageBase64 NVARCHAR(MAX),
     IsPrivate BIT NOT NULL DEFAULT 0
 );
