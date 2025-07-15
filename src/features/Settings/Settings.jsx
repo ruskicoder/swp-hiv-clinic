@@ -441,10 +441,9 @@ const Settings = () => {
             onChange={handleProfileChange}
             disabled={!isEditing || loading}
           >
-            <option value="">Select Gender (Optional)</option>
+            {!profileData.gender && <option value="">Select Gender (Optional)</option>}
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-            <option value="Prefer not to say">Prefer not to say</option>
           </select>
           {profileData.gender && (
             <small className="form-help">

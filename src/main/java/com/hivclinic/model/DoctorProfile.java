@@ -34,8 +34,9 @@ public class DoctorProfile {
     @Column(name = "Bio", columnDefinition = "NVARCHAR(MAX)")
     private String bio;
 
-    @Column(name = "Gender", length = 10)
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Gender", length = 20)
+    private Gender gender;
 
     @Lob
     @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
@@ -49,7 +50,7 @@ public class DoctorProfile {
     public Specialty getSpecialty() { return specialty; }
     public String getPhoneNumber() { return phoneNumber; }
     public String getBio() { return bio; }
-    public String getGender() { return gender; }
+    public Gender getGender() { return gender; }
     public String getProfileImageBase64() { return profileImageBase64; }
 
     // Setters
@@ -60,6 +61,16 @@ public class DoctorProfile {
     public void setSpecialty(Specialty specialty) { this.specialty = specialty; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public void setBio(String bio) { this.bio = bio; }
-    public void setGender(String gender) { this.gender = gender; }
+    public void setGender(Gender gender) { this.gender = gender; }
+    
+    // Helper method for string conversion (for compatibility)
+    public void setGenderFromString(String genderString) {
+        this.gender = Gender.fromString(genderString);
+    }
+    
+    // Helper method for string conversion (for compatibility)
+    public String getGenderAsString() {
+        return gender != null ? gender.getDisplayName() : null;
+    }
     public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
 }
