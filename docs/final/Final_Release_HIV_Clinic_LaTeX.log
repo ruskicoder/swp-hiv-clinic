@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.14)  15 JUL 2025 18:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.7.14)  15 JUL 2025 18:28
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -519,165 +519,105 @@ Underfull \hbox (badness 10000) in paragraph at lines 281--282
 
 
 [7]
-<images/patient_login.png, id=272, 1288.0622pt x 702.37407pt>
-File: images/patient_login.png Graphic file (type png)
-<use images/patient_login.png>
-Package pdftex.def Info: images/patient_login.png  used on input line 350.
-(pdftex.def)             Requested size: 407.66833pt x 222.2993pt.
-
 
 [8]
-<images/patient_register.png, id=293, 1283.54532pt x 696.35156pt>
-File: images/patient_register.png Graphic file (type png)
-<use images/patient_register.png>
-Package pdftex.def Info: images/patient_register.png  used on input line 357.
-(pdftex.def)             Requested size: 407.66833pt x 221.16885pt.
-<images/patient_booking.png, id=294, 1282.7925pt x 696.35156pt>
-File: images/patient_booking.png Graphic file (type png)
-<use images/patient_booking.png>
-Package pdftex.def Info: images/patient_booking.png  used on input line 364.
-(pdftex.def)             Requested size: 407.66833pt x 221.29636pt.
-
 
 [9
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.368 
+l.422 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.368 
-       <./images/patient_login.png> <./images/patient_register.png>]
-<images/patient_dashboard.png, id=303, 1290.32062pt x 703.87968pt>
-File: images/patient_dashboard.png Graphic file (type png)
-<use images/patient_dashboard.png>
-Package pdftex.def Info: images/patient_dashboard.png  used on input line 371.
-(pdftex.def)             Requested size: 407.66833pt x 222.37843pt.
-<images/patient_records.png, id=304, 1294.08469pt x 707.64375pt>
-File: images/patient_records.png Graphic file (type png)
-<use images/patient_records.png>
-Package pdftex.def Info: images/patient_records.png  used on input line 378.
-(pdftex.def)             Requested size: 407.66833pt x 222.91975pt.
-
-
-[10
+l.422 
+      
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.382 
+l.422 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.382 
-       <./images/patient_booking.png> <./images/patient_dashboard.png>]
-<images/doctor_login.png, id=313, 1283.54532pt x 719.68875pt>
-File: images/doctor_login.png Graphic file (type png)
-<use images/doctor_login.png>
-Package pdftex.def Info: images/doctor_login.png  used on input line 398.
-(pdftex.def)             Requested size: 407.66833pt x 228.581pt.
+l.422 
+      ]
 
-
-[11
+[10
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.402 
-       <./images/patient_records.png>]
-<images/doctor_availability.png, id=326, 1281.28688pt x 718.93594pt>
-File: images/doctor_availability.png Graphic file (type png)
-<use images/doctor_availability.png>
-Package pdftex.def Info: images/doctor_availability.png  used on input line 405.
-(pdftex.def)             Requested size: 407.66833pt x 228.73682pt.
-<images/doctor_dashboard.png, id=327, 1276.77pt x 697.10437pt>
-File: images/doctor_dashboard.png Graphic file (type png)
-<use images/doctor_dashboard.png>
-Package pdftex.def Info: images/doctor_dashboard.png  used on input line 412.
-(pdftex.def)             Requested size: 407.66833pt x 222.57802pt.
-
-
-[12
+l.465 
+      
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.416 
-      
+l.465 
+      ]
+
+[11
 pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.416 
-       <./images/doctor_login.png> <./images/doctor_availability.png>]
-<images/doctor_patientview.png, id=336, 1280.53406pt x 705.38531pt>
-File: images/doctor_patientview.png Graphic file (type png)
-<use images/doctor_patientview.png>
-Package pdftex.def Info: images/doctor_patientview.png  used on input line 419.
-(pdftex.def)             Requested size: 407.66833pt x 224.56548pt.
-<images/doctor_treatment.png, id=337, 1291.07344pt x 700.86844pt>
-File: images/doctor_treatment.png Graphic file (type png)
-<use images/doctor_treatment.png>
-Package pdftex.def Info: images/doctor_treatment.png  used on input line 426.
-(pdftex.def)             Requested size: 407.66833pt x 221.29875pt.
-
-
-[13
+l.504     \end{itemize}
+                       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.430 
-      
+l.504     \end{itemize}
+                       ]
+
+[12
 pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.430 
-       <./images/doctor_dashboard.png> <./images/doctor_patientview.png>]
-
-[14
+l.557         \item C
+                     onfigure notification templates
 pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.465 \end{itemize}
-                    <./images/doctor_treatment.png>]
-Underfull \hbox (badness 2165) in paragraph at lines 509--509
+l.557         \item C
+                     onfigure notification templates]
+
+[13]
+Underfull \hbox (badness 2165) in paragraph at lines 618--618
 []|\OT1/cmr/m/n/12 (+20) Database con-nec-tion
  []
 
 
-Underfull \hbox (badness 4391) in paragraph at lines 513--514
+Underfull \hbox (badness 4391) in paragraph at lines 622--623
 []|\OT1/cmr/m/n/12 (+20) Stop ex-ist-ing ser-vice or
  []
 
-[15]
-Underfull \hbox (badness 10000) in paragraph at lines 536--536
+
+Underfull \hbox (badness 10000) in paragraph at lines 645--645
 []|\OT1/cmr/m/n/12 (+20) Operating Sys-
  []
 
+[14]
 
-
-[16]
-
-[17] (./Final_Release_HIV_Clinic_LaTeX.aux)
+[15] (./Final_Release_HIV_Clinic_LaTeX.aux)
  ***********
 LaTeX2e <2025-06-01> patch level 1
 L3 programming layer <2025-07-11>
  ***********
 Package rerunfilecheck Info: File `Final_Release_HIV_Clinic_LaTeX.out' has not changed.
-(rerunfilecheck)             Checksum: EE4E67414314844FD464650121E08C52;5285.
+(rerunfilecheck)             Checksum: 06CF321E1F7B8DA9ABB1BA9163ECD968;5668.
  ) 
 Here is how much of TeX's memory you used:
- 15681 strings out of 469753
- 247897 string characters out of 5480518
- 903075 words of memory out of 5000000
- 43687 multiletter control sequences out of 15000+600000
+ 15618 strings out of 469753
+ 245548 string characters out of 5480518
+ 902541 words of memory out of 5000000
+ 43611 multiletter control sequences out of 15000+600000
  635135 words of font info for 97 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
  75i,12n,79p,1068b,1937s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb><d:/DATA/Programs/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb>
-Output written on Final_Release_HIV_Clinic_LaTeX.pdf (17 pages, 1507001 bytes).
+Output written on Final_Release_HIV_Clinic_LaTeX.pdf (15 pages, 103605 bytes).
 PDF statistics:
- 425 PDF objects out of 1000 (max. 8388607)
- 372 compressed objects within 4 object streams
- 144 named destinations out of 1000 (max. 500000)
- 29515 words of extra memory for PDF output out of 29859 (max. 10000000)
+ 423 PDF objects out of 1000 (max. 8388607)
+ 392 compressed objects within 4 object streams
+ 157 named destinations out of 1000 (max. 500000)
+ 29481 words of extra memory for PDF output out of 29859 (max. 10000000)
 
