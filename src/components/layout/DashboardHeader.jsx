@@ -243,6 +243,21 @@ const DashboardHeader = ({ title, subtitle }) => {
               {isPrivate ? 'Anonymous' : 'Public'}
             </button>
           )}
+
+          {/* Add Refresh Button */}
+          <button
+            className="refresh-btn"
+            onClick={window.location.reload}
+            title="Refresh dashboard"
+            type="button"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+              <path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+            </svg>
+            <span className="btn-text">Refresh</span>
+          </button>
+
           <div className="system-datetime">
             <div className="date">{date}</div>
             <div className="time">{time}</div>

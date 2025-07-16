@@ -135,20 +135,6 @@ public class AuthService {
      */
     public AuthResponse authenticateUser(LoginRequest loginRequest, String ipAddress, String userAgent) {
         try {
-            // Check if account is locked by username before attempting authentication
-            if (loginActivityService.isAccountLockedByUsername(loginRequest.getUsername())) {
-                logger.warn("Login attempt blocked - Account locked for username: {}", loginRequest.getUsername());
-                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
-                throw new RuntimeException("Account temporarily locked due to multiple failed login attempts");
-            }
-            
-            // Check for suspicious IP activity
-            if (ipAddress != null && loginActivityService.isSuspiciousIpActivity(ipAddress)) {
-                logger.warn("Login attempt blocked - Suspicious IP activity from: {}", ipAddress);
-                loginActivityService.logLoginAttempt(loginRequest.getUsername(), false, ipAddress, userAgent);
-                throw new RuntimeException("Login temporarily blocked due to suspicious activity");
-            }
-
             // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(

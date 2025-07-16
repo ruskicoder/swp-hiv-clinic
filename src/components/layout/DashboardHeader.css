@@ -110,6 +110,37 @@
   height: 1.25rem;
 }
 
+/* Refresh Button Styles */
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.refresh-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.refresh-btn:hover svg {
+  transform: rotate(180deg);
+}
+
+.refresh-btn .btn-text {
+  font-size: 14px;
+}
+
 /* System DateTime Styles */
 .system-datetime {
   display: flex;
