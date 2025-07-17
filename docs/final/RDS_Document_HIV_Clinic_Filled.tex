@@ -234,223 +234,389 @@ UC-045 & System Monitoring & Health Monitoring & System monitors application hea
 
 The following table details the functional requirements for each implemented use case:
 
-\begin{longtable}{|p{1cm}|p{2cm}|p{4cm}|p{7cm}|}
+\begin{longtable}{|p{1.2cm}|p{2.5cm}|p{3.5cm}|p{6.8cm}|}
 \hline
 \textbf{UC ID} & \textbf{Priority} & \textbf{Requirement Category} & \textbf{Functional Requirement Specification} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{AUTHENTICATION \& SECURITY REQUIREMENTS}} \\
 \hline
 UC-001 & High & User Registration & 
-\textbullet\ System shall validate email format and uniqueness \\
-\textbullet\ System shall require password confirmation matching \\
-\textbullet\ System shall assign appropriate roles (Patient/Doctor) \\
-\textbullet\ System shall create user profile upon successful registration \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall validate email format and uniqueness
+\item System shall require password confirmation matching
+\item System shall assign appropriate roles (Patient/Doctor)
+\item System shall create user profile upon successful registration
+\end{itemize} \\
 \hline
 UC-002 & High & User Authentication & 
-\textbullet\ System shall authenticate using JWT tokens \\
-\textbullet\ System shall redirect users based on assigned roles \\
-\textbullet\ System shall track login activities with IP and user agent \\
-\textbullet\ System shall maintain secure session management \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall authenticate using JWT tokens
+\item System shall redirect users based on assigned roles
+\item System shall track login activities with IP and user agent
+\item System shall maintain secure session management
+\end{itemize} \\
 \hline
 UC-012 & High & Password Security & 
-\textbullet\ System shall validate current password before change \\
-\textbullet\ System shall require password confirmation \\
-\textbullet\ System shall enforce password strength requirements \\
-\textbullet\ System shall invalidate existing sessions after password change \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall validate current password before change
+\item System shall require password confirmation
+\item System shall enforce password strength requirements
+\item System shall invalidate existing sessions after password change
+\end{itemize} \\
 \hline
 UC-042 & High & Session Management & 
-\textbullet\ System shall validate active sessions \\
-\textbullet\ System shall allow session extension \\
-\textbullet\ System shall support session invalidation \\
-\textbullet\ System shall handle concurrent session management \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall validate active sessions
+\item System shall allow session extension
+\item System shall support session invalidation
+\item System shall handle concurrent session management
+\end{itemize} \\
 \hline
 UC-043 & Medium & Activity Tracking & 
-\textbullet\ System shall log all login attempts \\
-\textbullet\ System shall record IP addresses and user agents \\
-\textbullet\ System shall provide login statistics \\
-\textbullet\ System shall support security audit trails \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall log all login attempts
+\item System shall record IP addresses and user agents
+\item System shall provide login statistics
+\item System shall support security audit trails
+\end{itemize} \\
+\hline
+\multicolumn{4}{|c|}{\textbf{PUBLIC \& GUEST ACCESS REQUIREMENTS}} \\
+\hline
+UC-003 & Medium & Public Website Access & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide public clinic information
+\item System shall display services overview
+\item System shall show contact details and hours
+\item System shall be accessible without authentication
+\end{itemize} \\
+\hline
+UC-004 & Medium & Public Doctor Search & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow searching doctors by specialization
+\item System shall display doctor profiles publicly
+\item System shall show doctor availability information
+\item System shall support filtering by medical specialty
+\end{itemize} \\
+\hline
+\multicolumn{4}{|c|}{\textbf{PATIENT DASHBOARD \& PROFILE REQUIREMENTS}} \\
+\hline
+UC-006 & High & Patient Dashboard & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display personalized patient dashboard
+\item System shall show appointments overview
+\item System shall display treatment status
+\item System shall provide notifications summary
+\end{itemize} \\
+\hline
+UC-011 & High & Profile Management & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow personal information updates
+\item System shall support profile image uploading
+\item System shall validate contact detail formats
+\item System shall maintain account preferences
+\end{itemize} \\
+\hline
+UC-014 & Medium & Privacy Settings & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide privacy preference controls
+\item System shall manage notification settings
+\item System shall control data sharing options
+\item System shall maintain medical information visibility settings
+\end{itemize} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{APPOINTMENT MANAGEMENT REQUIREMENTS}} \\
 \hline
 UC-005 & High & Appointment Booking & 
-\textbullet\ System shall display available doctor slots in real-time \\
-\textbullet\ System shall prevent double-booking of time slots \\
-\textbullet\ System shall confirm appointment creation \\
-\textbullet\ System shall send booking confirmation notifications \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display available doctor slots in real-time
+\item System shall prevent double-booking of time slots
+\item System shall confirm appointment creation
+\item System shall send booking confirmation notifications
+\end{itemize} \\
 \hline
-UC-006 & High & Appointment Viewing & 
-\textbullet\ System shall display patient's appointments chronologically \\
-\textbullet\ System shall show appointment status and details \\
-\textbullet\ System shall filter upcoming vs. historical appointments \\
-\textbullet\ System shall provide appointment search functionality \\
+UC-007 & High & Appointment Viewing & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display patient's appointments chronologically
+\item System shall show appointment status and details
+\item System shall filter upcoming vs. historical appointments
+\item System shall provide appointment search functionality
+\end{itemize} \\
 \hline
-UC-007 & High & Appointment Cancellation & 
-\textbullet\ System shall allow appointment cancellation with reasons \\
-\textbullet\ System shall update appointment status immediately \\
-\textbullet\ System shall notify relevant parties of cancellations \\
-\textbullet\ System shall free up cancelled time slots for rebooking \\
+UC-009 & High & Appointment Cancellation & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow appointment cancellation with reasons
+\item System shall update appointment status immediately
+\item System shall notify relevant parties of cancellations
+\item System shall free up cancelled time slots for rebooking
+\end{itemize} \\
 \hline
 UC-016 & High & Doctor Appointment Management & 
-\textbullet\ System shall display doctor's scheduled appointments \\
-\textbullet\ System shall provide patient information for each appointment \\
-\textbullet\ System shall allow appointment details modification \\
-\textbullet\ System shall support appointment status tracking \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display doctor's scheduled appointments
+\item System shall provide patient information for each appointment
+\item System shall allow appointment details modification
+\item System shall support appointment status tracking
+\end{itemize} \\
 \hline
 UC-017 & High & Appointment Status Updates & 
-\textbullet\ System shall allow status changes (completed, cancelled, rescheduled) \\
-\textbullet\ System shall support clinical notes addition \\
-\textbullet\ System shall track appointment history \\
-\textbullet\ System shall notify patients of status changes \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow status changes (completed, cancelled, rescheduled)
+\item System shall support clinical notes addition
+\item System shall track appointment history
+\item System shall notify patients of status changes
+\end{itemize} \\
 \hline
 UC-018 & High & Availability Management & 
-\textbullet\ System shall allow doctors to create time slots \\
-\textbullet\ System shall support slot modification and deletion \\
-\textbullet\ System shall prevent conflicts in availability \\
-\textbullet\ System shall integrate with appointment booking system \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow doctors to create time slots
+\item System shall support slot modification and deletion
+\item System shall prevent conflicts in availability
+\item System shall integrate with appointment booking system
+\end{itemize} \\
+\hline
+UC-030 & Medium & Admin Appointment Oversight & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display all appointments across the system
+\item System shall provide appointment monitoring capabilities
+\item System shall support system-wide appointment analytics
+\item System shall enable administrative appointment management
+\end{itemize} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{PATIENT CARE \& MEDICAL RECORDS REQUIREMENTS}} \\
 \hline
 UC-008 & High & Medical Records Viewing & 
-\textbullet\ System shall display patient's complete medical history \\
-\textbullet\ System shall show current medications and treatments \\
-\textbullet\ System shall provide secure access to personal health data \\
-\textbullet\ System shall maintain chronological record organization \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display patient's complete medical history
+\item System shall show current medications and treatments
+\item System shall provide secure access to personal health data
+\item System shall maintain chronological record organization
+\end{itemize} \\
 \hline
-UC-009 & High & Medical Records Updates & 
-\textbullet\ System shall allow patients to update personal information \\
-\textbullet\ System shall validate medical information format \\
-\textbullet\ System shall maintain record change history \\
-\textbullet\ System shall ensure data integrity and consistency \\
+UC-015 & High & Doctor Dashboard & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide professional dashboard for doctors
+\item System shall display patient appointments overview
+\item System shall show notifications and alerts
+\item System shall provide clinical tools access
+\end{itemize} \\
 \hline
 UC-019 & High & Doctor Patient Record Access & 
-\textbullet\ System shall provide doctors access to patient records during consultations \\
-\textbullet\ System shall display comprehensive clinical history \\
-\textbullet\ System shall ensure role-based access control \\
-\textbullet\ System shall log all record access for audit purposes \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide doctors access to patient records during consultations
+\item System shall display comprehensive clinical history
+\item System shall ensure role-based access control
+\item System shall log all record access for audit purposes
+\end{itemize} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{HIV TREATMENT \& ARV MANAGEMENT REQUIREMENTS}} \\
 \hline
 UC-010 & High & ARV Treatment Viewing & 
-\textbullet\ System shall display patient's ARV regimens \\
-\textbullet\ System shall show adherence tracking data \\
-\textbullet\ System shall provide medication schedule information \\
-\textbullet\ System shall track treatment progress over time \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display patient's ARV regimens
+\item System shall show adherence tracking data
+\item System shall provide medication schedule information
+\item System shall track treatment progress over time
+\end{itemize} \\
 \hline
 UC-020 & High & ARV Treatment Management & 
-\textbullet\ System shall allow doctors to create treatment regimens \\
-\textbullet\ System shall support treatment modifications \\
-\textbullet\ System shall monitor adherence and side effects \\
-\textbullet\ System shall provide treatment protocol templates \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow doctors to create treatment regimens
+\item System shall support treatment modifications
+\item System shall monitor adherence and side effects
+\item System shall provide treatment protocol templates
+\end{itemize} \\
+\hline
+UC-035 & High & Manager ARV Oversight & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide comprehensive ARV treatment oversight
+\item System shall monitor treatment programs across clinic
+\item System shall generate treatment effectiveness reports
+\item System shall track medication inventory and distribution
+\end{itemize} \\
 \hline
 UC-044 & Medium & Medication Routines & 
-\textbullet\ System shall create medication schedules \\
-\textbullet\ System shall support routine modifications \\
-\textbullet\ System shall provide medication reminders \\
-\textbullet\ System shall track medication compliance \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall create medication schedules
+\item System shall support routine modifications
+\item System shall provide medication reminders
+\item System shall track medication compliance
+\end{itemize} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{NOTIFICATION SYSTEM REQUIREMENTS}} \\
 \hline
 UC-013 & High & Patient Notifications & 
-\textbullet\ System shall deliver appointment reminders \\
-\textbullet\ System shall send treatment notifications \\
-\textbullet\ System shall support custom message delivery \\
-\textbullet\ System shall track notification read status \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall deliver appointment reminders
+\item System shall send treatment notifications
+\item System shall support custom message delivery
+\item System shall track notification read status
+\end{itemize} \\
 \hline
 UC-021 & High & Doctor Notification Sending & 
-\textbullet\ System shall allow custom notification creation \\
-\textbullet\ System shall support bulk notification sending \\
-\textbullet\ System shall provide notification scheduling \\
-\textbullet\ System shall track delivery confirmation \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow custom notification creation
+\item System shall support bulk notification sending
+\item System shall provide notification scheduling
+\item System shall track delivery confirmation
+\end{itemize} \\
 \hline
 UC-022 & Medium & Notification Templates & 
-\textbullet\ System shall allow template creation and editing \\
-\textbullet\ System shall support template categorization \\
-\textbullet\ System shall provide template library management \\
-\textbullet\ System shall enable template sharing across doctors \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow template creation and editing
+\item System shall support template categorization
+\item System shall provide template library management
+\item System shall enable template sharing across doctors
+\end{itemize} \\
 \hline
 UC-023 & Medium & Notification History & 
-\textbullet\ System shall maintain notification sending history \\
-\textbullet\ System shall track delivery and read status \\
-\textbullet\ System shall provide notification analytics \\
-\textbullet\ System shall support history search and filtering \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall maintain notification sending history
+\item System shall track delivery and read status
+\item System shall provide notification analytics
+\item System shall support history search and filtering
+\end{itemize} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{ADMINISTRATIVE REQUIREMENTS}} \\
 \hline
+UC-024 & High & Admin Dashboard & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide administrative dashboard
+\item System shall display system-wide statistics
+\item System shall show user management tools
+\item System shall provide system oversight capabilities
+\end{itemize} \\
+\hline
 UC-025 & High & User Management & 
-\textbullet\ System shall display all system users \\
-\textbullet\ System shall provide user detail management \\
-\textbullet\ System shall support user role assignment \\
-\textbullet\ System shall maintain user status tracking \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall display all system users
+\item System shall provide user detail management
+\item System shall support user role assignment
+\item System shall maintain user status tracking
+\end{itemize} \\
 \hline
 UC-026 & High & Doctor Account Creation & 
-\textbullet\ System shall create doctor accounts with specialized permissions \\
-\textbullet\ System shall assign medical specialties \\
-\textbullet\ System shall set up professional credentials \\
-\textbullet\ System shall integrate with scheduling system \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall create doctor accounts with specialized permissions
+\item System shall assign medical specialties
+\item System shall set up professional credentials
+\item System shall integrate with scheduling system
+\end{itemize} \\
 \hline
 UC-027 & High & Password Reset & 
-\textbullet\ System shall allow admin password resets \\
-\textbullet\ System shall generate secure temporary passwords \\
-\textbullet\ System shall require password change on first login \\
-\textbullet\ System shall notify users of password resets \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow admin password resets
+\item System shall generate secure temporary passwords
+\item System shall require password change on first login
+\item System shall notify users of password resets
+\end{itemize} \\
 \hline
 UC-028 & Medium & Specialty Management & 
-\textbullet\ System shall maintain medical specialty catalog \\
-\textbullet\ System shall support specialty assignment to doctors \\
-\textbullet\ System shall enable specialty-based filtering \\
-\textbullet\ System shall track specialty utilization \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall maintain medical specialty catalog
+\item System shall support specialty assignment to doctors
+\item System shall enable specialty-based filtering
+\item System shall track specialty utilization
+\end{itemize} \\
 \hline
 UC-029 & Medium & User Status Management & 
-\textbullet\ System shall allow user account activation/deactivation \\
-\textbullet\ System shall track status change history \\
-\textbullet\ System shall enforce access control based on status \\
-\textbullet\ System shall notify users of status changes \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall allow user account activation/deactivation
+\item System shall track status change history
+\item System shall enforce access control based on status
+\item System shall notify users of status changes
+\end{itemize} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{MANAGEMENT \& REPORTING REQUIREMENTS}} \\
 \hline
+UC-031 & High & Manager Dashboard & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide operational dashboard for managers
+\item System shall display clinic statistics and analytics
+\item System shall show data management tools
+\item System shall provide operational oversight capabilities
+\end{itemize} \\
+\hline
 UC-032 & High & Statistics Viewing & 
-\textbullet\ System shall calculate real-time clinic statistics \\
-\textbullet\ System shall provide patient and doctor metrics \\
-\textbullet\ System shall show appointment analytics \\
-\textbullet\ System shall display ARV treatment statistics \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall calculate real-time clinic statistics
+\item System shall provide patient and doctor metrics
+\item System shall show appointment analytics
+\item System shall display ARV treatment statistics
+\end{itemize} \\
 \hline
 UC-033 & Medium & Patient Record Management & 
-\textbullet\ System shall provide comprehensive patient record oversight \\
-\textbullet\ System shall support patient data validation \\
-\textbullet\ System shall maintain data integrity checks \\
-\textbullet\ System shall provide patient search capabilities \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide comprehensive patient record oversight
+\item System shall support patient data validation
+\item System shall maintain data integrity checks
+\item System shall provide patient search capabilities
+\end{itemize} \\
 \hline
 UC-034 & Medium & Doctor Record Management & 
-\textbullet\ System shall provide doctor information oversight \\
-\textbullet\ System shall track professional credentials \\
-\textbullet\ System shall manage doctor specialties and schedules \\
-\textbullet\ System shall provide doctor search capabilities \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide doctor information oversight
+\item System shall track professional credentials
+\item System shall manage doctor specialties and schedules
+\item System shall provide doctor search capabilities
+\end{itemize} \\
+\hline
+UC-036 & Medium & Schedule Management & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide clinic scheduling oversight
+\item System shall coordinate appointment distribution
+\item System shall manage availability coordination
+\item System shall optimize resource allocation
+\end{itemize} \\
 \hline
 UC-037 & Medium & Patient Search & 
-\textbullet\ System shall support name-based patient search \\
-\textbullet\ System shall provide filtering capabilities \\
-\textbullet\ System shall return relevant search results \\
-\textbullet\ System shall maintain search performance \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall support name-based patient search
+\item System shall provide filtering capabilities
+\item System shall return relevant search results
+\item System shall maintain search performance
+\end{itemize} \\
 \hline
 UC-038 & Medium & Doctor Search & 
-\textbullet\ System shall support name and specialty-based doctor search \\
-\textbullet\ System shall provide advanced filtering options \\
-\textbullet\ System shall return relevant search results \\
-\textbullet\ System shall integrate with appointment booking \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall support name and specialty-based doctor search
+\item System shall provide advanced filtering options
+\item System shall return relevant search results
+\item System shall integrate with appointment booking
+\end{itemize} \\
 \hline
 UC-039 & Medium & Data Export & 
-\textbullet\ System shall export data in CSV format \\
-\textbullet\ System shall support multiple data types (patients, doctors, appointments, treatments) \\
-\textbullet\ System shall maintain data accuracy in exports \\
-\textbullet\ System shall provide secure download mechanisms \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall export data in CSV format
+\item System shall support multiple data types (patients, doctors, appointments, treatments)
+\item System shall maintain data accuracy in exports
+\item System shall provide secure download mechanisms
+\end{itemize} \\
+\hline
+UC-040 & Medium & Patient Detail Management & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide detailed patient information access
+\item System shall support operational oversight capabilities
+\item System shall maintain compliance monitoring
+\item System shall enable comprehensive data management
+\end{itemize} \\
+\hline
+UC-041 & Medium & Doctor Detail Management & 
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall provide detailed doctor information access
+\item System shall support performance monitoring
+\item System shall enable staff management capabilities
+\item System shall track professional development
+\end{itemize} \\
 \hline
 \multicolumn{4}{|c|}{\textbf{SYSTEM MONITORING \& HEALTH REQUIREMENTS}} \\
 \hline
 UC-045 & Medium & System Health Monitoring & 
-\textbullet\ System shall monitor application health status \\
-\textbullet\ System shall check database connectivity \\
-\textbullet\ System shall provide system status reporting \\
-\textbullet\ System shall alert on system issues \\
+\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
+\item System shall monitor application health status
+\item System shall check database connectivity
+\item System shall provide system status reporting
+\item System shall alert on system issues
+\end{itemize} \\
 \hline
 \end{longtable}
 

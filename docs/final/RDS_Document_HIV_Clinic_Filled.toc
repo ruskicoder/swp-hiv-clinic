@@ -8,35 +8,35 @@
 \contentsline {paragraph}{b. Use Case Descriptions}{7}{section*.6}%
 \contentsline {subsection}{\numberline {1.3}Requirements Specifications}{11}{subsection.1.3}%
 \contentsline {subsubsection}{\numberline {1.3.1}Functional Requirements}{11}{subsubsection.1.3.1}%
-\contentsline {subsubsection}{\numberline {1.3.2}Non-Functional Requirements}{41}{subsubsection.1.3.2}%
-\contentsline {subsection}{\numberline {1.4}System High Level Design}{42}{subsection.1.4}%
-\contentsline {subsubsection}{\numberline {1.4.1}Database Design}{42}{subsubsection.1.4.1}%
-\contentsline {paragraph}{a. Database Schema}{42}{section*.7}%
-\contentsline {paragraph}{b. Table Descriptions}{43}{section*.9}%
-\contentsline {subsubsection}{\numberline {1.4.2}Code Packages}{44}{subsubsection.1.4.2}%
-\contentsline {subsubsection}{\numberline {1.4.3}Data Flow Architecture}{45}{subsubsection.1.4.3}%
-\contentsline {section}{\numberline {2}Requirement Specifications}{45}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Common functions}{45}{subsection.2.1}%
-\contentsline {subsubsection}{\numberline {2.1.1}UC-01 – Register Donor Account}{45}{subsubsection.2.1.1}%
-\contentsline {subsubsection}{\numberline {2.1.2}UC-02 – Log In}{47}{subsubsection.2.1.2}%
-\contentsline {subsubsection}{\numberline {2.1.3}UC-03 – View Hospital Information}{48}{subsubsection.2.1.3}%
-\contentsline {subsubsection}{\numberline {2.1.4}UC-04 – Read Blogs}{49}{subsubsection.2.1.4}%
-\contentsline {subsubsection}{\numberline {2.1.5}UC-05 – Manage Personal Profile}{50}{subsubsection.2.1.5}%
-\contentsline {section}{\numberline {3}Design Specifications}{51}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Authentication System}{51}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}User Login}{51}{subsubsection.3.1.1}%
-\contentsline {paragraph}{UI Design}{51}{section*.11}%
-\contentsline {paragraph}{Database Access}{51}{section*.12}%
-\contentsline {subsection}{\numberline {3.2}Appointment Management}{52}{subsection.3.2}%
-\contentsline {subsubsection}{\numberline {3.2.1}Appointment Booking}{52}{subsubsection.3.2.1}%
-\contentsline {paragraph}{UI Design}{52}{section*.14}%
-\contentsline {paragraph}{Database Access}{52}{section*.15}%
-\contentsline {subsection}{\numberline {3.3}Patient Care System}{53}{subsection.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.1}Patient Records Management}{53}{subsubsection.3.3.1}%
-\contentsline {paragraph}{UI Design}{53}{section*.17}%
-\contentsline {paragraph}{Database Access}{54}{section*.18}%
-\contentsline {section}{\numberline {4}Appendix}{55}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Assumptions \& Dependencies}{55}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Limitations \& Exclusions}{55}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Business Rules}{56}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Technical Specifications}{56}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {1.3.2}Non-Functional Requirements}{20}{subsubsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.4}System High Level Design}{21}{subsection.1.4}%
+\contentsline {subsubsection}{\numberline {1.4.1}Database Design}{21}{subsubsection.1.4.1}%
+\contentsline {paragraph}{a. Database Schema}{21}{section*.7}%
+\contentsline {paragraph}{b. Table Descriptions}{22}{section*.9}%
+\contentsline {subsubsection}{\numberline {1.4.2}Code Packages}{23}{subsubsection.1.4.2}%
+\contentsline {subsubsection}{\numberline {1.4.3}Data Flow Architecture}{24}{subsubsection.1.4.3}%
+\contentsline {section}{\numberline {2}Requirement Specifications}{24}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Common functions}{24}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}UC-01 – Register Donor Account}{24}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}UC-02 – Log In}{26}{subsubsection.2.1.2}%
+\contentsline {subsubsection}{\numberline {2.1.3}UC-03 – View Hospital Information}{27}{subsubsection.2.1.3}%
+\contentsline {subsubsection}{\numberline {2.1.4}UC-04 – Read Blogs}{28}{subsubsection.2.1.4}%
+\contentsline {subsubsection}{\numberline {2.1.5}UC-05 – Manage Personal Profile}{29}{subsubsection.2.1.5}%
+\contentsline {section}{\numberline {3}Design Specifications}{30}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Authentication System}{30}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}User Login}{30}{subsubsection.3.1.1}%
+\contentsline {paragraph}{UI Design}{30}{section*.11}%
+\contentsline {paragraph}{Database Access}{30}{section*.12}%
+\contentsline {subsection}{\numberline {3.2}Appointment Management}{31}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Appointment Booking}{31}{subsubsection.3.2.1}%
+\contentsline {paragraph}{UI Design}{31}{section*.14}%
+\contentsline {paragraph}{Database Access}{31}{section*.15}%
+\contentsline {subsection}{\numberline {3.3}Patient Care System}{32}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Patient Records Management}{32}{subsubsection.3.3.1}%
+\contentsline {paragraph}{UI Design}{32}{section*.17}%
+\contentsline {paragraph}{Database Access}{33}{section*.18}%
+\contentsline {section}{\numberline {4}Appendix}{34}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Assumptions \& Dependencies}{34}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Limitations \& Exclusions}{34}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Business Rules}{35}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Technical Specifications}{35}{subsection.4.4}%
