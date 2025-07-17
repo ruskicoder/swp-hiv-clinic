@@ -1,0 +1,31 @@
+/* ErrorBoundary.css */
+.error-boundary {
+  padding: 2rem;
+  background-color: #ffeaa7;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.error-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.retry-button {
+  background-color: #0984e3;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.error-details {
+  margin-top: 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+  background: #dfe6e9;
+  padding: 1rem;
+  border-radius: 5px;
+}
