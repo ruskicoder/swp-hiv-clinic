@@ -25,22 +25,10 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
 
-  // Reset form when modal opens/closes
-  useEffect(() => {
-    if (isOpen) {
-      resetForm();
-    }
-  }, [isOpen]);
-
-  // Update preview when template or custom message changes
-  useEffect(() => {
-    updatePreview();
-  }, [formData.templateId, formData.customMessage, formData.useCustomMessage, formData.patientIds, updatePreview]);
-
   /**
    * Reset form to initial state
    */
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({
       patientIds: [],
       templateId: '',
@@ -55,53 +43,7 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
     setSelectedTemplate(null);
     setError('');
     setValidationErrors({});
-  };
-
-  /**
-   * Handle form field changes
-   */
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-
-    // Clear validation error for this field
-    if (validationErrors[name]) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  /**
-   * Handle template selection
-   */
-  const handleTemplateChange = (e) => {
-    const templateId = e.target.value;
-    const template = templates.find(t => t.templateId === parseInt(templateId));
-    
-    setFormData(prev => ({
-      ...prev,
-      templateId,
-      subject: template ? template.subject : '',
-      useCustomMessage: false
-    }));
-    
-    setSelectedTemplate(template);
-  };
-
-  /**
-   * Handle patient selection
-   */
-  const handlePatientSelection = (selectedPatientIds) => {
-    setFormData(prev => ({
-      ...prev,
-      patientIds: selectedPatientIds
-    }));
-  };
+  }, []);
 
   /**
    * Update message preview with variable substitution
@@ -156,6 +98,64 @@ const NotificationSendModal = ({ isOpen, onClose, onSend, patients, templates })
 
     setPreviewMessage(preview);
   }, [formData.useCustomMessage, formData.customMessage, selectedTemplate, formData.patientIds, patients]);
+
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen, resetForm]);
+
+  // Update preview when template or custom message changes
+  useEffect(() => {
+    updatePreview();
+  }, [updatePreview]);
+
+  /**
+   * Handle form field changes
+   */
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+
+    // Clear validation error for this field
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  /**
+   * Handle template selection
+   */
+  const handleTemplateChange = (e) => {
+    const templateId = e.target.value;
+    const template = templates.find(t => t.templateId === parseInt(templateId));
+    
+    setFormData(prev => ({
+      ...prev,
+      templateId,
+      subject: template ? template.subject : '',
+      useCustomMessage: false
+    }));
+    
+    setSelectedTemplate(template);
+  };
+
+  /**
+   * Handle patient selection
+   */
+  const handlePatientSelection = (selectedPatientIds) => {
+    setFormData(prev => ({
+      ...prev,
+      patientIds: selectedPatientIds
+    }));
+  };
 
   /**
    * Validate form data

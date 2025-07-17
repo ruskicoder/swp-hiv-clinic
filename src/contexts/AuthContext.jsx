@@ -15,6 +15,34 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Check token and load user profile on mount
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        setLoading(true);
+        const token = sessionStorage.getItem('token');
+        
+        if (token) {
+          try {
+            const userProfile = await authService.getUserProfile();
+            setUser(userProfile);
+          } catch (error) {
+            console.error('Token validation failed:', error);
+            sessionStorage.removeItem('token');
+            setUser(null);
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setError('Failed to initialize authentication');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, []);
+
   /**
    * Enhanced logout function that handles both server and client cleanup
    */
@@ -45,61 +73,6 @@ export const AuthProvider = ({ children }) => {
     extendSession
   } = useSessionMonitor(!!user, logout);
 
-  // Check for existing token on app load - runs only once
-  useEffect(() => {
-    const initializeAuth = async () => {
-      // Set a maximum initialization timeout to prevent indefinite loading
-      const initializationTimeout = setTimeout(() => {
-        console.error('AuthContext initialization timed out after 15 seconds');
-        setLoading(false);
-        setError('Authentication initialization timed out');
-      }, 15000); // 15 second timeout
-      
-      try {
-        setLoading(true);
-        const token = sessionStorage.getItem('token');
-        
-        if (token) {
-          try {
-            // Verify token is still valid by getting user profile with timeout
-            const userProfile = await Promise.race([
-              authService.getUserProfile(),
-              new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('getUserProfile timeout')), 5000)
-              )
-            ]);
-            setUser(userProfile);
-            
-            // Initialize notifications for already logged-in user (non-blocking)
-            try {
-              await Promise.race([
-                notificationService.getInitialNotifications(),
-                new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error('notification initialization timeout')), 3000)
-                )
-              ]);
-            } catch (notificationError) {
-              console.error('Failed to initialize notifications on startup:', notificationError);
-              // Don't fail auth initialization if notification setup fails
-            }
-          } catch (error) {
-            console.error('Token validation failed:', error);
-            localStorage.removeItem('token');
-            setUser(null);
-          }
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error);
-        setError('Failed to initialize authentication');
-      } finally {
-        clearTimeout(initializationTimeout);
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
-  }, []); // No dependencies - runs only once on mount
-
   /**
    * Login function that authenticates user and stores token
    */
@@ -112,7 +85,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.success) {
         // Store token
-        localStorage.setItem('token', response.token);
+        sessionStorage.setItem('token', response.token);
         
         // Set initial user data immediately from login response
         const initialUser = {
@@ -212,7 +185,7 @@ export const AuthProvider = ({ children }) => {
       };
       // Persist user data if needed
       try {
-        localStorage.setItem('userData', JSON.stringify(updatedUser));
+        sessionStorage.setItem('userData', JSON.stringify(updatedUser));
       } catch (error) {
         console.error('Error saving user data:', error);
       }

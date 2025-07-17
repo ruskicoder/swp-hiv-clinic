@@ -11,7 +11,8 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{enumitem}
-
+\usepackage{caption}
+\usepackage{float} % for [H] placement
 \geometry{margin=1in}
 \pagestyle{fancy}
 \fancyhf{}
@@ -31,13 +32,39 @@
 
 \section*{Record of Changes}
 
-\begin{longtable}{|p{2cm}|p{2cm}|p{1cm}|p{3cm}|p{6cm}|}
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|c|c|c|c|p{7.5cm}|}
 \hline
-\textbf{Version} & \textbf{Date} & \textbf{A*M, D} & \textbf{In charge} & \textbf{Change Description} \\
+\textbf{Version} & \textbf{Date} & \textbf{A* M, D} & \textbf{In charge} & \textbf{Change Description} \\
 \hline
-V1.0 & 07/01/2025 & A & Development Team & Initial HIV Clinic System RDS document based on implemented codebase \\
+V1.0 & 28/6 & A & KhoaDDSE196260 & 
+Create document \newline
+Add requirements, Add actors (1.1) \newline
+Design Specification\\
 \hline
-\end{longtable}
+V1.0 & 28/6 & A & TuanTMSE192397 & 
+Add descriptions for guest and admin (1.2.b) \newline
+Authentication \& User Management (2.1) \\
+\hline
+V1.0 & 28/6 & A & DatNTSE194083 & 
+Add Use Case Diagram (1.2.a)\newline 
+Add Requirement Speciality
+\\
+\hline
+V1.0 & 28/6 & A & AnPPSE196260 & 
+Add Use case Table(1.2.1)
+Add ScreenFlow Diagram (2.1) \newline
+(2.2) Screen Descriptions, Appendix\newline 
+Add Requirement Speciality\\
+\hline
+\end{tabular}
+\caption{Version Change Log}
+\label{tab:version-log}
+\end{table}
+
+
 
 \textit{*A - Added M - Modified D - Deleted}
 
@@ -55,32 +82,74 @@ V1.0 & 07/01/2025 & A & Development Team & Initial HIV Clinic System RDS documen
 
 The HIV Clinic Appointment Booking System involves four main actors who interact with the system to perform various healthcare-related tasks:
 
-\begin{longtable}{|p{1cm}|p{3cm}|p{10cm}|}
+\subsection{Actor Description}
+
+\begin{longtable}{|c||c|p{9cm}|}
 \hline
-\textbf{\#} & \textbf{Actor} & \textbf{Description} \\
+\textbf{No} & \textbf{Actor} & \textbf{Description} \\
 \hline
-1 & Patient & Registered HIV patients who book appointments, manage their medical records, view treatment information, and receive medication reminders \\
+01 & Guest & An unauthenticated individual. Allowed to access public website features such as browsing content, registering for an account, or initiating the login process. \\
 \hline
-2 & Doctor & HIV/AIDS specialists and healthcare providers who manage patient appointments, update medical records, prescribe ARV treatments, and access patient information during consultations \\
+02 & Patient & A registered and authenticated user. Can book appointments (public or private), view their medical history, receive notifications, and access personalized treatment plans. \\
 \hline
-3 & Admin & System administrators who manage user accounts, system settings, and have full access to all system functionalities for maintenance and oversight \\
+03 & Doctor & A registered and authenticated medical professional. Can manage their availability, handle appointments and consultations, prescribe ARV or other treatments, and manage related patient notifications. \\
 \hline
-4 & Manager & Healthcare facility managers who oversee operations, generate reports, and manage clinic resources and staff schedules \\
+04 & Admin & A privileged user responsible for system administration. Manages user accounts (Patients and Doctors), handles booking rules and exceptions, and monitors overall system integrity. \\
+\hline
+05 & Manager & An authenticated user with oversight capabilities. Views system-wide analytics, monitors KPIs related to appointments and treatments, and supports data-driven strategic decisions. \\
 \hline
 \end{longtable}
+
 
 \subsubsection{Use Cases}
 
 \paragraph{a. Diagram(s)}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{diagrams/use_case_diagram.png}
+\includegraphics[width=0.9\textwidth]{diagrams/use_case_diagram.png}
 \caption{HIV Clinic Management System Use Case Diagram}
 \label{fig:use-case-diagram}
 \end{figure}
 
 The system provides comprehensive use cases covering patient care, appointment management, and administrative functions for an HIV clinic environment.
+
+
+% --- Use Case 1 ---
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/Picture/Usecase1.png}
+    \caption*{\textbf{Table 1.} Guess Use Case}
+\end{figure}
+
+% --- Use Case 2 ---
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/Picture/Usecase2.png}
+    \caption*{\textbf{Table 2.} Patient Use Case}
+\end{figure}
+
+% --- Use Case 3 ---
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/Picture/Usecase3.png}
+    \caption*{\textbf{Table 3.} Doctor Use Case}
+\end{figure}
+
+% --- Use Case 4 ---
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/Picture/Usecase4.png}
+    \caption*{\textbf{Table 4.} Admin Use Case}
+\end{figure}
+
+% --- Use Case 5 ---
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/Picture/Usecase5.png}
+    \caption*{\textbf{Table 5.} Manager Use Case}
+\end{figure}
+
 
 \paragraph{b. Descriptions}
 
@@ -88,31 +157,302 @@ The system provides comprehensive use cases covering patient care, appointment m
 \hline
 \textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
 \hline
+\multicolumn{4}{|c|}{\textbf{Authentication \& Profile Management}} \\
+\hline
 UC-001 & User Management & User Registration & New users (patients/doctors) create accounts with role-based access to the HIV clinic system \\
 \hline
 UC-002 & Authentication & User Login & Existing users authenticate using username/password with JWT token-based security \\
 \hline
 UC-003 & Profile Management & Update Profile & Users update personal information, contact details, and profile images \\
 \hline
-UC-004 & Appointment Management & Book Appointment & Patients schedule appointments with available doctors based on doctor availability slots \\
+UC-004 & Authentication & Change Password & Users change their account passwords with validation and security checks \\
 \hline
-UC-005 & Doctor Operations & Manage Availability & Doctors create, update, and manage their availability time slots for patient appointments \\
+UC-005 & Authentication & Logout & Users securely logout from the system and invalidate their session \\
 \hline
-UC-006 & Appointment Management & Cancel Appointment & Patients or doctors cancel scheduled appointments with cancellation reasons \\
+\multicolumn{4}{|c|}{\textbf{Patient Services}} \\
 \hline
-UC-007 & Patient Care & Manage Patient Records & Doctors access and update patient medical records including history, allergies, and current medications \\
+UC-006 & Patient Dashboard & View Dashboard & Patients access their personal dashboard with overview of appointments and treatments \\
 \hline
-UC-008 & HIV Treatment & ARV Treatment Management & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, and track side effects \\
+UC-007 & Appointment Management & Book Appointment & Patients schedule appointments with available doctors based on doctor availability slots \\
 \hline
-UC-009 & Medication Management & Medication Routine Management & Doctors create medication schedules and patients receive automated reminders for ARV adherence \\
+UC-008 & Appointment Management & View Appointments & Patients view their scheduled, completed, and cancelled appointments with details \\
 \hline
-UC-010 & Notification System & Appointment Reminders & System sends automated reminders to patients for upcoming appointments (24-hour, 1-hour, 30-minute) \\
+UC-009 & Appointment Management & Cancel Appointment & Patients cancel scheduled appointments with cancellation reasons \\
 \hline
-UC-011 & Notification System & Medication Reminders & System sends daily medication reminders to patients based on their prescribed ARV routine \\
+UC-010 & Patient Care & View Patient Records & Patients access their own medical records, treatment history, and current medications \\
 \hline
-UC-012 & Patient Privacy & Privacy Settings & Patients control the visibility of their medical information and set privacy preferences \\
+UC-011 & Patient Care & Update Patient Records & Patients update their personal medical information and emergency contacts \\
+\hline
+UC-012 & HIV Treatment & View ARV Treatments & Patients view their HIV antiretroviral treatment regimens and adherence status \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Doctor Services}} \\
+\hline
+UC-013 & Doctor Dashboard & View Doctor Dashboard & Doctors access their professional dashboard with patient appointments and notifications \\
+\hline
+UC-014 & Appointment Management & Manage Appointments & Doctors view and manage their scheduled appointments with patients \\
+\hline
+UC-015 & Appointment Management & Update Appointment Status & Doctors update appointment status (completed, cancelled, rescheduled) \\
+\hline
+UC-016 & Doctor Operations & Manage Availability Slots & Doctors create, update, and manage their availability time slots for patient appointments \\
+\hline
+UC-017 & Patient Care & Access Patient Records & Doctors access comprehensive patient medical records during consultations \\
+\hline
+UC-018 & HIV Treatment & Manage ARV Treatments & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, and track side effects \\
+\hline
+UC-019 & Notification System & Send Notifications & Doctors send custom notifications to patients regarding appointments and treatments \\
+\hline
+UC-020 & Notification System & View Notification History & Doctors review history of notifications sent to patients \\
+\hline
+UC-021 & Notification System & Manage Notification Templates & Doctors create and manage templates for common notifications \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Admin Services}} \\
+\hline
+UC-022 & Admin Dashboard & View Admin Dashboard & Administrators access system-wide dashboard with user and system management \\
+\hline
+UC-023 & User Management & Manage Users & Administrators manage all user accounts across the system \\
+\hline
+UC-024 & User Management & Manage Patients & Administrators specifically manage patient accounts and information \\
+\hline
+UC-025 & User Management & Manage Doctors & Administrators manage doctor accounts and professional information \\
+\hline
+UC-026 & User Management & Create Doctor Accounts & Administrators create new doctor accounts with specialized permissions \\
+\hline
+UC-027 & User Management & Toggle User Status & Administrators activate or deactivate user accounts across the system \\
+\hline
+UC-028 & User Management & Reset User Passwords & Administrators reset passwords for users who cannot access their accounts \\
+\hline
+UC-029 & System Management & Manage Specialties & Administrators manage medical specialties for doctor categorization \\
+\hline
+UC-030 & System Management & View All Appointments & Administrators view all appointments across the system for oversight \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Manager Services}} \\
+\hline
+UC-031 & Manager Dashboard & View Manager Dashboard & Managers access operational dashboard with clinic statistics and analytics \\
+\hline
+UC-032 & Analytics & View Statistics & Managers view comprehensive clinic statistics and performance metrics \\
+\hline
+UC-033 & Operations & Manage Patient Records & Managers oversee patient records management and data integrity \\
+\hline
+UC-034 & Operations & Manage Doctor Records & Managers oversee doctor records and professional information \\
+\hline
+UC-035 & Operations & Manage ARV Treatments & Managers monitor and oversee ARV treatment programs across the clinic \\
+\hline
+UC-036 & Operations & Manage Schedules & Managers oversee clinic scheduling and appointment distribution \\
+\hline
+UC-037 & Search & Search Patients & Managers search for specific patients across the clinic database \\
+\hline
+UC-038 & Search & Search Doctors & Managers search for specific doctors in the clinic system \\
+\hline
+UC-039 & Data Export & Export Data (CSV) & Managers export various clinic data in CSV format for reporting and analysis \\
+\hline
+UC-040 & Detail Views & View Patient Details & Managers access detailed patient information for operational oversight \\
+\hline
+UC-041 & Detail Views & View Doctor Details & Managers access detailed doctor information for operational oversight \\
 \hline
 \end{longtable}
+\begin{figure}[H]
+    \centering
+    
+    \caption*{\textbf{Chart 7.} Guest Use Case Diagram}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|c|c|c|p{7.5cm}|}
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+01 & Appointment Booking & Manage Appointment & Patient can create appointment and have option to receive notification. \\
+\hline
+02 & Online Consultation & Online Consultation & Patient books online consultation (can be anonymous) and has online conversation with doctors. \\
+\hline
+03 & Medical Records & View Patient Record & Patients can view treatment and process. \\
+\hline
+04 & Personal Information & View Profile & Patients view their personal information (address, phone number, …). \\
+\hline
+05 & Appointment Booking & Book Appointment & Patient can book an appointment (extends from View Doctors). \\
+\hline
+06 & Appointments & View Appointments & Patient can view their scheduled appointments. \\
+\hline
+07 & Appointment Metrics & View Number of Appointments & Patient can see the total number of their appointments. \\
+\hline
+08 & Notifications & View Notifications & Patient can view notifications sent by the system. \\
+\hline
+09 & Dashboard Overview & View Dashboard & Patient can access their dashboard to monitor key statistics. \\
+\hline
+10 & ARV Statistics & View Number of ARV Treatment & Included in Dashboard – shows number of ARV regimens. \\
+\hline
+11 & Appointment Forecast & View Number of Upcoming Appointments & Included in Dashboard – shows count of upcoming appointments. \\
+\hline
+12 & Doctor Availability Stats & View Number of Available Doctors & Included in Dashboard – shows available doctors count. \\
+\hline
+13 & Anonymous Mode & Switch to Anonymous Mode & Patient can switch to anonymous browsing mode. \\
+\hline
+14 & Profile Viewing & View Personal Profile & Patient can view their personal information. \\
+\hline
+15 & Profile Updating & Update Personal Profile & Patient can update their personal profile (extends from View Personal Profile). \\
+\hline
+\end{tabular}
+\caption*{\textbf{Table 8.} Patient Use Case Description}
+\label{tab:patient-usecases}
+\end{table}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|c|c|c|p{7.5cm}|}
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+\endhead
+
+% Table content starts here
+01 & Profile Management & View Profile & Doctor views their profile. \\
+\hline
+02 & Profile Management & Update Profile & Doctor updates profile details (extends from View Profile). \\
+\hline
+03 & Appointment Schedule & View My Appointment Schedule & Doctor views their scheduled appointments. \\
+\hline
+04 & Medical Records & View Patient Medical Record & Doctor views the medical record of a patient. \\
+\hline
+05 & ARV Treatment & View ARV Treatments & Included when viewing patient medical records. \\
+\hline
+06 & ARV Treatment & Add ARV Treatments & Doctor adds ARV treatments (extends from View ARV Treatments). \\
+\hline
+07 & ARV Treatment & Delete ARV Treatments & Doctor deletes ARV treatments (extends from View ARV Treatments). \\
+\hline
+08 & Medical Records & Update Patient Medical Record & Doctor updates medical info (extends from View Patient Medical Record). \\
+\hline
+09 & Appointment Schedule & Update Appointment & Doctor updates appointment info (extends from View Patient Medical Record). \\
+\hline
+10 & Availability Management & Manage Availability Slots & Doctor manages time slots for appointments. \\
+\hline
+11 & Availability Management & Create Availability Slots & Doctor creates time slots (extends from Manage Availability Slots). \\
+\hline
+12 & Availability Management & View Availability Slots & Doctor views time slots (extends from Manage Availability Slots). \\
+\hline
+13 & Dashboard & View Dashboard & Doctor accesses dashboard metrics. \\
+\hline
+14 & Dashboard & View Number of Appointments & Included in Dashboard – shows total appointments. \\
+\hline
+15 & Dashboard & View Number of Available Slots & Included in Dashboard – shows available slots. \\
+\hline
+16 & Dashboard & View Number of Booked Slots & Included in Dashboard – shows booked slots. \\
+\hline
+17 & Dashboard & View Numbers of Today's Appointments & Included in Dashboard – shows today's appointments. \\
+\hline
+18 & Notification & View Notification Dashboard & Doctor views stats on notifications. \\
+\hline
+19 & Notification & View Number of Most Used Template & Included in Notification Dashboard. \\
+\hline
+20 & Notification & View Number of Today Sent & Included in Notification Dashboard. \\
+\hline
+21 & Notification & View Number of Total Sent & Included in Notification Dashboard. \\
+\hline
+22 & Notification & View Number of Pending & Included in Notification Dashboard. \\
+\hline
+23 & Notification Management & Manage Notification & Doctor manages all notification-related actions. \\
+\hline
+24 & Notification Management & Edit Notification Template & Doctor edits templates (extends from Manage Notification). \\
+\hline
+25 & Notification Management & Send Notification & Doctor sends notification (extends from Manage Notification). \\
+\hline
+26 & Notification Management & Delete Notification & Doctor deletes notification (extends from Manage Notification). \\
+\hline
+27 & Notification Management & Create Notification Template & Doctor creates a new template (extends from Manage Notification). \\
+\hline
+28 & Notification Management & Search Notification History & Doctor searches notification history (extends from Manage Notification). \\
+\hline
+
+\hline
+\multicolumn{4}{|c|}{\textbf{Table 9.} Doctor Use Case Description} \\
+\hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|c|c|c|p{7.5cm}|}
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+\endhead
+
+01 & User Management & Manage Users & Admin manages user-related actions. \\
+\hline
+02 & User Management & View Users & Admin views user list (extends from Manage Users). \\
+\hline
+03 & User Management & Deactivate User Account & Admin disables a user account (extends from Manage Users). \\
+\hline
+04 & User Management & Reset Password & Admin resets user password (extends from Manage Users). \\
+\hline
+05 & Doctor Management & Manage Doctors & Admin manages doctor-related actions. \\
+\hline
+06 & Doctor Management & View Doctors & Admin views doctor list (extends from Manage Doctors). \\
+\hline
+07 & Doctor Management & Deactivate Doctor Account & Admin disables a doctor account (extends from Manage Doctors). \\
+\hline
+08 & Appointment Management & View Appointments & Admin views all appointments. \\
+\hline
+09 & Doctor Management & Create Doctor & Admin creates a new doctor account. \\
+\hline
+10 & Dashboard & View Dashboard & Admin views system-wide statistics. \\
+\hline
+11 & Dashboard & View Number of Users & Shows total number of users (included in Dashboard). \\
+\hline
+12 & Dashboard & View Number of Patients & Shows total number of patients (included in Dashboard). \\
+\hline
+13 & Dashboard & View Number of Doctors & Shows total number of doctors (included in Dashboard). \\
+\hline
+14 & Dashboard & View Number of Appointments & Shows total number of appointments (included in Dashboard). \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Table 10.} Admin Use Case Description} \\
+\hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|c|c|c|p{7.5cm}|}
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\hline
+\endhead
+
+01 & Patient Management & View Patients & Manager views all patient profiles. \\
+\hline
+02 & Doctor Management & View Doctors & Manager views all registered doctors. \\
+\hline
+03 & ARV Management & View ARV Regimens & Manager views ARV treatment regimens. \\
+\hline
+04 & Appointment Management & View ARV Appointments & Manager views ARV-related appointments. \\
+\hline
+05 & Data Overview & View Dashboard & Manager views data summaries on the dashboard. \\
+\hline
+06 & Data Export & Export Patient Profile & Manager can export patient profiles (extends from View Dashboard). \\
+\hline
+07 & Data Export & Export Doctor Availability Slot & Manager can export doctor availability slots (extends from View Dashboard). \\
+\hline
+08 & Data Export & Export ARV Treatments & Manager can export ARV treatment data (extends from View Dashboard). \\
+\hline
+09 & Data Export & Export Doctor Profile & Manager can export doctor profile data (extends from View Dashboard). \\
+\hline
+10 & Data Export & Export Appointment & Manager can export appointment records (extends from View Dashboard). \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Table 11.} Manager Use Case Description} \\
+\hline
+\end{longtable}
+
 
 \subsection{Overall Functionalities}
 
@@ -120,117 +460,276 @@ UC-012 & Patient Privacy & Privacy Settings & Patients control the visibility of
 
 The HIV Clinic system provides role-based screen flows ensuring appropriate access to sensitive medical information:
 
-\begin{itemize}
-    \item \textbf{Patient Flow}: Login → Patient Dashboard → Book Appointment → View Medical Records → Medication Reminders
-    \item \textbf{Doctor Flow}: Login → Doctor Dashboard → Manage Availability → View Patient Records → Update Treatment Plans
-    \item \textbf{Admin Flow}: Login → Admin Dashboard → User Management → System Settings → Reports
-    \item \textbf{Manager Flow}: Login → Manager Dashboard → Clinic Operations → Staff Management → Analytics
-\end{itemize}
 
-\begin{figure}
-\centering
-\includegraphics[width=0.9\textwidth]{diagrams/user_interface_flow.png}
-\caption{User Interface Flow Diagram}
-\label{fig:ui-flow-diagram}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{diagrams/Picture/ScreenFlow.png}
+    \caption*{\textbf{Chart 12.} Overall Screen Flow}
+
+    \vspace{0.5em}
+    {\color{blue}\textit{(Screen Flow Link: \href{https://tinyurl.com/3hhmmk6x}{https://tinyurl.com/3hhmmk6x})}}
 \end{figure}
+
+
+
 
 \subsubsection{Screen Descriptions}
 
-\begin{longtable}{|p{1cm}|p{3cm}|p{3cm}|p{7cm}|}
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{|c|c|c|p{8.5cm}|}
 \hline
 \textbf{\#} & \textbf{Feature} & \textbf{Screen} & \textbf{Description} \\
 \hline
-1 & Authentication & Login Screen & Secure login with username/password authentication and JWT token generation \\
+\endfirsthead
+
 \hline
-2 & Authentication & Registration Screen & User registration with role selection, profile information, and email verification \\
+\textbf{\#} & \textbf{Feature} & \textbf{Screen} & \textbf{Description} \\
 \hline
-3 & Patient Dashboard & Patient Home & Overview of upcoming appointments, medication reminders, and treatment status \\
+\endhead
+
+1 & Authentication & HOME PAGE & The landing page of the system. Includes brief introduction, access to login/register, blog, and medical knowledge. \\
 \hline
-4 & Appointment Management & Book Appointment & Search available doctors, view time slots, and schedule appointments \\
+2 & Authentication & Register Page & Allows users (patients, doctors, admins) to create new accounts with basic info and email/phone verification. \\
 \hline
-5 & Appointment Management & My Appointments & View scheduled, completed, and cancelled appointments with details \\
+3 & Authentication & LOGIN PAGE & Login page for all users. After successful login, users are routed to their respective dashboard based on role. \\
 \hline
-6 & Doctor Dashboard & Doctor Home & Overview of daily appointments, patient notifications, and availability management \\
+4 & Information & Information Page & Displays hospital or system information. Accessible from Home Page without login. \\
 \hline
-7 & Doctor Operations & Availability Management & Create, update, and manage doctor availability time slots \\
+5 & Blog & Blog Page & Public health blogs and articles available for reading from the Home Page. \\
 \hline
-8 & Patient Records & Medical Records & Comprehensive patient medical history, allergies, current medications, and emergency contacts \\
+6 & Dashboard & Patient Dashboard & Main landing screen after login for patients. Central hub for accessing medical features. \\
 \hline
-9 & ARV Treatment & Treatment Management & HIV treatment regimens, adherence tracking, and side effect monitoring \\
+7 & Appointment & Choose Doctor & Screen to browse/select available doctors. \\
 \hline
-10 & Medication Management & Medication Routine & Daily medication schedules, dosage information, and reminder settings \\
+8 & Appointment & View Calendar & Displays doctor availability slots in a calendar view. \\
 \hline
-11 & Notification System & Notification Center & View and manage appointment reminders and medication alerts \\
+9 & Appointment & Booking Appointment & Patient books an appointment based on calendar availability. \\
 \hline
-12 & Admin Panel & User Management & Manage user accounts, roles, and system permissions \\
+10 & Medical Records & Medication Record & Access patient's medication history. \\
+\hline
+11 & Medical Records & View ARV Treatment & Displays current and past ARV regimens assigned to the patient. \\
+\hline
+12 & Medical Records & My Appointment & Lists patient’s past and upcoming appointments. \\
+\hline
+13 & Medical Records & Update Medical Record & Allows editing/updating of medical information. \\
+\hline
+14 & Notification & Notification & Patient receives alerts and system notifications. \\
+\hline
+15 & Overview & Overview & Summary screen showing appointment count, ARV status, and doctor availability. \\
+\hline
+16 & Profile & Personal Profile & View patient personal profile details. \\
+\hline
+17 & Profile & Update Profile & Edit patient personal information. \\
+\hline
+18 & Dashboard & Doctor Dashboard & Main dashboard for doctors after login to manage appointments, records, availability, and notifications. \\
+\hline
+19 & Appointment & Appointment Schedule & View the list of scheduled appointments for the doctor. \\
+\hline
+20 & Medical Record & Patient Medical Record & View and access patient-specific medical information. \\
+\hline
+21 & ARV Treatment & Add ARV Treatment & Add a new ARV regimen to a patient's treatment plan. \\
+\hline
+22 & ARV Treatment & Delete ARV Treatment & Remove an existing ARV regimen from the patient's record. \\
+\hline
+23 & Medical Record & Update Patient Medical Record & Edit and update patient medical records. \\
+\hline
+24 & Availability & Availability Slot & Manage doctor's available time slots for appointments. \\
+\hline
+25 & Availability & Create Availability Slots & Create new time slots in which doctor is available. \\
+\hline
+26 & Availability & View Availability Slots & View existing availability slots of the doctor. \\
+\hline
+27 & Overview & Overview & Summarized statistics on appointments and availability. \\
+\hline
+28 & Notification & Notification & Access the notification center to view and manage messages. \\
+\hline
+29 & Notification & Edit Notification Template & Modify existing templates for notification messages. \\
+\hline
+30 & Notification & Create Notification Template & Create new templates for sending system notifications. \\
+\hline
+31 & Notification & Send Notification & Send notifications to patients or other system users. \\
+\hline
+32 & Notification & Delete Notification & Remove previously created notification entries. \\
+\hline
+33 & Notification & Search Notification History & Search and review previously sent notifications. \\
+\hline
+34 & Dashboard & Admin Dashboard & Main screen for administrators to manage users, doctors, appointments, and system overview. \\
+\hline
+35 & User Management & Manage Users & Access user account controls including deactivation and password reset. \\
+\hline
+36 & User Management & Deactivate Users & Disable user accounts from the system. \\
+\hline
+37 & User Management & Reset Password & Reset passwords for user accounts. \\
+\hline
+38 & Doctor Management & Manage Doctors & Manage doctor-related data and account status. \\
+\hline
+39 & Doctor Management & Deactivate Doctor Account & Temporarily or permanently disable doctor access. \\
+\hline
+40 & Appointment & View Appointment & View and monitor scheduled appointments in the system. \\
+\hline
+41 & Doctor Management & Create Doctor & Add new doctors into the system with profile setup. \\
+\hline
+42 & Overview & Overview & Summarized data including number of users, doctors, appointments. \\
+\hline
+43 & Dashboard & Manager Dashboard & Main screen for managers to view and monitor patient care and resource availability. \\
+\hline
+44 & Patient Management & View Patients & View and review list of registered patients. \\
+\hline
+45 & Doctor Management & View Doctors & Review registered doctors and their status. \\
+\hline
+46 & ARV Management & View ARV Treatments & View current ARV treatments across patients. \\
+\hline
+47 & Appointment & View Appointments & Access all ARV appointment records. \\
+\hline
+48 & Overview & Overview & Manager-level data insights for patients, treatments, and appointments. \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Table 12.} Screen Description Table} \\
 \hline
 \end{longtable}
+
+
 
 \subsubsection{Screen Authorization}
 
-\begin{longtable}{|p{4cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|}
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{|p{5cm}|c|c|c|c|}
 \hline
 \textbf{Screen} & \textbf{Patient} & \textbf{Doctor} & \textbf{Admin} & \textbf{Manager} \\
 \hline
-Login Screen & X & X & X & X \\
+\endfirsthead
+
 \hline
-Registration Screen & X & X & X & X \\
+\textbf{Screen} & \textbf{Patient} & \textbf{Doctor} & \textbf{Admin} & \textbf{Manager} \\
 \hline
-Patient Dashboard & X & & & \\
+\endhead
+
+HOME PAGE & X & X & X & X \\
 \hline
-\quad View Own Records & X & & & \\
+Register Page & X & X & X & X \\
 \hline
-\quad Update Own Profile & X & & & \\
+LOGIN PAGE & X & X & X & X \\
 \hline
-\quad Book Appointments & X & & & \\
+Information Page & X & X & X & X \\
 \hline
-Doctor Dashboard & & X & & \\
+Blog Page & X & X & X & X \\
 \hline
-\quad Manage Availability & & X & & \\
+Patient Dashboard & X &  &  &  \\
 \hline
-\quad View Patient Records & & X & X & \\
+Choose Doctor & X &  &  &  \\
 \hline
-\quad Update Treatment Plans & & X & & \\
+View Calendar & X &  &  &  \\
 \hline
-Admin Dashboard & & & X & \\
+Booking Appointment & X &  &  &  \\
 \hline
-\quad User Management & & & X & \\
+Medication Record & X &  &  &  \\
 \hline
-\quad System Settings & & & X & \\
+View ARV Treatment & X & X &  & X \\
 \hline
-Manager Dashboard & & & & X \\
+My Appointment & X &  &  &  \\
 \hline
-\quad Generate Reports & & & X & X \\
+Update Medical Record &  & X &  &  \\
 \hline
-\quad View Analytics & & & X & X \\
+Notification & X & X &  &  \\
 \hline
-Appointment Management & X & X & X & X \\
+Overview & X & X & X & X \\
 \hline
-\quad Cancel Appointments & X & X & X & \\
+Personal Profile & X &  &  &  \\
 \hline
-Notification System & X & X & X & X \\
+Update Profile & X &  &  &  \\
+\hline
+Doctor Dashboard &  & X &  &  \\
+\hline
+Appointment Schedule &  & X &  &  \\
+\hline
+Patient Medical Record &  & X & X &  \\
+\hline
+Add ARV Treatment &  & X &  &  \\
+\hline
+Delete ARV Treatment &  & X &  &  \\
+\hline
+Update Patient Medical Record &  & X &  &  \\
+\hline
+Availability Slot &  & X &  &  \\
+\hline
+Create Availability Slots &  & X &  &  \\
+\hline
+View Availability Slots &  & X &  &  \\
+\hline
+Notification &  & X &  &  \\
+\hline
+Edit Notification Template &  & X &  &  \\
+\hline
+Create Notification Template &  & X &  &  \\
+\hline
+Send Notification &  & X &  &  \\
+\hline
+Delete Notification &  & X &  &  \\
+\hline
+Search Notification History &  & X &  &  \\
+\hline
+Admin Dashboard &  &  & X &  \\
+\hline
+Manage Users &  &  & X &  \\
+\hline
+Deactivate Users &  &  & X &  \\
+\hline
+Reset Password &  &  & X &  \\
+\hline
+Manage Doctors &  &  & X &  \\
+\hline
+Deactivate Doctor Account &  &  & X &  \\
+\hline
+View Appointment &  &  & X &  \\
+\hline
+Create Doctor &  &  & X &  \\
+\hline
+Overview &  &  &  & X \\
+\hline
+Manager Dashboard &  &  &  & X \\
+\hline
+View Patients &  &  &  & X \\
+\hline
+View Doctors &  &  &  & X \\
+\hline
+View ARV Treatments &  &  &  & X \\
+\hline
+View Appointments &  &  &  & X \\
+\hline
+Overview &  &  &  & X \\
+\hline
+\multicolumn{5}{|c|}{\textbf{Table 14.} Screen Authorization Matrix} \\
 \hline
 \end{longtable}
+
 
 \subsubsection{Non-UI Functions}
 
-\begin{longtable}{|p{1cm}|p{4cm}|p{4cm}|p{5cm}|}
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|c|p{4.5cm}|p{4.5cm}|p{6.5cm}|}
 \hline
 \textbf{\#} & \textbf{Feature} & \textbf{System Function} & \textbf{Description} \\
 \hline
-1 & Notification Scheduling & Automated Reminder Service & Background service that schedules and sends appointment and medication reminders based on configured templates \\
+\endfirsthead
+
 \hline
-2 & Security & JWT Token Management & Automatic token generation, validation, and refresh for secure API access \\
+\textbf{\#} & \textbf{Feature} & \textbf{System Function} & \textbf{Description} \\
 \hline
-3 & Data Validation & Input Sanitization & Server-side validation and sanitization of all user inputs to prevent SQL injection and XSS attacks \\
+\endhead
+
+1 & Notification Scheduling & Automated Reminder Service & Background service that schedules and sends appointment and medication reminders based on configured templates. \\
 \hline
-4 & Audit Logging & Activity Tracking & Automatic logging of user actions, login attempts, and data modifications for security and compliance \\
+2 & Security & JWT Token Management & Automatic token generation, validation, and refresh for secure API access. \\
 \hline
-5 & Database Management & Automated Backups & Scheduled database backups and maintenance operations \\
+3 & Data Validation & Input Sanitization & Server-side validation and sanitization of all user inputs to prevent SQL injection and XSS attacks. \\
 \hline
-6 & Email Service & SMTP Integration & Email delivery service for notifications and system communications \\
+4 & Audit Logging & Activity Tracking & Automatic logging of user actions, login attempts, and data modifications for security and compliance. \\
+\hline
+5 & Database Management & Automated Backups & Scheduled database backups and maintenance operations. \\
+\hline
+\multicolumn{4}{|c|}{\textbf{Table 15.} System Functions Description} \\
 \hline
 \end{longtable}
+
 
 \subsection{System High Level Design}
 
@@ -240,101 +739,108 @@ Notification System & X & X & X & X \\
 
 The HIV Clinic system uses Microsoft SQL Server with the following core tables:
 
-\begin{itemize}
-    \item \textbf{Users}: Central user management with role-based access
-    \item \textbf{Roles}: System roles (Patient, Doctor, Admin, Manager)
-    \item \textbf{PatientProfiles}: Extended patient information
-    \item \textbf{DoctorProfiles}: Extended doctor information with specialties
-    \item \textbf{Appointments}: Appointment scheduling and management
-    \item \textbf{DoctorAvailabilitySlots}: Doctor availability management
-    \item \textbf{PatientRecords}: Medical records and patient history
-    \item \textbf{ARVTreatments}: HIV antiretroviral treatment tracking
-    \item \textbf{MedicationRoutines}: Daily medication schedules
-    \item \textbf{Notifications}: System notification management
-    \item \textbf{NotificationTemplates}: Reusable notification templates
-\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{diagrams/Picture/Database.png}
+    \caption*{\textbf{Table 16.} Database Design Overview}
+\end{figure}
+
+
 
 \paragraph{b. Table Descriptions}
 
-\begin{longtable}{|p{1cm}|p{3cm}|p{10cm}|}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|c|p{4cm}|p{9cm}|}
 \hline
 \textbf{No} & \textbf{Table} & \textbf{Description} \\
 \hline
-01 & Users & Central user authentication and profile management table storing username, password hash, email, and role associations \\
-& & - Primary keys: UserID \\
-& & - Foreign keys: RoleID (references Roles) \\
+\endfirsthead
+
 \hline
-02 & Roles & System role definitions for access control \\
-& & - Primary keys: RoleID \\
-& & - Contains: Patient, Doctor, Admin, Manager roles \\
+\textbf{No} & \textbf{Table} & \textbf{Description} \\
 \hline
-03 & PatientProfiles & Extended patient information including demographics and privacy settings \\
-& & - Primary keys: PatientProfileID \\
-& & - Foreign keys: UserID (references Users) \\
+\endhead
+
+01 & Users & Central user management with role-based access. \\
 \hline
-04 & DoctorProfiles & Doctor professional information including specialties and qualifications \\
-& & - Primary keys: DoctorProfileID \\
-& & - Foreign keys: UserID (references Users), SpecialtyID (references Specialties) \\
+02 & Roles & System roles (Patient, Doctor, Admin, Manager). \\
 \hline
-05 & Appointments & Appointment scheduling between patients and doctors \\
-& & - Primary keys: AppointmentID \\
-& & - Foreign keys: PatientUserID, DoctorUserID (references Users), AvailabilitySlotID \\
+03 & PatientProfiles & Extended patient information. \\
 \hline
-06 & DoctorAvailabilitySlots & Doctor availability time slot management \\
-& & - Primary keys: AvailabilitySlotID \\
-& & - Foreign keys: DoctorUserID (references Users) \\
+04 & DoctorProfiles & Extended doctor information with specialties. \\
 \hline
-07 & PatientRecords & Comprehensive medical records including history, allergies, medications \\
-& & - Primary keys: RecordID \\
-& & - Foreign keys: PatientUserID (references Users) \\
+05 & Appointments & Appointment scheduling and management. \\
 \hline
-08 & ARVTreatments & HIV antiretroviral treatment regimens and monitoring \\
-& & - Primary keys: ARVTreatmentID \\
-& & - Foreign keys: PatientUserID, DoctorUserID (references Users), AppointmentID \\
+06 & DoctorAvailabilitySlots & Doctor availability management. \\
 \hline
-09 & MedicationRoutines & Daily medication schedules and reminder configurations \\
-& & - Primary keys: RoutineID \\
-& & - Foreign keys: PatientUserID, DoctorUserID (references Users), ARVTreatmentID \\
+07 & PatientRecords & Medical records and patient history. \\
 \hline
-10 & Notifications & System notifications for appointments and medication reminders \\
-& & - Primary keys: NotificationID \\
-& & - Foreign keys: UserID (references Users), templateId (references NotificationTemplates) \\
+08 & ARVTreatments & HIV antiretroviral treatment tracking. \\
 \hline
-11 & NotificationTemplates & Reusable notification message templates \\
-& & - Primary keys: templateId \\
-& & - Contains: appointment reminder, medication reminder, and system notification templates \\
+09 & MedicationRoutines & Daily medication schedules. \\
+\hline
+10 & Notifications & System notification management. \\
+\hline
+11 & NotificationTemplates & Reusable notification templates. \\
+\hline
+12 & Specialties & Stores medical specialty categories linked to doctors. \\
+\hline
+13 & SystemSettings & Stores system-wide configuration settings. \\
+\hline
+14 & PasswordResetTokens & Manages secure password reset tokens. \\
+\hline
+15 & AppointmentStatusHistory & Tracks changes in appointment status over time for audit and traceability. \\
+\hline
+16 & LoginActivity & Logs login attempts for security monitoring. \\
+\hline
+17 & MedicationReminders & Tracks individual medication reminder instances sent to patients. \\
+\hline
+18 & AppointmentReminders & Tracks specific reminders for upcoming appointments. \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Table 17.} Database Table Description} \\
 \hline
 \end{longtable}
+
 
 \subsubsection{Code Packages}
 
 The HIV Clinic system follows a layered Spring Boot architecture:
-
-\begin{longtable}{|p{1cm}|p{4cm}|p{9cm}|}
+\renewcommand{\arraystretch}{1.4}
+\begin{longtable}{|c|p{6cm}|p{8cm}|}
 \hline
 \textbf{No} & \textbf{Package} & \textbf{Description} \\
 \hline
-01 & com.hivclinic.controller & REST API controllers handling HTTP requests for appointments, authentication, patient records, doctor operations, and notifications \\
+\endfirsthead
+
 \hline
-02 & com.hivclinic.service & Business logic layer containing services for appointment management, user authentication, patient care, ARV treatment, and notification scheduling \\
+\textbf{No} & \textbf{Package} & \textbf{Description} \\
 \hline
-03 & com.hivclinic.repository & Data access layer with JPA repositories for database operations \\
+\endhead
+
+01 & com.hivclinic.controller & REST API controllers handling HTTP requests for appointments, authentication, patient records, doctor operations, and notifications. \\
 \hline
-04 & com.hivclinic.model & Entity classes representing database tables including User, Appointment, PatientRecord, ARVTreatment, and Notification models \\
+02 & com.hivclinic.service & Business logic layer containing services for appointment management, user authentication, patient care, ARV treatment, and notification scheduling. \\
 \hline
-05 & com.hivclinic.dto & Data Transfer Objects for request/response handling and API communication \\
+03 & com.hivclinic.repository & Data access layer with JPA repositories for database operations. \\
 \hline
-06 & com.hivclinic.config & Configuration classes for security (JWT), database, and application settings \\
+04 & com.hivclinic.model & Entity classes representing database tables including User, Appointment, PatientRecord, ARVTreatment, and Notification models. \\
 \hline
-07 & com.hivclinic.exception & Custom exception handling for application-specific errors \\
+05 & com.hivclinic.dto & Data Transfer Objects for request/response handling and API communication. \\
 \hline
-08 & com.hivclinic.validation & Input validation and sanitization utilities \\
+06 & com.hivclinic.config & Configuration classes for security (JWT), database, and application settings. \\
+\hline
+07 & com.hivclinic.exception & Custom exception handling for application-specific errors. \\
+\hline
+08 & com.hivclinic.validation & Input validation and sanitization utilities. \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Table 18.} Package Descriptions} \\
 \hline
 \end{longtable}
 
 \subsubsection{Data Flow Architecture}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{diagrams/data_flow_diagram.png}
 \caption{System Data Flow Diagram}
@@ -343,398 +849,328 @@ The HIV Clinic system follows a layered Spring Boot architecture:
 
 \section{Requirement Specifications}
 
-\subsection{Authentication \& User Management}
+\subsection{Common functions}
 
-\subsubsection{UC-001\_User Registration}
+\subsubsection{UC-01 – Register Donor Account}
 
-\paragraph{a. Functionalities}
-
-\textbf{UC ID and Name:} UC-001 User Registration
-
-\textbf{Created By:} Development Team
-
-\textbf{Date Created:} January 2025
-
-\textbf{Primary Actor:} Guest User (future Patient/Doctor)
-
-\textbf{Secondary Actors:} System Administrator
-
-\textbf{Trigger:} New user accesses registration page and submits registration form
-
-\textbf{Description:} New users register for accounts in the HIV clinic system with role-based access. The system validates user information, creates secure accounts, and establishes appropriate permissions.
-
-\textbf{Preconditions:}
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-01 – Register Donor Account \\
+\hline
+\textbf{Created By:} & DatNT \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Guest \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & A new user registers using email, password, and date of birth. The system creates a Level 1 account with the "Donor" role. To upgrade to Level 2 (eligible for blood donation registration), the user must visit a certified medical facility for in-person identity and eligibility verification. \\
+\hline
+\textbf{Trigger:} & The user clicks the 'Register' button. \\
+\hline
+\textbf{Preconditions:} &
 \begin{itemize}
-    \item User has valid email address
-    \item Username is unique in the system
-    \item Password meets security requirements
-\end{itemize}
-
-\textbf{Postconditions:}
+  \item The user is not logged in
+  \item The email is not already in use
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
 \begin{itemize}
-    \item User account created with encrypted password
-    \item Role assigned based on registration type
-    \item User profile initialized
-    \item Account activation email sent
-\end{itemize}
-
-\textbf{Normal Flow:}
+  \item A Level 1 donor account is created
+  \item The user can log in
+  \item The account remains ineligible for donation event registration until verified (Level 2)
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
 \begin{enumerate}
-    \item User accesses registration screen
-    \item User enters username, email, password, and confirms password
-    \item User selects role (Patient/Doctor)
-    \item User provides additional profile information
-    \item System validates input data
-    \item System checks username and email uniqueness
-    \item System creates user account with encrypted password
-    \item System assigns appropriate role
-    \item System creates corresponding profile record
-    \item System sends confirmation response
-\end{enumerate}
-
-\textbf{Alternative Flows:}
+  \item User opens the registration page
+  \item Fills in the form
+  \item Submits the form
+  \item System validates input and creates the account
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} & None defined \\
+\hline
+\textbf{Exceptions:} &
 \begin{itemize}
-    \item \textbf{1.1 Doctor Registration:} Additional validation for medical credentials and specialty selection
-\end{itemize}
-
-\textbf{Exceptions:}
+  \item EX-1: If the email is already in use, the system shows an error message: \textit{"Email is already in use. Please use another email."}
+  \item EX-2: If the user is under the required age, the system shows an ineligibility message: \textit{"You are not eligible to register as a blood donor."}
+  \item EX-3: If a database or server error occurs, the system shows a retry message: \textit{"A system error occurred. Please try again later."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
 \begin{itemize}
-    \item \textbf{1.0.E1:} Username already exists - System displays error message
-    \item \textbf{1.0.E2:} Email already registered - System displays error message
-    \item \textbf{1.0.E3:} Password confirmation mismatch - System requests password re-entry
-    \item \textbf{1.0.E4:} Invalid email format - System displays validation error
-\end{itemize}
-
-\textbf{Priority:} Must Have
-
-\textbf{Frequency of Use:} Low frequency, primarily during initial system rollout
-
-\textbf{Business Rules:} BR-001, BR-002, BR-003
-
-\paragraph{b. Business Rules}
-
-\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
+  \item BR-21: Only Level 2 (verified) users can register for donation events
+  \item BR-22: User profile must be accurate and match official documents (relevant for Level 2 verification)
+\end{itemize} \\
 \hline
-\textbf{ID} & \textbf{Business Rule} & \textbf{Business Rule Description} \\
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item The user provides a valid email and basic profile information
+  \item Level 2 access requires identity and health status confirmation at a medical center
+\end{itemize} \\
 \hline
-BR-001 & Password Security & User passwords must be hashed using BCrypt with minimum 8 characters, including uppercase, lowercase, and numbers \\
+\textbf{Priority:} & High \\
 \hline
-BR-002 & Unique Credentials & Username and email must be unique across the entire system \\
-\hline
-BR-003 & Role Validation & Doctor registrations require additional verification of medical credentials \\
+\textbf{Frequency of Use:} & Daily \\
 \hline
 \end{longtable}
 
-\subsubsection{UC-002\_User Login}
 
-\paragraph{a. Functional Description}
 
-\textbf{UC ID and Name:} UC-002 User Login
 
-\textbf{Created By:} Development Team
 
-\textbf{Date Created:} January 2025
+\subsubsection{UC-02 – Log In}
 
-\textbf{Primary Actor:} Registered User (Patient/Doctor/Admin/Manager)
 
-\textbf{Secondary Actors:} Authentication Service
-
-\textbf{Trigger:} User attempts to access the system or protected resources
-
-\textbf{Description:} Registered users authenticate using username/password credentials to access role-appropriate system features. The system validates credentials and provides JWT tokens for secure session management.
-
-\textbf{Preconditions:}
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-02 – Log In \\
+\hline
+\textbf{Created By:} & KhoaDD \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Guest, Donor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & The user logs into the system using their email and password. Upon successful login, the system redirects the user to their personal dashboard. Account access may be limited based on verification level (Level 1 or Level 2). \\
+\hline
+\textbf{Trigger:} & The user submits the login form. \\
+\hline
+\textbf{Preconditions:} &
 \begin{itemize}
-    \item User account exists and is active
-    \item User has valid credentials
-\end{itemize}
-
-\textbf{Postconditions:}
+  \item A registered account exists
+  \item The user is not currently logged in
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
 \begin{itemize}
-    \item User session established with JWT token
-    \item User redirected to role-appropriate dashboard
-    \item Login activity logged for security audit
-\end{itemize}
-
-\textbf{Normal Flow:}
+  \item The user is authenticated
+  \item The user is redirected to their personal dashboard
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
 \begin{enumerate}
-    \item User accesses login screen
-    \item User enters username and password
-    \item System validates credentials against database
-    \item System generates JWT token with role information
-    \item System returns authentication response with token
-    \item User redirected to appropriate dashboard
-    \item System logs successful login activity
-\end{enumerate}
-
-\textbf{Alternative Flows:} None
-
-\textbf{Exceptions:}
+  \item User opens the login form
+  \item Enters email and password
+  \item Submits the form
+  \item The system validates the credentials and logs the user in
+  \item User is redirected to the dashboard with access based on account verification level
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} & None defined \\
+\hline
+\textbf{Exceptions:} &
 \begin{itemize}
-    \item \textbf{2.0.E1:} Invalid credentials - System displays error message and logs failed attempt
-    \item \textbf{2.0.E2:} Account inactive - System displays account status message
-    \item \textbf{2.0.E3:} Multiple failed attempts - System temporarily locks account
-\end{itemize}
-
-\textbf{Priority:} Must Have
-
-\textbf{Frequency of Use:} High - Daily usage by all system users
-
-\textbf{Business Rules:} BR-004, BR-005, BR-006
-
-\paragraph{b. Business Rules}
-
-\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
+  \item EX-1: If the email or password is incorrect, show an error message: \textit{"Invalid email or password."}
+  \item EX-2: If the system is unavailable (e.g., server error), show an error message: \textit{"Unable to connect. Please try again later."}
+\end{itemize} \\
 \hline
-\textbf{ID} & \textbf{Business Rule} & \textbf{Business Rule Description} \\
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-24: Email must follow institutional format (e.g., *@gmail.com)
+\end{itemize} \\
 \hline
-BR-004 & Session Management & JWT tokens expire after 24 hours and must be refreshed for continued access \\
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item The account is active and verified
+  \item The user provides correct credentials
+\end{itemize} \\
 \hline
-BR-005 & Account Lockout & Account locked for 30 minutes after 5 consecutive failed login attempts \\
+\textbf{Priority:} & High \\
 \hline
-BR-006 & Audit Logging & All login attempts (successful and failed) are logged with timestamp, IP address, and user agent \\
+\textbf{Frequency of Use:} & Daily \\
 \hline
 \end{longtable}
 
-\subsection{Appointment Management}
+\subsubsection{UC-03 – View Hospital Information}
 
-\subsubsection{UC-004\_Book Appointment}
-
-\paragraph{a. Functional Description}
-
-\textbf{UC ID and Name:} UC-004 Book Appointment
-
-\textbf{Created By:} Development Team
-
-\textbf{Date Created:} January 2025
-
-\textbf{Primary Actor:} Patient
-
-\textbf{Secondary Actors:} Doctor (availability provider)
-
-\textbf{Trigger:} Patient initiates appointment booking process
-
-\textbf{Description:} Patients book appointments with available doctors by selecting from available time slots. The system ensures no double-booking and automatically updates doctor availability.
-
-\textbf{Preconditions:}
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-03 – View Hospital Information \\
+\hline
+\textbf{Created By:} & AnPP \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Guest \\
+\hline
+\textbf{Secondary Actors:} & None \\
+\hline
+\textbf{Description:} & The user views information about the hospital, including its services, location, and contact details. \\
+\hline
+\textbf{Trigger:} & The user accesses the homepage or selects the "About Us" section. \\
+\hline
+\textbf{Preconditions:} &
 \begin{itemize}
-    \item Patient is logged into the system
-    \item Doctor has available time slots
-    \item Patient has no conflicting appointments
-\end{itemize}
-
-\textbf{Postconditions:}
+  \item The system is online and accessible
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
 \begin{itemize}
-    \item Appointment created with "Scheduled" status
-    \item Doctor availability slot marked as booked
-    \item Appointment confirmation sent to patient
-    \item Automatic reminders scheduled
-\end{itemize}
-
-\textbf{Normal Flow:}
+  \item Hospital information is displayed to the user
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
 \begin{enumerate}
-    \item Patient accesses appointment booking screen
-    \item System displays list of available doctors
-    \item Patient selects preferred doctor
-    \item System displays available time slots for selected doctor
-    \item Patient selects desired appointment time
-    \item Patient provides appointment notes (optional)
-    \item System validates appointment availability
-    \item System creates appointment record
-    \item System updates doctor availability slot
-    \item System schedules automatic reminders
-    \item System sends confirmation to patient
-\end{enumerate}
-
-\textbf{Alternative Flows:}
+  \item User opens the website
+  \item Clicks on "About Us"
+  \item The system displays hospital information
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} & None defined \\
+\hline
+\textbf{Exceptions:} &
 \begin{itemize}
-    \item \textbf{4.1 Emergency Appointment:} Priority booking for urgent medical needs
-\end{itemize}
-
-\textbf{Exceptions:}
+  \item EX-1: If hospital data is unavailable, the system displays a default message or an error: \textit{"Hospital information is currently unavailable."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
 \begin{itemize}
-    \item \textbf{4.0.E1:} Time slot no longer available - System refreshes available slots
-    \item \textbf{4.0.E2:} Patient has conflicting appointment - System displays conflict warning
-    \item \textbf{4.0.E3:} Maximum appointments per day exceeded - System enforces daily limit
-\end{itemize}
-
-\textbf{Priority:} Must Have
-
-\textbf{Frequency of Use:} High - Multiple daily bookings expected
-
-\textbf{Business Rules:} BR-007, BR-008, BR-009
-
-\paragraph{b. Business Rules}
-
-\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
+  \item BR-19: Only admins can make changes to system about hospital information
+\end{itemize} \\
 \hline
-\textbf{ID} & \textbf{Business Rule} & \textbf{Business Rule Description} \\
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Hospital information is properly maintained and updated in the system
+\end{itemize} \\
 \hline
-BR-007 & Appointment Limits & Patients limited to 3 active appointments at any time \\
+\textbf{Priority:} & Medium \\
 \hline
-BR-008 & Advance Booking & Appointments can be booked up to 30 days in advance \\
-\hline
-BR-009 & Default Duration & All appointments default to 30 minutes unless specified otherwise \\
+\textbf{Frequency of Use:} & Occasional \\
 \hline
 \end{longtable}
 
-\subsection{Patient Care Management}
 
-\subsubsection{UC-007\_Manage Patient Records}
+\subsubsection{UC-04 – Read Blogs}
 
-\paragraph{a. Functional Description}
-
-\textbf{UC ID and Name:} UC-007 Manage Patient Records
-
-\textbf{Created By:} Development Team
-
-\textbf{Date Created:} January 2025
-
-\textbf{Primary Actor:} Doctor
-
-\textbf{Secondary Actors:} Patient, Admin
-
-\textbf{Trigger:} Doctor accesses patient record during appointment or review
-
-\textbf{Description:} Doctors access and update comprehensive patient medical records including medical history, allergies, current medications, and treatment notes. The system maintains complete audit trails of all record modifications.
-
-\textbf{Preconditions:}
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-04 – Read Blogs \\
+\hline
+\textbf{Created By:} & AnPP \\
+\hline
+\textbf{Date Created:} & 29/6 \\
+\hline
+\textbf{Primary Actor:} & Guest \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & The user reads educational blog posts related to blood donation. \\
+\hline
+\textbf{Trigger:} & The user clicks on the "Blog" section. \\
+\hline
+\textbf{Preconditions:} &
 \begin{itemize}
-    \item Doctor is authenticated with appropriate permissions
-    \item Patient record exists in the system
-    \item Doctor has legitimate medical reason for access
-\end{itemize}
-
-\textbf{Postconditions:}
+  \item At least one blog post has been published
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
 \begin{itemize}
-    \item Patient record updated with new information
-    \item Modification audit trail created
-    \item Patient notified of record updates (if enabled)
-\end{itemize}
-
-\textbf{Normal Flow:}
+  \item A list of blogs is displayed
+  \item The user can read individual posts
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
 \begin{enumerate}
-    \item Doctor searches for patient record
-    \item System displays patient medical information
-    \item Doctor reviews current medical history
-    \item Doctor updates relevant medical information
-    \item Doctor adds appointment notes
-    \item System validates input data
-    \item System saves record updates
-    \item System creates audit log entry
-    \item System confirms successful update
-\end{enumerate}
-
-\textbf{Alternative Flows:}
+  \item User clicks "Blog"
+  \item System displays list of available posts
+  \item User selects and reads a blog
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} No blog posts available → Show message: \textit{"No blog content is currently available."} \\
+\hline
+\textbf{Exceptions:} &
 \begin{itemize}
-    \item \textbf{7.1 Emergency Access:} Override access for emergency medical situations
-    \item \textbf{7.2 Patient Self-Update:} Patients update non-clinical information
-\end{itemize}
-
-\textbf{Exceptions:}
+  \item EX-1: System error → Show message: \textit{"Unable to load blogs. Please try again later."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
 \begin{itemize}
-    \item \textbf{7.0.E1:} Access denied - Patient privacy settings prevent access
-    \item \textbf{7.0.E2:} Record locked - Another doctor currently editing
-    \item \textbf{7.0.E3:} Invalid data - System validates medical information format
-\end{itemize}
-
-\textbf{Priority:} Must Have
-
-\textbf{Frequency of Use:} High - Used during every patient consultation
-
-\textbf{Business Rules:} BR-010, BR-011, BR-012
-
-\paragraph{b. Business Rules}
-
-\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
+  \item BR-17: Only blog authors or admins can edit blog articles
+\end{itemize} \\
 \hline
-\textbf{ID} & \textbf{Business Rule} & \textbf{Business Rule Description} \\
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Blog content is reviewed and approved before being published
+\end{itemize} \\
 \hline
-BR-010 & Privacy Protection & Patient records can only be accessed by treating doctors or with explicit patient consent \\
+\textbf{Priority:} & Medium \\
 \hline
-BR-011 & Audit Requirements & All record access and modifications must be logged with doctor ID, timestamp, and reason \\
-\hline
-BR-012 & Data Retention & Patient records must be retained for minimum 7 years as per medical regulations \\
+\textbf{Frequency of Use:} & Frequent \\
 \hline
 \end{longtable}
 
-\subsection{Notification System}
 
-\subsubsection{UC-010\_Appointment Reminders}
+\subsubsection{UC-05 – Manage Personal Profile}
 
-\paragraph{a. Functional Description}
-
-\textbf{UC ID and Name:} UC-010 Appointment Reminders
-
-\textbf{Created By:} Development Team
-
-\textbf{Date Created:} January 2025
-
-\textbf{Primary Actor:} System (Automated Service)
-
-\textbf{Secondary Actors:} Patient, Notification Service
-
-\textbf{Trigger:} Scheduled reminder time reached for upcoming appointment
-
-\textbf{Description:} System automatically sends appointment reminders to patients at configured intervals (24 hours, 1 hour, 30 minutes) before scheduled appointments using notification templates.
-
-\textbf{Preconditions:}
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-05 – Manage Personal Profile \\
+\hline
+\textbf{Created By:} & TuanTM \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Donor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & The donor views and updates their personal profile, including contact information. \\
+\hline
+\textbf{Trigger:} & The user accesses the "My Profile" section. \\
+\hline
+\textbf{Preconditions:} &
 \begin{itemize}
-    \item Appointment exists with scheduled date/time
-    \item Patient has active notification preferences
-    \item Notification templates configured
-\end{itemize}
-
-\textbf{Postconditions:}
+  \item The user is logged in to the system
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
 \begin{itemize}
-    \item Reminder notification sent to patient
-    \item Notification status updated in database
-    \item Delivery confirmation logged
-\end{itemize}
-
-\textbf{Normal Flow:}
+  \item Profile data is updated and saved successfully
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
 \begin{enumerate}
-    \item System scheduler identifies upcoming appointments
-    \item System checks reminder intervals (24h, 1h, 30min)
-    \item System selects appropriate notification template
-    \item System personalizes message with patient/doctor details
-    \item System sends notification via configured channels
-    \item System logs notification delivery
-    \item System updates reminder status
-\end{enumerate}
-
-\textbf{Alternative Flows:}
+  \item User navigates to profile section
+  \item Edits personal information
+  \item Clicks "Save"
+  \item System validates and saves changes
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} Invalid input (e.g., phone number format) → Show error: \textit{"Please correct the highlighted fields."} \\
+\hline
+\textbf{Exceptions:} &
 \begin{itemize}
-    \item \textbf{10.1 SMS Reminder:} Send reminder via SMS for urgent notifications
-    \item \textbf{10.2 Email Reminder:} Send detailed reminder via email
-\end{itemize}
-
-\textbf{Exceptions:}
+  \item EX-1: If update fails due to system error → Show error: \textit{"Failed to update profile. Please try again."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
 \begin{itemize}
-    \item \textbf{10.0.E1:} Delivery failure - System retries notification delivery
-    \item \textbf{10.0.E2:} Patient opted out - System skips notification
-    \item \textbf{10.0.E3:} Appointment cancelled - System cancels pending reminders
-\end{itemize}
-
-\textbf{Priority:} Should Have
-
-\textbf{Frequency of Use:} High - Automated daily operations
-
-\textbf{Business Rules:} BR-013, BR-014, BR-015
-
-\paragraph{b. Business Rules}
-
-\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
+  \item BR-22: User profile information must be accurate and match official documents
+\end{itemize} \\
 \hline
-\textbf{ID} & \textbf{Business Rule} & \textbf{Business Rule Description} \\
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Profile data is accurate and editable
+\end{itemize} \\
 \hline
-BR-013 & Reminder Schedule & Appointment reminders sent at 24 hours, 1 hour, and 30 minutes before appointment \\
+\textbf{Priority:} & High \\
 \hline
-BR-014 & Template Usage & All notifications must use predefined templates for consistency \\
-\hline
-BR-015 & Opt-out Respect & System must respect patient notification preferences and opt-out requests \\
+\textbf{Frequency of Use:} & Occasional \\
 \hline
 \end{longtable}
+
 
 \section{Design Specifications}
 
