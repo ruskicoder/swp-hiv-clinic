@@ -694,6 +694,1374 @@ Medical Records & Clinical Standards & System must support standard clinical dat
 \hline
 \end{longtable}
 
+\section{Design Specifications}
+
+\subsection{Use Case Design Specifications}
+
+This section provides detailed design specifications for all 45 implemented use cases, including UI mockups and implementation details.
+
+\subsubsection{Guest/Unauthenticated User Use Cases}
+
+\paragraph{UC-001: User Registration}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-001: User Registration \\
+\hline
+\textbf{Primary Actor:} & Unauthenticated User \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & New users create accounts with role-based access (Patient/Doctor) including email validation, password confirmation, and automatic role assignment \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Registration Form} \vspace{2cm}}}
+    \caption*{User Registration Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Registration form with validation
+\item Backend: AuthController.registerUser()
+\item Database: Users table with role assignment
+\item Validation: Email format, password strength
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-002: User Login}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-002: User Login \\
+\hline
+\textbf{Primary Actor:} & Unauthenticated User \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Users authenticate using username/password with JWT token-based security, role-based redirection, and session management \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Form} \vspace{2cm}}}
+    \caption*{User Login Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Login form with credential validation
+\item Backend: AuthController.loginUser()
+\item Security: JWT token generation
+\item Redirection: Role-based dashboard routing
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-003: Browse Public Website}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-003: Browse Public Website \\
+\hline
+\textbf{Primary Actor:} & Unauthenticated User \\
+\hline
+\textbf{Secondary Actors:} & None \\
+\hline
+\textbf{Description:} & Unauthenticated users access public clinic information, services overview, and contact details \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Public Website Homepage} \vspace{2cm}}}
+    \caption*{Public Website Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Public website components
+\item Content: Clinic information, services, contact
+\item Access: No authentication required
+\item SEO: Optimized for search engines
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\subsubsection{Patient Use Cases}
+
+\paragraph{UC-004: View Patient Dashboard}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-004: View Patient Dashboard \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients access personalized dashboard with appointments overview, treatment status, notifications, and clinic statistics \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Dashboard} \vspace{2cm}}}
+    \caption*{Patient Dashboard Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: CustomerDashboard.jsx
+\item Backend: Patient data aggregation
+\item Features: Appointments, notifications, statistics
+\item Security: Patient role authentication
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-005: Book Appointment}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-005: Book Appointment \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & Doctor, System \\
+\hline
+\textbf{Description:} & Patients schedule appointments with available doctors using unified calendar interface, slot availability checking, and confirmation system \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Booking Form} \vspace{2cm}}}
+    \caption*{Appointment Booking Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Appointment booking components
+\item Backend: AppointmentController.bookAppointment()
+\item Validation: Slot availability, doctor schedule
+\item Notifications: Confirmation messages
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-006: View Appointments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-006: View Appointments \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients view current appointments, upcoming appointments, appointment history with detailed information and status tracking \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Appointments List} \vspace{2cm}}}
+    \caption*{Patient Appointments Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Appointment list components
+\item Backend: AppointmentController.getPatientAppointments()
+\item Filtering: Upcoming, past, status-based
+\item Details: Doctor info, time, status
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-007: Cancel Appointment}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-007: Cancel Appointment \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & Doctor, System \\
+\hline
+\textbf{Description:} & Patients cancel scheduled appointments with cancellation reasons, status updates, and automatic notifications \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Cancellation Form} \vspace{2cm}}}
+    \caption*{Appointment Cancellation Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Cancellation form with reason selection
+\item Backend: AppointmentController.cancelAppointment()
+\item Workflow: Status update, notification sending
+\item Validation: Cancellation policy compliance
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-008: View Medical Records}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-008: View Medical Records \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients access their personal medical records, treatment history, current medications, and healthcare documentation \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Medical Records View} \vspace{2cm}}}
+    \caption*{Medical Records Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Medical records display components
+\item Backend: PatientRecordController.getRecords()
+\item Security: Patient-specific access control
+\item Content: History, medications, treatments
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-009: Update Medical Records}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-009: Update Medical Records \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients update personal medical information, emergency contacts, medical history, and healthcare preferences \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medical Records Update Form} \vspace{2cm}}}
+    \caption*{Medical Records Update Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Editable medical record forms
+\item Backend: PatientRecordController.updateRecords()
+\item Validation: Medical data format validation
+\item Audit: Change history tracking
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-010: View ARV Treatments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-010: View ARV Treatments \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients view their HIV antiretroviral treatment regimens, adherence tracking, medication schedules, and treatment progress \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment View} \vspace{2cm}}}
+    \caption*{ARV Treatment Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: ARV treatment display components
+\item Backend: ARVTreatmentController.getPatientTreatments()
+\item Features: Schedules, adherence tracking, progress
+\item Integration: Medication routine management
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-011: Update Profile}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-011: Update Profile \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients update personal information, profile images, contact details, and account preferences \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Profile Update Form} \vspace{2cm}}}
+    \caption*{Profile Update Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Profile editing components
+\item Backend: User profile update endpoints
+\item Features: Image upload, contact info, preferences
+\item Validation: Data format and consistency checks
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-012: Change Password}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-012: Change Password \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients change account passwords with current password validation, new password confirmation, and security checks \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Change Form} \vspace{2cm}}}
+    \caption*{Password Change Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Password change form with validation
+\item Backend: AuthController.changePassword()
+\item Security: Current password verification, strength checks
+\item Session: Session invalidation after change
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-013: Receive Notifications}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-013: Receive Notifications \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System, Doctor \\
+\hline
+\textbf{Description:} & Patients receive appointment reminders, treatment notifications, custom messages, and system alerts \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notifications Panel} \vspace{2cm}}}
+    \caption*{Notifications Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Notification display components
+\item Backend: NotificationController.getPatientNotifications()
+\item Types: Reminders, treatments, custom, alerts
+\item Features: Read status, categorization
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-014: View Privacy Settings}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-014: View Privacy Settings \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients manage privacy preferences, notification settings, and data sharing controls \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Privacy Settings Panel} \vspace{2cm}}}
+    \caption*{Privacy Settings Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Privacy settings management
+\item Backend: Privacy preference storage
+\item Controls: Data sharing, notifications, visibility
+\item Compliance: HIPAA and GDPR requirements
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\subsubsection{Doctor Use Cases}
+
+\paragraph{UC-015: View Doctor Dashboard}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-015: View Doctor Dashboard \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Doctors access professional dashboard with patient appointments, notifications, availability management, and clinical tools \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Dashboard} \vspace{2cm}}}
+    \caption*{Doctor Dashboard Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: DoctorDashboard.jsx
+\item Backend: Doctor-specific data aggregation
+\item Features: Appointments, patients, notifications, tools
+\item Security: Doctor role authentication
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-016: Manage Appointments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-016: Manage Appointments \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & Patient, System \\
+\hline
+\textbf{Description:} & Doctors view and manage scheduled appointments with patients, appointment details, and patient information \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Appointments Management} \vspace{2cm}}}
+    \caption*{Doctor Appointments Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Doctor appointment management components
+\item Backend: AppointmentController.getDoctorAppointments()
+\item Features: Schedule view, patient details, appointment management
+\item Integration: Patient records access
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-017: Update Appointment Status}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-017: Update Appointment Status \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & Patient, System \\
+\hline
+\textbf{Description:} & Doctors update appointment status (completed, cancelled, rescheduled), add clinical notes, and manage follow-ups \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Status Update Form} \vspace{2cm}}}
+    \caption*{Appointment Status Update Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Status update forms and components
+\item Backend: AppointmentController.updateAppointmentStatus()
+\item Features: Status changes, clinical notes, follow-ups
+\item Notifications: Patient status change alerts
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-018: Manage Availability}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-018: Manage Availability \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Doctors create, update, and manage availability time slots for patient appointments with flexible scheduling options \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Availability Management} \vspace{2cm}}}
+    \caption*{Doctor Availability Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Availability scheduling components
+\item Backend: DoctorController.manageAvailability()
+\item Features: Time slot creation, modification, deletion
+\item Integration: Appointment booking system
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-019: Access Patient Records}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-019: Access Patient Records \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Doctors access comprehensive patient medical records during consultations with full clinical history and treatment data \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Access View} \vspace{2cm}}}
+    \caption*{Patient Records Access Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Comprehensive patient record viewer
+\item Backend: PatientRecordController.getDoctorPatientRecords()
+\item Security: Doctor-patient relationship verification
+\item Content: Full medical history, treatments, notes
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-020: Manage ARV Treatments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-020: Manage ARV Treatments \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & Patient, System \\
+\hline
+\textbf{Description:} & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, track side effects, and adjust treatment protocols \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Management} \vspace{2cm}}}
+    \caption*{ARV Treatment Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: ARV treatment management components
+\item Backend: ARVTreatmentController.manageTreatments()
+\item Features: Regimen creation, adherence monitoring, adjustments
+\item Integration: Medication routine system
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-021: Send Notifications}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-021: Send Notifications \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & Patient, System \\
+\hline
+\textbf{Description:} & Doctors send custom notifications to patients regarding appointments, treatments, and healthcare instructions \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Send Notification Form} \vspace{2cm}}}
+    \caption*{Send Notification Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Notification composition interface
+\item Backend: NotificationController.sendNotification()
+\item Features: Custom messages, patient selection, scheduling
+\item Templates: Integration with notification templates
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-022: Manage Notification Templates}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-022: Manage Notification Templates \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Doctors create, edit, and manage templates for common notifications to streamline patient communication \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification Templates Management} \vspace{2cm}}}
+    \caption*{Notification Templates Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Template management interface
+\item Backend: NotificationController.manageTemplates()
+\item Features: Template creation, editing, categorization
+\item Sharing: Template library for all doctors
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-023: View Notification History}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-023: View Notification History \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Doctors review history of notifications sent to patients, delivery status, and patient responses \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification History View} \vspace{2cm}}}
+    \caption*{Notification History Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Notification history display
+\item Backend: NotificationController.getNotificationHistory()
+\item Features: History tracking, delivery status, analytics
+\item Filtering: Date range, patient, notification type
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\subsubsection{Administrator Use Cases}
+
+\paragraph{UC-024: View Admin Dashboard}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-024: View Admin Dashboard \\
+\hline
+\textbf{Primary Actor:} & Administrator \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Administrators access system-wide dashboard with user management, system statistics, and administrative oversight tools \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Admin Dashboard} \vspace{2cm}}}
+    \caption*{Admin Dashboard Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: AdminDashboard.jsx
+\item Backend: System-wide data aggregation
+\item Features: User management, statistics, system oversight
+\item Security: Administrator role authentication
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-025: Manage Users}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-025: Manage Users \\
+\hline
+\textbf{Primary Actor:} & Administrator \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Administrators manage all user accounts across the system with comprehensive user administration capabilities \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Management Interface} \vspace{2cm}}}
+    \caption*{User Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: User management components
+\item Backend: AdminController.manageUsers()
+\item Features: User listing, details, role management, status
+\item Operations: Create, update, deactivate, role assignment
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-026: Create Doctor Accounts}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-026: Create Doctor Accounts \\
+\hline
+\textbf{Primary Actor:} & Administrator \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Administrators create new doctor accounts with specialized permissions, specialty assignments, and professional credentials \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Create Doctor Account Form} \vspace{2cm}}}
+    \caption*{Create Doctor Account Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Doctor account creation form
+\item Backend: AdminController.createDoctorAccount()
+\item Features: Specialty assignment, credentials, permissions
+\item Integration: Doctor profile and availability setup
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-027: Reset User Passwords}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-027: Reset User Passwords \\
+\hline
+\textbf{Primary Actor:} & Administrator \\
+\hline
+\textbf{Secondary Actors:} & User, System \\
+\hline
+\textbf{Description:} & Administrators reset passwords for users who cannot access their accounts with secure password generation \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Reset Interface} \vspace{2cm}}}
+    \caption*{Password Reset Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Password reset interface
+\item Backend: AdminController.resetUserPassword()
+\item Security: Secure password generation, user notification
+\item Process: Temporary password, forced change on login
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-028: Manage Specialties}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-028: Manage Specialties \\
+\hline
+\textbf{Primary Actor:} & Administrator \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Administrators manage medical specialties for doctor categorization and appointment filtering \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Specialty Management Interface} \vspace{2cm}}}
+    \caption*{Specialty Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Specialty management components
+\item Backend: AdminController.manageSpecialties()
+\item Features: Specialty creation, editing, assignment
+\item Integration: Doctor profiles, appointment filtering
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-029: Toggle User Status}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-029: Toggle User Status \\
+\hline
+\textbf{Primary Actor:} & Administrator \\
+\hline
+\textbf{Secondary Actors:} & User, System \\
+\hline
+\textbf{Description:} & Administrators activate or deactivate user accounts across the system for security and access control \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Status Management} \vspace{2cm}}}
+    \caption*{User Status Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: User status toggle controls
+\item Backend: AdminController.toggleUserStatus()
+\item Features: Activation, deactivation, status tracking
+\item Security: Access control enforcement, audit logging
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-030: View All Appointments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-030: View All Appointments \\
+\hline
+\textbf{Primary Actor:} & Administrator \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Administrators view all appointments across the system for oversight, monitoring, and system analysis \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System-wide Appointments View} \vspace{2cm}}}
+    \caption*{System-wide Appointments Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: System-wide appointment viewer
+\item Backend: AdminController.getAllAppointments()
+\item Features: All appointments, filtering, monitoring
+\item Analytics: System utilization, appointment patterns
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\subsubsection{Manager Use Cases}
+
+\paragraph{UC-031: View Manager Dashboard}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-031: View Manager Dashboard \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers access operational dashboard with clinic statistics, analytics, and data management tools \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Manager Dashboard} \vspace{2cm}}}
+    \caption*{Manager Dashboard Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: ManagerDashboard.jsx
+\item Backend: Operational data aggregation
+\item Features: Statistics, analytics, management tools
+\item Security: Manager role authentication
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-032: View Statistics}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-032: View Statistics \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers view comprehensive clinic statistics including patient counts, doctor metrics, appointment analytics, and ARV treatment statistics \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Statistics Dashboard} \vspace{2cm}}}
+    \caption*{Statistics Dashboard Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Statistics visualization components
+\item Backend: ManagerController.getStatistics()
+\item Features: Patient metrics, doctor analytics, appointments, treatments
+\item Visualization: Charts, graphs, reports
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-033: Manage Patient Records}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-033: Manage Patient Records \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers oversee patient records management, data integrity, and operational patient information \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Management} \vspace{2cm}}}
+    \caption*{Patient Records Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Patient records oversight interface
+\item Backend: ManagerController.managePatientRecords()
+\item Features: Record oversight, data integrity, validation
+\item Operations: Bulk operations, data quality checks
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-034: Manage Doctor Records}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-034: Manage Doctor Records \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers oversee doctor records, professional information, and clinical staff management \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Records Management} \vspace{2cm}}}
+    \caption*{Doctor Records Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Doctor records management interface
+\item Backend: ManagerController.manageDoctorRecords()
+\item Features: Professional info, credentials, performance
+\item Operations: Staff oversight, credential verification
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-035: Manage ARV Treatments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-035: Manage ARV Treatments \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers monitor and oversee ARV treatment programs across the clinic with comprehensive treatment oversight \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Program Management} \vspace{2cm}}}
+    \caption*{ARV Treatment Program Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: ARV program management interface
+\item Backend: ManagerController.manageARVTreatments()
+\item Features: Program oversight, effectiveness tracking, inventory
+\item Analytics: Treatment outcomes, adherence rates, costs
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-036: Manage Schedules}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-036: Manage Schedules \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers oversee clinic scheduling, appointment distribution, and availability coordination \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Schedule Management Interface} \vspace{2cm}}}
+    \caption*{Schedule Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Schedule oversight interface
+\item Backend: ManagerController.manageSchedules()
+\item Features: Clinic scheduling, resource optimization, coordination
+\item Analytics: Utilization rates, appointment patterns
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-037: Search Patients}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-037: Search Patients \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers search for specific patients across the clinic database with name-based filtering and patient lookup \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Search Interface} \vspace{2cm}}}
+    \caption*{Patient Search Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Patient search components
+\item Backend: ManagerController.searchPatients()
+\item Features: Name-based search, filtering, lookup
+\item Performance: Optimized search queries, indexing
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-038: Search Doctors}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-038: Search Doctors \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers search for specific doctors in the clinic system with name and specialty-based filtering \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Search Interface} \vspace{2cm}}}
+    \caption*{Doctor Search Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Doctor search components
+\item Backend: ManagerController.searchDoctors()
+\item Features: Name and specialty search, filtering
+\item Integration: Appointment booking, staff management
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-039: Export Data (CSV)}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-039: Export Data (CSV) \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers export various clinic data in CSV format for reporting, analysis, and external system integration \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Data Export Interface} \vspace{2cm}}}
+    \caption*{Data Export Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Data export interface
+\item Backend: ManagerController.exportData()
+\item Features: CSV format, multiple data types, secure download
+\item Data Types: Patients, doctors, appointments, treatments
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-040: View Patient Details}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-040: View Patient Details \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers access detailed patient information for operational oversight, compliance, and data management \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Details View} \vspace{2cm}}}
+    \caption*{Patient Details View Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Detailed patient information viewer
+\item Backend: ManagerController.getPatientDetails()
+\item Features: Comprehensive patient data, compliance monitoring
+\item Security: Manager-level access control
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-041: View Doctor Details}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-041: View Doctor Details \\
+\hline
+\textbf{Primary Actor:} & Manager \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Managers access detailed doctor information for operational oversight, performance monitoring, and staff management \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Details View} \vspace{2cm}}}
+    \caption*{Doctor Details View Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Detailed doctor information viewer
+\item Backend: ManagerController.getDoctorDetails()
+\item Features: Professional info, performance metrics, staff management
+\item Analytics: Performance monitoring, development tracking
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\subsubsection{System-Wide Use Cases}
+
+\paragraph{UC-042: Session Management}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-042: Session Management \\
+\hline
+\textbf{Primary Actor:} & System \\
+\hline
+\textbf{Secondary Actors:} & All Users \\
+\hline
+\textbf{Description:} & System manages user sessions with validation, extension, and invalidation for security and user experience \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Session Management Indicators} \vspace{2cm}}}
+    \caption*{Session Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Session status indicators, timeout warnings
+\item Backend: Session validation, extension, invalidation
+\item Security: JWT token management, timeout handling
+\item User Experience: Session extension prompts
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-043: Login Activity Tracking}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-043: Login Activity Tracking \\
+\hline
+\textbf{Primary Actor:} & System \\
+\hline
+\textbf{Secondary Actors:} & All Users \\
+\hline
+\textbf{Description:} & System tracks login attempts, IP addresses, user agents, and login statistics for security monitoring and audit trails \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Activity Dashboard} \vspace{2cm}}}
+    \caption*{Login Activity Tracking Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Activity dashboard for admins
+\item Backend: Login activity logging and tracking
+\item Security: IP tracking, user agent analysis, audit trails
+\item Analytics: Login patterns, security monitoring
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-044: Medication Routine Management}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-044: Medication Routine Management \\
+\hline
+\textbf{Primary Actor:} & System \\
+\hline
+\textbf{Secondary Actors:} & Patient, Doctor \\
+\hline
+\textbf{Description:} & System manages medication routines, schedules, and reminders for comprehensive patient care \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medication Routine Management} \vspace{2cm}}}
+    \caption*{Medication Routine Management Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Medication schedule interface
+\item Backend: Routine management, reminder system
+\item Features: Schedule creation, modifications, reminders
+\item Integration: ARV treatment system, notifications
+\end{itemize} \\
+\hline
+\end{longtable}
+
+\paragraph{UC-045: Health Monitoring}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-045: Health Monitoring \\
+\hline
+\textbf{Primary Actor:} & System \\
+\hline
+\textbf{Secondary Actors:} & Administrator \\
+\hline
+\textbf{Description:} & System monitors application health, database connectivity, and system status for operational reliability \\
+\hline
+\textbf{UI Screenshot:} & 
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System Health Dashboard} \vspace{2cm}}}
+    \caption*{System Health Monitoring Interface}
+\end{figure} \\
+\hline
+\textbf{Implementation Details:} & 
+\begin{itemize}
+\item Frontend: Health monitoring dashboard
+\item Backend: Health checks, connectivity monitoring
+\item Features: Application status, database health, alerts
+\item Monitoring: Performance metrics, error tracking
+\end{itemize} \\
+\hline
+\end{longtable}
+
 \subsection{System High Level Design}
 
 \subsubsection{Database Design}
@@ -880,525 +2248,5 @@ The HIV Clinic system follows a layered Spring Boot architecture:
 \textbf{Frequency of Use:} & Daily \\
 \hline
 \end{longtable}
-
-
-
-
-
-\subsubsection{UC-02 – Log In}
-
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-02 – Log In \\
-\hline
-\textbf{Created By:} & KhoaDD \\
-\hline
-\textbf{Date Created:} & 28/6 \\
-\hline
-\textbf{Primary Actor:} & Guest, Donor \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & The user logs into the system using their email and password. Upon successful login, the system redirects the user to their personal dashboard. Account access may be limited based on verification level (Level 1 or Level 2). \\
-\hline
-\textbf{Trigger:} & The user submits the login form. \\
-\hline
-\textbf{Preconditions:} &
-\begin{itemize}
-  \item A registered account exists
-  \item The user is not currently logged in
-\end{itemize} \\
-\hline
-\textbf{Postconditions:} &
-\begin{itemize}
-  \item The user is authenticated
-  \item The user is redirected to their personal dashboard
-\end{itemize} \\
-\hline
-\textbf{Normal Flow:} &
-\begin{enumerate}
-  \item User opens the login form
-  \item Enters email and password
-  \item Submits the form
-  \item The system validates the credentials and logs the user in
-  \item User is redirected to the dashboard with access based on account verification level
-\end{enumerate} \\
-\hline
-\textbf{Alternative Flows:} & None defined \\
-\hline
-\textbf{Exceptions:} &
-\begin{itemize}
-  \item EX-1: If the email or password is incorrect, show an error message: \textit{"Invalid email or password."}
-  \item EX-2: If the system is unavailable (e.g., server error), show an error message: \textit{"Unable to connect. Please try again later."}
-\end{itemize} \\
-\hline
-\textbf{Business Rules:} &
-\begin{itemize}
-  \item BR-24: Email must follow institutional format (e.g., *@gmail.com)
-\end{itemize} \\
-\hline
-\textbf{Assumptions:} &
-\begin{itemize}
-  \item The account is active and verified
-  \item The user provides correct credentials
-\end{itemize} \\
-\hline
-\textbf{Priority:} & High \\
-\hline
-\textbf{Frequency of Use:} & Daily \\
-\hline
-\end{longtable}
-
-\subsubsection{UC-03 – View Hospital Information}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-03 – View Hospital Information \\
-\hline
-\textbf{Created By:} & AnPP \\
-\hline
-\textbf{Date Created:} & 28/6 \\
-\hline
-\textbf{Primary Actor:} & Guest \\
-\hline
-\textbf{Secondary Actors:} & None \\
-\hline
-\textbf{Description:} & The user views information about the hospital, including its services, location, and contact details. \\
-\hline
-\textbf{Trigger:} & The user accesses the homepage or selects the "About Us" section. \\
-\hline
-\textbf{Preconditions:} &
-\begin{itemize}
-  \item The system is online and accessible
-\end{itemize} \\
-\hline
-\textbf{Postconditions:} &
-\begin{itemize}
-  \item Hospital information is displayed to the user
-\end{itemize} \\
-\hline
-\textbf{Normal Flow:} &
-\begin{enumerate}
-  \item User opens the website
-  \item Clicks on "About Us"
-  \item The system displays hospital information
-\end{enumerate} \\
-\hline
-\textbf{Alternative Flows:} & None defined \\
-\hline
-\textbf{Exceptions:} &
-\begin{itemize}
-  \item EX-1: If hospital data is unavailable, the system displays a default message or an error: \textit{"Hospital information is currently unavailable."}
-\end{itemize} \\
-\hline
-\textbf{Business Rules:} &
-\begin{itemize}
-  \item BR-19: Only admins can make changes to system about hospital information
-\end{itemize} \\
-\hline
-\textbf{Assumptions:} &
-\begin{itemize}
-  \item Hospital information is properly maintained and updated in the system
-\end{itemize} \\
-\hline
-\textbf{Priority:} & Medium \\
-\hline
-\textbf{Frequency of Use:} & Occasional \\
-\hline
-\end{longtable}
-
-
-\subsubsection{UC-04 – Read Blogs}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-04 – Read Blogs \\
-\hline
-\textbf{Created By:} & AnPP \\
-\hline
-\textbf{Date Created:} & 29/6 \\
-\hline
-\textbf{Primary Actor:} & Guest \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & The user reads educational blog posts related to blood donation. \\
-\hline
-\textbf{Trigger:} & The user clicks on the "Blog" section. \\
-\hline
-\textbf{Preconditions:} &
-\begin{itemize}
-  \item At least one blog post has been published
-\end{itemize} \\
-\hline
-\textbf{Postconditions:} &
-\begin{itemize}
-  \item A list of blogs is displayed
-  \item The user can read individual posts
-\end{itemize} \\
-\hline
-\textbf{Normal Flow:} &
-\begin{enumerate}
-  \item User clicks "Blog"
-  \item System displays list of available posts
-  \item User selects and reads a blog
-\end{enumerate} \\
-\hline
-\textbf{Alternative Flows:} &
-\textbf{AF-1:} No blog posts available → Show message: \textit{"No blog content is currently available."} \\
-\hline
-\textbf{Exceptions:} &
-\begin{itemize}
-  \item EX-1: System error → Show message: \textit{"Unable to load blogs. Please try again later."}
-\end{itemize} \\
-\hline
-\textbf{Business Rules:} &
-\begin{itemize}
-  \item BR-17: Only blog authors or admins can edit blog articles
-\end{itemize} \\
-\hline
-\textbf{Assumptions:} &
-\begin{itemize}
-  \item Blog content is reviewed and approved before being published
-\end{itemize} \\
-\hline
-\textbf{Priority:} & Medium \\
-\hline
-\textbf{Frequency of Use:} & Frequent \\
-\hline
-\end{longtable}
-
-
-\subsubsection{UC-05 – Manage Personal Profile}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-05 – Manage Personal Profile \\
-\hline
-\textbf{Created By:} & TuanTM \\
-\hline
-\textbf{Date Created:} & 28/6 \\
-\hline
-\textbf{Primary Actor:} & Donor \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & The donor views and updates their personal profile, including contact information. \\
-\hline
-\textbf{Trigger:} & The user accesses the "My Profile" section. \\
-\hline
-\textbf{Preconditions:} &
-\begin{itemize}
-  \item The user is logged in to the system
-\end{itemize} \\
-\hline
-\textbf{Postconditions:} &
-\begin{itemize}
-  \item Profile data is updated and saved successfully
-\end{itemize} \\
-\hline
-\textbf{Normal Flow:} &
-\begin{enumerate}
-  \item User navigates to profile section
-  \item Edits personal information
-  \item Clicks "Save"
-  \item System validates and saves changes
-\end{enumerate} \\
-\hline
-\textbf{Alternative Flows:} &
-\textbf{AF-1:} Invalid input (e.g., phone number format) → Show error: \textit{"Please correct the highlighted fields."} \\
-\hline
-\textbf{Exceptions:} &
-\begin{itemize}
-  \item EX-1: If update fails due to system error → Show error: \textit{"Failed to update profile. Please try again."}
-\end{itemize} \\
-\hline
-\textbf{Business Rules:} &
-\begin{itemize}
-  \item BR-22: User profile information must be accurate and match official documents
-\end{itemize} \\
-\hline
-\textbf{Assumptions:} &
-\begin{itemize}
-  \item Profile data is accurate and editable
-\end{itemize} \\
-\hline
-\textbf{Priority:} & High \\
-\hline
-\textbf{Frequency of Use:} & Occasional \\
-\hline
-\end{longtable}
-
-
-\section{Design Specifications}
-
-\subsection{Authentication System}
-
-\subsubsection{User Login}
-
-This screen allows users to authenticate into the system with role-based access to appropriate functionalities.
-
-\textbf{Related use cases:} UC-002 User Login
-
-\paragraph{UI Design}
-
-\begin{longtable}{|p{3cm}|p{3cm}|p{8cm}|}
-\hline
-\textbf{Field Name} & \textbf{Field Type} & \textbf{Description} \\
-\hline
-Username* & Text Box & User enters registered username or email address for authentication \\
-\hline
-Password* & Password Box & User enters password (masked input for security) \\
-\hline
-Login & Button & Submits authentication request to server \\
-\hline
-Register & Hyperlink & Redirects to user registration page for new users \\
-\hline
-Forgot Password? & Hyperlink & Initiates password reset process \\
-\hline
-\end{longtable}
-
-\paragraph{Database Access}
-
-\begin{longtable}{|p{3cm}|p{2cm}|p{9cm}|}
-\hline
-\textbf{Table} & \textbf{CRUD} & \textbf{Description} \\
-\hline
-Users & R & Verify username/email and password hash for authentication \\
-\hline
-Roles & R & Retrieve user role information for authorization \\
-\hline
-LoginActivity & C & Log login attempt for security audit \\
-\hline
-\end{longtable}
-
-\paragraph{SQL Commands}
-
-\begin{lstlisting}[language=SQL]
--- 1. Authenticate user credentials
-SELECT u.UserID, u.Username, u.Email, u.IsActive, r.RoleName
-FROM Users u 
-INNER JOIN Roles r ON u.RoleID = r.RoleID
-WHERE (u.Username = ? OR u.Email = ?) AND u.IsActive = 1
-
--- 2. Log login activity
-INSERT INTO LoginActivity 
-(UserID, UsernameAttempted, AttemptTime, IsSuccess, IPAddress, UserAgent)
-VALUES (?, ?, GETDATE(), ?, ?, ?)
-\end{lstlisting}
-
-\subsection{Appointment Management}
-
-\subsubsection{Appointment Booking}
-
-This screen enables patients to book appointments with available doctors by selecting from available time slots.
-
-\textbf{Related use cases:} UC-004 Book Appointment
-
-\paragraph{UI Design}
-
-\begin{longtable}{|p{3cm}|p{3cm}|p{8cm}|}
-\hline
-\textbf{Field Name} & \textbf{Field Type} & \textbf{Description} \\
-\hline
-Doctor Selection* & Dropdown & List of available doctors with specialties \\
-\hline
-Appointment Date* & Date Picker & Calendar widget for selecting appointment date \\
-\hline
-Available Time Slots* & Radio Buttons & Dynamic list of available time slots for selected doctor/date \\
-\hline
-Appointment Notes & Text Area & Optional notes about appointment purpose or concerns \\
-\hline
-Book Appointment & Button & Submit appointment booking request \\
-\hline
-Cancel & Button & Return to previous screen without booking \\
-\hline
-\end{longtable}
-
-\paragraph{Database Access}
-
-\begin{longtable}{|p{3cm}|p{2cm}|p{9cm}|}
-\hline
-\textbf{Table} & \textbf{CRUD} & \textbf{Description} \\
-\hline
-Users & R & Retrieve available doctors with their specialties \\
-\hline
-DoctorAvailabilitySlots & R,U & Query available slots and mark as booked \\
-\hline
-Appointments & C & Create new appointment record \\
-\hline
-Notifications & C & Schedule appointment reminder notifications \\
-\hline
-\end{longtable}
-
-\paragraph{SQL Commands}
-
-\begin{lstlisting}[language=SQL]
--- 1. Get available doctors
-SELECT u.UserID, u.FirstName, u.LastName, dp.Bio, s.SpecialtyName
-FROM Users u
-INNER JOIN DoctorProfiles dp ON u.UserID = dp.UserID
-LEFT JOIN Specialties s ON dp.SpecialtyID = s.SpecialtyID
-WHERE u.RoleID = (SELECT RoleID FROM Roles WHERE RoleName = 'Doctor')
-AND u.IsActive = 1
-
--- 2. Get available time slots
-SELECT AvailabilitySlotID, SlotDate, StartTime, EndTime
-FROM DoctorAvailabilitySlots
-WHERE DoctorUserID = ? AND SlotDate = ? AND IsBooked = 0
-ORDER BY StartTime
-
--- 3. Create appointment
-INSERT INTO Appointments 
-(PatientUserID, DoctorUserID, AvailabilitySlotID, AppointmentDateTime, 
- Status, AppointmentNotes, CreatedAt, UpdatedAt)
-VALUES (?, ?, ?, ?, 'Scheduled', ?, GETDATE(), GETDATE())
-
--- 4. Update availability slot
-UPDATE DoctorAvailabilitySlots 
-SET IsBooked = 1, UpdatedAt = GETDATE()
-WHERE AvailabilitySlotID = ?
-\end{lstlisting}
-
-\subsection{Patient Care System}
-
-\subsubsection{Patient Records Management}
-
-This screen provides comprehensive medical record management for HIV patients including treatment history and current medications.
-
-\textbf{Related use cases:} UC-007 Manage Patient Records
-
-\paragraph{UI Design}
-
-\begin{longtable}{|p{3cm}|p{3cm}|p{8cm}|}
-\hline
-\textbf{Field Name} & \textbf{Field Type} & \textbf{Description} \\
-\hline
-Medical History & Text Area & Comprehensive medical history including HIV diagnosis details \\
-\hline
-Current Allergies & Text Area & Known allergies and adverse reactions \\
-\hline
-Current Medications & Text Area & List of current medications including ARV regimens \\
-\hline
-Blood Type & Dropdown & ABO blood type classification \\
-\hline
-Emergency Contact & Text Box & Emergency contact person name \\
-\hline
-Emergency Phone & Text Box & Emergency contact phone number \\
-\hline
-Clinical Notes & Text Area & Doctor's clinical observations and notes \\
-\hline
-Save Record & Button & Save medical record updates \\
-\hline
-View ARV Treatments & Button & Access HIV treatment management screen \\
-\hline
-\end{longtable}
-
-\paragraph{Database Access}
-
-\begin{longtable}{|p{3cm}|p{2cm}|p{9cm}|}
-\hline
-\textbf{Table} & \textbf{CRUD} & \textbf{Description} \\
-\hline
-PatientRecords & R,U & Retrieve and update patient medical records \\
-\hline
-ARVTreatments & R & Access HIV treatment history \\
-\hline
-MedicationRoutines & R & View current medication schedules \\
-\hline
-Users & R & Verify doctor access permissions \\
-\hline
-\end{longtable}
-
-\paragraph{SQL Commands}
-
-\begin{lstlisting}[language=SQL]
--- 1. Retrieve patient record
-SELECT RecordID, PatientUserID, MedicalHistory, Allergies, 
-       CurrentMedications, BloodType, EmergencyContact, 
-       EmergencyPhone, Notes, UpdatedAt
-FROM PatientRecords
-WHERE PatientUserID = ?
-
--- 2. Update patient record
-UPDATE PatientRecords
-SET MedicalHistory = ?, Allergies = ?, CurrentMedications = ?,
-    BloodType = ?, EmergencyContact = ?, EmergencyPhone = ?,
-    Notes = ?, UpdatedAt = GETDATE()
-WHERE PatientUserID = ?
-
--- 3. Get ARV treatment history
-SELECT ARVTreatmentID, Regimen, StartDate, EndDate, 
-       Adherence, SideEffects, IsActive
-FROM ARVTreatments
-WHERE PatientUserID = ?
-ORDER BY StartDate DESC
-\end{lstlisting}
-
-\section{Appendix}
-
-\subsection{Assumptions \& Dependencies}
-
-\begin{itemize}
-    \item \textbf{AS-1:} Microsoft SQL Server database is available and properly configured for healthcare data storage
-    \item \textbf{AS-2:} SMTP email service is configured for sending appointment and medication reminders
-    \item \textbf{AS-3:} System users have basic computer literacy and internet access
-    \item \textbf{AS-4:} Clinic staff will receive training on HIV patient management workflows
-    \item \textbf{DE-1:} Integration with existing hospital information systems may be required
-    \item \textbf{DE-2:} HIPAA compliance requirements must be met for patient data protection
-    \item \textbf{DE-3:} System depends on reliable internet connectivity for real-time operations
-\end{itemize}
-
-\subsection{Limitations \& Exclusions}
-
-\begin{itemize}
-    \item System does not include billing or insurance processing capabilities
-    \item Laboratory result integration is not included in current scope
-    \item Telemedicine or video consultation features are excluded
-    \item Mobile application development is not part of initial release
-    \item Integration with pharmacy systems for prescription management is excluded
-    \item Advanced analytics and reporting dashboards are limited in scope
-\end{itemize}
-
-\subsection{Business Rules}
-
-\begin{longtable}{|p{2cm}|p{3cm}|p{9cm}|}
-\hline
-\textbf{ID} & \textbf{Category} & \textbf{Rule Definition} \\
-\hline
-BR-016 & Data Security & All patient data must be encrypted at rest and in transit using AES-256 encryption \\
-\hline
-BR-017 & Access Control & Role-based access ensures patients can only view their own records unless explicitly shared \\
-\hline
-BR-018 & Appointment Scheduling & No overlapping appointments allowed for any doctor or patient \\
-\hline
-BR-019 & Medication Adherence & ARV medication reminders are mandatory for all HIV patients unless opted out \\
-\hline
-BR-020 & Record Retention & Patient medical records must be retained for minimum 7 years per healthcare regulations \\
-\hline
-BR-021 & Emergency Access & Emergency override allows authorized medical staff to access any patient record \\
-\hline
-BR-022 & Notification Preferences & Patients must be able to opt-out of non-critical notifications \\
-\hline
-BR-023 & Data Backup & Daily automated backups of all patient data with 30-day retention \\
-\hline
-\end{longtable}
-
-\subsection{Technical Specifications}
-
-\begin{itemize}
-    \item \textbf{Backend Technology:} Spring Boot 3.x with Java 17
-    \item \textbf{Frontend Technology:} React 18 with modern JavaScript (ES6+)
-    \item \textbf{Database:} Microsoft SQL Server with T-SQL stored procedures
-    \item \textbf{Authentication:} JWT (JSON Web Tokens) with BCrypt password hashing
-    \item \textbf{API Architecture:} RESTful APIs with JSON data exchange
-    \item \textbf{Security:} HTTPS/TLS encryption, CORS configuration, input validation
-    \item \textbf{Deployment:} Containerized deployment ready (Docker compatible)
-\end{itemize}
 
 \end{document}
