@@ -3,7 +3,7 @@
 ## Progress Status
 
 ### Completed Use Case Specifications
-The RDS document now has detailed specifications for **26 out of 81 use cases** (UC-01 through UC-26):
+The RDS document now has detailed specifications for **41 out of 81 use cases** (UC-01 through UC-41):
 
 #### Authentication & Profile Management (UC-01 to UC-05)
 - ✅ UC-01: User Registration
@@ -32,33 +32,31 @@ The RDS document now has detailed specifications for **26 out of 81 use cases** 
 - ✅ UC-20: View Notification History
 - ✅ UC-21: Manage Notification Templates
 
-#### Admin Services (UC-22 to UC-26)
+#### Admin Services (UC-22 to UC-30)
 - ✅ UC-22: View Admin Dashboard
 - ✅ UC-23: Manage Users
 - ✅ UC-24: Manage Patients
 - ✅ UC-25: Manage Doctors
 - ✅ UC-26: Create Doctor Accounts
-
-### Remaining Use Cases (55 remaining)
-
-#### Admin Services (UC-27 to UC-30)
-- ⏳ UC-27: Toggle User Status
-- ⏳ UC-28: Reset User Passwords
-- ⏳ UC-29: Manage Specialties
-- ⏳ UC-30: View All Appointments
+- ✅ UC-27: Toggle User Status
+- ✅ UC-28: Reset User Passwords
+- ✅ UC-29: Manage Specialties
+- ✅ UC-30: View All Appointments
 
 #### Manager Services (UC-31 to UC-41)
-- ⏳ UC-31: View Manager Dashboard
-- ⏳ UC-32: View Statistics
-- ⏳ UC-33: Manage Patient Records
-- ⏳ UC-34: Manage Doctor Records
-- ⏳ UC-35: Manage ARV Treatments
-- ⏳ UC-36: Manage Schedules
-- ⏳ UC-37: Search Patients
-- ⏳ UC-38: Search Doctors
-- ⏳ UC-39: Export Data (CSV)
-- ⏳ UC-40: View Patient Details
-- ⏳ UC-41: View Doctor Details
+- ✅ UC-31: View Manager Dashboard
+- ✅ UC-32: View Statistics
+- ✅ UC-33: Manage Patient Records
+- ✅ UC-34: Manage Doctor Records
+- ✅ UC-35: Manage ARV Treatments
+- ✅ UC-36: Manage Schedules
+- ✅ UC-37: Search Patients
+- ✅ UC-38: Search Doctors
+- ✅ UC-39: Export Data (CSV)
+- ✅ UC-40: View Patient Details
+- ✅ UC-41: View Doctor Details
+
+### Remaining Use Cases (40 remaining)
 
 #### Guest Services (UC-42 to UC-46)
 - ⏳ UC-42: View Home Page
@@ -189,8 +187,8 @@ Each remaining use case should follow this LaTeX template:
 
 - **File**: `docs/final/RDS_Document_HIV_Clinic_Filled.tex`
 - **Total Use Cases**: 81
-- **Completed Detailed Specifications**: 26 (32%)
-- **Remaining**: 55 (68%)
+- **Completed Detailed Specifications**: 41 (51%)
+- **Remaining**: 40 (49%)
 
 ## Next Steps
 
