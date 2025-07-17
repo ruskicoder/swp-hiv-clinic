@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.7.17)  17 JUL 2025 18:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.7.17)  17 JUL 2025 19:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -530,7 +530,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [3]
-<diagrams/use_case_diagram.png, id=179, 1577.895pt x 3491.0425pt>
+<diagrams/use_case_diagram.png, id=138, 1577.895pt x 3491.0425pt>
 File: diagrams/use_case_diagram.png Graphic file (type png)
 <use diagrams/use_case_diagram.png>
 Package pdftex.def Info: diagrams/use_case_diagram.png  used on input line 112.
