@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.7.17)  17 JUL 2025 19:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.7.17)  17 JUL 2025 19:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -394,32 +394,102 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks27
 \@floatcapt=\box63
 )
+(/usr/share/texlive/texmf-dist/tex/latex/tools/multicol.sty
+Package: multicol 2024/09/14 v1.9i multicolumn formatting (FMi)
+\c@tracingmulticols=\count309
+\mult@box=\box64
+\multicol@leftmargin=\dimen186
+\c@unbalance=\count310
+\c@collectmore=\count311
+\doublecol@number=\count312
+\multicoltolerance=\count313
+\multicolpretolerance=\count314
+\full@width=\dimen187
+\page@free=\dimen188
+\premulticols=\dimen189
+\postmulticols=\dimen190
+\multicolsep=\skip73
+\multicolbaselineskip=\skip74
+\partial@page=\box65
+\last@line=\box66
+\mc@boxedresult=\box67
+\maxbalancingoverflow=\dimen191
+\mult@rightbox=\box68
+\mult@grightbox=\box69
+\mult@firstbox=\box70
+\mult@gfirstbox=\box71
+\@tempa=\box72
+\@tempa=\box73
+\@tempa=\box74
+\@tempa=\box75
+\@tempa=\box76
+\@tempa=\box77
+\@tempa=\box78
+\@tempa=\box79
+\@tempa=\box80
+\@tempa=\box81
+\@tempa=\box82
+\@tempa=\box83
+\@tempa=\box84
+\@tempa=\box85
+\@tempa=\box86
+\@tempa=\box87
+\@tempa=\box88
+\@tempa=\box89
+\@tempa=\box90
+\@tempa=\box91
+\@tempa=\box92
+\@tempa=\box93
+\@tempa=\box94
+\@tempa=\box95
+\@tempa=\box96
+\@tempa=\box97
+\@tempa=\box98
+\@tempa=\box99
+\@tempa=\box100
+\@tempa=\box101
+\@tempa=\box102
+\@tempa=\box103
+\@tempa=\box104
+\@tempa=\box105
+\@tempa=\box106
+\@tempa=\box107
+\c@minrows=\count315
+\c@columnbadness=\count316
+\c@finalcolumnbadness=\count317
+\last@try=\dimen192
+\multicolovershoot=\dimen193
+\multicolundershoot=\dimen194
+\mult@nat@firstbox=\box108
+\colbreak@box=\box109
+\mc@col@check@num=\count318
+)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count309
-\l__pdf_internal_box=\box64
+\l__color_backend_stack_int=\count319
+\l__pdf_internal_box=\box110
 )
 (./RDS_Document_HIV_Clinic_Filled.aux)
 \openout1 = `RDS_Document_HIV_Clinic_Filled.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 26.
-LaTeX Font Info:    ... okay on input line 26.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -457,16 +527,16 @@ LaTeX Font Info:    ... okay on input line 26.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count310
-\scratchdimen=\dimen186
-\scratchbox=\box65
-\nofMPsegments=\count311
-\nofMParguments=\count312
+\scratchcounter=\count320
+\scratchdimen=\dimen195
+\scratchbox=\box111
+\nofMPsegments=\count321
+\nofMParguments=\count322
 \everyMPshowfont=\toks28
-\MPscratchCnt=\count313
-\MPscratchDim=\dimen187
-\MPnumerator=\count314
-\makeMPintoPDFobject=\count315
+\MPscratchCnt=\count323
+\MPscratchDim=\dimen196
+\MPnumerator=\count324
+\makeMPintoPDFobject=\count325
 \everyMPtoPDFconversion=\toks29
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -477,33 +547,33 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 26.
+Package hyperref Info: Link coloring OFF on input line 27.
 
 (./RDS_Document_HIV_Clinic_Filled.out) (./RDS_Document_HIV_Clinic_Filled.out)
 \@outlinefile=\write3
 \openout3 = `RDS_Document_HIV_Clinic_Filled.out'.
 
-\c@lstlisting=\count316
+\c@lstlisting=\count326
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 29.
+(Font)              <14.4> on input line 30.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 29.
+(Font)              <7> on input line 30.
 
 
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 38.
+(Font)              <12> on input line 39.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 38.
+(Font)              <8> on input line 39.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 38.
+(Font)              <6> on input line 39.
 
-Overfull \hbox (61.05971pt too wide) in paragraph at lines 38--68
+Overfull \hbox (68.54842pt too wide) in paragraph at lines 39--58
  [][] 
  []
 
@@ -530,7 +600,24 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [3]
-<diagrams/use_case_diagram.png, id=138, 1577.895pt x 3491.0425pt>
+Underfull \hbox (badness 3108) in paragraph at lines 80--81
+[]|\OT1/cmr/m/n/12 Healthcare pro-fes-sion-als spe-cial-iz-ing in HIV/AIDS
+ []
+
+
+Overfull \hbox (54.682pt too wide) in paragraph at lines 94--94
+[]|\OT1/cmr/bx/n/12 Guest/Unauthenticated
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 14.49998pt, for example:
+(fancyhdr)                \setlength{\headheight}{14.49998pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
+
+[4]
+<diagrams/use_case_diagram.png, id=143, 1577.895pt x 3491.0425pt>
 File: diagrams/use_case_diagram.png Graphic file (type png)
 <use diagrams/use_case_diagram.png>
 Package pdftex.def Info: diagrams/use_case_diagram.png  used on input line 111.
@@ -545,7 +632,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[4]
+[5]
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -554,7 +641,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[5]
+[6]
 Overfull \vbox (256.69301pt too high) has occurred while \output is active []
 
 
@@ -566,589 +653,86 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[6 <./diagrams/use_case_diagram.png (PNG copy)>]
-Underfull \hbox (badness 10000) in paragraph at lines 124--124
-[]|\OT1/cmr/bx/n/12 Feature Cat-e-
+[7 <./diagrams/use_case_diagram.png (PNG copy)>]
+Underfull \hbox (badness 1484) in paragraph at lines 130--130
+[]|\OT1/cmr/m/n/12 Browse Pub-lic Web-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 128--128
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 130--130
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1924) in paragraph at lines 130--131
-[]|\OT1/cmr/m/n/12 Users au-then-ti-cate us-ing user-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 132--132
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 132--132
-[]|\OT1/cmr/m/n/12 Browse Pub-lic
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 132--133
-[]|\OT1/cmr/m/n/12 Unauthenticated users ac-cess
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--136
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--137
-[]|\OT1/cmr/m/n/12 Patients ac-cess per-son-al-ized
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--137
-\OT1/cmr/m/n/12 dash-board with ap-point-ments
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--137
-\OT1/cmr/m/n/12 overview, treat-ment sta-tus,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 138--138
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1009) in paragraph at lines 138--139
-[]|\OT1/cmr/m/n/12 Patients sched-ule ap-point-ments
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 140--140
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 140--140
-[]|\OT1/cmr/m/n/12 View Ap-point-
- []
-
-
-Underfull \hbox (badness 1297) in paragraph at lines 140--141
-[]|\OT1/cmr/m/n/12 Patients view cur-rent ap-point-
- []
-
-
-Underfull \hbox (badness 3861) in paragraph at lines 140--141
-\OT1/cmr/m/n/12 ap-point-ment his-tory with de-
- []
-
-
-Underfull \hbox (badness 4416) in paragraph at lines 140--141
-\OT1/cmr/m/n/12 tailed in-for-ma-tion and sta-tus
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 142--142
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 142--142
-[]|\OT1/cmr/m/n/12 Cancel Ap-point-
- []
-
-
-Underfull \hbox (badness 3919) in paragraph at lines 142--143
-[]|\OT1/cmr/m/n/12 Patients can-cel sched-uled ap-
+Underfull \hbox (badness 3568) in paragraph at lines 134--134
+[]|\OT1/cmr/m/n/12 View Pa-tient Dash-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 144--144
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 144--144
-[]|\OT1/cmr/m/n/12 View Med-i-cal
- []
-
-
-Underfull \hbox (badness 3471) in paragraph at lines 144--145
-[]|\OT1/cmr/m/n/12 Patients ac-cess their per-sonal
- []
-
-
-Underfull \hbox (badness 1178) in paragraph at lines 144--145
-\OT1/cmr/m/n/12 tory, cur-rent med-i-ca-tions, and
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 146--146
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 146--146
 []|\OT1/cmr/m/n/12 Update Med-i-cal
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 148--148
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1360) in paragraph at lines 148--148
+Underfull \hbox (badness 10000) in paragraph at lines 146--146
 []|\OT1/cmr/m/n/12 View ARV Treat-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 150--150
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 150--150
-[]|\OT1/cmr/m/n/12 Profile Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 152--152
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 2401) in paragraph at lines 152--153
-[]|\OT1/cmr/m/n/12 Patients change ac-count pass-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 154--154
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 154--154
-[]|\OT1/cmr/m/n/12 Notification Sys-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 154--154
-[]|\OT1/cmr/m/n/12 Receive No-ti-fi-ca-
- []
-
-
-Underfull \hbox (badness 2744) in paragraph at lines 154--155
-\OT1/cmr/m/n/12 cus-tom mes-sages, and sys-tem
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 156--156
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 156--156
-[]|\OT1/cmr/m/n/12 Privacy Man-age-
+Underfull \hbox (badness 5446) in paragraph at lines 158--158
+[]|\OT1/cmr/m/n/12 View Doc-tor Dash-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 160--160
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 162--162
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 162--162
 []|\OT1/cmr/m/n/12 Manage Ap-point-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 164--164
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 164--164
-[]|\OT1/cmr/m/n/12 Update Ap-point-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 164--165
-[]|\OT1/cmr/m/n/12 Doctors up-date ap-point-ment
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 164--165
-\OT1/cmr/m/n/12 sta-tus (com-pleted, can-celled,
- []
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 166--166
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 4353) in paragraph at lines 166--166
-[]|\OT1/cmr/m/n/12 Schedule Man-age-
- []
-
-
-Underfull \hbox (badness 2753) in paragraph at lines 166--166
-[]|\OT1/cmr/m/n/12 Manage Avail-abil-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 168--168
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 168--168
 []|\OT1/cmr/m/n/12 Access Pa-tient
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 170--170
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 170--170
-[]|\OT1/cmr/m/n/12 Manage ARV
+Underfull \hbox (badness 1303) in paragraph at lines 168--168
+[]|\OT1/cmr/m/n/12 Manage ARV Treat-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 172--172
-[]|\OT1/cmr/m/n/12 UC-
+[]|\OT1/cmr/m/n/12 Manage No-ti-fi-ca-tion
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 172--172
-[]|\OT1/cmr/m/n/12 Notification Sys-
- []
-
-
-Underfull \hbox (badness 2119) in paragraph at lines 172--173
-\OT1/cmr/m/n/12 to pa-tients re-gard-ing ap-point-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 174--174
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 174--174
-[]|\OT1/cmr/m/n/12 Notification Sys-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 174--174
-[]|\OT1/cmr/m/n/12 Manage No-ti-fi-ca-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--176
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--176
-[]|\OT1/cmr/m/n/12 Notification Sys-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--176
-[]|\OT1/cmr/m/n/12 View No-ti-fi-ca-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 180--180
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 6332) in paragraph at lines 180--181
-[]|\OT1/cmr/m/n/12 Administrators ac-cess system-
+Underfull \hbox (badness 6016) in paragraph at lines 178--178
+[]|\OT1/cmr/m/n/12 View Ad-min Dash-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 182--182
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1067) in paragraph at lines 182--183
-\OT1/cmr/m/n/12 com-pre-hen-sive user ad-min-is-tra-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 184--184
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 186--186
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 4084) in paragraph at lines 186--186
-[]|\OT1/cmr/m/n/12 Reset User Pass-
- []
-
-
-Underfull \hbox (badness 1540) in paragraph at lines 186--187
-[]|\OT1/cmr/m/n/12 Administrators re-set pass-words
- []
-
-
-Underfull \hbox (badness 1292) in paragraph at lines 186--187
-\OT1/cmr/m/n/12 ac-counts with se-cure pass-word
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 188--188
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 188--188
-[]|\OT1/cmr/m/n/12 System Man-age-
+[]|\OT1/cmr/m/n/12 Create Doc-tor Ac-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 190--190
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 192--192
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1742) in paragraph at lines 192--193
-\OT1/cmr/m/n/12 sight, mon-i-tor-ing, and sys-tem
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 196--196
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 196--196
-[]|\OT1/cmr/m/n/12 View Man-ager
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 196--197
-[]|\OT1/cmr/m/n/12 Managers ac-cess op-er-a-tional
+[]|\OT1/cmr/m/n/12 View All Ap-point-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 198--198
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 6658) in paragraph at lines 198--199
-[]|\OT1/cmr/m/n/12 Managers view com-pre-hen-sive
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 200--200
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 200--200
 []|\OT1/cmr/m/n/12 Manage Pa-tient
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--202
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 202--202
+Underfull \hbox (badness 10000) in paragraph at lines 200--200
 []|\OT1/cmr/m/n/12 Manage Doc-tor
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--203
-\OT1/cmr/m/n/12 pro-fes-sional in-for-ma-tion, and
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 204--204
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 204--204
-[]|\OT1/cmr/m/n/12 Manage ARV
- []
-
-
-Underfull \hbox (badness 1325) in paragraph at lines 204--205
-[]|\OT1/cmr/m/n/12 Managers mon-i-tor and over-see
- []
-
-
-Underfull \hbox (badness 3148) in paragraph at lines 204--205
-\OT1/cmr/m/n/12 the clinic with com-pre-hen-sive
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 206--206
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 4441) in paragraph at lines 206--207
-\OT1/cmr/m/n/12 ing, ap-point-ment dis-tri-bu-tion,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 208--208
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 210--210
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 212--212
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1147) in paragraph at lines 212--213
-[]|\OT1/cmr/m/n/12 Managers ex-port var-i-ous clinic
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 214--214
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 214--214
-[]|\OT1/cmr/m/n/12 Detail Man-age-
- []
-
-
-Underfull \hbox (badness 1917) in paragraph at lines 214--214
-[]|\OT1/cmr/m/n/12 View Pa-tient De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 216--216
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 216--216
-[]|\OT1/cmr/m/n/12 Detail Man-age-
- []
-
-
-Underfull \hbox (badness 3199) in paragraph at lines 216--216
-[]|\OT1/cmr/m/n/12 View Doc-tor De-
- []
-
-
-Underfull \hbox (badness 2197) in paragraph at lines 216--217
-\OT1/cmr/m/n/12 sight, per-for-mance mon-i-tor-ing,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 220--220
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 220--220
-[]|\OT1/cmr/m/n/12 Session Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 220--220
-[]|\OT1/cmr/m/n/12 Session Man-age-
- []
-
-
-Underfull \hbox (badness 2790) in paragraph at lines 220--221
-[]|\OT1/cmr/m/n/12 System man-ages user ses-sions
+Underfull \hbox (badness 1303) in paragraph at lines 202--202
+[]|\OT1/cmr/m/n/12 Manage ARV Treat-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 222--222
-[]|\OT1/cmr/m/n/12 UC-
+[]|\OT1/cmr/m/n/12 Medication Rou-tine
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 222--222
-[]|\OT1/cmr/m/n/12 Login Ac-tiv-ity
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 224--224
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 224--224
-[]|\OT1/cmr/m/n/12 Treatment Man-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 224--224
-[]|\OT1/cmr/m/n/12 Medication Rou-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 226--226
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 226--227
-[]|\OT1/cmr/m/n/12 System mon-i-tors ap-pli-ca-tion
- []
-
-
-Underfull \hbox (badness 6691) in paragraph at lines 226--227
-\OT1/cmr/m/n/12 health, database con-nec-tiv-ity,
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[7]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -1158,6 +742,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [8]
 
+
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
 (fancyhdr)                \setlength{\headheight}{14.49998pt}.
@@ -1165,6 +750,90 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [9]
+Underfull \hbox (badness 10000) in paragraph at lines 252--252
+[]|\OT1/cmr/bx/n/12 Registration
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 260--260
+[]|\OT1/cmr/bx/n/12 Manager Dash-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 262--262
+[]|\OT1/cmr/bx/n/12 Appointment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 266--266
+[]|\OT1/cmr/bx/n/12 ARV Treat-ment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 270--270
+[]|\OT1/cmr/bx/n/12 Profile Man-age-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 272--272
+[]|\OT1/cmr/bx/n/12 Reporting In-ter-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 282--282
+[]|\OT1/cmr/bx/n/12 Public Home-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 286--286
+[]|\OT1/cmr/bx/n/12 Patient Dash-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 288--288
+[]|\OT1/cmr/bx/n/12 Doctor Dash-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 290--290
+[]|\OT1/cmr/bx/n/12 Admin Dash-
+ []
+
+
+Underfull \hbox (badness 6380) in paragraph at lines 292--292
+[]|\OT1/cmr/bx/n/12 Manager Dash-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 294--294
+[]|\OT1/cmr/bx/n/12 Book Ap-point-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 296--296
+[]|\OT1/cmr/bx/n/12 View Med-i-cal
+ []
+
+
+Underfull \hbox (badness 5231) in paragraph at lines 298--298
+[]|\OT1/cmr/bx/n/12 Update Pa-tient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 306--306
+[]|\OT1/cmr/bx/n/12 Send No-ti-fi-ca-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 308--308
+[]|\OT1/cmr/bx/n/12 User Man-age-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 314--314
+[]|\OT1/cmr/bx/n/12 Notification
+ []
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -1173,514 +842,41 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [10]
-Underfull \hbox (badness 10000) in paragraph at lines 238--238
-[]|\OT1/cmr/bx/n/12 UC
+Underfull \hbox (badness 10000) in paragraph at lines 324--324
+[]|\OT1/cmr/m/n/12 Appointment Re-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 238--238
-[]|\OT1/cmr/bx/n/12 Requirement
+Underfull \hbox (badness 1424) in paragraph at lines 328--328
+[]|\OT1/cmr/m/n/12 Password Re-set Ser-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 242--242
-[]|\OT1/cmr/m/n/12 UC-
+Underfull \hbox (badness 10000) in paragraph at lines 334--334
+[]|\OT1/cmr/m/n/12 Report Gen-er-a-tion
  []
 
 
-Underfull \hbox (badness 3514) in paragraph at lines 246--247
-[]\OT1/cmr/m/n/12 System shall as-sign ap-pro-pri-ate
+Underfull \hbox (badness 5133) in paragraph at lines 338--338
+[]|\OT1/cmr/m/n/12 Session Man-age-ment
  []
 
 
-Underfull \hbox (badness 2189) in paragraph at lines 247--248
-[]\OT1/cmr/m/n/12 System shall cre-ate user pro-file
+Overfull \hbox (5.8683pt too wide) in paragraph at lines 366--366
+[]|\OT1/cmr/m/n/12 DoctorAvailabilitySlots| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 250--250
-[]|\OT1/cmr/m/n/12 UC-
+Overfull \hbox (24.69865pt too wide) in paragraph at lines 378--378
+[]|\OT1/cmr/m/n/12 AppointmentStatusHistory| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 250--250
-[]|\OT1/cmr/m/n/12 User Au-then-ti-ca-
+Overfull \hbox (8.47939pt too wide) in paragraph at lines 380--380
+[]|\OT1/cmr/m/n/12 AppointmentReminders| 
  []
 
 
-Underfull \hbox (badness 3375) in paragraph at lines 252--253
-[]\OT1/cmr/m/n/12 System shall au-then-ti-cate us-ing
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 258--258
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 262--263
-[]\OT1/cmr/m/n/12 System shall en-force pass-word
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 266--266
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 266--266
-[]|\OT1/cmr/m/n/12 Session Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 274--274
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 284--284
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 287--288
-[]\OT1/cmr/m/n/12 System shall dis-play ser-vices
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 292--292
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 292--292
-[]|\OT1/cmr/m/n/12 Public Doc-tor
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 302--302
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1558) in paragraph at lines 305--306
-[]\OT1/cmr/m/n/12 System shall show ap-point-ments
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 310--310
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 310--310
-[]|\OT1/cmr/m/n/12 Profile Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 318--318
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 328--328
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 328--328
-[]|\OT1/cmr/m/n/12 Appointment
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 331--332
-[]\OT1/cmr/m/n/12 System shall pre-vent double-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 336--336
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 336--336
-[]|\OT1/cmr/m/n/12 Appointment
- []
-
-
-Underfull \hbox (badness 1087) in paragraph at lines 340--341
-[]\OT1/cmr/m/n/12 System shall fil-ter up-com-ing vs.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 344--344
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 2913) in paragraph at lines 346--347
-[]\OT1/cmr/m/n/12 System shall al-low ap-point-ment
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 352--352
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 352--352
-[]|\OT1/cmr/m/n/12 Doctor Ap-point-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 360--360
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 4353) in paragraph at lines 360--360
-[]|\OT1/cmr/m/n/12 Appointment Sta-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 368--368
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 368--368
-[]|\OT1/cmr/m/n/12 Availability Man-
- []
-
-
-Underfull \hbox (badness 1924) in paragraph at lines 373--374
-[]\OT1/cmr/m/n/12 System shall in-te-grate with ap-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 376--376
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 376--376
-[]|\OT1/cmr/m/n/12 Admin Ap-point-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 386--386
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 386--386
-[]|\OT1/cmr/m/n/12 Medical Records
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 394--394
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1024) in paragraph at lines 397--398
-[]\OT1/cmr/m/n/12 System shall dis-play pa-tient ap-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 402--402
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 402--402
-[]|\OT1/cmr/m/n/12 Doctor Pa-tient
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 412--412
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 412--412
-[]|\OT1/cmr/m/n/12 ARV Treat-ment
- []
-
-
-Underfull \hbox (badness 1824) in paragraph at lines 416--417
-[]\OT1/cmr/m/n/12 System shall pro-vide med-i-ca-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 417--418
-[]\OT1/cmr/m/n/12 System shall track treat-ment
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 420--420
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 420--420
-[]|\OT1/cmr/m/n/12 ARV Treat-ment
- []
-
-
-Underfull \hbox (badness 3547) in paragraph at lines 423--424
-[]\OT1/cmr/m/n/12 System shall sup-port treat-ment
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 428--428
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 428--428
-[]|\OT1/cmr/m/n/12 Manager ARV
- []
-
-
-Underfull \hbox (badness 3068) in paragraph at lines 431--432
-[]\OT1/cmr/m/n/12 System shall mon-i-tor treat-ment
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 436--436
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 436--436
-[]|\OT1/cmr/m/n/12 Medication Rou-
- []
-
-
-Underfull \hbox (badness 5726) in paragraph at lines 438--439
-[]\OT1/cmr/m/n/12 System shall cre-ate med-i-ca-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 446--446
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 446--446
-[]|\OT1/cmr/m/n/12 Patient No-ti-fi-ca-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 454--454
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1215) in paragraph at lines 458--459
-[]\OT1/cmr/m/n/12 System shall pro-vide no-ti-fi-ca-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 462--462
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 462--462
-[]|\OT1/cmr/m/n/12 Notification Tem-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 470--470
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 470--470
-[]|\OT1/cmr/m/n/12 Notification His-
- []
-
-
-Underfull \hbox (badness 1215) in paragraph at lines 474--475
-[]\OT1/cmr/m/n/12 System shall pro-vide no-ti-fi-ca-tion
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 480--480
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 488--488
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 2245) in paragraph at lines 490--491
-[]\OT1/cmr/m/n/12 System shall dis-play all sys-tem
- []
-
-
-Underfull \hbox (badness 1215) in paragraph at lines 491--492
-[]\OT1/cmr/m/n/12 System shall pro-vide user de-tail
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 496--496
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 496--496
-[]|\OT1/cmr/m/n/12 Doctor Ac-count
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 504--504
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 508--509
-[]\OT1/cmr/m/n/12 System shall re-quire pass-word
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 512--512
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1596) in paragraph at lines 512--512
-[]|\OT1/cmr/m/n/12 Specialty Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 520--520
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1102) in paragraph at lines 520--520
-[]|\OT1/cmr/m/n/12 User Sta-tus Man-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 530--530
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 530--530
-[]|\OT1/cmr/m/n/12 Manager Dash-
- []
-
-
-Underfull \hbox (badness 1303) in paragraph at lines 532--533
-[]\OT1/cmr/m/n/12 System shall pro-vide op-er-a-tional
- []
-
-
-Underfull \hbox (badness 1303) in paragraph at lines 535--536
-[]\OT1/cmr/m/n/12 System shall pro-vide op-er-a-tional
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 538--538
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 3240) in paragraph at lines 540--541
-[]\OT1/cmr/m/n/12 System shall cal-cu-late real-time
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 546--546
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 546--546
-[]|\OT1/cmr/m/n/12 Patient Record
- []
-
-
-Underfull \hbox (badness 2735) in paragraph at lines 550--551
-[]\OT1/cmr/m/n/12 System shall main-tain data in-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 554--554
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 554--554
-[]|\OT1/cmr/m/n/12 Doctor Record
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 562--562
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 4353) in paragraph at lines 562--562
-[]|\OT1/cmr/m/n/12 Schedule Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 570--570
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 578--578
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1571) in paragraph at lines 580--581
-[]\OT1/cmr/m/n/12 System shall sup-port name and
- []
-
-
-Underfull \hbox (badness 1924) in paragraph at lines 583--584
-[]\OT1/cmr/m/n/12 System shall in-te-grate with ap-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 586--586
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 594--594
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 594--594
-[]|\OT1/cmr/m/n/12 Patient De-tail
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 602--602
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 612--612
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 612--612
-[]|\OT1/cmr/m/n/12 System Health
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1690,6 +886,14 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [11]
+<diagrams/Picture/Database.png, id=184, 1606.0pt x 1276.77pt>
+File: diagrams/Picture/Database.png Graphic file (type png)
+<use diagrams/Picture/Database.png>
+Package pdftex.def Info: diagrams/Picture/Database.png  used on input line 390.
+
+(pdftex.def)             Requested size: 407.66833pt x 324.10117pt.
+
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -1705,7 +909,478 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[13]
+[13 <./diagrams/Picture/Database.png (PNG copy)>]
+<diagrams/data_flow_diagram.png, id=200, 786.94pt x 169.63374pt>
+File: diagrams/data_flow_diagram.png Graphic file (type png)
+<use diagrams/data_flow_diagram.png>
+Package pdftex.def Info: diagrams/data_flow_diagram.png  used on input line 427
+.
+(pdftex.def)             Requested size: 407.66833pt x 87.87614pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+[]|\OT1/cmr/bx/n/12 UC
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+[]|\OT1/cmr/bx/n/12 Use Case
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
+[]|\OT1/cmr/m/n/12 User Reg-is-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 444--444
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 448--448
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 2173) in paragraph at lines 448--448
+[]|\OT1/cmr/m/n/12 Browse Pub-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 450--450
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 454--454
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 456--456
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 456--456
+[]|\OT1/cmr/m/n/12 Book Ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 458--458
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 458--458
+[]|\OT1/cmr/m/n/12 View Ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 460--460
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 460--460
+[]|\OT1/cmr/m/n/12 Cancel Ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--462
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 464--464
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 466--466
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 466--466
+[]|\OT1/cmr/m/n/12 View ARV
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 468--468
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 4569) in paragraph at lines 468--468
+[]|\OT1/cmr/m/n/12 Update Pro-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 470--470
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 474--474
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 478--478
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 2903) in paragraph at lines 478--478
+[]|\OT1/cmr/m/n/12 View Doc-tor
+ []
+
+
+Underfull \hbox (badness 1910) in paragraph at lines 478--479
+\OT1/cmr/m/n/12 pa-tients, no-ti-fi-ca-tions, and pro-fes-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 480--480
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 6364) in paragraph at lines 480--480
+[]|\OT1/cmr/m/n/12 Manage Ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 482--482
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 482--482
+[]|\OT1/cmr/m/n/12 Update Ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 482--482
+\OT1/cmr/m/n/12 point-ment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 484--484
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 484--484
+[]|\OT1/cmr/m/n/12 Manage
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 486--486
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 486--486
+[]|\OT1/cmr/m/n/12 Access Pa-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 488--488
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 490--490
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 490--490
+[]|\OT1/cmr/m/n/12 Send No-ti-fi-
+ []
+
+
+Underfull \hbox (badness 7925) in paragraph at lines 490--491
+[]|\OT1/cmr/m/n/12 System shall pro-vide no-ti-fi-ca-tion
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 492--492
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 494--494
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 494--494
+[]|\OT1/cmr/m/n/12 View No-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 494--494
+\OT1/cmr/m/n/12 ti-fi-ca-tion
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 498--498
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 3679) in paragraph at lines 498--498
+[]|\OT1/cmr/m/n/12 View Ad-min
+ []
+
+
+Underfull \hbox (badness 8075) in paragraph at lines 498--499
+[]|\OT1/cmr/m/n/12 System shall dis-play all sys-tem
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 500--500
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 502--502
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 502--502
+[]|\OT1/cmr/m/n/12 Create Doc-
+ []
+
+
+Underfull \hbox (badness 1127) in paragraph at lines 502--503
+\OT1/cmr/m/n/12 ation with pro-fes-sional in-for-ma-tion
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 504--504
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 504--504
+[]|\OT1/cmr/m/n/12 Reset User
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 506--506
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 1253) in paragraph at lines 506--506
+[]|\OT1/cmr/m/n/12 Manage Spe-
+ []
+
+
+Underfull \hbox (badness 3919) in paragraph at lines 506--507
+\OT1/cmr/m/n/12 cre-ation, edit-ing, and as-sign-ment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 508--508
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 508--508
+[]|\OT1/cmr/m/n/12 Toggle User
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 510--510
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 514--514
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 514--514
+[]|\OT1/cmr/m/n/12 View Man-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 514--514
+\OT1/cmr/m/n/12 ager Dash-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 514--515
+[]|\OT1/cmr/m/n/12 System shall pro-vide op-er-a-tional
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 514--515
+\OT1/cmr/m/n/12 dash-boards with statis-tics and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 516--516
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 7012) in paragraph at lines 516--516
+[]|\OT1/cmr/m/n/12 View Statis-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 518--518
+[]|\OT1/cmr/m/n/12 Manage Pa-
+ []
+
+
+Underfull \hbox (badness 1418) in paragraph at lines 518--519
+\OT1/cmr/m/n/12 and pro-vide com-pre-hen-sive pa-tient
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 520--520
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 1365) in paragraph at lines 520--521
+[]|\OT1/cmr/m/n/12 System shall pro-vide doc-tor in-for-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 522--522
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 524--524
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 524--524
+[]|\OT1/cmr/m/n/12 Manage
+ []
+
+
+Underfull \hbox (badness 1127) in paragraph at lines 524--525
+[]|\OT1/cmr/m/n/12 System shall co-or-di-nate clinic-wide
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 526--526
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 526--526
+[]|\OT1/cmr/m/n/12 Search Pa-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 528--528
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 528--528
+[]|\OT1/cmr/m/n/12 Search Doc-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 530--530
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 2310) in paragraph at lines 530--531
+[]|\OT1/cmr/m/n/12 System shall pro-vide CSV ex-port
+ []
+
+
+Underfull \hbox (badness 1852) in paragraph at lines 530--531
+\OT1/cmr/m/n/12 func-tion-al-ity for re-ports and data
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 532--532
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 534--534
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 2903) in paragraph at lines 534--534
+[]|\OT1/cmr/m/n/12 View Doc-tor
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 538--538
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 1163) in paragraph at lines 538--539
+[]|\OT1/cmr/m/n/12 System shall man-age user ses-sions
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 540--540
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 3407) in paragraph at lines 540--540
+[]|\OT1/cmr/m/n/12 Login Ac-tiv-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 542--542
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 542--542
+[]|\OT1/cmr/m/n/12 Medication
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 542--542
+\OT1/cmr/m/n/12 Rou-tine
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 544--544
+[]|\OT1/cmr/m/n/12 UC-
+ []
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -1713,7 +1388,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[14]
+[14 <./diagrams/data_flow_diagram.png>]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -1730,6 +1405,75 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [16]
+Underfull \hbox (badness 10000) in paragraph at lines 556--556
+[]|\OT1/cmr/m/n/12 Response
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 558--558
+[]|\OT1/cmr/m/n/12 Response
+ []
+
+
+Overfull \hbox (5.89093pt too wide) in paragraph at lines 566--566
+[]|\OT1/cmr/m/n/12 Authentication| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 566--567
+[]|\OT1/cmr/m/n/12 JWT-based au-then-ti-ca-tion with 30-
+ []
+
+
+Underfull \hbox (badness 1253) in paragraph at lines 570--570
+[]|\OT1/cmr/m/n/12 Data Pro-tec-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 578--578
+[]|\OT1/cmr/m/n/12 Data In-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 580--580
+[]|\OT1/cmr/m/n/12 Fault Tol-er-
+ []
+
+
+Underfull \hbox (badness 6032) in paragraph at lines 582--582
+[]|\OT1/cmr/m/n/12 Disaster Re-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 586--587
+[]|\OT1/cmr/m/n/12 Mobile-responsive de-sign sup-port-ing
+ []
+
+
+Underfull \hbox (badness 2809) in paragraph at lines 590--590
+[]|\OT1/cmr/m/n/12 User Ex-pe-ri-
+ []
+
+
+Underfull \hbox (badness 1874) in paragraph at lines 590--591
+[]|\OT1/cmr/m/n/12 Intuitive nav-i-ga-tion with max-i-mum 3
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 606--606
+[]|\OT1/cmr/m/n/12 Operating
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 614--614
+[]|\OT1/cmr/m/n/12 Medical
+ []
+
+
+Underfull \hbox (badness 3343) in paragraph at lines 614--615
+[]|\OT1/cmr/m/n/12 HL7 FHIR com-pat-i-bil-ity for med-i-cal
+ []
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
@@ -1739,6 +1483,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [17]
 
+
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
 (fancyhdr)                \setlength{\headheight}{14.49998pt}.
@@ -1747,6 +1492,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [18]
 
+
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 14.49998pt, for example:
 (fancyhdr)                \setlength{\headheight}{14.49998pt}.
@@ -1754,149 +1500,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [19]
-Underfull \hbox (badness 10000) in paragraph at lines 630--630
-[]|\OT1/cmr/m/n/12 Response
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 632--632
-[]|\OT1/cmr/m/n/12 Response
- []
-
-
-Overfull \hbox (5.10774pt too wide) in paragraph at lines 634--634
-[]|\OT1/cmr/m/n/12 Throughput| 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 634--634
-[]|\OT1/cmr/m/n/12 Concurrent
- []
-
-
-Overfull \hbox (5.10774pt too wide) in paragraph at lines 636--636
-[]|\OT1/cmr/m/n/12 Throughput| 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 636--636
-[]|\OT1/cmr/m/n/12 Appointment
- []
-
-
-Overfull \hbox (20.11731pt too wide) in paragraph at lines 640--640
-[]|\OT1/cmr/m/n/12 Authentication| 
- []
-
-
-Overfull \hbox (14.56876pt too wide) in paragraph at lines 642--642
-[]|\OT1/cmr/m/n/12 Authorization| 
- []
-
-
-Underfull \hbox (badness 2856) in paragraph at lines 642--642
-[]|\OT1/cmr/m/n/12 Role-Based Ac-
- []
-
-
-Underfull \hbox (badness 2020) in paragraph at lines 644--644
-[]|\OT1/cmr/m/n/12 Data Pro-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 648--648
-[]|\OT1/cmr/m/n/12 Password
- []
-
-
-Overfull \hbox (2.4925pt too wide) in paragraph at lines 652--652
-[]|\OT1/cmr/m/n/12 Availability| 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 654--654
-[]|\OT1/cmr/m/n/12 Data
- []
-
-
-Underfull \hbox (badness 1603) in paragraph at lines 658--658
-[]|\OT1/cmr/m/n/12 Disaster Re-cov-
- []
-
-
-Underfull \hbox (badness 3769) in paragraph at lines 662--662
-[]|\OT1/cmr/m/n/12 Responsive De-
- []
-
-
-Overfull \hbox (6.86606pt too wide) in paragraph at lines 664--664
-[]|\OT1/cmr/m/n/12 Accessibility| 
- []
-
-
-Underfull \hbox (badness 6526) in paragraph at lines 668--668
-[]|\OT1/cmr/m/n/12 Help Sys-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 672--672
-[]|\OT1/cmr/m/n/12 User
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 674--674
-[]|\OT1/cmr/m/n/12 Data
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 674--674
-[]|\OT1/cmr/m/n/12 Database Scal-
- []
-
-
-Overfull \hbox (1.27168pt too wide) in paragraph at lines 676--676
-[]|\OT1/cmr/m/n/12 Geographic| 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 680--680
-[]|\OT1/cmr/m/n/12 Browser
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 682--682
-[]|\OT1/cmr/m/n/12 Operating
- []
-
-
-Underfull \hbox (badness 1147) in paragraph at lines 682--682
-[]|\OT1/cmr/m/n/12 OS Com-pat-i-bil-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 688--688
-[]|\OT1/cmr/m/n/12 Medical
- []
-
-
-Underfull \hbox (badness 6675) in paragraph at lines 690--690
-[]|\OT1/cmr/m/n/12 Data Pri-
- []
-
-
-Underfull \hbox (badness 2197) in paragraph at lines 690--690
-[]|\OT1/cmr/m/n/12 GDPR Com-pli-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 692--692
-[]|\OT1/cmr/m/n/12 Medical
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 692--692
-[]|\OT1/cmr/m/n/12 Clinical Stan-
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1906,14 +1509,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [20]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 718--719
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 720--720
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1923,14 +1518,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [21]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 744--745
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 746--746
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1940,24 +1527,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [22]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 770--771
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 772--772
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 798--799
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 800--800
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1967,19 +1536,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [23]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 824--825
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 826--826
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 829--830
-[]\OT1/cmr/m/n/12 Backend: Ap-point-ment-Con-
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1989,34 +1545,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [24]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 850--851
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 852--852
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 855--856
-[]\OT1/cmr/m/n/12 Backend: Ap-point-ment-Con-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 876--877
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 878--878
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 881--882
-[]\OT1/cmr/m/n/12 Backend: Ap-point-ment-Con-
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2026,14 +1554,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
 [25]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 902--903
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 904--904
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -2042,696 +1562,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
 
-[26]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 928--929
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 930--930
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 954--955
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 956--956
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 959--960
-[]\OT1/cmr/m/n/12 Backend: ARVTreat-ment-Con-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[27]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 980--981
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 982--982
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1006--1007
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1008--1008
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[28]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1032--1033
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1034--1034
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1037--1038
-[]\OT1/cmr/m/n/12 Backend: No-ti-fi-ca-tion-Con-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[29]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1058--1059
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1060--1060
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1086--1087
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1088--1088
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 1975) in paragraph at lines 1092--1093
-[]\OT1/cmr/m/n/12 Features: Ap-point-ments, pa-tients, no-ti-fi-ca-tions,
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[30]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1112--1113
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1114--1114
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1117--1118
-[]\OT1/cmr/m/n/12 Backend: Ap-point-ment-Con-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[31]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1138--1139
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1140--1140
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1143--1144
-[]\OT1/cmr/m/n/12 Backend: Ap-point-ment-Con-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1164--1165
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1166--1166
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[32]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1190--1191
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1192--1192
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1195--1196
-[]\OT1/cmr/m/n/12 Backend: Pa-tien-tRecord-Con-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[33]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1216--1217
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1218--1218
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1221--1222
-[]\OT1/cmr/m/n/12 Backend: ARVTreat-ment-Con-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1242--1243
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1244--1244
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 3449) in paragraph at lines 1248--1249
-[]\OT1/cmr/m/n/12 Features: Cus-tom mes-sages, pa-tient se-lec-tion,
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[34]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1268--1269
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1270--1270
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[35]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1294--1295
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1296--1296
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1299--1300
-[]\OT1/cmr/m/n/12 Backend: No-ti-fi-ca-tion-Con-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1322--1323
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1324--1324
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[36]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1348--1349
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1350--1350
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[37]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1374--1375
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1376--1376
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1400--1401
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1402--1402
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[38]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1426--1427
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1428--1428
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[39]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1452--1453
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1454--1454
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1478--1479
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1480--1480
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[40]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1506--1507
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1508--1508
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1532--1533
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1534--1534
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[41]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1558--1559
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1560--1560
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1563--1564
-[]\OT1/cmr/m/n/12 Backend: Man-ager-Con-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[42]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1584--1585
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1586--1586
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1589--1590
-[]\OT1/cmr/m/n/12 Backend: Man-ager-Con-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1610--1611
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1612--1612
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1615--1616
-[]\OT1/cmr/m/n/12 Backend: Man-ager-Con-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[43]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1636--1637
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1638--1638
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[44]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1662--1663
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1664--1664
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1688--1689
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1690--1690
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[45]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1714--1715
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1716--1716
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[46]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1740--1741
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1742--1742
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1766--1767
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1768--1768
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[47]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1794--1795
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1796--1796
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[48]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1820--1821
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1822--1822
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1846--1847
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1848--1848
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-Underfull \hbox (badness 2495) in paragraph at lines 1852--1853
-[]\OT1/cmr/m/n/12 Features: Sched-ule cre-ation, mod-i-fi-ca-tions, re-
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[49]
-Overfull \hbox (49.47911pt too wide) in paragraph at lines 1872--1873
-[]|[]| 
- []
-
-
-Underfull \hbox (badness 6927) in paragraph at lines 1874--1874
-[]|\OT1/cmr/bx/n/12 Implementation De-
- []
-
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[50]
-<diagrams/Picture/Database.png, id=436, 1606.0pt x 1276.77pt>
-File: diagrams/Picture/Database.png Graphic file (type png)
-<use diagrams/Picture/Database.png>
-Package pdftex.def Info: diagrams/Picture/Database.png  used on input line 1892
-.
-(pdftex.def)             Requested size: 430.31812pt x 342.10245pt.
-
-Overfull \hbox (5.8683pt too wide) in paragraph at lines 1917--1917
-[]|\OT1/cmr/m/n/12 DoctorAvailabilitySlots| 
- []
-
-
-Overfull \hbox (24.69865pt too wide) in paragraph at lines 1935--1935
-[]|\OT1/cmr/m/n/12 AppointmentStatusHistory| 
- []
-
-
-Overfull \hbox (8.47939pt too wide) in paragraph at lines 1941--1941
-[]|\OT1/cmr/m/n/12 AppointmentReminders| 
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[51 <./diagrams/Picture/Database.png (PNG copy)>]
-Overfull \hbox (0.27623pt too wide) in alignment at lines 1950--1954
- [] [] [] 
- []
-
-
-Overfull \hbox (0.27623pt too wide) in alignment at lines 1954--1959
- [] [] [] 
- []
-
-
-Underfull \hbox (badness 2913) in paragraph at lines 1967--1968
-[]|\OT1/cmr/m/n/12 Entity classes rep-re-sent-ing database ta-
- []
-
-
-Overfull \hbox (0.27623pt too wide) in alignment at lines 1959--1979
- [] [] [] 
- []
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[52]
-<diagrams/data_flow_diagram.png, id=449, 786.94pt x 169.63374pt>
-File: diagrams/data_flow_diagram.png Graphic file (type png)
-<use diagrams/data_flow_diagram.png>
-Package pdftex.def Info: diagrams/data_flow_diagram.png  used on input line 198
-4.
-(pdftex.def)             Requested size: 407.66833pt x 87.87614pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[53 <./diagrams/data_flow_diagram.png>]
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 14.49998pt, for example:
-(fancyhdr)                \setlength{\headheight}{14.49998pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-2.49998pt}.
-
-[54] (./RDS_Document_HIV_Clinic_Filled.aux)
+[26] (./RDS_Document_HIV_Clinic_Filled.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -2740,27 +1571,85 @@ L3 programming layer <2025-01-18>
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package rerunfilecheck Info: File `RDS_Document_HIV_Clinic_Filled.out' has not 
-changed.
-(rerunfilecheck)             Checksum: D7E2CD12D0116751C2C532803E0E0C59;3839.
+
+Package rerunfilecheck Warning: File `RDS_Document_HIV_Clinic_Filled.out' has c
+hanged.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `RDS_Document_HIV_Clinic_Filled.out'
+:
+(rerunfilecheck)             Before: D7E2CD12D0116751C2C532803E0E0C59;3839
+(rerunfilecheck)             After:  F2F9F421695936C8DE0AED9D37476592;4799.
  ) 
 Here is how much of TeX's memory you used:
- 14470 strings out of 475178
- 232276 string characters out of 5766539
- 781350 words of memory out of 5000000
- 37128 multiletter control sequences out of 15000+600000
- 564996 words of font info for 56 fonts, out of 8000000 for 9000
+ 14554 strings out of 475178
+ 233990 string characters out of 5766539
+ 727471 words of memory out of 5000000
+ 37255 multiletter control sequences out of 15000+600000
+ 564649 words of font info for 55 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,12n,79p,400b,612s stack positions out of 10000i,1000n,20000p,200000b,200000s
- </home/ubuntu/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.60
-0pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></
-usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/sha
-re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on RDS_Document_HIV_Clinic_Filled.pdf (54 pages, 1098002 bytes).
+ 75i,12n,79p,344b,606s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+pdfTeX warning (dest): name{subsubsection.3.1.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.2.3} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.2.2} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.2.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.1.6} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.1.5} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.1.4} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.1.3} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.1.2} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.2.1.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.1.3.2} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.1.3.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.1.3} has been referenced but does not ex
+ist, replaced by a fixed one
+
+ </home/ubuntu/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600p
+k></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb>
+Output written on RDS_Document_HIV_Clinic_Filled.pdf (26 pages, 1037462 bytes).
 
 PDF statistics:
- 527 PDF objects out of 1000 (max. 8388607)
- 456 compressed objects within 5 object streams
- 188 named destinations out of 1000 (max. 500000)
+ 376 PDF objects out of 1000 (max. 8388607)
+ 336 compressed objects within 4 object streams
+ 143 named destinations out of 1000 (max. 500000)
  200 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -3,71 +3,38 @@
 \contentsline {subsection}{\numberline {1.1}User Requirements}{4}{subsection.1.1}%
 \contentsline {subsubsection}{\numberline {1.1.1}Actors}{4}{subsubsection.1.1.1}%
 \contentsline {subsection}{\numberline {1.2}Actor Description}{4}{subsection.1.2}%
-\contentsline {subsubsection}{\numberline {1.2.1}Use Cases}{6}{subsubsection.1.2.1}%
-\contentsline {paragraph}{a. Diagram(s)}{7}{figure.caption.5}%
-\contentsline {paragraph}{b. Use Case Descriptions}{7}{section*.6}%
-\contentsline {subsection}{\numberline {1.3}Requirements Specifications}{11}{subsection.1.3}%
-\contentsline {subsubsection}{\numberline {1.3.1}Functional Requirements}{11}{subsubsection.1.3.1}%
-\contentsline {subsubsection}{\numberline {1.3.2}Non-Functional Requirements}{20}{subsubsection.1.3.2}%
-\contentsline {section}{\numberline {2}Design Specifications}{21}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Use Case Design Specifications}{21}{subsection.2.1}%
-\contentsline {subsubsection}{\numberline {2.1.1}Guest/Unauthenticated User Use Cases}{21}{subsubsection.2.1.1}%
-\contentsline {paragraph}{UC-001: User Registration}{21}{section*.7}%
-\contentsline {paragraph}{UC-002: User Login}{22}{section*.8}%
-\contentsline {paragraph}{UC-003: Browse Public Website}{23}{section*.9}%
-\contentsline {subsubsection}{\numberline {2.1.2}Patient Use Cases}{23}{subsubsection.2.1.2}%
-\contentsline {paragraph}{UC-004: View Patient Dashboard}{23}{section*.10}%
-\contentsline {paragraph}{UC-005: Book Appointment}{24}{section*.11}%
-\contentsline {paragraph}{UC-006: View Appointments}{25}{section*.12}%
-\contentsline {paragraph}{UC-007: Cancel Appointment}{25}{section*.13}%
-\contentsline {paragraph}{UC-008: View Medical Records}{26}{section*.14}%
-\contentsline {paragraph}{UC-009: Update Medical Records}{27}{section*.15}%
-\contentsline {paragraph}{UC-010: View ARV Treatments}{27}{section*.16}%
-\contentsline {paragraph}{UC-011: Update Profile}{28}{section*.17}%
-\contentsline {paragraph}{UC-012: Change Password}{28}{section*.18}%
-\contentsline {paragraph}{UC-013: Receive Notifications}{29}{section*.19}%
-\contentsline {paragraph}{UC-014: View Privacy Settings}{30}{section*.20}%
-\contentsline {subsubsection}{\numberline {2.1.3}Doctor Use Cases}{30}{subsubsection.2.1.3}%
-\contentsline {paragraph}{UC-015: View Doctor Dashboard}{30}{section*.21}%
-\contentsline {paragraph}{UC-016: Manage Appointments}{31}{section*.22}%
-\contentsline {paragraph}{UC-017: Update Appointment Status}{32}{section*.23}%
-\contentsline {paragraph}{UC-018: Manage Availability}{32}{section*.24}%
-\contentsline {paragraph}{UC-019: Access Patient Records}{33}{section*.25}%
-\contentsline {paragraph}{UC-020: Manage ARV Treatments}{34}{section*.26}%
-\contentsline {paragraph}{UC-021: Send Notifications}{34}{section*.27}%
-\contentsline {paragraph}{UC-022: Manage Notification Templates}{35}{section*.28}%
-\contentsline {paragraph}{UC-023: View Notification History}{36}{section*.29}%
-\contentsline {subsubsection}{\numberline {2.1.4}Administrator Use Cases}{36}{subsubsection.2.1.4}%
-\contentsline {paragraph}{UC-024: View Admin Dashboard}{36}{section*.30}%
-\contentsline {paragraph}{UC-025: Manage Users}{37}{section*.31}%
-\contentsline {paragraph}{UC-026: Create Doctor Accounts}{38}{section*.32}%
-\contentsline {paragraph}{UC-027: Reset User Passwords}{38}{section*.33}%
-\contentsline {paragraph}{UC-028: Manage Specialties}{39}{section*.34}%
-\contentsline {paragraph}{UC-029: Toggle User Status}{40}{section*.35}%
-\contentsline {paragraph}{UC-030: View All Appointments}{40}{section*.36}%
-\contentsline {subsubsection}{\numberline {2.1.5}Manager Use Cases}{41}{subsubsection.2.1.5}%
-\contentsline {paragraph}{UC-031: View Manager Dashboard}{41}{section*.37}%
-\contentsline {paragraph}{UC-032: View Statistics}{42}{section*.38}%
-\contentsline {paragraph}{UC-033: Manage Patient Records}{42}{section*.39}%
-\contentsline {paragraph}{UC-034: Manage Doctor Records}{43}{section*.40}%
-\contentsline {paragraph}{UC-035: Manage ARV Treatments}{43}{section*.41}%
-\contentsline {paragraph}{UC-036: Manage Schedules}{44}{section*.42}%
-\contentsline {paragraph}{UC-037: Search Patients}{45}{section*.43}%
-\contentsline {paragraph}{UC-038: Search Doctors}{45}{section*.44}%
-\contentsline {paragraph}{UC-039: Export Data (CSV)}{46}{section*.45}%
-\contentsline {paragraph}{UC-040: View Patient Details}{47}{section*.46}%
-\contentsline {paragraph}{UC-041: View Doctor Details}{47}{section*.47}%
-\contentsline {subsubsection}{\numberline {2.1.6}System-Wide Use Cases}{48}{subsubsection.2.1.6}%
-\contentsline {paragraph}{UC-042: Session Management}{48}{section*.48}%
-\contentsline {paragraph}{UC-043: Login Activity Tracking}{49}{section*.49}%
-\contentsline {paragraph}{UC-044: Medication Routine Management}{49}{section*.50}%
-\contentsline {paragraph}{UC-045: Health Monitoring}{50}{section*.51}%
-\contentsline {subsection}{\numberline {2.2}System High Level Design}{51}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}Database Design}{51}{subsubsection.2.2.1}%
-\contentsline {paragraph}{a. Database Schema}{51}{section*.52}%
-\contentsline {paragraph}{b. Table Descriptions}{51}{section*.53}%
-\contentsline {subsubsection}{\numberline {2.2.2}Code Packages}{52}{subsubsection.2.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.3}Data Flow Architecture}{53}{subsubsection.2.2.3}%
-\contentsline {section}{\numberline {3}Requirement Specifications}{53}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Common functions}{53}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}UC-01 – Register Donor Account}{53}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {1.2.1}Use Cases}{7}{subsubsection.1.2.1}%
+\contentsline {paragraph}{a. Diagram(s)}{8}{figure.caption.5}%
+\contentsline {paragraph}{b. Use Case List}{8}{section*.6}%
+\contentsline {section}{\numberline {2}Overall Functionalities}{9}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Screens Flow}{9}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Screen Descriptions}{10}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Screen Authorization}{10}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Non-UI Functions}{11}{subsection.2.4}%
+\contentsline {section}{\numberline {3}System High Level Design}{12}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Database Design}{12}{subsection.3.1}%
+\contentsline {paragraph}{a. Database Schema}{12}{section*.7}%
+\contentsline {paragraph}{b. Database Diagram}{13}{figure.caption.9}%
+\contentsline {subsection}{\numberline {3.2}Code Packages}{13}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Data Flow Architecture}{14}{subsection.3.3}%
+\contentsline {section}{\numberline {4}Requirement Specifications}{14}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Functional Requirements}{14}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Non-Functional Requirements}{17}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Design Specifications}{18}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Authentication \& User Management}{18}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}UC-001: User Registration}{18}{subsubsection.5.1.1}%
+\contentsline {paragraph}{a. Functionalities}{18}{section*.11}%
+\contentsline {subsubsection}{\numberline {5.1.2}UC-002: User Login}{20}{subsubsection.5.1.2}%
+\contentsline {paragraph}{a. Functionalities}{20}{section*.12}%
+\contentsline {subsubsection}{\numberline {5.1.3}UC-003: Browse Public Website}{21}{subsubsection.5.1.3}%
+\contentsline {paragraph}{a. Functionalities}{21}{section*.13}%
+\contentsline {subsection}{\numberline {5.2}Patient Management}{22}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}UC-004: View Patient Dashboard}{22}{subsubsection.5.2.1}%
+\contentsline {paragraph}{a. Functionalities}{22}{section*.14}%
+\contentsline {subsubsection}{\numberline {5.2.2}UC-005: Book Appointment}{24}{subsubsection.5.2.2}%
+\contentsline {paragraph}{a. Functionalities}{24}{section*.15}%
+\contentsline {section}{\numberline {6}Appendix}{25}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Assumptions \& Dependencies}{25}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Limitations \& Exclusions}{25}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Business Rules}{26}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Technical Specifications}{26}{subsection.6.4}%

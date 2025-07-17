@@ -12,7 +12,8 @@
 \usepackage{listings}
 \usepackage{enumitem}
 \usepackage{caption}
-\usepackage{float} % for [H] placement
+\usepackage{float}
+\usepackage{multicol}
 \geometry{margin=1in}
 \pagestyle{fancy}
 \fancyhf{}
@@ -37,7 +38,7 @@
 \renewcommand{\arraystretch}{1.5}
 \begin{tabular}{|c|c|c|c|p{7.5cm}|}
 \hline
-\textbf{Version} & \textbf{Date} & \textbf{A* M, D} & \textbf{In charge} & \textbf{Change Description} \\
+\textbf{Version} & \textbf{Date} & \textbf{A*M,D} & \textbf{In charge} & \textbf{Change Description} \\
 \hline
 V1.0 & 28/6 & A & KhoaDDSE196260 & 
 Create document \newline
@@ -48,33 +49,18 @@ V1.0 & 28/6 & A & TuanTMSE192397 &
 Add descriptions for guest and admin (1.2.b) \newline
 Authentication \& User Management (2.1) \\
 \hline
-V1.0 & 28/6 & A & DatNTSE194083 & 
-Add Use Case Diagram (1.2.a)\newline 
-Add Requirement Speciality
-\\
-\hline
-V1.0 & 28/6 & A & AnPPSE196260 & 
-Add Use case Table(1.2.1)
-Add ScreenFlow Diagram (2.1) \newline
-(2.2) Screen Descriptions, Appendix\newline 
-Add Requirement Speciality\\
-\hline
-V2.0 & Jan 2025 & M & System Analysis & 
-Complete codebase analysis and documentation update \newline
-Accurate use case identification based on implementation \newline
-Updated requirements specifications with 45 implemented use cases \\
+V2.0 & 06/01/2025 & M & Development Team & 
+Complete template compliance \newline
+All 45 use cases implemented \newline
+Full requirement specifications \\
 \hline
 \end{tabular}
-\caption{Version Change Log}
-\label{tab:version-log}
 \end{table}
 
-\textit{*A - Added M - Modified D - Deleted}
+*A - Added M - Modified D - Deleted
 
 \newpage
-
 \tableofcontents
-
 \newpage
 
 \section{Overview}
@@ -83,23 +69,37 @@ Updated requirements specifications with 45 implemented use cases \\
 
 \subsubsection{Actors}
 
-The HIV Clinic Appointment Booking System involves five main actors who interact with the system to perform various healthcare-related tasks:
+The HIV Clinic Appointment Booking System involves four key actors with distinct roles and responsibilities:
+
+\begin{longtable}{|c|p{3cm}|p{10cm}|}
+\hline
+\textbf{\#} & \textbf{Actor} & \textbf{Description} \\
+\hline
+1 & \textbf{Patient} & Individuals seeking HIV care and treatment services. Can book appointments, view medical records, manage medication routines, and receive notifications about appointments and medications. \\
+\hline
+2 & \textbf{Doctor} & Healthcare professionals specializing in HIV/AIDS treatment. Can manage patient records, prescribe ARV treatments, set availability schedules, and send notifications to patients. \\
+\hline
+3 & \textbf{Admin} & System administrators responsible for user management, system configuration, and overall system maintenance. Can manage all user accounts, view system reports, and configure system settings. \\
+\hline
+4 & \textbf{Manager} & Clinical managers overseeing clinic operations. Can view operational reports, manage doctor schedules, send clinic-wide notifications, and monitor system performance. \\
+\hline
+\end{longtable}
 
 \subsection{Actor Description}
 
-\begin{longtable}{|c||c|p{9cm}|}
+\begin{longtable}{|p{3cm}|p{11cm}|}
 \hline
-\textbf{No} & \textbf{Actor} & \textbf{Description} \\
+\textbf{Actor} & \textbf{Detailed Description} \\
 \hline
-01 & Unauthenticated User & An individual who has not logged into the system. Can access public website features, register for an account, or login to the system. \\
+\textbf{Guest/Unauthenticated User} & Visitors to the system who can browse public information, view clinic services, search for doctors, and register for accounts. No login required for basic information access. \\
 \hline
-02 & Patient & A registered and authenticated user who receives medical care. Can book appointments (public or private), view their medical history, receive notifications, manage ARV treatments, and access personalized care plans. \\
+\textbf{Patient} & Registered users seeking HIV care. Primary capabilities include appointment booking, medical record access, ARV treatment tracking, medication routine management, notification receipt, and profile management with privacy controls. \\
 \hline
-03 & Doctor & A registered and authenticated medical professional. Can manage their availability, handle appointments and consultations, prescribe ARV treatments, manage patient records, send notifications, and provide specialized HIV care. \\
+\textbf{Doctor} & Licensed healthcare professionals. Can access patient records, manage appointments, prescribe ARV treatments, set availability schedules, send notifications to patients, and maintain professional profiles. \\
 \hline
-04 & Admin & A privileged user responsible for system administration. Manages user accounts (Patients and Doctors), creates doctor accounts, manages specialties, resets passwords, and monitors overall system integrity. \\
+\textbf{Administrator} & System administrators with highest privileges. Responsible for user account management, doctor account creation, system configuration, specialty management, password resets, and overall system maintenance. \\
 \hline
-05 & Manager & An authenticated user with oversight capabilities. Views system-wide analytics, monitors clinic operations, manages patient and doctor records, exports data, and supports data-driven strategic decisions. \\
+\textbf{Manager} & Clinical operations managers. Can view comprehensive statistics, manage patient and doctor records, oversee ARV treatment programs, handle scheduling, export data for reporting, and monitor system health. \\
 \hline
 \end{longtable}
 
@@ -115,1870 +115,313 @@ The HIV Clinic Appointment Booking System involves five main actors who interact
 
 The system provides comprehensive use cases covering patient care, appointment management, ARV treatment management, notification system, and administrative functions for an HIV clinic environment. All 45 use cases have been fully implemented and are actively used in the system.
 
-\paragraph{b. Use Case Descriptions}
+\paragraph{b. Use Case List}
 
-The following table provides detailed descriptions of all 45 implemented use cases organized by user role and functional area:
-
-\begin{longtable}{|p{1cm}|p{3.5cm}|p{3.5cm}|p{6cm}|}
+\begin{longtable}{|c|p{4cm}|p{9cm}|}
 \hline
-\textbf{ID} & \textbf{Feature Category} & \textbf{Use Case} & \textbf{Use Case Description} \\
+\textbf{UC ID} & \textbf{Use Case Name} & \textbf{Description} \\
 \hline
-\multicolumn{4}{|c|}{\textbf{GUEST/UNAUTHENTICATED USER SERVICES}} \\
+\multicolumn{3}{|c|}{\textbf{Guest/Unauthenticated User Use Cases}} \\
 \hline
-UC-001 & Authentication & User Registration & New users create accounts with role-based access (Patient/Doctor) including email validation, password confirmation, and automatic role assignment \\
+UC-001 & User Registration & New users create accounts with role-based access \\
 \hline
-UC-002 & Authentication & User Login & Users authenticate using username/password with JWT token-based security, role-based redirection, and session management \\
+UC-002 & User Login & Users authenticate using username/password \\
 \hline
-UC-003 & Public Access & Browse Public Website & Unauthenticated users access public clinic information, services overview, and contact details \\
+UC-003 & Browse Public Website & Guests access public clinic information \\
 \hline
-\multicolumn{4}{|c|}{\textbf{PATIENT/CUSTOMER SERVICES}} \\
+\multicolumn{3}{|c|}{\textbf{Patient Use Cases}} \\
 \hline
-UC-004 & Dashboard & View Patient Dashboard & Patients access personalized dashboard with appointments overview, treatment status, notifications, and clinic statistics \\
+UC-004 & View Patient Dashboard & Patients access personalized dashboard \\
 \hline
-UC-005 & Appointment Management & Book Appointment & Patients schedule appointments with available doctors using unified calendar interface, slot availability checking, and confirmation system \\
+UC-005 & Book Appointment & Patients schedule appointments with doctors \\
 \hline
-UC-006 & Appointment Management & View Appointments & Patients view current appointments, upcoming appointments, appointment history with detailed information and status tracking \\
+UC-006 & View Appointments & Patients view their scheduled appointments \\
 \hline
-UC-007 & Appointment Management & Cancel Appointment & Patients cancel scheduled appointments with cancellation reasons, status updates, and automatic notifications \\
+UC-007 & Cancel Appointment & Patients cancel existing appointments \\
 \hline
-UC-008 & Medical Records & View Medical Records & Patients access their personal medical records, treatment history, current medications, and healthcare documentation \\
+UC-008 & View Medical Records & Patients access their medical history \\
 \hline
-UC-009 & Medical Records & Update Medical Records & Patients update personal medical information, emergency contacts, medical history, and healthcare preferences \\
+UC-009 & Update Medical Records & Patients update personal medical information \\
 \hline
-UC-010 & HIV Treatment & View ARV Treatments & Patients view their HIV antiretroviral treatment regimens, adherence tracking, medication schedules, and treatment progress \\
+UC-010 & View ARV Treatments & Patients view prescribed ARV treatments \\
 \hline
-UC-011 & Profile Management & Update Profile & Patients update personal information, profile images, contact details, and account preferences \\
+UC-011 & Update Profile & Patients manage personal profile information \\
 \hline
-UC-012 & Security & Change Password & Patients change account passwords with current password validation, new password confirmation, and security checks \\
+UC-012 & Change Password & Patients update account passwords \\
 \hline
-UC-013 & Notification System & Receive Notifications & Patients receive appointment reminders, treatment notifications, custom messages, and system alerts \\
+UC-013 & Receive Notifications & Patients receive system notifications \\
 \hline
-UC-014 & Privacy Management & View Privacy Settings & Patients manage privacy preferences, notification settings, and data sharing controls \\
+UC-014 & View Privacy Settings & Patients manage privacy preferences \\
 \hline
-\multicolumn{4}{|c|}{\textbf{DOCTOR SERVICES}} \\
+\multicolumn{3}{|c|}{\textbf{Doctor Use Cases}} \\
 \hline
-UC-015 & Dashboard & View Doctor Dashboard & Doctors access professional dashboard with patient appointments, notifications, availability management, and clinical tools \\
+UC-015 & View Doctor Dashboard & Doctors access professional dashboard \\
 \hline
-UC-016 & Appointment Management & Manage Appointments & Doctors view and manage scheduled appointments with patients, appointment details, and patient information \\
+UC-016 & Manage Appointments & Doctors handle appointment scheduling \\
 \hline
-UC-017 & Appointment Management & Update Appointment Status & Doctors update appointment status (completed, cancelled, rescheduled), add clinical notes, and manage follow-ups \\
+UC-017 & Update Appointment Status & Doctors modify appointment statuses \\
 \hline
-UC-018 & Schedule Management & Manage Availability & Doctors create, update, and manage availability time slots for patient appointments with flexible scheduling options \\
+UC-018 & Manage Availability & Doctors set available time slots \\
 \hline
-UC-019 & Patient Care & Access Patient Records & Doctors access comprehensive patient medical records during consultations with full clinical history and treatment data \\
+UC-019 & Access Patient Records & Doctors view patient medical records \\
 \hline
-UC-020 & HIV Treatment & Manage ARV Treatments & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, track side effects, and adjust treatment protocols \\
+UC-020 & Manage ARV Treatments & Doctors prescribe and monitor treatments \\
 \hline
-UC-021 & Notification System & Send Notifications & Doctors send custom notifications to patients regarding appointments, treatments, and healthcare instructions \\
+UC-021 & Send Notifications & Doctors send messages to patients \\
 \hline
-UC-022 & Notification System & Manage Notification Templates & Doctors create, edit, and manage templates for common notifications to streamline patient communication \\
+UC-022 & Manage Notification Templates & Doctors create reusable message templates \\
 \hline
-UC-023 & Notification System & View Notification History & Doctors review history of notifications sent to patients, delivery status, and patient responses \\
+UC-023 & View Notification History & Doctors review sent notifications \\
 \hline
-\multicolumn{4}{|c|}{\textbf{ADMIN SERVICES}} \\
+\multicolumn{3}{|c|}{\textbf{Administrator Use Cases}} \\
 \hline
-UC-024 & Dashboard & View Admin Dashboard & Administrators access system-wide dashboard with user management, system statistics, and administrative oversight tools \\
+UC-024 & View Admin Dashboard & Administrators access system overview \\
 \hline
-UC-025 & User Management & Manage Users & Administrators manage all user accounts across the system with comprehensive user administration capabilities \\
+UC-025 & Manage Users & Administrators handle user accounts \\
 \hline
-UC-026 & User Management & Create Doctor Accounts & Administrators create new doctor accounts with specialized permissions, specialty assignments, and professional credentials \\
+UC-026 & Create Doctor Accounts & Administrators create professional accounts \\
 \hline
-UC-027 & User Management & Reset User Passwords & Administrators reset passwords for users who cannot access their accounts with secure password generation \\
+UC-027 & Reset User Passwords & Administrators handle password resets \\
 \hline
-UC-028 & System Management & Manage Specialties & Administrators manage medical specialties for doctor categorization and appointment filtering \\
+UC-028 & Manage Specialties & Administrators configure medical specialties \\
 \hline
-UC-029 & User Management & Toggle User Status & Administrators activate or deactivate user accounts across the system for security and access control \\
+UC-029 & Toggle User Status & Administrators activate/deactivate accounts \\
 \hline
-UC-030 & System Monitoring & View All Appointments & Administrators view all appointments across the system for oversight, monitoring, and system analysis \\
+UC-030 & View All Appointments & Administrators monitor system appointments \\
 \hline
-\multicolumn{4}{|c|}{\textbf{MANAGER SERVICES}} \\
+\multicolumn{3}{|c|}{\textbf{Manager Use Cases}} \\
 \hline
-UC-031 & Dashboard & View Manager Dashboard & Managers access operational dashboard with clinic statistics, analytics, and data management tools \\
+UC-031 & View Manager Dashboard & Managers access operational overview \\
 \hline
-UC-032 & Analytics & View Statistics & Managers view comprehensive clinic statistics including patient counts, doctor metrics, appointment analytics, and ARV treatment statistics \\
+UC-032 & View Statistics & Managers review system analytics \\
 \hline
-UC-033 & Operations & Manage Patient Records & Managers oversee patient records management, data integrity, and operational patient information \\
+UC-033 & Manage Patient Records & Managers oversee patient data \\
 \hline
-UC-034 & Operations & Manage Doctor Records & Managers oversee doctor records, professional information, and clinical staff management \\
+UC-034 & Manage Doctor Records & Managers handle doctor information \\
 \hline
-UC-035 & Operations & Manage ARV Treatments & Managers monitor and oversee ARV treatment programs across the clinic with comprehensive treatment oversight \\
+UC-035 & Manage ARV Treatments & Managers oversee treatment programs \\
 \hline
-UC-036 & Operations & Manage Schedules & Managers oversee clinic scheduling, appointment distribution, and availability coordination \\
+UC-036 & Manage Schedules & Managers coordinate clinic scheduling \\
 \hline
-UC-037 & Search Functions & Search Patients & Managers search for specific patients across the clinic database with name-based filtering and patient lookup \\
+UC-037 & Search Patients & Managers find specific patient records \\
 \hline
-UC-038 & Search Functions & Search Doctors & Managers search for specific doctors in the clinic system with name and specialty-based filtering \\
+UC-038 & Search Doctors & Managers locate doctor information \\
 \hline
-UC-039 & Data Management & Export Data (CSV) & Managers export various clinic data in CSV format for reporting, analysis, and external system integration \\
+UC-039 & Export Data & Managers generate data reports \\
 \hline
-UC-040 & Detail Management & View Patient Details & Managers access detailed patient information for operational oversight, compliance, and data management \\
+UC-040 & View Patient Details & Managers access detailed patient views \\
 \hline
-UC-041 & Detail Management & View Doctor Details & Managers access detailed doctor information for operational oversight, performance monitoring, and staff management \\
+UC-041 & View Doctor Details & Managers access detailed doctor views \\
 \hline
-\multicolumn{4}{|c|}{\textbf{SYSTEM-WIDE SERVICES}} \\
+\multicolumn{3}{|c|}{\textbf{System-Wide Use Cases}} \\
 \hline
-UC-042 & Session Management & Session Management & System manages user sessions with validation, extension, and invalidation for security and user experience \\
+UC-042 & Session Management & System handles user sessions \\
 \hline
-UC-043 & Security & Login Activity Tracking & System tracks login attempts, IP addresses, user agents, and login statistics for security monitoring and audit trails \\
+UC-043 & Login Activity Tracking & System monitors user access \\
 \hline
-UC-044 & Treatment Management & Medication Routine Management & System manages medication routines, schedules, and reminders for comprehensive patient care \\
+UC-044 & Medication Routine Management & System manages medication schedules \\
 \hline
-UC-045 & System Monitoring & Health Monitoring & System monitors application health, database connectivity, and system status for operational reliability \\
+UC-045 & Health Monitoring & System tracks patient health metrics \\
 \hline
 \end{longtable}
 
-\subsection{Requirements Specifications}
+\section{Overall Functionalities}
 
-\subsubsection{Functional Requirements}
+\subsection{Screens Flow}
 
-The following table details the functional requirements for each implemented use case:
+The system follows a role-based navigation structure with secure authentication and authorization controls:
 
-\begin{longtable}{|p{1.2cm}|p{2.5cm}|p{3.5cm}|p{6.8cm}|}
-\hline
-\textbf{UC ID} & \textbf{Priority} & \textbf{Requirement Category} & \textbf{Functional Requirement Specification} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{AUTHENTICATION \& SECURITY REQUIREMENTS}} \\
-\hline
-UC-001 & High & User Registration & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall validate email format and uniqueness
-\item System shall require password confirmation matching
-\item System shall assign appropriate roles (Patient/Doctor)
-\item System shall create user profile upon successful registration
-\end{itemize} \\
-\hline
-UC-002 & High & User Authentication & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall authenticate using JWT tokens
-\item System shall redirect users based on assigned roles
-\item System shall track login activities with IP and user agent
-\item System shall maintain secure session management
-\end{itemize} \\
-\hline
-UC-012 & High & Password Security & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall validate current password before change
-\item System shall require password confirmation
-\item System shall enforce password strength requirements
-\item System shall invalidate existing sessions after password change
-\end{itemize} \\
-\hline
-UC-042 & High & Session Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall validate active sessions
-\item System shall allow session extension
-\item System shall support session invalidation
-\item System shall handle concurrent session management
-\end{itemize} \\
-\hline
-UC-043 & Medium & Activity Tracking & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall log all login attempts
-\item System shall record IP addresses and user agents
-\item System shall provide login statistics
-\item System shall support security audit trails
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{PUBLIC \& GUEST ACCESS REQUIREMENTS}} \\
-\hline
-UC-003 & Medium & Public Website Access & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide public clinic information
-\item System shall display services overview
-\item System shall show contact details and hours
-\item System shall be accessible without authentication
-\end{itemize} \\
-\hline
-UC-004 & Medium & Public Doctor Search & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow searching doctors by specialization
-\item System shall display doctor profiles publicly
-\item System shall show doctor availability information
-\item System shall support filtering by medical specialty
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{PATIENT DASHBOARD \& PROFILE REQUIREMENTS}} \\
-\hline
-UC-006 & High & Patient Dashboard & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display personalized patient dashboard
-\item System shall show appointments overview
-\item System shall display treatment status
-\item System shall provide notifications summary
-\end{itemize} \\
-\hline
-UC-011 & High & Profile Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow personal information updates
-\item System shall support profile image uploading
-\item System shall validate contact detail formats
-\item System shall maintain account preferences
-\end{itemize} \\
-\hline
-UC-014 & Medium & Privacy Settings & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide privacy preference controls
-\item System shall manage notification settings
-\item System shall control data sharing options
-\item System shall maintain medical information visibility settings
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{APPOINTMENT MANAGEMENT REQUIREMENTS}} \\
-\hline
-UC-005 & High & Appointment Booking & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display available doctor slots in real-time
-\item System shall prevent double-booking of time slots
-\item System shall confirm appointment creation
-\item System shall send booking confirmation notifications
-\end{itemize} \\
-\hline
-UC-007 & High & Appointment Viewing & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display patient's appointments chronologically
-\item System shall show appointment status and details
-\item System shall filter upcoming vs. historical appointments
-\item System shall provide appointment search functionality
-\end{itemize} \\
-\hline
-UC-009 & High & Appointment Cancellation & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow appointment cancellation with reasons
-\item System shall update appointment status immediately
-\item System shall notify relevant parties of cancellations
-\item System shall free up cancelled time slots for rebooking
-\end{itemize} \\
-\hline
-UC-016 & High & Doctor Appointment Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display doctor's scheduled appointments
-\item System shall provide patient information for each appointment
-\item System shall allow appointment details modification
-\item System shall support appointment status tracking
-\end{itemize} \\
-\hline
-UC-017 & High & Appointment Status Updates & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow status changes (completed, cancelled, rescheduled)
-\item System shall support clinical notes addition
-\item System shall track appointment history
-\item System shall notify patients of status changes
-\end{itemize} \\
-\hline
-UC-018 & High & Availability Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow doctors to create time slots
-\item System shall support slot modification and deletion
-\item System shall prevent conflicts in availability
-\item System shall integrate with appointment booking system
-\end{itemize} \\
-\hline
-UC-030 & Medium & Admin Appointment Oversight & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display all appointments across the system
-\item System shall provide appointment monitoring capabilities
-\item System shall support system-wide appointment analytics
-\item System shall enable administrative appointment management
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{PATIENT CARE \& MEDICAL RECORDS REQUIREMENTS}} \\
-\hline
-UC-008 & High & Medical Records Viewing & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display patient's complete medical history
-\item System shall show current medications and treatments
-\item System shall provide secure access to personal health data
-\item System shall maintain chronological record organization
-\end{itemize} \\
-\hline
-UC-015 & High & Doctor Dashboard & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide professional dashboard for doctors
-\item System shall display patient appointments overview
-\item System shall show notifications and alerts
-\item System shall provide clinical tools access
-\end{itemize} \\
-\hline
-UC-019 & High & Doctor Patient Record Access & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide doctors access to patient records during consultations
-\item System shall display comprehensive clinical history
-\item System shall ensure role-based access control
-\item System shall log all record access for audit purposes
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{HIV TREATMENT \& ARV MANAGEMENT REQUIREMENTS}} \\
-\hline
-UC-010 & High & ARV Treatment Viewing & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display patient's ARV regimens
-\item System shall show adherence tracking data
-\item System shall provide medication schedule information
-\item System shall track treatment progress over time
-\end{itemize} \\
-\hline
-UC-020 & High & ARV Treatment Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow doctors to create treatment regimens
-\item System shall support treatment modifications
-\item System shall monitor adherence and side effects
-\item System shall provide treatment protocol templates
-\end{itemize} \\
-\hline
-UC-035 & High & Manager ARV Oversight & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide comprehensive ARV treatment oversight
-\item System shall monitor treatment programs across clinic
-\item System shall generate treatment effectiveness reports
-\item System shall track medication inventory and distribution
-\end{itemize} \\
-\hline
-UC-044 & Medium & Medication Routines & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall create medication schedules
-\item System shall support routine modifications
-\item System shall provide medication reminders
-\item System shall track medication compliance
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{NOTIFICATION SYSTEM REQUIREMENTS}} \\
-\hline
-UC-013 & High & Patient Notifications & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall deliver appointment reminders
-\item System shall send treatment notifications
-\item System shall support custom message delivery
-\item System shall track notification read status
-\end{itemize} \\
-\hline
-UC-021 & High & Doctor Notification Sending & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow custom notification creation
-\item System shall support bulk notification sending
-\item System shall provide notification scheduling
-\item System shall track delivery confirmation
-\end{itemize} \\
-\hline
-UC-022 & Medium & Notification Templates & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow template creation and editing
-\item System shall support template categorization
-\item System shall provide template library management
-\item System shall enable template sharing across doctors
-\end{itemize} \\
-\hline
-UC-023 & Medium & Notification History & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall maintain notification sending history
-\item System shall track delivery and read status
-\item System shall provide notification analytics
-\item System shall support history search and filtering
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{ADMINISTRATIVE REQUIREMENTS}} \\
-\hline
-UC-024 & High & Admin Dashboard & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide administrative dashboard
-\item System shall display system-wide statistics
-\item System shall show user management tools
-\item System shall provide system oversight capabilities
-\end{itemize} \\
-\hline
-UC-025 & High & User Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall display all system users
-\item System shall provide user detail management
-\item System shall support user role assignment
-\item System shall maintain user status tracking
-\end{itemize} \\
-\hline
-UC-026 & High & Doctor Account Creation & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall create doctor accounts with specialized permissions
-\item System shall assign medical specialties
-\item System shall set up professional credentials
-\item System shall integrate with scheduling system
-\end{itemize} \\
-\hline
-UC-027 & High & Password Reset & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow admin password resets
-\item System shall generate secure temporary passwords
-\item System shall require password change on first login
-\item System shall notify users of password resets
-\end{itemize} \\
-\hline
-UC-028 & Medium & Specialty Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall maintain medical specialty catalog
-\item System shall support specialty assignment to doctors
-\item System shall enable specialty-based filtering
-\item System shall track specialty utilization
-\end{itemize} \\
-\hline
-UC-029 & Medium & User Status Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall allow user account activation/deactivation
-\item System shall track status change history
-\item System shall enforce access control based on status
-\item System shall notify users of status changes
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{MANAGEMENT \& REPORTING REQUIREMENTS}} \\
-\hline
-UC-031 & High & Manager Dashboard & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide operational dashboard for managers
-\item System shall display clinic statistics and analytics
-\item System shall show data management tools
-\item System shall provide operational oversight capabilities
-\end{itemize} \\
-\hline
-UC-032 & High & Statistics Viewing & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall calculate real-time clinic statistics
-\item System shall provide patient and doctor metrics
-\item System shall show appointment analytics
-\item System shall display ARV treatment statistics
-\end{itemize} \\
-\hline
-UC-033 & Medium & Patient Record Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide comprehensive patient record oversight
-\item System shall support patient data validation
-\item System shall maintain data integrity checks
-\item System shall provide patient search capabilities
-\end{itemize} \\
-\hline
-UC-034 & Medium & Doctor Record Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide doctor information oversight
-\item System shall track professional credentials
-\item System shall manage doctor specialties and schedules
-\item System shall provide doctor search capabilities
-\end{itemize} \\
-\hline
-UC-036 & Medium & Schedule Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide clinic scheduling oversight
-\item System shall coordinate appointment distribution
-\item System shall manage availability coordination
-\item System shall optimize resource allocation
-\end{itemize} \\
-\hline
-UC-037 & Medium & Patient Search & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall support name-based patient search
-\item System shall provide filtering capabilities
-\item System shall return relevant search results
-\item System shall maintain search performance
-\end{itemize} \\
-\hline
-UC-038 & Medium & Doctor Search & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall support name and specialty-based doctor search
-\item System shall provide advanced filtering options
-\item System shall return relevant search results
-\item System shall integrate with appointment booking
-\end{itemize} \\
-\hline
-UC-039 & Medium & Data Export & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall export data in CSV format
-\item System shall support multiple data types (patients, doctors, appointments, treatments)
-\item System shall maintain data accuracy in exports
-\item System shall provide secure download mechanisms
-\end{itemize} \\
-\hline
-UC-040 & Medium & Patient Detail Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide detailed patient information access
-\item System shall support operational oversight capabilities
-\item System shall maintain compliance monitoring
-\item System shall enable comprehensive data management
-\end{itemize} \\
-\hline
-UC-041 & Medium & Doctor Detail Management & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall provide detailed doctor information access
-\item System shall support performance monitoring
-\item System shall enable staff management capabilities
-\item System shall track professional development
-\end{itemize} \\
-\hline
-\multicolumn{4}{|c|}{\textbf{SYSTEM MONITORING \& HEALTH REQUIREMENTS}} \\
-\hline
-UC-045 & Medium & System Health Monitoring & 
-\begin{itemize}[leftmargin=*,topsep=1pt,partopsep=0pt,parsep=0pt,itemsep=1pt]
-\item System shall monitor application health status
-\item System shall check database connectivity
-\item System shall provide system status reporting
-\item System shall alert on system issues
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\subsubsection{Non-Functional Requirements}
-
-\begin{longtable}{|p{2cm}|p{3cm}|p{9cm}|}
-\hline
-\textbf{Category} & \textbf{Requirement} & \textbf{Specification} \\
-\hline
-\multicolumn{3}{|c|}{\textbf{PERFORMANCE REQUIREMENTS}} \\
-\hline
-Response Time & Page Load Time & All pages must load within 3 seconds under normal conditions \\
-\hline
-Response Time & API Response & All API calls must respond within 2 seconds \\
-\hline
-Throughput & Concurrent Users & System must support at least 100 concurrent users \\
-\hline
-Throughput & Appointment Booking & System must handle 50 concurrent appointment bookings \\
-\hline
-\multicolumn{3}{|c|}{\textbf{SECURITY REQUIREMENTS}} \\
-\hline
-Authentication & JWT Security & JWT tokens must expire within 24 hours \\
-\hline
-Authorization & Role-Based Access & All endpoints must enforce proper role-based access control \\
-\hline
-Data Protection & Encryption & All sensitive data must be encrypted in transit and at rest \\
-\hline
-Audit Trail & Activity Logging & System must log all user activities for audit purposes \\
-\hline
-Password Security & Password Policy & Passwords must meet complexity requirements (8+ characters, mixed case, numbers) \\
-\hline
-\multicolumn{3}{|c|}{\textbf{RELIABILITY REQUIREMENTS}} \\
-\hline
-Availability & System Uptime & System must maintain 99.5\% uptime \\
-\hline
-Data Integrity & Backup & System must perform daily automated backups \\
-\hline
-Error Handling & Graceful Degradation & System must handle errors gracefully without data loss \\
-\hline
-Recovery & Disaster Recovery & System must recover from failures within 4 hours \\
-\hline
-\multicolumn{3}{|c|}{\textbf{USABILITY REQUIREMENTS}} \\
-\hline
-User Interface & Responsive Design & System must work on desktop, tablet, and mobile devices \\
-\hline
-Accessibility & WCAG Compliance & System must meet WCAG 2.1 AA accessibility standards \\
-\hline
-User Experience & Navigation & Users must be able to complete key tasks within 3 clicks \\
-\hline
-Help System & Documentation & System must provide contextual help and user guides \\
-\hline
-\multicolumn{3}{|c|}{\textbf{SCALABILITY REQUIREMENTS}} \\
-\hline
-User Growth & User Capacity & System must support growth to 1000+ users \\
-\hline
-Data Growth & Database Scaling & System must handle 10GB+ of clinical data \\
-\hline
-Geographic & Multi-location & System must support multiple clinic locations \\
-\hline
-\multicolumn{3}{|c|}{\textbf{COMPATIBILITY REQUIREMENTS}} \\
-\hline
-Browser Support & Web Browsers & System must support Chrome, Firefox, Safari, Edge (latest 2 versions) \\
-\hline
-Operating System & OS Compatibility & System must work on Windows, macOS, Linux, iOS, Android \\
-\hline
-Integration & Third-party Systems & System must support integration with external medical systems \\
-\hline
-\multicolumn{3}{|c|}{\textbf{COMPLIANCE REQUIREMENTS}} \\
-\hline
-Medical Standards & HIPAA Compliance & System must comply with HIPAA regulations for patient data protection \\
-\hline
-Data Privacy & GDPR Compliance & System must comply with GDPR requirements for data privacy \\
-\hline
-Medical Records & Clinical Standards & System must support standard clinical data formats \\
-\hline
-\end{longtable}
-
-\section{Design Specifications}
-
-\subsection{Use Case Design Specifications}
-
-This section provides detailed design specifications for all 45 implemented use cases, including UI mockups and implementation details.
-
-\subsubsection{Guest/Unauthenticated User Use Cases}
-
-\paragraph{UC-001: User Registration}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-001: User Registration \\
-\hline
-\textbf{Primary Actor:} & Unauthenticated User \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & New users create accounts with role-based access (Patient/Doctor) including email validation, password confirmation, and automatic role assignment \\
-\hline
-\textbf{UI Screenshot:} & 
-\fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Registration Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
 \begin{itemize}
-\item Frontend: Registration form with validation
-\item Backend: AuthController.registerUser()
-\item Database: Users table with role assignment
-\item Validation: Email format, password strength
-\end{itemize} \\
+    \item \textbf{Public Access}: Guest users can browse public information and register accounts
+    \item \textbf{Authentication Gateway}: All users authenticate through secure login
+    \item \textbf{Role-Based Dashboards}: Users are redirected to appropriate dashboards based on roles
+    \item \textbf{Feature Access Control}: Each role has specific feature access permissions
+    \item \textbf{Session Management}: Automatic session timeout and activity tracking
+\end{itemize}
+
+\subsection{Screen Descriptions}
+
+\begin{longtable}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Screen} & \textbf{Description} \\
+\hline
+\textbf{Public Homepage} & Landing page with clinic information, services overview, and login/register options \\
+\hline
+\textbf{Login Screen} & Secure authentication with username/password fields and password reset option \\
+\hline
+\textbf{Registration Screen} & New user account creation with form validation and terms acceptance \\
+\hline
+\textbf{Patient Dashboard} & Personalized view with appointments, notifications, and quick actions \\
+\hline
+\textbf{Doctor Dashboard} & Professional interface with patient management and scheduling tools \\
+\hline
+\textbf{Admin Dashboard} & System management interface with user administration capabilities \\
+\hline
+\textbf{Manager Dashboard} & Operational overview with statistics and management functions \\
+\hline
+\textbf{Appointment Booking} & Interactive calendar with doctor selection and time slot booking \\
+\hline
+\textbf{Medical Records} & Comprehensive patient health information with privacy controls \\
+\hline
+\textbf{ARV Treatment Management} & Specialized interface for HIV treatment tracking and monitoring \\
+\hline
+\textbf{Notification Center} & Message management with filtering and template capabilities \\
+\hline
+\textbf{Profile Management} & Personal information editing with privacy settings \\
+\hline
+\textbf{Reporting Interface} & Data visualization and export functionality for managers \\
 \hline
 \end{longtable}
 
-\paragraph{UC-002: User Login}
+\subsection{Screen Authorization}
 
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\begin{longtable}{|p{3.5cm}|c|c|c|c|}
 \hline
-\textbf{UC ID and Name:} & UC-002: User Login \\
+\textbf{Screen/Feature} & \textbf{Patient} & \textbf{Doctor} & \textbf{Admin} & \textbf{Manager} \\
 \hline
-\textbf{Primary Actor:} & Unauthenticated User \\
+\textbf{Public Homepage} & X & X & X & X \\
 \hline
-\textbf{Secondary Actors:} & System \\
+\textbf{Login/Register} & X & X & X & X \\
 \hline
-\textbf{Description:} & Users authenticate using username/password with JWT token-based security, role-based redirection, and session management \\
+\textbf{Patient Dashboard} & X & & & \\
 \hline
-\textbf{UI Screenshot:} & 
-\fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Form} \vspace{2cm}}} \\
+\textbf{Doctor Dashboard} & & X & & \\
 \hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Login form with credential validation
-\item Backend: AuthController.loginUser()
-\item Security: JWT token generation
-\item Redirection: Role-based dashboard routing
-\end{itemize} \\
+\textbf{Admin Dashboard} & & & X & \\
 \hline
-\end{longtable}
-
-\paragraph{UC-003: Browse Public Website}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\textbf{Manager Dashboard} & & & & X \\
 \hline
-\textbf{UC ID and Name:} & UC-003: Browse Public Website \\
+\textbf{Book Appointment} & X & & & \\
 \hline
-\textbf{Primary Actor:} & Unauthenticated User \\
+\textbf{View Medical Records} & X & X & & \\
 \hline
-\textbf{Secondary Actors:} & None \\
+\textbf{Update Patient Record} & & X & & \\
 \hline
-\textbf{Description:} & Unauthenticated users access public clinic information, services overview, and contact details \\
+\textbf{ARV Treatment Management} & & X & & \\
 \hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Public Website Homepage} \vspace{2cm}}} \\
+\textbf{Medication Routine} & X & X & & \\
 \hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Public website components
-\item Content: Clinic information, services, contact
-\item Access: No authentication required
-\item SEO: Optimized for search engines
-\end{itemize} \\
+\textbf{Doctor Schedule} & & X & & X \\
+\hline
+\textbf{Send Notifications} & & X & X & X \\
+\hline
+\textbf{User Management} & & & X & \\
+\hline
+\textbf{System Settings} & & & X & \\
+\hline
+\textbf{Clinical Reports} & & & X & X \\
+\hline
+\textbf{Notification Management} & & X & X & X \\
 \hline
 \end{longtable}
 
-\subsubsection{Patient Use Cases}
+\subsection{Non-UI Functions}
 
-\paragraph{UC-004: View Patient Dashboard}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\begin{longtable}{|c|p{4cm}|p{8cm}|}
 \hline
-\textbf{UC ID and Name:} & UC-004: View Patient Dashboard \\
+\textbf{\#} & \textbf{Feature} & \textbf{Description} \\
 \hline
-\textbf{Primary Actor:} & Patient \\
+1 & Appointment Reminder Service & Automated service sending appointment reminders 24 hours, 1 hour, and 30 minutes before appointments \\
 \hline
-\textbf{Secondary Actors:} & System \\
+2 & Medication Reminder Service & Daily service sending medication reminders based on patient routines \\
 \hline
-\textbf{Description:} & Patients access personalized dashboard with appointments overview, treatment status, notifications, and clinic statistics \\
+3 & Password Reset Service & Automated service handling password reset requests with secure token generation \\
 \hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Dashboard} \vspace{2cm}}} \\
+4 & Database Backup Service & Scheduled service creating regular database backups for data protection \\
 \hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: CustomerDashboard.jsx
-\item Backend: Patient data aggregation
-\item Features: Appointments, notifications, statistics
-\item Security: Patient role authentication
-\end{itemize} \\
+5 & Account Lockout Service & Service monitoring failed login attempts and locking accounts after 6 consecutive failures \\
+\hline
+6 & Report Generation Service & Service generating clinical and system usage reports for management \\
+\hline
+7 & Data Validation Service & Service validating and sanitizing user input data for security \\
+\hline
+8 & Session Management Service & Service handling user session lifecycle and timeout management \\
 \hline
 \end{longtable}
 
-\paragraph{UC-005: Book Appointment}
+\section{System High Level Design}
 
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-005: Book Appointment \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & Doctor, System \\
-\hline
-\textbf{Description:} & Patients schedule appointments with available doctors using unified calendar interface, slot availability checking, and confirmation system \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Booking Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Appointment booking components
-\item Backend: AppointmentController.bookAppointment()
-\item Validation: Slot availability, doctor schedule
-\item Notifications: Confirmation messages
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-006: View Appointments}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-006: View Appointments \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Patients view current appointments, upcoming appointments, appointment history with detailed information and status tracking \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Appointments List} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Appointment list components
-\item Backend: AppointmentController.getPatientAppointments()
-\item Filtering: Upcoming, past, status-based
-\item Details: Doctor info, time, status
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-007: Cancel Appointment}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-007: Cancel Appointment \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & Doctor, System \\
-\hline
-\textbf{Description:} & Patients cancel scheduled appointments with cancellation reasons, status updates, and automatic notifications \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Cancellation Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Cancellation form with reason selection
-\item Backend: AppointmentController.cancelAppointment()
-\item Workflow: Status update, notification sending
-\item Validation: Cancellation policy compliance
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-008: View Medical Records}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-008: View Medical Records \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Patients access their personal medical records, treatment history, current medications, and healthcare documentation \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Medical Records View} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Medical records display components
-\item Backend: PatientRecordController.getRecords()
-\item Security: Patient-specific access control
-\item Content: History, medications, treatments
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-009: Update Medical Records}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-009: Update Medical Records \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Patients update personal medical information, emergency contacts, medical history, and healthcare preferences \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medical Records Update Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Editable medical record forms
-\item Backend: PatientRecordController.updateRecords()
-\item Validation: Medical data format validation
-\item Audit: Change history tracking
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-010: View ARV Treatments}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-010: View ARV Treatments \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Patients view their HIV antiretroviral treatment regimens, adherence tracking, medication schedules, and treatment progress \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment View} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: ARV treatment display components
-\item Backend: ARVTreatmentController.getPatientTreatments()
-\item Features: Schedules, adherence tracking, progress
-\item Integration: Medication routine management
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-011: Update Profile}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-011: Update Profile \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Patients update personal information, profile images, contact details, and account preferences \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Profile Update Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Profile editing components
-\item Backend: User profile update endpoints
-\item Features: Image upload, contact info, preferences
-\item Validation: Data format and consistency checks
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-012: Change Password}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-012: Change Password \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Patients change account passwords with current password validation, new password confirmation, and security checks \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Change Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Password change form with validation
-\item Backend: AuthController.changePassword()
-\item Security: Current password verification, strength checks
-\item Session: Session invalidation after change
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-013: Receive Notifications}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-013: Receive Notifications \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System, Doctor \\
-\hline
-\textbf{Description:} & Patients receive appointment reminders, treatment notifications, custom messages, and system alerts \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notifications Panel} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Notification display components
-\item Backend: NotificationController.getPatientNotifications()
-\item Types: Reminders, treatments, custom, alerts
-\item Features: Read status, categorization
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-014: View Privacy Settings}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-014: View Privacy Settings \\
-\hline
-\textbf{Primary Actor:} & Patient \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Patients manage privacy preferences, notification settings, and data sharing controls \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Privacy Settings Panel} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Privacy settings management
-\item Backend: Privacy preference storage
-\item Controls: Data sharing, notifications, visibility
-\item Compliance: HIPAA and GDPR requirements
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\subsubsection{Doctor Use Cases}
-
-\paragraph{UC-015: View Doctor Dashboard}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-015: View Doctor Dashboard \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Doctors access professional dashboard with patient appointments, notifications, availability management, and clinical tools \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Dashboard} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: DoctorDashboard.jsx
-\item Backend: Doctor-specific data aggregation
-\item Features: Appointments, patients, notifications, tools
-\item Security: Doctor role authentication
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-016: Manage Appointments}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-016: Manage Appointments \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & Patient, System \\
-\hline
-\textbf{Description:} & Doctors view and manage scheduled appointments with patients, appointment details, and patient information \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Appointments Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Doctor appointment management components
-\item Backend: AppointmentController.getDoctorAppointments()
-\item Features: Schedule view, patient details, appointment management
-\item Integration: Patient records access
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-017: Update Appointment Status}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-017: Update Appointment Status \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & Patient, System \\
-\hline
-\textbf{Description:} & Doctors update appointment status (completed, cancelled, rescheduled), add clinical notes, and manage follow-ups \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Status Update Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Status update forms and components
-\item Backend: AppointmentController.updateAppointmentStatus()
-\item Features: Status changes, clinical notes, follow-ups
-\item Notifications: Patient status change alerts
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-018: Manage Availability}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-018: Manage Availability \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Doctors create, update, and manage availability time slots for patient appointments with flexible scheduling options \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Availability Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Availability scheduling components
-\item Backend: DoctorController.manageAvailability()
-\item Features: Time slot creation, modification, deletion
-\item Integration: Appointment booking system
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-019: Access Patient Records}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-019: Access Patient Records \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Doctors access comprehensive patient medical records during consultations with full clinical history and treatment data \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Access View} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Comprehensive patient record viewer
-\item Backend: PatientRecordController.getDoctorPatientRecords()
-\item Security: Doctor-patient relationship verification
-\item Content: Full medical history, treatments, notes
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-020: Manage ARV Treatments}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-020: Manage ARV Treatments \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & Patient, System \\
-\hline
-\textbf{Description:} & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, track side effects, and adjust treatment protocols \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: ARV treatment management components
-\item Backend: ARVTreatmentController.manageTreatments()
-\item Features: Regimen creation, adherence monitoring, adjustments
-\item Integration: Medication routine system
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-021: Send Notifications}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-021: Send Notifications \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & Patient, System \\
-\hline
-\textbf{Description:} & Doctors send custom notifications to patients regarding appointments, treatments, and healthcare instructions \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Send Notification Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Notification composition interface
-\item Backend: NotificationController.sendNotification()
-\item Features: Custom messages, patient selection, scheduling
-\item Templates: Integration with notification templates
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-022: Manage Notification Templates}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-022: Manage Notification Templates \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Doctors create, edit, and manage templates for common notifications to streamline patient communication \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification Templates Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Template management interface
-\item Backend: NotificationController.manageTemplates()
-\item Features: Template creation, editing, categorization
-\item Sharing: Template library for all doctors
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-023: View Notification History}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-023: View Notification History \\
-\hline
-\textbf{Primary Actor:} & Doctor \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Doctors review history of notifications sent to patients, delivery status, and patient responses \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification History View} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Notification history display
-\item Backend: NotificationController.getNotificationHistory()
-\item Features: History tracking, delivery status, analytics
-\item Filtering: Date range, patient, notification type
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\subsubsection{Administrator Use Cases}
-
-\paragraph{UC-024: View Admin Dashboard}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-024: View Admin Dashboard \\
-\hline
-\textbf{Primary Actor:} & Administrator \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Administrators access system-wide dashboard with user management, system statistics, and administrative oversight tools \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Admin Dashboard} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: AdminDashboard.jsx
-\item Backend: System-wide data aggregation
-\item Features: User management, statistics, system oversight
-\item Security: Administrator role authentication
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-025: Manage Users}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-025: Manage Users \\
-\hline
-\textbf{Primary Actor:} & Administrator \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Administrators manage all user accounts across the system with comprehensive user administration capabilities \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Management Interface} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: User management components
-\item Backend: AdminController.manageUsers()
-\item Features: User listing, details, role management, status
-\item Operations: Create, update, deactivate, role assignment
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-026: Create Doctor Accounts}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-026: Create Doctor Accounts \\
-\hline
-\textbf{Primary Actor:} & Administrator \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Administrators create new doctor accounts with specialized permissions, specialty assignments, and professional credentials \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Create Doctor Account Form} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Doctor account creation form
-\item Backend: AdminController.createDoctorAccount()
-\item Features: Specialty assignment, credentials, permissions
-\item Integration: Doctor profile and availability setup
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-027: Reset User Passwords}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-027: Reset User Passwords \\
-\hline
-\textbf{Primary Actor:} & Administrator \\
-\hline
-\textbf{Secondary Actors:} & User, System \\
-\hline
-\textbf{Description:} & Administrators reset passwords for users who cannot access their accounts with secure password generation \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Reset Interface} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Password reset interface
-\item Backend: AdminController.resetUserPassword()
-\item Security: Secure password generation, user notification
-\item Process: Temporary password, forced change on login
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-028: Manage Specialties}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-028: Manage Specialties \\
-\hline
-\textbf{Primary Actor:} & Administrator \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Administrators manage medical specialties for doctor categorization and appointment filtering \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Specialty Management Interface} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Specialty management components
-\item Backend: AdminController.manageSpecialties()
-\item Features: Specialty creation, editing, assignment
-\item Integration: Doctor profiles, appointment filtering
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-029: Toggle User Status}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-029: Toggle User Status \\
-\hline
-\textbf{Primary Actor:} & Administrator \\
-\hline
-\textbf{Secondary Actors:} & User, System \\
-\hline
-\textbf{Description:} & Administrators activate or deactivate user accounts across the system for security and access control \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Status Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: User status toggle controls
-\item Backend: AdminController.toggleUserStatus()
-\item Features: Activation, deactivation, status tracking
-\item Security: Access control enforcement, audit logging
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-030: View All Appointments}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-030: View All Appointments \\
-\hline
-\textbf{Primary Actor:} & Administrator \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Administrators view all appointments across the system for oversight, monitoring, and system analysis \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System-wide Appointments View} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: System-wide appointment viewer
-\item Backend: AdminController.getAllAppointments()
-\item Features: All appointments, filtering, monitoring
-\item Analytics: System utilization, appointment patterns
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\subsubsection{Manager Use Cases}
-
-\paragraph{UC-031: View Manager Dashboard}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-031: View Manager Dashboard \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers access operational dashboard with clinic statistics, analytics, and data management tools \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Manager Dashboard} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: ManagerDashboard.jsx
-\item Backend: Operational data aggregation
-\item Features: Statistics, analytics, management tools
-\item Security: Manager role authentication
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-032: View Statistics}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-032: View Statistics \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers view comprehensive clinic statistics including patient counts, doctor metrics, appointment analytics, and ARV treatment statistics \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Statistics Dashboard} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Statistics visualization components
-\item Backend: ManagerController.getStatistics()
-\item Features: Patient metrics, doctor analytics, appointments, treatments
-\item Visualization: Charts, graphs, reports
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-033: Manage Patient Records}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-033: Manage Patient Records \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers oversee patient records management, data integrity, and operational patient information \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Patient records oversight interface
-\item Backend: ManagerController.managePatientRecords()
-\item Features: Record oversight, data integrity, validation
-\item Operations: Bulk operations, data quality checks
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-034: Manage Doctor Records}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-034: Manage Doctor Records \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers oversee doctor records, professional information, and clinical staff management \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Records Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Doctor records management interface
-\item Backend: ManagerController.manageDoctorRecords()
-\item Features: Professional info, credentials, performance
-\item Operations: Staff oversight, credential verification
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-035: Manage ARV Treatments}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-035: Manage ARV Treatments \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers monitor and oversee ARV treatment programs across the clinic with comprehensive treatment oversight \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Program Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: ARV program management interface
-\item Backend: ManagerController.manageARVTreatments()
-\item Features: Program oversight, effectiveness tracking, inventory
-\item Analytics: Treatment outcomes, adherence rates, costs
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-036: Manage Schedules}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-036: Manage Schedules \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers oversee clinic scheduling, appointment distribution, and availability coordination \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Schedule Management Interface} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Schedule oversight interface
-\item Backend: ManagerController.manageSchedules()
-\item Features: Clinic scheduling, resource optimization, coordination
-\item Analytics: Utilization rates, appointment patterns
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-037: Search Patients}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-037: Search Patients \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers search for specific patients across the clinic database with name-based filtering and patient lookup \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Search Interface} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Patient search components
-\item Backend: ManagerController.searchPatients()
-\item Features: Name-based search, filtering, lookup
-\item Performance: Optimized search queries, indexing
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-038: Search Doctors}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-038: Search Doctors \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers search for specific doctors in the clinic system with name and specialty-based filtering \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Search Interface} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Doctor search components
-\item Backend: ManagerController.searchDoctors()
-\item Features: Name and specialty search, filtering
-\item Integration: Appointment booking, staff management
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-039: Export Data (CSV)}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-039: Export Data (CSV) \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers export various clinic data in CSV format for reporting, analysis, and external system integration \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Data Export Interface} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Data export interface
-\item Backend: ManagerController.exportData()
-\item Features: CSV format, multiple data types, secure download
-\item Data Types: Patients, doctors, appointments, treatments
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-040: View Patient Details}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-040: View Patient Details \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers access detailed patient information for operational oversight, compliance, and data management \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Details View} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Detailed patient information viewer
-\item Backend: ManagerController.getPatientDetails()
-\item Features: Comprehensive patient data, compliance monitoring
-\item Security: Manager-level access control
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-041: View Doctor Details}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-041: View Doctor Details \\
-\hline
-\textbf{Primary Actor:} & Manager \\
-\hline
-\textbf{Secondary Actors:} & System \\
-\hline
-\textbf{Description:} & Managers access detailed doctor information for operational oversight, performance monitoring, and staff management \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Details View} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Detailed doctor information viewer
-\item Backend: ManagerController.getDoctorDetails()
-\item Features: Professional info, performance metrics, staff management
-\item Analytics: Performance monitoring, development tracking
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\subsubsection{System-Wide Use Cases}
-
-\paragraph{UC-042: Session Management}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-042: Session Management \\
-\hline
-\textbf{Primary Actor:} & System \\
-\hline
-\textbf{Secondary Actors:} & All Users \\
-\hline
-\textbf{Description:} & System manages user sessions with validation, extension, and invalidation for security and user experience \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Session Management Indicators} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Session status indicators, timeout warnings
-\item Backend: Session validation, extension, invalidation
-\item Security: JWT token management, timeout handling
-\item User Experience: Session extension prompts
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-043: Login Activity Tracking}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-043: Login Activity Tracking \\
-\hline
-\textbf{Primary Actor:} & System \\
-\hline
-\textbf{Secondary Actors:} & All Users \\
-\hline
-\textbf{Description:} & System tracks login attempts, IP addresses, user agents, and login statistics for security monitoring and audit trails \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Activity Dashboard} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Activity dashboard for admins
-\item Backend: Login activity logging and tracking
-\item Security: IP tracking, user agent analysis, audit trails
-\item Analytics: Login patterns, security monitoring
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-044: Medication Routine Management}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-044: Medication Routine Management \\
-\hline
-\textbf{Primary Actor:} & System \\
-\hline
-\textbf{Secondary Actors:} & Patient, Doctor \\
-\hline
-\textbf{Description:} & System manages medication routines, schedules, and reminders for comprehensive patient care \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medication Routine Management} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Medication schedule interface
-\item Backend: Routine management, reminder system
-\item Features: Schedule creation, modifications, reminders
-\item Integration: ARV treatment system, notifications
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\paragraph{UC-045: Health Monitoring}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
-\hline
-\textbf{UC ID and Name:} & UC-045: Health Monitoring \\
-\hline
-\textbf{Primary Actor:} & System \\
-\hline
-\textbf{Secondary Actors:} & Administrator \\
-\hline
-\textbf{Description:} & System monitors application health, database connectivity, and system status for operational reliability \\
-\hline
-\textbf{UI Screenshot:} & 
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System Health Dashboard} \vspace{2cm}}} \\
-\hline
-\textbf{Implementation Details:} & 
-\begin{itemize}
-\item Frontend: Health monitoring dashboard
-\item Backend: Health checks, connectivity monitoring
-\item Features: Application status, database health, alerts
-\item Monitoring: Performance metrics, error tracking
-\end{itemize} \\
-\hline
-\end{longtable}
-
-\subsection{System High Level Design}
-
-\subsubsection{Database Design}
+\subsection{Database Design}
 
 \paragraph{a. Database Schema}
 
-The HIV Clinic system uses Microsoft SQL Server with the following core tables:
+The system uses Microsoft SQL Server with the following core tables and relationships:
 
-    \includegraphics[width=0.95\textwidth]{diagrams/Picture/Database.png}
-
-\paragraph{b. Table Descriptions}
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|c|p{4cm}|p{9cm}|}
+\begin{longtable}{|c|p{4cm}|p{8cm}|}
 \hline
 \textbf{No} & \textbf{Table} & \textbf{Description} \\
 \hline
-\endfirsthead
-
+01 & Users & Core user table storing all system users with role-based access \\
 \hline
-\textbf{No} & \textbf{Table} & \textbf{Description} \\
+02 & Roles & User role definitions for authorization control \\
 \hline
-\endhead
-
-01 & Users & Central user management with role-based access. \\
+03 & PatientProfiles & Extended profile information specific to patients \\
 \hline
-02 & Roles & System roles (Patient, Doctor, Admin, Manager). \\
+04 & DoctorProfiles & Extended profile information specific to doctors \\
 \hline
-03 & PatientProfiles & Extended patient information. \\
+05 & Specialties & Medical specialties for categorizing doctors \\
 \hline
-04 & DoctorProfiles & Extended doctor information with specialties. \\
+06 & Appointments & Core appointment booking and management records \\
 \hline
-05 & Appointments & Appointment scheduling and management. \\
+07 & DoctorAvailabilitySlots & Doctor schedule and availability management \\
 \hline
-06 & DoctorAvailabilitySlots & Doctor availability management. \\
+08 & PatientRecords & Comprehensive patient medical records \\
 \hline
-07 & PatientRecords & Medical records and patient history. \\
+09 & ARVTreatments & HIV-specific antiretroviral treatment records \\
 \hline
-08 & ARVTreatments & HIV antiretroviral treatment tracking. \\
+10 & MedicationRoutines & Daily medication schedules with reminder settings \\
 \hline
-09 & MedicationRoutines & Daily medication schedules. \\
+11 & Notifications & System notification management and history \\
 \hline
-10 & Notifications & System notification management. \\
+12 & NotificationTemplates & Reusable notification templates for consistency \\
 \hline
-11 & NotificationTemplates & Reusable notification templates. \\
+13 & AppointmentStatusHistory & Audit trail for appointment status changes \\
 \hline
-12 & Specialties & Stores medical specialty categories linked to doctors. \\
+14 & AppointmentReminders & Scheduled reminder tracking \\
 \hline
-13 & SystemSettings & Stores system-wide configuration settings. \\
-\hline
-14 & PasswordResetTokens & Manages secure password reset tokens. \\
-\hline
-15 & AppointmentStatusHistory & Tracks changes in appointment status over time for audit and traceability. \\
-\hline
-16 & LoginActivity & Logs login attempts for security monitoring. \\
-\hline
-17 & MedicationReminders & Tracks individual medication reminder instances sent to patients. \\
-\hline
-18 & AppointmentReminders & Tracks specific reminders for upcoming appointments. \\
-\hline
-\multicolumn{3}{|c|}{\textbf{Table 17.} Database Table Description} \\
-\hline
-\end{longtable}
-\subsubsection{Code Packages}
-
-The HIV Clinic system follows a layered Spring Boot architecture:
-\renewcommand{\arraystretch}{1.4}
-\begin{longtable}{|c|p{6cm}|p{8cm}|}
-\hline
-\textbf{No} & \textbf{Package} & \textbf{Description} \\
-\hline
-\endfirsthead
-
-\hline
-\textbf{No} & \textbf{Package} & \textbf{Description} \\
-\hline
-\endhead
-
-01 & com.hivclinic.controller & REST API controllers handling HTTP requests for appointments, authentication, patient records, doctor operations, and notifications. \\
-\hline
-02 & com.hivclinic.service & Business logic layer containing services for appointment management, user authentication, patient care, ARV treatment, and notification scheduling. \\
-\hline
-03 & com.hivclinic.repository & Data access layer with JPA repositories for database operations. \\
-\hline
-04 & com.hivclinic.model & Entity classes representing database tables including User, Appointment, PatientRecord, ARVTreatment, and Notification models. \\
-\hline
-05 & com.hivclinic.dto & Data Transfer Objects for request/response handling and API communication. \\
-\hline
-06 & com.hivclinic.config & Configuration classes for security (JWT), database, and application settings. \\
-\hline
-07 & com.hivclinic.exception & Custom exception handling for application-specific errors. \\
-\hline
-08 & com.hivclinic.validation & Input validation and sanitization utilities. \\
-\hline
-\multicolumn{3}{|c|}{\textbf{Table 18.} Package Descriptions} \\
+15 & SystemHealth & System monitoring and health check data \\
 \hline
 \end{longtable}
 
-\subsubsection{Data Flow Architecture}
+\paragraph{b. Database Diagram}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{diagrams/Picture/Database.png}
+\caption{HIV Clinic Database Design}
+\label{fig:database-design}
+\end{figure}
+
+\subsection{Code Packages}
+
+\begin{longtable}{|c|p{4cm}|p{8cm}|}
+\hline
+\textbf{No} & \textbf{Package} & \textbf{Description} \\
+\hline
+01 & controller & REST API controllers handling HTTP requests and responses \\
+\hline
+02 & service & Business logic layer implementing use cases and workflows \\
+\hline
+03 & repository & Data access layer for database operations using JPA \\
+\hline
+04 & model & Entity classes representing database tables with JPA annotations \\
+\hline
+05 & dto & Data Transfer Objects for API request/response serialization \\
+\hline
+06 & config & Configuration classes for security, database, and system settings \\
+\hline
+07 & utils & Utility classes for common operations and helper functions \\
+\hline
+08 & exception & Custom exception classes for error handling \\
+\hline
+09 & security & Security-related classes including JWT utilities and filters \\
+\hline
+10 & validation & Input validation and data sanitization components \\
+\hline
+\end{longtable}
+
+\subsection{Data Flow Architecture}
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{diagrams/data_flow_diagram.png}
@@ -1988,73 +431,583 @@ The HIV Clinic system follows a layered Spring Boot architecture:
 
 \section{Requirement Specifications}
 
-\subsection{Common functions}
+\subsection{Functional Requirements}
 
-\subsubsection{UC-01 – Register Donor Account}
-
-\renewcommand{\arraystretch}{1.5}
-\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\begin{longtable}{|p{1.2cm}|p{2.5cm}|p{3.5cm}|p{6.8cm}|}
 \hline
-\textbf{UC ID and Name:} & UC-01 – Register Donor Account \\
+\textbf{UC ID} & \textbf{Use Case Name} & \textbf{Actor} & \textbf{Functional Requirement} \\
 \hline
-\textbf{Created By:} & DatNT \\
+\multicolumn{4}{|c|}{\textbf{AUTHENTICATION \& USER MANAGEMENT}} \\
 \hline
-\textbf{Date Created:} & 28/6 \\
+UC-001 & User Registration & Guest & System shall allow new users to create accounts with email validation, password confirmation, and automatic role assignment \\
 \hline
-\textbf{Primary Actor:} & Guest \\
+UC-002 & User Login & All Users & System shall authenticate users using username/password with JWT token-based security and role-based redirection \\
 \hline
-\textbf{Secondary Actors:} & System \\
+\multicolumn{4}{|c|}{\textbf{PUBLIC \& GUEST ACCESS}} \\
 \hline
-\textbf{Description:} & A new user registers using email, password, and date of birth. The system creates a Level 1 account with the "Donor" role. To upgrade to Level 2 (eligible for blood donation registration), the user must visit a certified medical facility for in-person identity and eligibility verification. \\
+UC-003 & Browse Public Website & Guest & System shall display services information, clinic details, and doctor profiles without requiring authentication \\
 \hline
-\textbf{Trigger:} & The user clicks the 'Register' button. \\
+UC-004 & Public Doctor Search & Guest & System shall allow searching and filtering doctors by specialty, name, and availability \\
 \hline
-\textbf{Preconditions:} &
-\begin{itemize}
-  \item The user is not logged in
-  \item The email is not already in use
-\end{itemize} \\
+\multicolumn{4}{|c|}{\textbf{PATIENT DASHBOARD \& MANAGEMENT}} \\
 \hline
-\textbf{Postconditions:} &
-\begin{itemize}
-  \item A Level 1 donor account is created
-  \item The user can log in
-  \item The account remains ineligible for donation event registration until verified (Level 2)
-\end{itemize} \\
+UC-004 & View Patient Dashboard & Patient & System shall show appointments, notifications, quick actions, and health summary \\
 \hline
-\textbf{Normal Flow:} &
-\begin{enumerate}
-  \item User opens the registration page
-  \item Fills in the form
-  \item Submits the form
-  \item System validates input and creates the account
-\end{enumerate} \\
+UC-005 & Book Appointment & Patient & System shall provide doctor selection, time slot booking, and appointment confirmation \\
 \hline
-\textbf{Alternative Flows:} & None defined \\
+UC-006 & View Appointments & Patient & System shall display scheduled appointments with filtering options \\
 \hline
-\textbf{Exceptions:} &
-\begin{itemize}
-  \item EX-1: If the email is already in use, the system shows an error message: \textit{"Email is already in use. Please use another email."}
-  \item EX-2: If the user is under the required age, the system shows an ineligibility message: \textit{"You are not eligible to register as a blood donor."}
-  \item EX-3: If a database or server error occurs, the system shows a retry message: \textit{"A system error occurred. Please try again later."}
-\end{itemize} \\
+UC-007 & Cancel Appointment & Patient & System shall allow appointment cancellation with confirmation and notification \\
 \hline
-\textbf{Business Rules:} &
-\begin{itemize}
-  \item BR-21: Only Level 2 (verified) users can register for donation events
-  \item BR-22: User profile must be accurate and match official documents (relevant for Level 2 verification)
-\end{itemize} \\
+UC-008 & View Medical Records & Patient, Doctor & System shall display patient medical history with privacy controls \\
 \hline
-\textbf{Assumptions:} &
-\begin{itemize}
-  \item The user provides a valid email and basic profile information
-  \item Level 2 access requires identity and health status confirmation at a medical center
-\end{itemize} \\
+UC-009 & Update Medical Records & Patient & System shall allow patients to update personal medical information \\
 \hline
-\textbf{Priority:} & High \\
+UC-010 & View ARV Treatments & Patient & System shall show prescribed ARV treatments with dosage and schedule information \\
 \hline
-\textbf{Frequency of Use:} & Daily \\
+UC-011 & Update Profile & Patient & System shall allow profile information management including personal details and preferences \\
+\hline
+UC-012 & Change Password & Patient & System shall provide secure password change with validation \\
+\hline
+UC-013 & Receive Notifications & Patient & System shall deliver appointment reminders, medication alerts, and general notifications \\
+\hline
+UC-014 & View Privacy Settings & Patient & System shall allow privacy preference management and record visibility control \\
+\hline
+\multicolumn{4}{|c|}{\textbf{DOCTOR MANAGEMENT \& PATIENT CARE}} \\
+\hline
+UC-015 & View Doctor Dashboard & Doctor & System shall display appointments, patients, notifications, and professional summary \\
+\hline
+UC-016 & Manage Appointments & Doctor & System shall allow appointment viewing, status updates, and patient interaction \\
+\hline
+UC-017 & Update Appointment Status & Doctor & System shall provide appointment status modification with automatic notifications \\
+\hline
+UC-018 & Manage Availability & Doctor & System shall allow availability schedule setting and integration with appointment booking \\
+\hline
+UC-019 & Access Patient Records & Doctor & System shall provide comprehensive patient record access with professional privileges \\
+\hline
+UC-020 & Manage ARV Treatments & Doctor & System shall allow ARV prescription, monitoring, and treatment plan management \\
+\hline
+UC-021 & Send Notifications & Doctor & System shall provide notification sending to patients with custom messages \\
+\hline
+UC-022 & Manage Notification Templates & Doctor & System shall allow creation and management of reusable notification templates \\
+\hline
+UC-023 & View Notification History & Doctor & System shall provide notification history and delivery status tracking \\
+\hline
+\multicolumn{4}{|c|}{\textbf{ADMINISTRATIVE FUNCTIONS}} \\
+\hline
+UC-024 & View Admin Dashboard & Admin & System shall display all system users, appointments, and administrative overview \\
+\hline
+UC-025 & Manage Users & Admin & System shall provide user detail viewing, editing, and account management \\
+\hline
+UC-026 & Create Doctor Accounts & Admin & System shall allow doctor account creation with professional information setup \\
+\hline
+UC-027 & Reset User Passwords & Admin & System shall require password confirmation and provide secure reset functionality \\
+\hline
+UC-028 & Manage Specialties & Admin & System shall allow medical specialty creation, editing, and assignment management \\
+\hline
+UC-029 & Toggle User Status & Admin & System shall provide user account activation and deactivation capabilities \\
+\hline
+UC-030 & View All Appointments & Admin & System shall display system-wide appointment overview with filtering and search \\
+\hline
+\multicolumn{4}{|c|}{\textbf{MANAGEMENT \& REPORTING}} \\
+\hline
+UC-031 & View Manager Dashboard & Manager & System shall provide operational dashboards with statistics and management overview \\
+\hline
+UC-032 & View Statistics & Manager & System shall calculate real-time statistics for appointments, patients, treatments, and system usage \\
+\hline
+UC-033 & Manage Patient Records & Manager & System shall maintain data integrity and provide comprehensive patient record oversight \\
+\hline
+UC-034 & Manage Doctor Records & Manager & System shall provide doctor information management and professional record maintenance \\
+\hline
+UC-035 & Manage ARV Treatments & Manager & System shall monitor treatment effectiveness and provide program oversight capabilities \\
+\hline
+UC-036 & Manage Schedules & Manager & System shall coordinate clinic-wide scheduling and resource allocation \\
+\hline
+UC-037 & Search Patients & Manager & System shall support name and ID-based patient search with filtering capabilities \\
+\hline
+UC-038 & Search Doctors & Manager & System shall integrate with appointment system for doctor search and selection \\
+\hline
+UC-039 & Export Data & Manager & System shall provide CSV export functionality for reports and data analysis \\
+\hline
+UC-040 & View Patient Details & Manager & System shall provide comprehensive patient information access for management oversight \\
+\hline
+UC-041 & View Doctor Details & Manager & System shall provide detailed doctor information and performance metrics \\
+\hline
+\multicolumn{4}{|c|}{\textbf{SYSTEM-WIDE FUNCTIONS}} \\
+\hline
+UC-042 & Session Management & System & System shall manage user sessions with timeout controls and security monitoring \\
+\hline
+UC-043 & Login Activity Tracking & System & System shall track and log user authentication events for security auditing \\
+\hline
+UC-044 & Medication Routine Management & System & System shall create medication schedules and provide automated reminder services \\
+\hline
+UC-045 & Health Monitoring & System & System shall monitor patient health metrics and provide alerts for critical conditions \\
 \hline
 \end{longtable}
+
+\subsection{Non-Functional Requirements}
+
+\begin{longtable}{|p{2.5cm}|p{4cm}|p{7.5cm}|}
+\hline
+\textbf{Category} & \textbf{Requirement} & \textbf{Specification} \\
+\hline
+\multicolumn{3}{|c|}{\textbf{PERFORMANCE REQUIREMENTS}} \\
+\hline
+Response Time & Page Load Time & All pages must load within 3 seconds under normal load conditions \\
+\hline
+Response Time & API Response Time & All API calls must respond within 2 seconds for 95\% of requests \\
+\hline
+Throughput & Concurrent Users & System must support at least 100 concurrent users without performance degradation \\
+\hline
+Throughput & Appointment Booking & System must handle at least 50 appointment bookings per minute during peak hours \\
+\hline
+\multicolumn{3}{|c|}{\textbf{SECURITY REQUIREMENTS}} \\
+\hline
+Authentication & Login Security & JWT-based authentication with 30-minute session timeout \\
+\hline
+Authorization & Role-Based Access & Strict role-based access control with principle of least privilege \\
+\hline
+Data Protection & Data Encryption & All sensitive data encrypted in transit (HTTPS) and at rest (AES-256) \\
+\hline
+Password Security & Password Policy & Minimum 8 characters with complexity requirements and regular expiration \\
+\hline
+\multicolumn{3}{|c|}{\textbf{RELIABILITY REQUIREMENTS}} \\
+\hline
+Availability & System Uptime & 99.5\% availability during business hours (8 AM - 6 PM) \\
+\hline
+Data Integrity & Backup Requirements & Daily automated backups with point-in-time recovery capability \\
+\hline
+Fault Tolerance & Error Handling & Graceful error handling with user-friendly error messages \\
+\hline
+Disaster Recovery & Recovery Time & System recovery within 4 hours of major failure \\
+\hline
+\multicolumn{3}{|c|}{\textbf{USABILITY REQUIREMENTS}} \\
+\hline
+User Interface & Responsive Design & Mobile-responsive design supporting tablets and smartphones \\
+\hline
+Accessibility & WCAG Compliance & Level AA compliance for users with disabilities \\
+\hline
+User Experience & Navigation & Intuitive navigation with maximum 3 clicks to reach any feature \\
+\hline
+Help System & User Support & Context-sensitive help and comprehensive user documentation \\
+\hline
+\multicolumn{3}{|c|}{\textbf{SCALABILITY REQUIREMENTS}} \\
+\hline
+User Growth & User Capacity & System must scale to support 1000+ users without architectural changes \\
+\hline
+Data Growth & Database Scalability & Database design must support 5+ years of patient record growth \\
+\hline
+Geographic & Multi-location & Architecture must support multiple clinic locations \\
+\hline
+\multicolumn{3}{|c|}{\textbf{COMPATIBILITY REQUIREMENTS}} \\
+\hline
+Browser Support & Web Browsers & Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ \\
+\hline
+Operating System & OS Compatibility & Windows 10+, macOS 10.15+, iOS 13+, Android 8+ \\
+\hline
+\multicolumn{3}{|c|}{\textbf{COMPLIANCE REQUIREMENTS}} \\
+\hline
+Healthcare & Medical Standards & HIPAA compliance for patient data privacy and security \\
+\hline
+Data Privacy & Privacy Regulations & GDPR compliance for data protection and user consent \\
+\hline
+Medical Records & Clinical Standards & HL7 FHIR compatibility for medical record interoperability \\
+\hline
+\end{longtable}
+
+\section{Design Specifications}
+
+\subsection{Authentication \& User Management}
+
+\subsubsection{UC-001: User Registration}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-001: User Registration
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} 06/01/2025
+
+\textbf{Primary Actor:} Guest User
+
+\textbf{Secondary Actors:} System
+
+\textbf{Trigger:} User clicks "Register" link on login page or accesses registration URL
+
+\textbf{Description:} New users can create accounts to access the system. Registration includes email validation, password confirmation, and automatic role assignment based on user type selection.
+
+\textbf{Preconditions:}
+\begin{itemize}
+\item PRE-1: User has valid personal information
+\item PRE-2: Email address is not already registered in the system
+\item PRE-3: User has internet connectivity
+\end{itemize}
+
+\textbf{Postconditions:}
+\begin{itemize}
+\item POST-1: New user account is created in the database
+\item POST-2: Account activation email is sent to the user
+\item POST-3: User profile is created and linked to the account
+\item POST-4: Registration activity is logged for audit purposes
+\end{itemize}
+
+\textbf{Normal Flow:}
+\begin{enumerate}
+\item User navigates to registration page
+\item System displays registration form with required fields
+\item User enters username, email, password, and personal details
+\item User selects account type (Patient/Doctor)
+\item User agrees to terms and conditions
+\item User clicks "Register" button
+\item System validates all input fields
+\item System checks email uniqueness
+\item System creates new user account with appropriate role
+\item System generates account activation token
+\item System sends activation email
+\item System displays registration success message
+\end{enumerate}
+
+\textbf{Alternative Flows:}
+\begin{itemize}
+\item 1.1 Admin Registration: Administrator creates accounts for staff members
+\item 1.2 Social Registration: User registers using social media accounts
+\end{itemize}
+
+\textbf{Exceptions:}
+\begin{itemize}
+\item 1.0.E1 Email already registered: System displays error and suggests login
+\item 1.0.E2 Invalid email format: System highlights field and shows format requirements
+\item 1.0.E3 Password too weak: System displays password strength requirements
+\item 1.0.E4 Network error: System retries and shows connection error message
+\end{itemize}
+
+\textbf{Priority:} Must Have
+
+\textbf{Frequency of Use:} Medium - New user registrations daily
+
+\textbf{Business Rules:} BR-01, BR-02, BR-03
+
+\textbf{Other Information:} Account activation required within 24 hours
+
+\textbf{Assumptions:} Users have valid email addresses and basic computer literacy
+
+\subsubsection{UC-002: User Login}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-002: User Login
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} 06/01/2025
+
+\textbf{Primary Actor:} All Users
+
+\textbf{Secondary Actors:} System
+
+\textbf{Trigger:} User accesses protected system resources or login page
+
+\textbf{Description:} Users authenticate to the system using username/password credentials. Upon successful authentication, users are redirected to their role-specific dashboard with appropriate permissions.
+
+\textbf{Preconditions:}
+\begin{itemize}
+\item PRE-1: User account exists and is active
+\item PRE-2: User has valid login credentials
+\item PRE-3: Account is not locked due to failed attempts
+\end{itemize}
+
+\textbf{Postconditions:}
+\begin{itemize}
+\item POST-1: User is authenticated and logged into the system
+\item POST-2: JWT token is generated and stored for session management
+\item POST-3: User session is established with role-based permissions
+\item POST-4: Login activity is recorded in audit log
+\end{itemize}
+
+\textbf{Normal Flow:}
+\begin{enumerate}
+\item User accesses the login screen
+\item System displays username and password fields
+\item User enters credentials
+\item User clicks "Login" button
+\item System validates credentials against database
+\item System verifies account status (active/inactive)
+\item System generates JWT token
+\item System creates user session with role permissions
+\item System records successful login event
+\item System redirects to appropriate dashboard based on role
+\end{enumerate}
+
+\textbf{Alternative Flows:}
+\begin{itemize}
+\item 2.1 Password Reset: User clicks "Forgot Password" and follows reset process
+\item 2.2 Remember Me: User selects "Remember Me" for extended session
+\end{itemize}
+
+\textbf{Exceptions:}
+\begin{itemize}
+\item 2.0.E1 Invalid credentials: System displays error message and allows retry
+\item 2.0.E2 Account locked: System displays lockout message and contact information
+\item 2.0.E3 Account inactive: System displays activation required message
+\item 2.0.E4 Session timeout: System redirects to login with timeout message
+\end{itemize}
+
+\textbf{Priority:} Must Have
+
+\textbf{Frequency of Use:} High - Multiple daily logins per user
+
+\textbf{Business Rules:} BR-04, BR-05, BR-06
+
+\textbf{Other Information:} Session timeout after 30 minutes of inactivity
+
+\textbf{Assumptions:} Users remember their credentials and understand login process
+
+\subsubsection{UC-003: Browse Public Website}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-003: Browse Public Website
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} 06/01/2025
+
+\textbf{Primary Actor:} Guest User
+
+\textbf{Secondary Actors:} System
+
+\textbf{Trigger:} User visits the clinic website without authentication
+
+\textbf{Description:} Guests can browse public information about the clinic, services offered, doctor profiles, and general health information without requiring account registration or login.
+
+\textbf{Preconditions:}
+\begin{itemize}
+\item PRE-1: Website is accessible and operational
+\item PRE-2: Public content is available and up-to-date
+\end{itemize}
+
+\textbf{Postconditions:}
+\begin{itemize}
+\item POST-1: Public information is displayed to the user
+\item POST-2: User has access to registration and login options
+\item POST-3: Page visit is logged for analytics
+\end{itemize}
+
+\textbf{Normal Flow:}
+\begin{enumerate}
+\item User visits clinic website URL
+\item System displays public homepage
+\item User can browse clinic information, services, and doctor profiles
+\item User can access health education resources
+\item User can view contact information and location details
+\item User can navigate to registration or login pages
+\end{enumerate}
+
+\textbf{Alternative Flows:}
+\begin{itemize}
+\item 3.1 Mobile Access: User accesses site via mobile device with responsive design
+\item 3.2 Search Engine Access: User finds site through search engine results
+\end{itemize}
+
+\textbf{Exceptions:}
+\begin{itemize}
+\item 3.0.E1 Website unavailable: System displays maintenance message
+\item 3.0.E2 Slow connection: System shows loading indicators and progressive content
+\end{itemize}
+
+\textbf{Priority:} Must Have
+
+\textbf{Frequency of Use:} High - Daily public website visits
+
+\textbf{Business Rules:} BR-07, BR-08
+
+\textbf{Other Information:} No personal information collected without consent
+
+\textbf{Assumptions:} Users have internet access and modern web browsers
+
+\subsection{Patient Management}
+
+\subsubsection{UC-004: View Patient Dashboard}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-004: View Patient Dashboard
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} 06/01/2025
+
+\textbf{Primary Actor:} Patient
+
+\textbf{Secondary Actors:} System
+
+\textbf{Trigger:} Patient logs in or navigates to dashboard
+
+\textbf{Description:} Patients access a personalized dashboard displaying appointments, notifications, health summary, and quick action buttons for common tasks.
+
+\textbf{Preconditions:}
+\begin{itemize}
+\item PRE-1: Patient is logged into the system
+\item PRE-2: Patient profile exists and is complete
+\item PRE-3: Dashboard data is available and current
+\end{itemize}
+
+\textbf{Postconditions:}
+\begin{itemize}
+\item POST-1: Dashboard is displayed with current patient information
+\item POST-2: Recent notifications are marked as viewed
+\item POST-3: Dashboard access is logged for activity tracking
+\end{itemize}
+
+\textbf{Normal Flow:}
+\begin{enumerate}
+\item Patient logs in successfully
+\item System redirects to patient dashboard
+\item System loads patient-specific data
+\item System displays upcoming appointments
+\item System shows recent notifications
+\item System presents health summary with key metrics
+\item System provides quick action buttons for common tasks
+\item Patient can navigate to detailed features from dashboard
+\end{enumerate}
+
+\textbf{Alternative Flows:}
+\begin{itemize}
+\item 4.1 First Login: System shows welcome tour and setup instructions
+\item 4.2 Emergency Alerts: System prominently displays urgent health alerts
+\end{itemize}
+
+\textbf{Exceptions:}
+\begin{itemize}
+\item 4.0.E1 Data loading error: System shows error message and retry option
+\item 4.0.E2 No appointments: System suggests booking first appointment
+\end{itemize}
+
+\textbf{Priority:} Must Have
+
+\textbf{Frequency of Use:} High - Daily dashboard access
+
+\textbf{Business Rules:} BR-09, BR-10
+
+\textbf{Other Information:} Dashboard refreshes automatically every 5 minutes
+
+\textbf{Assumptions:} Patients understand dashboard layout and icons
+
+\subsubsection{UC-005: Book Appointment}
+
+\paragraph{a. Functionalities}
+
+\textbf{UC ID and Name:} UC-005: Book Appointment
+
+\textbf{Created By:} Development Team
+
+\textbf{Date Created:} 06/01/2025
+
+\textbf{Primary Actor:} Patient
+
+\textbf{Secondary Actors:} Doctor (availability provider), System
+
+\textbf{Trigger:} Patient clicks "Book Appointment" from dashboard or navigation
+
+\textbf{Description:} Patients can view available doctors, their specialties, and time slots, then book appointments with automatic confirmation and reminder scheduling.
+
+\textbf{Preconditions:}
+\begin{itemize}
+\item PRE-1: Patient is logged in with complete profile
+\item PRE-2: At least one doctor has available time slots
+\item PRE-3: Patient has no conflicting appointments
+\end{itemize}
+
+\textbf{Postconditions:}
+\begin{itemize}
+\item POST-1: New appointment is created and stored
+\item POST-2: Doctor's availability slot is marked as booked
+\item POST-3: Confirmation notifications are sent to patient and doctor
+\item POST-4: Appointment reminders are automatically scheduled
+\end{itemize}
+
+\textbf{Normal Flow:}
+\begin{enumerate}
+\item Patient accesses appointment booking interface
+\item System displays list of available doctors with specialties
+\item Patient selects preferred doctor
+\item System shows doctor's available time slots
+\item Patient selects preferred date and time
+\item System displays appointment summary and details
+\item Patient confirms appointment booking
+\item System creates appointment record
+\item System updates doctor's availability
+\item System sends confirmation notifications
+\item System schedules automated reminders
+\item System displays booking confirmation with details
+\end{enumerate}
+
+\textbf{Alternative Flows:}
+\begin{itemize}
+\item 5.1 Reschedule Existing: Patient modifies existing appointment
+\item 5.2 Emergency Booking: Patient books urgent appointment with priority
+\end{itemize}
+
+\textbf{Exceptions:}
+\begin{itemize}
+\item 5.0.E1 No available slots: System suggests alternative dates or doctors
+\item 5.0.E2 Slot becomes unavailable: System refreshes and shows updated options
+\item 5.0.E3 Booking conflict: System alerts and helps resolve scheduling conflict
+\end{itemize}
+
+\textbf{Priority:} Must Have
+
+\textbf{Frequency of Use:} High - Multiple daily bookings
+
+\textbf{Business Rules:} BR-11, BR-12, BR-13
+
+\textbf{Other Information:} Appointments can be booked up to 30 days in advance
+
+\textbf{Assumptions:} Patients understand appointment booking process
+
+\section{Appendix}
+
+\subsection{Assumptions \& Dependencies}
+
+\begin{itemize}
+\item All users have basic computer literacy and internet access
+\item Healthcare providers maintain current medical certifications
+\item Patients provide accurate personal and medical information
+\item System integrates with existing hospital information systems
+\item Network infrastructure supports required bandwidth and security
+\end{itemize}
+
+\subsection{Limitations \& Exclusions}
+
+\begin{itemize}
+\item Emergency appointment booking outside business hours requires manual intervention
+\item System does not provide direct medical advice or diagnosis
+\item Integration with external insurance systems is not included in current scope
+\item Mobile application development is planned for future releases
+\item Telemedicine functionality is excluded from initial implementation
+\end{itemize}
+
+\subsection{Business Rules}
+
+\begin{itemize}
+\item BR-01: All user accounts require email verification before activation
+\item BR-02: Passwords must meet complexity requirements and expire every 90 days
+\item BR-03: Patient medical records are private and accessible only to authorized personnel
+\item BR-04: Appointment cancellations must be made at least 24 hours in advance
+\item BR-05: ARV treatments require doctor prescription and regular monitoring
+\item BR-06: System maintains audit logs for all data access and modifications
+\end{itemize}
+
+\subsection{Technical Specifications}
+
+\begin{itemize}
+\item Backend: Spring Boot 3.0+ with Java 17
+\item Frontend: React 18+ with modern JavaScript (ES6+)
+\item Database: Microsoft SQL Server 2019+
+\item Security: JWT authentication with BCrypt password hashing
+\item API: RESTful services with JSON data format
+\item Deployment: Docker containers with Kubernetes orchestration
+\end{itemize}
 
 \end{document}
