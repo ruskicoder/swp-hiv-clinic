@@ -571,7 +571,7 @@ const AdminDashboard = () => {
                 name="specialtyId"
                 value={formData.specialtyId}
                 onChange={handleChange}
-                disabled={specialtiesLoading}
+                // disabled={specialtiesLoading}
               >
                 <option value="">
                   {specialtiesLoading ? 'Loading specialties...' : 'Select a specialty...'}
