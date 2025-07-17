@@ -3,6 +3,7 @@ import authService from '../services/authService';
 import notificationService from '../services/notificationService';
 import useSessionMonitor from './useSessionMonitor';
 import SessionTimeoutModal from '../components/ui/SessionTimeoutModal';
+import ProfileLoadingModal from '../components/ui/ProfileLoadingModal';
 
 /**
  * Authentication Context for managing user authentication state
@@ -14,6 +15,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showProfileLoadingModal, setShowProfileLoadingModal] = useState(false);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   // Check token and load user profile on mount
   useEffect(() => {
@@ -43,6 +46,25 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  // Show profile loading modal after first login if needed
+  useEffect(() => {
+    if (isFirstLogin && user && !showProfileLoadingModal) {
+      // Check if profile data is incomplete or if we should show the modal
+      const hasIncompleteProfile = !user.firstName || !user.lastName || !user.phoneNumber;
+      if (hasIncompleteProfile) {
+        setShowProfileLoadingModal(true);
+      }
+      setIsFirstLogin(false);
+    }
+  }, [isFirstLogin, user, showProfileLoadingModal]);
+
+  /**
+   * Handle profile loading modal close
+   */
+  const handleProfileModalClose = () => {
+    setShowProfileLoadingModal(false);
+  };
+
   /**
    * Enhanced logout function that handles both server and client cleanup
    */
@@ -57,12 +79,16 @@ export const AuthProvider = ({ children }) => {
       // Client-side cleanup
       setUser(null);
       setError(null);
+      setShowProfileLoadingModal(false);
+      setIsFirstLogin(false);
     } catch (error) {
       console.error('Logout error:', error);
       // Still perform client-side cleanup even if server call fails
       notificationService.resetPollingState();
       setUser(null);
       setError(null);
+      setShowProfileLoadingModal(false);
+      setIsFirstLogin(false);
     }
   }, []);
 
@@ -119,9 +145,15 @@ export const AuthProvider = ({ children }) => {
             address: profileResponse.address || '',
             profileImageBase64: profileResponse.profileImageBase64 || ''
           }));
+          
+          // Set first login flag to show modal after successful profile load
+          setIsFirstLogin(true);
         } catch (profileError) {
           console.error('Failed to load user profile:', profileError);
           // Don't fail login if profile loading fails - user data is already set
+          // Show profile loading modal to suggest page reload
+          setIsFirstLogin(true);
+          setShowProfileLoadingModal(true);
         }
         
         // Initialize notifications after successful login
@@ -130,6 +162,10 @@ export const AuthProvider = ({ children }) => {
         } catch (notificationError) {
           console.error('Failed to initialize notifications:', notificationError);
           // Don't fail login if notification initialization fails
+          // Show profile loading modal to suggest page reload for proper initialization
+          if (!showProfileLoadingModal) {
+            setShowProfileLoadingModal(true);
+          }
         }
         
         return { success: true };
@@ -227,6 +263,12 @@ export const AuthProvider = ({ children }) => {
         remainingSeconds={sessionStatus.remainingSeconds}
         onExtendSession={handleExtendSession}
         onLogout={logout}
+      />
+      
+      {/* Profile Loading Modal */}
+      <ProfileLoadingModal
+        isOpen={showProfileLoadingModal}
+        onClose={handleProfileModalClose}
       />
     </AuthContext.Provider>
   );
