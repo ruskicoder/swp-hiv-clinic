@@ -21,10 +21,6 @@ public class LoginActivityService {
     
     private static final Logger logger = LoggerFactory.getLogger(LoginActivityService.class);
     
-    // Security constants
-    private static final int MAX_FAILED_ATTEMPTS = 5;
-    private static final int FAILED_ATTEMPT_WINDOW_MINUTES = 30;
-    
     @Autowired
     private LoginActivityRepository loginActivityRepository;
     
@@ -102,69 +98,6 @@ public class LoginActivityService {
         } catch (Exception e) {
             logger.error("Error getting all login activities for user {}: {}", user.getUsername(), e.getMessage(), e);
             return List.of();
-        }
-    }
-    
-    /**
-     * Check if account should be locked due to failed attempts
-     */
-    public boolean isAccountLocked(User user) {
-        try {
-            LocalDateTime windowStart = LocalDateTime.now().minusMinutes(FAILED_ATTEMPT_WINDOW_MINUTES);
-            long failedAttempts = loginActivityRepository.countByUserAndIsSuccessFalseAndAttemptTimeAfter(user, windowStart);
-            
-            boolean isLocked = failedAttempts >= MAX_FAILED_ATTEMPTS;
-            
-            if (isLocked) {
-                logger.warn("Account locked due to {} failed attempts for user: {}", failedAttempts, user.getUsername());
-            }
-            
-            return isLocked;
-        } catch (Exception e) {
-            logger.error("Error checking account lock status for user {}: {}", user.getUsername(), e.getMessage(), e);
-            return false; // Default to not locked if there's an error
-        }
-    }
-    
-    /**
-     * Check if account should be locked by username (for failed login attempts)
-     */
-    public boolean isAccountLockedByUsername(String username) {
-        try {
-            LocalDateTime windowStart = LocalDateTime.now().minusMinutes(FAILED_ATTEMPT_WINDOW_MINUTES);
-            long failedAttempts = loginActivityRepository.countByUsernameAttemptedAndIsSuccessFalseAndAttemptTimeAfter(username, windowStart);
-            
-            boolean isLocked = failedAttempts >= MAX_FAILED_ATTEMPTS;
-            
-            if (isLocked) {
-                logger.warn("Account locked due to {} failed attempts for username: {}", failedAttempts, username);
-            }
-            
-            return isLocked;
-        } catch (Exception e) {
-            logger.error("Error checking account lock status for username {}: {}", username, e.getMessage(), e);
-            return false; // Default to not locked if there's an error
-        }
-    }
-    
-    /**
-     * Check for suspicious activity from IP address
-     */
-    public boolean isSuspiciousIpActivity(String ipAddress) {
-        try {
-            LocalDateTime windowStart = LocalDateTime.now().minusMinutes(FAILED_ATTEMPT_WINDOW_MINUTES);
-            long failedAttemptsFromIp = loginActivityRepository.countByIpAddressAndIsSuccessFalseAndAttemptTimeAfter(ipAddress, windowStart);
-            
-            boolean isSuspicious = failedAttemptsFromIp >= MAX_FAILED_ATTEMPTS * 2; // More lenient for IP-based blocking
-            
-            if (isSuspicious) {
-                logger.warn("Suspicious activity detected from IP: {} with {} failed attempts", ipAddress, failedAttemptsFromIp);
-            }
-            
-            return isSuspicious;
-        } catch (Exception e) {
-            logger.error("Error checking suspicious IP activity for {}: {}", ipAddress, e.getMessage(), e);
-            return false;
         }
     }
     

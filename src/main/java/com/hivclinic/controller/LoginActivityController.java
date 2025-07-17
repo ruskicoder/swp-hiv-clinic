@@ -170,7 +170,6 @@ public class LoginActivityController {
             stats.put("failedAttempts", failedCount);
             stats.put("successRate", totalAttempts > 0 ? (double) successfulCount / totalAttempts * 100 : 0);
             stats.put("lastLoginTime", lastLoginTime.orElse(null));
-            stats.put("isAccountLocked", loginActivityService.isAccountLocked(user));
             
             logger.debug("Retrieved login statistics for user: {}", userPrincipal.getUsername());
             return ResponseEntity.ok(MessageResponse.builder()
