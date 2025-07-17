@@ -19,7 +19,7 @@
 \rhead{\thepage}
 \lhead{HIV Clinic RDS}
 
-\title{\textbf{Requirement \& Design Specification\\HIV Clinic Appointment Booking System}}
+\title{\textbf{Requirement \& Design Specification\\HIV Clinic Appointment Booking System}} \\
 \author{Version: 2.0}
 \date{January 2025}
 
@@ -106,13 +106,10 @@ The HIV Clinic Appointment Booking System involves five main actors who interact
 \subsubsection{Use Cases}
 
 \paragraph{a. Diagram(s)}
-
-\begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{diagrams/use_case_diagram.png}
 \caption{HIV Clinic Management System Use Case Diagram}
 \label{fig:use-case-diagram}
-\end{figure}
 
 The system provides comprehensive use cases covering patient care, appointment management, ARV treatment management, notification system, and administrative functions for an HIV clinic environment. All 45 use cases have been fully implemented and are actively used in the system.
 
@@ -716,11 +713,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & New users create accounts with role-based access (Patient/Doctor) including email validation, password confirmation, and automatic role assignment \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Registration Form} \vspace{2cm}}}
-    \caption*{User Registration Interface}
-\end{figure} \\
+\fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Registration Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -746,11 +739,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Users authenticate using username/password with JWT token-based security, role-based redirection, and session management \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Form} \vspace{2cm}}}
-    \caption*{User Login Interface}
-\end{figure} \\
+\fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -776,11 +765,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Unauthenticated users access public clinic information, services overview, and contact details \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Public Website Homepage} \vspace{2cm}}}
-    \caption*{Public Website Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Public Website Homepage} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -808,11 +793,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients access personalized dashboard with appointments overview, treatment status, notifications, and clinic statistics \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Dashboard} \vspace{2cm}}}
-    \caption*{Patient Dashboard Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Dashboard} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -838,11 +819,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients schedule appointments with available doctors using unified calendar interface, slot availability checking, and confirmation system \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Booking Form} \vspace{2cm}}}
-    \caption*{Appointment Booking Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Booking Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -868,11 +845,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients view current appointments, upcoming appointments, appointment history with detailed information and status tracking \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Appointments List} \vspace{2cm}}}
-    \caption*{Patient Appointments Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Appointments List} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -898,11 +871,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients cancel scheduled appointments with cancellation reasons, status updates, and automatic notifications \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Cancellation Form} \vspace{2cm}}}
-    \caption*{Appointment Cancellation Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Cancellation Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -928,11 +897,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients access their personal medical records, treatment history, current medications, and healthcare documentation \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Medical Records View} \vspace{2cm}}}
-    \caption*{Medical Records Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Medical Records View} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -958,11 +923,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients update personal medical information, emergency contacts, medical history, and healthcare preferences \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medical Records Update Form} \vspace{2cm}}}
-    \caption*{Medical Records Update Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medical Records Update Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -988,11 +949,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients view their HIV antiretroviral treatment regimens, adherence tracking, medication schedules, and treatment progress \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment View} \vspace{2cm}}}
-    \caption*{ARV Treatment Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment View} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1018,11 +975,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients update personal information, profile images, contact details, and account preferences \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Profile Update Form} \vspace{2cm}}}
-    \caption*{Profile Update Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Profile Update Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1048,11 +1001,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients change account passwords with current password validation, new password confirmation, and security checks \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Change Form} \vspace{2cm}}}
-    \caption*{Password Change Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Change Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1078,11 +1027,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients receive appointment reminders, treatment notifications, custom messages, and system alerts \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notifications Panel} \vspace{2cm}}}
-    \caption*{Notifications Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notifications Panel} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1108,11 +1053,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Patients manage privacy preferences, notification settings, and data sharing controls \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Privacy Settings Panel} \vspace{2cm}}}
-    \caption*{Privacy Settings Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Privacy Settings Panel} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1140,11 +1081,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors access professional dashboard with patient appointments, notifications, availability management, and clinical tools \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Dashboard} \vspace{2cm}}}
-    \caption*{Doctor Dashboard Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Dashboard} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1170,11 +1107,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors view and manage scheduled appointments with patients, appointment details, and patient information \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Appointments Management} \vspace{2cm}}}
-    \caption*{Doctor Appointments Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Appointments Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1200,11 +1133,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors update appointment status (completed, cancelled, rescheduled), add clinical notes, and manage follow-ups \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Status Update Form} \vspace{2cm}}}
-    \caption*{Appointment Status Update Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Appointment Status Update Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1230,11 +1159,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors create, update, and manage availability time slots for patient appointments with flexible scheduling options \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Availability Management} \vspace{2cm}}}
-    \caption*{Doctor Availability Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Availability Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1260,11 +1185,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors access comprehensive patient medical records during consultations with full clinical history and treatment data \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Access View} \vspace{2cm}}}
-    \caption*{Patient Records Access Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Access View} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1290,11 +1211,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors manage HIV antiretroviral treatment regimens, monitor adherence, track side effects, and adjust treatment protocols \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Management} \vspace{2cm}}}
-    \caption*{ARV Treatment Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1320,11 +1237,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors send custom notifications to patients regarding appointments, treatments, and healthcare instructions \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Send Notification Form} \vspace{2cm}}}
-    \caption*{Send Notification Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Send Notification Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1350,11 +1263,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors create, edit, and manage templates for common notifications to streamline patient communication \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification Templates Management} \vspace{2cm}}}
-    \caption*{Notification Templates Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification Templates Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1380,11 +1289,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Doctors review history of notifications sent to patients, delivery status, and patient responses \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification History View} \vspace{2cm}}}
-    \caption*{Notification History Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Notification History View} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1412,11 +1317,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Administrators access system-wide dashboard with user management, system statistics, and administrative oversight tools \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Admin Dashboard} \vspace{2cm}}}
-    \caption*{Admin Dashboard Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Admin Dashboard} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1442,11 +1343,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Administrators manage all user accounts across the system with comprehensive user administration capabilities \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Management Interface} \vspace{2cm}}}
-    \caption*{User Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Management Interface} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1472,11 +1369,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Administrators create new doctor accounts with specialized permissions, specialty assignments, and professional credentials \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Create Doctor Account Form} \vspace{2cm}}}
-    \caption*{Create Doctor Account Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Create Doctor Account Form} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1502,11 +1395,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Administrators reset passwords for users who cannot access their accounts with secure password generation \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Reset Interface} \vspace{2cm}}}
-    \caption*{Password Reset Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Password Reset Interface} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1532,11 +1421,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Administrators manage medical specialties for doctor categorization and appointment filtering \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Specialty Management Interface} \vspace{2cm}}}
-    \caption*{Specialty Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Specialty Management Interface} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1562,11 +1447,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Administrators activate or deactivate user accounts across the system for security and access control \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Status Management} \vspace{2cm}}}
-    \caption*{User Status Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: User Status Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1592,11 +1473,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Administrators view all appointments across the system for oversight, monitoring, and system analysis \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System-wide Appointments View} \vspace{2cm}}}
-    \caption*{System-wide Appointments Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System-wide Appointments View} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1624,11 +1501,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers access operational dashboard with clinic statistics, analytics, and data management tools \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Manager Dashboard} \vspace{2cm}}}
-    \caption*{Manager Dashboard Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Manager Dashboard} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1654,11 +1527,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers view comprehensive clinic statistics including patient counts, doctor metrics, appointment analytics, and ARV treatment statistics \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Statistics Dashboard} \vspace{2cm}}}
-    \caption*{Statistics Dashboard Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Statistics Dashboard} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1684,11 +1553,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers oversee patient records management, data integrity, and operational patient information \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Management} \vspace{2cm}}}
-    \caption*{Patient Records Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Records Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1714,11 +1579,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers oversee doctor records, professional information, and clinical staff management \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Records Management} \vspace{2cm}}}
-    \caption*{Doctor Records Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Records Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1744,11 +1605,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers monitor and oversee ARV treatment programs across the clinic with comprehensive treatment oversight \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Program Management} \vspace{2cm}}}
-    \caption*{ARV Treatment Program Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: ARV Treatment Program Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1774,11 +1631,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers oversee clinic scheduling, appointment distribution, and availability coordination \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Schedule Management Interface} \vspace{2cm}}}
-    \caption*{Schedule Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Schedule Management Interface} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1804,11 +1657,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers search for specific patients across the clinic database with name-based filtering and patient lookup \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Search Interface} \vspace{2cm}}}
-    \caption*{Patient Search Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Search Interface} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1834,11 +1683,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers search for specific doctors in the clinic system with name and specialty-based filtering \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Search Interface} \vspace{2cm}}}
-    \caption*{Doctor Search Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Search Interface} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1864,11 +1709,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers export various clinic data in CSV format for reporting, analysis, and external system integration \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Data Export Interface} \vspace{2cm}}}
-    \caption*{Data Export Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Data Export Interface} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1894,11 +1735,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers access detailed patient information for operational oversight, compliance, and data management \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Details View} \vspace{2cm}}}
-    \caption*{Patient Details View Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Patient Details View} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1924,11 +1761,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & Managers access detailed doctor information for operational oversight, performance monitoring, and staff management \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Details View} \vspace{2cm}}}
-    \caption*{Doctor Details View Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Doctor Details View} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1956,11 +1789,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & System manages user sessions with validation, extension, and invalidation for security and user experience \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Session Management Indicators} \vspace{2cm}}}
-    \caption*{Session Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Session Management Indicators} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -1986,11 +1815,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & System tracks login attempts, IP addresses, user agents, and login statistics for security monitoring and audit trails \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Activity Dashboard} \vspace{2cm}}}
-    \caption*{Login Activity Tracking Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Login Activity Dashboard} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -2016,11 +1841,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & System manages medication routines, schedules, and reminders for comprehensive patient care \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medication Routine Management} \vspace{2cm}}}
-    \caption*{Medication Routine Management Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: Medication Routine Management} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -2046,11 +1867,7 @@ This section provides detailed design specifications for all 45 implemented use 
 \textbf{Description:} & System monitors application health, database connectivity, and system status for operational reliability \\
 \hline
 \textbf{UI Screenshot:} & 
-\begin{figure}[H]
-    \centering
-    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System Health Dashboard} \vspace{2cm}}}
-    \caption*{System Health Monitoring Interface}
-\end{figure} \\
+    \fbox{\parbox{12cm}{\centering \vspace{2cm} \textit{UI Screenshot Placeholder: System Health Dashboard} \vspace{2cm}}} \\
 \hline
 \textbf{Implementation Details:} & 
 \begin{itemize}
@@ -2070,17 +1887,9 @@ This section provides detailed design specifications for all 45 implemented use 
 
 The HIV Clinic system uses Microsoft SQL Server with the following core tables:
 
-\begin{figure}[H]
-    \centering
     \includegraphics[width=0.95\textwidth]{diagrams/Picture/Database.png}
-    \caption*{\textbf{Table 16.} Database Design Overview}
-\end{figure}
-
-
 
 \paragraph{b. Table Descriptions}
-
-
 \renewcommand{\arraystretch}{1.5}
 \begin{longtable}{|c|p{4cm}|p{9cm}|}
 \hline
@@ -2132,8 +1941,6 @@ The HIV Clinic system uses Microsoft SQL Server with the following core tables:
 \multicolumn{3}{|c|}{\textbf{Table 17.} Database Table Description} \\
 \hline
 \end{longtable}
-
-
 \subsubsection{Code Packages}
 
 The HIV Clinic system follows a layered Spring Boot architecture:
@@ -2170,7 +1977,6 @@ The HIV Clinic system follows a layered Spring Boot architecture:
 \end{longtable}
 
 \subsubsection{Data Flow Architecture}
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{diagrams/data_flow_diagram.png}
