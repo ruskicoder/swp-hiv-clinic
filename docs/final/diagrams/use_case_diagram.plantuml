@@ -27,45 +27,50 @@ actor "Manager" as Manager
 
 package "HIV Clinic Management System" {
 
-    package "Authentication & Profile Management" {
+    package "Authentication & Security" {
         usecase "UC_001: User Registration" as UC_001
         usecase "UC_002: User Login" as UC_002
-        usecase "UC_003: Update Profile" as UC_003
-        usecase "UC_004: Change Password" as UC_004
-        usecase "UC_005: Logout" as UC_005
+        usecase "UC_012: Change Password" as UC_012
+        usecase "UC_042: Session Management" as UC_042
+        usecase "UC_043: Login Activity Tracking" as UC_043
+    }
+
+    package "Public Access" {
+        usecase "UC_003: Browse Public Website" as UC_003
     }
 
     package "Patient Services" {
-        usecase "UC_006: View Dashboard" as UC_006
-        usecase "UC_007: Book Appointment" as UC_007
-        usecase "UC_008: View Appointments" as UC_008
-        usecase "UC_009: Cancel Appointment" as UC_009
-        usecase "UC_010: View Patient Records" as UC_010
-        usecase "UC_011: Update Patient Records" as UC_011
-        usecase "UC_012: View ARV Treatments" as UC_012
+        usecase "UC_004: View Patient Dashboard" as UC_004
+        usecase "UC_005: Book Appointment" as UC_005
+        usecase "UC_006: View Appointments" as UC_006
+        usecase "UC_007: Cancel Appointment" as UC_007
+        usecase "UC_008: View Medical Records" as UC_008
+        usecase "UC_009: Update Medical Records" as UC_009
+        usecase "UC_010: View ARV Treatments" as UC_010
+        usecase "UC_011: Update Profile" as UC_011
+        usecase "UC_013: Receive Notifications" as UC_013
+        usecase "UC_014: View Privacy Settings" as UC_014
     }
 
     package "Doctor Services" {
-        usecase "UC_013: View Doctor Dashboard" as UC_013
-        usecase "UC_014: Manage Appointments" as UC_014
-        usecase "UC_015: Update Appointment Status" as UC_015
-        usecase "UC_016: Manage Availability Slots" as UC_016
-        usecase "UC_017: Access Patient Records" as UC_017
-        usecase "UC_018: Manage ARV Treatments" as UC_018
-        usecase "UC_019: Send Notifications" as UC_019
-        usecase "UC_020: View Notification History" as UC_020
-        usecase "UC_021: Manage Notification Templates" as UC_021
+        usecase "UC_015: View Doctor Dashboard" as UC_015
+        usecase "UC_016: Manage Appointments" as UC_016
+        usecase "UC_017: Update Appointment Status" as UC_017
+        usecase "UC_018: Manage Availability" as UC_018
+        usecase "UC_019: Access Patient Records" as UC_019
+        usecase "UC_020: Manage ARV Treatments" as UC_020
+        usecase "UC_021: Send Notifications" as UC_021
+        usecase "UC_022: Manage Notification Templates" as UC_022
+        usecase "UC_023: View Notification History" as UC_023
     }
 
     package "Admin Services" {
-        usecase "UC_022: View Admin Dashboard" as UC_022
-        usecase "UC_023: Manage Users" as UC_023
-        usecase "UC_024: Manage Patients" as UC_024
-        usecase "UC_025: Manage Doctors" as UC_025
+        usecase "UC_024: View Admin Dashboard" as UC_024
+        usecase "UC_025: Manage Users" as UC_025
         usecase "UC_026: Create Doctor Accounts" as UC_026
-        usecase "UC_027: Toggle User Status" as UC_027
-        usecase "UC_028: Reset User Passwords" as UC_028
-        usecase "UC_029: Manage Specialties" as UC_029
+        usecase "UC_027: Reset User Passwords" as UC_027
+        usecase "UC_028: Manage Specialties" as UC_028
+        usecase "UC_029: Toggle User Status" as UC_029
         usecase "UC_030: View All Appointments" as UC_030
     }
 
@@ -82,6 +87,11 @@ package "HIV Clinic Management System" {
         usecase "UC_040: View Patient Details" as UC_040
         usecase "UC_041: View Doctor Details" as UC_041
     }
+
+    package "System Services" {
+        usecase "UC_044: Medication Routine Management" as UC_044
+        usecase "UC_045: Health Monitoring" as UC_045
+    }
 }
 
 ' ====== RELATIONSHIPS ======
@@ -89,9 +99,11 @@ package "HIV Clinic Management System" {
 ' --- Unauthenticated User ---
 Guest --> UC_001
 Guest --> UC_002
+Guest --> UC_003
 
 ' --- Patient User ---
-Patient --> UC_003
+Patient --> UC_001
+Patient --> UC_002
 Patient --> UC_004
 Patient --> UC_005
 Patient --> UC_006
@@ -101,13 +113,14 @@ Patient --> UC_009
 Patient --> UC_010
 Patient --> UC_011
 Patient --> UC_012
+Patient --> UC_013
+Patient --> UC_014
 
 ' --- Doctor User ---
-Doctor --> UC_003
-Doctor --> UC_004
-Doctor --> UC_005
-Doctor --> UC_013
-Doctor --> UC_014
+Doctor --> UC_001
+Doctor --> UC_002
+Doctor --> UC_011
+Doctor --> UC_012
 Doctor --> UC_015
 Doctor --> UC_016
 Doctor --> UC_017
@@ -115,13 +128,13 @@ Doctor --> UC_018
 Doctor --> UC_019
 Doctor --> UC_020
 Doctor --> UC_021
+Doctor --> UC_022
+Doctor --> UC_023
 
 ' --- Admin User ---
-Admin --> UC_003
-Admin --> UC_004
-Admin --> UC_005
-Admin --> UC_022
-Admin --> UC_023
+Admin --> UC_002
+Admin --> UC_011
+Admin --> UC_012
 Admin --> UC_024
 Admin --> UC_025
 Admin --> UC_026
@@ -131,9 +144,9 @@ Admin --> UC_029
 Admin --> UC_030
 
 ' --- Manager User ---
-Manager --> UC_003
-Manager --> UC_004
-Manager --> UC_005
+Manager --> UC_002
+Manager --> UC_011
+Manager --> UC_012
 Manager --> UC_031
 Manager --> UC_032
 Manager --> UC_033
@@ -146,17 +159,52 @@ Manager --> UC_039
 Manager --> UC_040
 Manager --> UC_041
 
-' --- Include Relationships ---
-UC_003 ..> UC_002 : <<include>>
-UC_006 ..> UC_002 : <<include>>
-UC_007 ..> UC_002 : <<include>>
-UC_013 ..> UC_002 : <<include>>
-UC_022 ..> UC_002 : <<include>>
-UC_031 ..> UC_002 : <<include>>
+' ====== USE CASE RELATIONSHIPS ======
 
-' --- Extend Relationships ---
-UC_002 <.. UC_004 : <<extend>>
-UC_008 <.. UC_009 : <<extend>>
-UC_014 <.. UC_015 : <<extend>>
+' Include relationships
+UC_005 ..> UC_018 : <<include>>
+UC_021 ..> UC_022 : <<include>>
+UC_020 ..> UC_044 : <<include>>
+
+' Extend relationships
+UC_007 ..> UC_006 : <<extend>>
+UC_009 ..> UC_008 : <<extend>>
+UC_011 ..> UC_014 : <<extend>>
+
+' Generalization relationships
+UC_025 <|-- UC_033
+UC_025 <|-- UC_034
+UC_032 <|-- UC_040
+UC_032 <|-- UC_041
+
+note top of Guest
+  Can register as Patient or Doctor
+  Can browse public content
+  Can login to access system
+end note
+
+note top of Patient
+  Authenticated user who receives care
+  Can manage appointments and treatments
+  Can access personal medical records
+end note
+
+note top of Doctor
+  Medical professional with clinical access
+  Can manage patient care and treatments
+  Can send notifications and manage availability
+end note
+
+note top of Admin
+  System administrator
+  Can manage users and system configuration
+  Has oversight of all system operations
+end note
+
+note top of Manager
+  Operational oversight role
+  Can view analytics and export data
+  Can search and manage records
+end note
 
 @enduml
