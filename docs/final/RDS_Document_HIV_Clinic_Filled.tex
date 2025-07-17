@@ -1300,6 +1300,522 @@ The HIV Clinic system follows a layered Spring Boot architecture:
 \end{longtable}
 
 
+\subsubsection{UC-06 – View Dashboard}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-06 – View Dashboard \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients access their personal dashboard with overview of appointments and treatments. \\
+\hline
+\textbf{Trigger:} & User logs in and navigates to dashboard. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as patient
+  \item User has active account
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item Dashboard displays current appointments
+  \item Treatment status is visible
+  \item Notifications are shown
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item User logs into system
+  \item System displays patient dashboard
+  \item User views appointments and treatments
+  \item User can navigate to other features
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} No appointments scheduled → Show message: \textit{"No upcoming appointments."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Dashboard loading error → Show message: \textit{"Unable to load dashboard. Please try again."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-24: Dashboard shows only patient's own data
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Patient has valid login credentials
+\end{itemize} \\
+\hline
+\textbf{Priority:} & High \\
+\hline
+\textbf{Frequency of Use:} & Very Frequent \\
+\hline
+\end{longtable}
+
+\subsubsection{UC-07 – Book Appointment}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-07 – Book Appointment \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System, Doctor \\
+\hline
+\textbf{Description:} & Patients schedule appointments with available doctors based on doctor availability slots. \\
+\hline
+\textbf{Trigger:} & User clicks "Book Appointment" button. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as patient
+  \item Doctors have available time slots
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item Appointment is scheduled
+  \item Doctor's slot is marked as booked
+  \item Notification is sent to patient and doctor
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item User selects doctor from available list
+  \item User selects preferred date
+  \item System shows available time slots
+  \item User selects time slot
+  \item User enters appointment notes (optional)
+  \item User confirms booking
+  \item System creates appointment record
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} No available slots → Show message: \textit{"No available slots for selected date."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Booking conflict → Show message: \textit{"Slot no longer available. Please select another."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-25: No overlapping appointments for same patient
+  \item BR-26: Appointments must be at least 24 hours in advance
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Doctor availability is up-to-date
+\end{itemize} \\
+\hline
+\textbf{Priority:} & High \\
+\hline
+\textbf{Frequency of Use:} & Frequent \\
+\hline
+\end{longtable}
+
+\subsubsection{UC-08 – View Appointments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-08 – View Appointments \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients view their scheduled, completed, and cancelled appointments with details. \\
+\hline
+\textbf{Trigger:} & User navigates to "My Appointments" section. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as patient
+  \item User has appointment history
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item List of appointments is displayed
+  \item Appointment details are accessible
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item User clicks "My Appointments"
+  \item System retrieves appointment history
+  \item System displays appointments by status
+  \item User can view appointment details
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} No appointments found → Show message: \textit{"No appointments found."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Data retrieval error → Show message: \textit{"Unable to load appointments. Please try again."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-27: Only show patient's own appointments
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Appointment data is accurate and current
+\end{itemize} \\
+\hline
+\textbf{Priority:} & High \\
+\hline
+\textbf{Frequency of Use:} & Frequent \\
+\hline
+\end{longtable}
+
+\subsubsection{UC-09 – Cancel Appointment}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-09 – Cancel Appointment \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System, Doctor \\
+\hline
+\textbf{Description:} & Patients cancel scheduled appointments with cancellation reasons. \\
+\hline
+\textbf{Trigger:} & User clicks "Cancel" on scheduled appointment. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as patient
+  \item Appointment exists and is scheduled
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item Appointment status is updated to cancelled
+  \item Doctor's time slot becomes available
+  \item Cancellation notification is sent
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item User selects appointment to cancel
+  \item System shows cancellation confirmation
+  \item User provides cancellation reason
+  \item User confirms cancellation
+  \item System updates appointment status
+  \item System sends notifications
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} Appointment cannot be cancelled → Show message: \textit{"This appointment cannot be cancelled."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Cancellation too late → Show message: \textit{"Cancellation must be at least 2 hours before appointment."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-28: Cancellation allowed up to 2 hours before appointment
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Appointment is not already started
+\end{itemize} \\
+\hline
+\textbf{Priority:} & Medium \\
+\hline
+\textbf{Frequency of Use:} & Occasional \\
+\hline
+\end{longtable}
+
+\subsubsection{UC-10 – View Patient Records}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-10 – View Patient Records \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients access their own medical records, treatment history, and current medications. \\
+\hline
+\textbf{Trigger:} & User navigates to "Medical Records" section. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as patient
+  \item Medical records exist for patient
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item Medical records are displayed
+  \item Treatment history is accessible
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item User clicks "Medical Records"
+  \item System retrieves patient's medical data
+  \item System displays comprehensive records
+  \item User can view different sections
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} No medical records → Show message: \textit{"No medical records found."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Access denied → Show message: \textit{"Unable to access medical records."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-29: Patients can only view their own records
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Medical records are up-to-date
+\end{itemize} \\
+\hline
+\textbf{Priority:} & High \\
+\hline
+\textbf{Frequency of Use:} & Frequent \\
+\hline
+\end{longtable}
+
+\subsubsection{UC-11 – Update Patient Records}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-11 – Update Patient Records \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients update their personal medical information and emergency contacts. \\
+\hline
+\textbf{Trigger:} & User clicks "Edit" on medical records page. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as patient
+  \item Medical records exist for patient
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item Medical records are updated
+  \item Changes are saved to database
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item User clicks "Edit Medical Records"
+  \item System displays editable form
+  \item User updates information
+  \item User clicks "Save Changes"
+  \item System validates and saves data
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} Invalid data → Show message: \textit{"Please correct the highlighted fields."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Save failed → Show message: \textit{"Unable to save changes. Please try again."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-30: Only patient can update their own records
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Patient provides accurate information
+\end{itemize} \\
+\hline
+\textbf{Priority:} & Medium \\
+\hline
+\textbf{Frequency of Use:} & Occasional \\
+\hline
+\end{longtable}
+
+\subsubsection{UC-12 – View ARV Treatments}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-12 – View ARV Treatments \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Patient \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Patients view their HIV antiretroviral treatment regimens and adherence status. \\
+\hline
+\textbf{Trigger:} & User navigates to "ARV Treatments" section. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as patient
+  \item ARV treatment records exist
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item ARV treatment history is displayed
+  \item Current regimen is shown
+  \item Adherence status is visible
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item User clicks "ARV Treatments"
+  \item System retrieves treatment data
+  \item System displays treatment regimens
+  \item User can view adherence reports
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} No ARV treatments → Show message: \textit{"No ARV treatments found."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Data access error → Show message: \textit{"Unable to load ARV treatments."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-31: Only show patient's own treatment data
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Treatment data is current and accurate
+\end{itemize} \\
+\hline
+\textbf{Priority:} & High \\
+\hline
+\textbf{Frequency of Use:} & Frequent \\
+\hline
+\end{longtable}
+
+\subsubsection{UC-13 – View Doctor Dashboard}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{longtable}{|p{4.5cm}|p{10.5cm}|}
+\hline
+\textbf{UC ID and Name:} & UC-13 – View Doctor Dashboard \\
+\hline
+\textbf{Created By:} & System Team \\
+\hline
+\textbf{Date Created:} & 28/6 \\
+\hline
+\textbf{Primary Actor:} & Doctor \\
+\hline
+\textbf{Secondary Actors:} & System \\
+\hline
+\textbf{Description:} & Doctors access their professional dashboard with patient appointments and notifications. \\
+\hline
+\textbf{Trigger:} & Doctor logs in and navigates to dashboard. \\
+\hline
+\textbf{Preconditions:} &
+\begin{itemize}
+  \item User is authenticated as doctor
+  \item Doctor profile is active
+\end{itemize} \\
+\hline
+\textbf{Postconditions:} &
+\begin{itemize}
+  \item Dashboard displays today's appointments
+  \item Notifications are shown
+  \item Quick actions are available
+\end{itemize} \\
+\hline
+\textbf{Normal Flow:} &
+\begin{enumerate}
+  \item Doctor logs into system
+  \item System displays doctor dashboard
+  \item Doctor views appointments and notifications
+  \item Doctor can navigate to other features
+\end{enumerate} \\
+\hline
+\textbf{Alternative Flows:} &
+\textbf{AF-1:} No appointments today → Show message: \textit{"No appointments scheduled for today."} \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Dashboard loading error → Show message: \textit{"Unable to load dashboard. Please try again."}
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-32: Dashboard shows only doctor's own appointments
+\end{itemize} \\
+\hline
+\textbf{Assumptions:} &
+\begin{itemize}
+  \item Doctor has valid login credentials
+\end{itemize} \\
+\hline
+\textbf{Priority:} & High \\
+\hline
+\textbf{Frequency of Use:} & Very Frequent \\
+\hline
+\end{longtable}
+
 \section{Design Specifications}
 
 \subsection{Authentication System}

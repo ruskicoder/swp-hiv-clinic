@@ -46,14 +46,11 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  // Show profile loading modal after first login if needed
+  // Show profile loading modal after first login
   useEffect(() => {
     if (isFirstLogin && user && !showProfileLoadingModal) {
-      // Check if profile data is incomplete or if we should show the modal
-      const hasIncompleteProfile = !user.firstName || !user.lastName || !user.phoneNumber;
-      if (hasIncompleteProfile) {
-        setShowProfileLoadingModal(true);
-      }
+      // Always show modal on first login to ensure page reload for optimal experience
+      setShowProfileLoadingModal(true);
       setIsFirstLogin(false);
     }
   }, [isFirstLogin, user, showProfileLoadingModal]);
@@ -145,15 +142,9 @@ export const AuthProvider = ({ children }) => {
             address: profileResponse.address || '',
             profileImageBase64: profileResponse.profileImageBase64 || ''
           }));
-          
-          // Set first login flag to show modal after successful profile load
-          setIsFirstLogin(true);
         } catch (profileError) {
           console.error('Failed to load user profile:', profileError);
           // Don't fail login if profile loading fails - user data is already set
-          // Show profile loading modal to suggest page reload
-          setIsFirstLogin(true);
-          setShowProfileLoadingModal(true);
         }
         
         // Initialize notifications after successful login
@@ -162,11 +153,10 @@ export const AuthProvider = ({ children }) => {
         } catch (notificationError) {
           console.error('Failed to initialize notifications:', notificationError);
           // Don't fail login if notification initialization fails
-          // Show profile loading modal to suggest page reload for proper initialization
-          if (!showProfileLoadingModal) {
-            setShowProfileLoadingModal(true);
-          }
         }
+        
+        // Always set first login flag to show modal for page reload
+        setIsFirstLogin(true);
         
         return { success: true };
       } else {

@@ -20,18 +20,19 @@ const ProfileLoadingModal = ({
     <div className="profile-loading-modal-overlay">
       <div className="profile-loading-modal">
         <div className="profile-loading-modal-header">
-          <h3>⚠️ Profile Loading</h3>
+          <h3>🔄 Page Reload Required</h3>
         </div>
         
         <div className="profile-loading-modal-content">
-          <p>Your profile is still loading. For the best experience, please reload the page to ensure all your information is displayed correctly.</p>
+          <p>Welcome! Your profile is still loading. Please reload the page to ensure all features work properly.</p>
           
           <div className="profile-loading-info">
-            <p>This will help ensure:</p>
+            <p>Reloading will help ensure:</p>
             <ul>
-              <li>All your profile information is loaded</li>
+              <li>Your profile information is fully loaded</li>
               <li>Notifications are properly initialized</li>
-              <li>Dashboard data is fully synchronized</li>
+              <li>All dashboard features are available</li>
+              <li>The system works optimally</li>
             </ul>
           </div>
         </div>
