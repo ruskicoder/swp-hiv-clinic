@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.7.18)  18 JUL 2025 02:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.7.18)  18 JUL 2025 02:21
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -402,24 +402,24 @@ File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 (./RDS_Document_HIV_Clinic_Filled.aux)
 \openout1 = `RDS_Document_HIV_Clinic_Filled.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -477,7 +477,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 28.
+Package hyperref Info: Link coloring OFF on input line 27.
 
 (./RDS_Document_HIV_Clinic_Filled.out) (./RDS_Document_HIV_Clinic_Filled.out)
 \@outlinefile=\write3
@@ -488,583 +488,994 @@ Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 31.
+(Font)              <14.4> on input line 30.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 31.
+(Font)              <7> on input line 30.
 
 
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+(./RDS_Document_HIV_Clinic_Filled.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 40.
+(Font)              <12> on input line 3.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 40.
+(Font)              <8> on input line 3.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 40.
-
-Overfull \hbox (61.3861pt too wide) in paragraph at lines 40--70
- [][] 
- []
-
-
-
-[2] (./RDS_Document_HIV_Clinic_Filled.toc)
+(Font)              <6> on input line 3.
+)
 \tf@toc=\write4
 \openout4 = `RDS_Document_HIV_Clinic_Filled.toc'.
 
 
 
+[2]
+
 [3]
+Overfull \hbox (99.32367pt too wide) in alignment at lines 89--145
+ [] [] [] [] 
+ []
+
+
+Package longtable Warning: Column widths have changed
+(longtable)                in table 1 on input line 145.
+
+<diagrams/use_case_diagram.png, id=183, 1923.185pt x 2739.23375pt>
+File: diagrams/use_case_diagram.png Graphic file (type png)
+<use diagrams/use_case_diagram.png>
+Package pdftex.def Info: diagrams/use_case_diagram.png  used on input line 151.
+
+(pdftex.def)             Requested size: 407.66833pt x 580.64792pt.
+
 
 [4]
-Underfull \hbox (badness 10000) in paragraph at lines 134--134
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 1024) in paragraph at lines 134--134
-[]|\OT1/cmr/m/n/12 Public In-for-ma-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 134--134
-[]|\OT1/cmr/m/n/12 Browse Pub-lic
- []
-
-
-Underfull \hbox (badness 2277) in paragraph at lines 134--135
-[]|\OT1/cmr/m/n/12 View HIV in-for-ma-tion, ed-u-ca-tional
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--136
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--136
-[]|\OT1/cmr/m/n/12 Account Man-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 136--136
-[]|\OT1/cmr/m/n/12 User Reg-is-tra-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 138--138
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 138--139
-[]|\OT1/cmr/m/n/12 Authenticate us-ing user-name/-pass-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 142--142
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 144--144
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 146--146
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 146--146
-[]|\OT1/cmr/m/n/12 Change Pass-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 150--150
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 150--150
-[]|\OT1/cmr/m/n/12 View Pa-tient
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 152--152
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 152--152
-[]|\OT1/cmr/m/n/12 Manage Ap-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 154--154
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 154--154
-[]|\OT1/cmr/m/n/12 Manage Per-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 154--154
-\OT1/cmr/m/n/12 sonal Med-i-cal
- []
-
-
-Underfull \hbox (badness 1983) in paragraph at lines 154--155
-[]|\OT1/cmr/m/n/12 View and up-date per-sonal med-i-cal
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 156--156
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 156--156
-[]|\OT1/cmr/m/n/12 View ARV
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 158--158
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 158--158
-[]|\OT1/cmr/m/n/12 View No-ti-fi-ca-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 162--162
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 162--162
-[]|\OT1/cmr/m/n/12 View Doc-tor
- []
-
-
-Underfull \hbox (badness 1371) in paragraph at lines 162--163
-[]|\OT1/cmr/m/n/12 Professional dash-board with pa-tient
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 164--164
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 164--164
-[]|\OT1/cmr/m/n/12 Manage Ap-
- []
-
+<diagrams/user_interface_flow.png, id=189, 8198.63pt x 938.50626pt>
+File: diagrams/user_interface_flow.png Graphic file (type png)
+<use diagrams/user_interface_flow.png>
+Package pdftex.def Info: diagrams/user_interface_flow.png  used on input line 1
+62.
+(pdftex.def)             Requested size: 407.66833pt x 46.65596pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 166--166
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 166--166
-[]|\OT1/cmr/m/n/12 Manage Avail-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 168--168
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 168--168
-[]|\OT1/cmr/m/n/12 Access Pa-tient
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 170--170
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 170--170
-[]|\OT1/cmr/m/n/12 Manage ARV
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 172--172
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--176
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--176
-[]|\OT1/cmr/m/n/12 View Ad-min
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 178--178
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 178--178
-[]|\OT1/cmr/m/n/12 User Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 180--180
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 180--180
-[]|\OT1/cmr/m/n/12 System Over-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 180--180
-[]|\OT1/cmr/m/n/12 View All Ap-
- []
-
-
-Underfull \hbox (badness 7151) in paragraph at lines 180--181
-[]|\OT1/cmr/m/n/12 System-wide ap-point-ment over-sight
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 184--184
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 184--184
-[]|\OT1/cmr/m/n/12 View Man-ager
- []
-
-
-Underfull \hbox (badness 1033) in paragraph at lines 184--185
-\OT1/cmr/m/n/12 hen-sive an-a-lyt-ics, data ex-port, and
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 186--186
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 3240) in paragraph at lines 186--187
-[]|\OT1/cmr/m/n/12 Comprehensive clinic statis-tics and
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 188--188
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 190--190
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 2717) in paragraph at lines 190--190
-[]|\OT1/cmr/m/n/12 Manage Doc-tor
- []
 
+[5 <./diagrams/use_case_diagram.png>]
 
-Underfull \hbox (badness 10000) in paragraph at lines 192--192
-[]|\OT1/cmr/m/n/12 UC-
+[6 <./diagrams/user_interface_flow.png>] [7] [8] [9]
+Underfull \hbox (badness 10000) in paragraph at lines 404--405
+\OT1/cmr/m/n/12 guid-ance for get-ting
  []
 
+[10]
 
-Underfull \hbox (badness 10000) in paragraph at lines 192--192
-[]|\OT1/cmr/m/n/12 Manage ARV
+[11] [12] [13]
+Underfull \hbox (badness 10000) in paragraph at lines 597--598
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Dash-board
  []
 
 
-Underfull \hbox (badness 5771) in paragraph at lines 192--193
-[]|\OT1/cmr/m/n/12 Monitor ARV treat-ment pro-grams
+Underfull \hbox (badness 4569) in paragraph at lines 597--598
+\OT1/cmr/m/n/12 cus-tomiza-tion \TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 User
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 194--194
-[]|\OT1/cmr/m/n/12 UC-
+Underfull \hbox (badness 10000) in paragraph at lines 597--598
+\OT1/cmr/m/n/12 can mod-ify wid-get
  []
-
-
-Underfull \hbox (badness 6032) in paragraph at lines 194--194
-[]|\OT1/cmr/m/n/12 Manage Sched-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 196--196
-[]|\OT1/cmr/m/n/12 UC-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 196--196
-[]|\OT1/cmr/m/n/12 Data Man-age-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 196--196
-[]|\OT1/cmr/m/n/12 Export Data
- []
-
-[5]
-Overfull \hbox (49.45198pt too wide) in alignment at lines 220--224
- [] [] [] [] 
- []
-
-
-Overfull \hbox (49.45198pt too wide) in alignment at lines 224--229
- [] [] [] [] 
- []
-
-
-Overfull \hbox (49.45198pt too wide) in alignment at lines 229--255
- [] [] [] [] 
- []
-
-
-
-[6] [7]
 
-[8] [9] [10]
-Underfull \hbox (badness 10000) in paragraph at lines 520--521
+[14] [15]
+Underfull \hbox (badness 10000) in paragraph at lines 674--675
 []|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Ap-point-ment
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 520--521
+Underfull \hbox (badness 10000) in paragraph at lines 674--675
 \OT1/cmr/m/n/12 within 24 hours \TS1/cmr/m/n/12 ^^Y
  []
 
-[11] [12]
-Underfull \hbox (badness 10000) in paragraph at lines 600--601
+[16] [17] [18] [19] [20] [21]
+Underfull \hbox (badness 1275) in paragraph at lines 933--934
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Ur-gent pa-tient
+ []
+
+[22] [23]
+Underfull \hbox (badness 10000) in paragraph at lines 997--998
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Ap-point-ment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 997--998
+\OT1/cmr/m/n/12 finds al-ter-na-tive time
+ []
+
+[24]
+Underfull \hbox (badness 10000) in paragraph at lines 1062--1063
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Emer-gency
+ []
+
+
+Underfull \hbox (badness 6268) in paragraph at lines 1062--1063
+\OT1/cmr/m/n/12 me-di-ately blocks slots
+ []
+
+
+Underfull \hbox (badness 1226) in paragraph at lines 1072--1073
+[]\OT1/cmr/m/n/12 BR-036: Can-not mod-ify slots that are al-ready
+ []
+
+[25] [26]
+Underfull \hbox (badness 3769) in paragraph at lines 1120--1121
+[]\OT1/cmr/m/n/12 System dis-plays com-pre-hen-sive pa-tient med-i-cal
+ []
+
+
+Underfull \hbox (badness 1231) in paragraph at lines 1128--1129
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Emer-gency ac-
+ []
+
+[27]
+Underfull \hbox (badness 10000) in paragraph at lines 1196--1197
 \OT1/cmr/m/n/12 de-tected \TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 Doc-tor
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 600--601
+Underfull \hbox (badness 10000) in paragraph at lines 1196--1197
 \OT1/cmr/m/n/12 sched-ules coun-sel-ing
  []
 
-[13] [14]
-Underfull \hbox (badness 10000) in paragraph at lines 652--652
+[28] [29] [30] [31]
+Underfull \hbox (badness 1072) in paragraph at lines 1328--1329
+\OT1/cmr/m/n/12 lo-gin \TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 Sys-tem shows
+ []
+
+[32] [33] [34]
+Underfull \hbox (badness 6016) in paragraph at lines 1447--1448
+[]\OT1/cmr/m/n/12 Administrator ac-cesses ap-point-ment mon-i-tor-ing
+ []
+
+
+Underfull \hbox (badness 3449) in paragraph at lines 1457--1458
+\OT1/cmr/m/n/12 al-ity \TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 Ad-min-is-tra-tor
+ []
+
+[35]
+Underfull \hbox (badness 10000) in paragraph at lines 1522--1523
+\TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 Ad-min-is-tra-tor can
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1522--1523
+\OT1/cmr/m/n/12 save drafts for later
+ []
+
+
+
+[36] [37]
+Underfull \hbox (badness 1158) in paragraph at lines 1558--1559
+[]|\OT1/cmr/m/n/12 Managers ac-cess com-pre-hen-sive op-er-a-tional dash-board
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 1586--1587
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Real-time up-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1586--1587
+\OT1/cmr/m/n/12 dates \TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 Dash-board
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1586--1587
+\OT1/cmr/m/n/12 re-freshes au-to-mat-i-cally
+ []
+
+[38] [39]
+Underfull \hbox (badness 6032) in paragraph at lines 1651--1652
+\OT1/cmr/m/n/12 tion \TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 Ad-min-is-tra-tor
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1651--1652
+\OT1/cmr/m/n/12 can re-store archived
+ []
+
+[40]
+Underfull \hbox (badness 10000) in paragraph at lines 1716--1717
+\OT1/cmr/m/n/12 ing \TS1/cmr/m/n/12 ^^Y \OT1/cmr/m/n/12 Ad-min-is-tra-tor
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1716--1717
+\OT1/cmr/m/n/12 guides new doc-tor
+ []
+
+
+Underfull \hbox (badness 1755) in paragraph at lines 1728--1729
+[]\OT1/cmr/m/n/12 BR-068: Pro-fes-sional li-cense ex-pi-ra-tion trig-gers
+ []
+
+[41] [42]
+Underfull \hbox (badness 4096) in paragraph at lines 1782--1783
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Sched-uled re-
+ []
+
+[43] [44]
+Underfull \hbox (badness 3189) in paragraph at lines 1848--1849
+[]|\OT1/cmr/bx/n/12 AF-2: \OT1/cmr/m/n/12 Sched-uled ex-
+ []
+
+[45] [46] [47]
+
+[48]
+Underfull \hbox (badness 10000) in paragraph at lines 1959--1959
 []|\OT1/cmr/m/n/12 Forgot Pass-
  []
 
-[15] (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/09/23 1.10c listings language file
 )
-Overfull \hbox (61.68121pt too wide) in paragraph at lines 681--682
+Overfull \hbox (61.68121pt too wide) in paragraph at lines 1988--1989
 [][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 699--699
+
+[49]
+Underfull \hbox (badness 10000) in paragraph at lines 2014--2014
+[]|\OT1/cmr/m/n/12 Confirm Pass-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2050--2050
 []|\OT1/cmr/m/n/12 Doctor Se-lec-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 701--701
+Underfull \hbox (badness 10000) in paragraph at lines 2052--2052
 []|\OT1/cmr/m/n/12 Appointment
  []
 
 
-Underfull \hbox (badness 4621) in paragraph at lines 703--703
+Underfull \hbox (badness 4621) in paragraph at lines 2054--2054
 []|\OT1/cmr/m/n/12 Available Time
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 705--705
+Underfull \hbox (badness 10000) in paragraph at lines 2056--2056
 []|\OT1/cmr/m/n/12 Appointment
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 707--707
+Underfull \hbox (badness 10000) in paragraph at lines 2058--2058
 []|\OT1/cmr/m/n/12 Book Ap-point-
  []
 
-[16]
-Overfull \hbox (34.32106pt too wide) in paragraph at lines 721--721
+[50]
+Overfull \hbox (34.32106pt too wide) in paragraph at lines 2072--2072
 []|\OT1/cmr/m/n/12 DoctorAvailabilitySlots| 
  []
 
 
-Overfull \hbox (5.28131pt too wide) in paragraph at lines 733--734
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (33.48126pt too wide) in paragraph at lines 737--738
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-
-Overfull \hbox (40.53125pt too wide) in paragraph at lines 748--749
-[][][][][][][][][][][][][][][] 
+Underfull \hbox (badness 10000) in paragraph at lines 2090--2090
+[]|\OT1/cmr/m/n/12 Appointment
  []
 
 
 
-[17]
-Underfull \hbox (badness 10000) in paragraph at lines 774--774
-[]|\OT1/cmr/m/n/12 Current Reg-i-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 776--776
-[]|\OT1/cmr/m/n/12 Available ARV
- []
-
-
-Underfull \hbox (badness 8151) in paragraph at lines 782--782
-[]|\OT1/cmr/m/n/12 Treatment Du-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 786--786
-[]|\OT1/cmr/m/n/12 Monitoring
- []
-
-
-Underfull \hbox (badness 1668) in paragraph at lines 788--788
-[]|\OT1/cmr/m/n/12 Special In-struc-
- []
-
-
-Overfull \hbox (13.206pt too wide) in paragraph at lines 810--810
-[]|\OT1/cmr/m/n/12 AdherenceTracking| 
- []
-
-
-
-[18]
-Underfull \hbox (badness 2142) in paragraph at lines 858--859
+[51]
+Underfull \hbox (badness 2142) in paragraph at lines 2120--2121
 []|\OT1/cmr/m/n/12 Comprehensive med-i-cal his-tory in-clud-ing
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 860--860
+Underfull \hbox (badness 10000) in paragraph at lines 2122--2122
 []|\OT1/cmr/m/n/12 Current Al-ler-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 868--868
+Underfull \hbox (badness 10000) in paragraph at lines 2130--2130
 []|\OT1/cmr/m/n/12 Emergency
  []
 
 
 
-[19]
-Overfull \hbox (40.53125pt too wide) in paragraph at lines 906--907
-[][][][][][][][][][][][][][][][][][][][][][][][] 
+[52]
+Underfull \hbox (badness 10000) in paragraph at lines 2178--2178
+[]|\OT1/cmr/m/n/12 Current Reg-i-
  []
 
 
-Overfull \hbox (12.3313pt too wide) in paragraph at lines 908--909
-[][][][][][][][][][][][][][][][][][][][][][][] 
+Underfull \hbox (badness 10000) in paragraph at lines 2180--2180
+[]|\OT1/cmr/m/n/12 Available ARV
+ []
+
+
+Underfull \hbox (badness 8151) in paragraph at lines 2186--2186
+[]|\OT1/cmr/m/n/12 Treatment Du-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2190--2190
+[]|\OT1/cmr/m/n/12 Monitoring
+ []
+
+
+Underfull \hbox (badness 1668) in paragraph at lines 2192--2192
+[]|\OT1/cmr/m/n/12 Special In-struc-
+ []
+
+
+Overfull \hbox (13.206pt too wide) in paragraph at lines 2214--2214
+[]|\OT1/cmr/m/n/12 AdherenceTracking| 
  []
 
 
 
-[20]
-Overfull \hbox (7.73001pt too wide) in paragraph at lines 941--942
-[]\OT1/cmr/bx/n/12 UC-013 (Man-age Ap-point-ments) \OT1/cmr/m/n/12 in-cludes \O
-T1/cmr/bx/n/12 UC-015 (Ac-cess Pa-tient Records)
+[53]
+Underfull \hbox (badness 10000) in paragraph at lines 2232--2232
+[]|\OT1/cmr/m/n/12 Welcome Mes-
  []
 
 
-Overfull \hbox (22.9924pt too wide) in paragraph at lines 942--943
+Underfull \hbox (badness 10000) in paragraph at lines 2234--2234
+[]|\OT1/cmr/m/n/12 Upcoming Ap-
+ []
+
+
+Underfull \hbox (badness 4608) in paragraph at lines 2240--2240
+[]|\OT1/cmr/m/n/12 Treatment Sta-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2242--2242
+[]|\OT1/cmr/m/n/12 Next Ap-point-
+ []
+
+
+Underfull \hbox (badness 1147) in paragraph at lines 2242--2243
+[]|\OT1/cmr/m/n/12 Next sched-uled ap-point-ment with count-
+ []
+
+
+Underfull \hbox (badness 6658) in paragraph at lines 2258--2258
+[]|\OT1/cmr/m/n/12 Today's Sched-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2264--2264
+[]|\OT1/cmr/m/n/12 Treatment
+ []
+
+
+Underfull \hbox (badness 5563) in paragraph at lines 2264--2265
+[]|\OT1/cmr/m/n/12 Patients re-quir-ing treat-ment re-view or
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2270--2270
+[]|\OT1/cmr/m/n/12 Performance
+ []
+
+[54]
+Underfull \hbox (badness 10000) in paragraph at lines 2286--2286
+[]|\OT1/cmr/m/n/12 System
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2290--2290
+[]|\OT1/cmr/m/n/12 Appointment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2298--2298
+[]|\OT1/cmr/m/n/12 Performance
+ []
+
+
+Underfull \hbox (badness 4940) in paragraph at lines 2314--2314
+[]|\OT1/cmr/m/n/12 Financial Sum-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2316--2316
+[]|\OT1/cmr/m/n/12 Patient De-mo-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2320--2320
+[]|\OT1/cmr/m/n/12 Staff Per-for-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2322--2322
+[]|\OT1/cmr/m/n/12 Export Func-
+ []
+
+[55]
+Underfull \hbox (badness 10000) in paragraph at lines 2342--2342
+[]|\OT1/cmr/m/n/12 Dropdown
+ []
+
+
+Underfull \hbox (badness 2717) in paragraph at lines 2344--2344
+[]|\OT1/cmr/m/n/12 Priority In-di-ca-
+ []
+
+
+Overfull \hbox (6.09079pt too wide) in paragraph at lines 2364--2364
+[]|\OT1/cmr/m/n/12 NotificationTypes| 
+ []
+
+
+Overfull \hbox (33.01552pt too wide) in paragraph at lines 2368--2368
+[]|\OT1/cmr/m/n/12 NotificationPreferences| 
+ []
+
+[56]
+
+[57]
+Underfull \hbox (badness 10000) in paragraph at lines 2383--2383
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (23.36452pt too wide) in paragraph at lines 2385--2385
+[]|\OT1/cmr/m/n/12 VARCHAR(50)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2385--2385
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (29.23946pt too wide) in paragraph at lines 2387--2387
+[]|\OT1/cmr/m/n/12 VARCHAR(100)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2387--2387
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (29.23946pt too wide) in paragraph at lines 2389--2389
+[]|\OT1/cmr/m/n/12 VARCHAR(255)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2389--2389
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (23.36452pt too wide) in paragraph at lines 2391--2391
+[]|\OT1/cmr/m/n/12 VARCHAR(50)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2391--2391
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (23.36452pt too wide) in paragraph at lines 2393--2393
+[]|\OT1/cmr/m/n/12 VARCHAR(50)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2393--2393
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (23.36452pt too wide) in paragraph at lines 2395--2395
+[]|\OT1/cmr/m/n/12 VARCHAR(20)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2397--2397
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2399--2399
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (7.53691pt too wide) in paragraph at lines 2401--2401
+[]|\OT1/cmr/m/n/12 DATETIME| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2401--2401
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (7.53691pt too wide) in paragraph at lines 2403--2403
+[]|\OT1/cmr/m/n/12 DATETIME| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2403--2403
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2412--2412
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2414--2414
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2416--2416
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (7.488pt too wide) in paragraph at lines 2418--2418
+[]|\OT1/cmr/m/n/12 AvailabilitySlotID| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2418--2418
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (33.9294pt too wide) in paragraph at lines 2420--2420
+[]|\OT1/cmr/m/n/12 AppointmentDateTime| 
+ []
+
+
+Overfull \hbox (7.53691pt too wide) in paragraph at lines 2420--2420
+[]|\OT1/cmr/m/n/12 DATETIME| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2420--2420
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (23.36452pt too wide) in paragraph at lines 2422--2422
+[]|\OT1/cmr/m/n/12 VARCHAR(20)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2422--2422
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (11.63518pt too wide) in paragraph at lines 2424--2424
+[]|\OT1/cmr/m/n/12 AppointmentNotes| 
+ []
+
+
+Overfull \hbox (7.53691pt too wide) in paragraph at lines 2428--2428
+[]|\OT1/cmr/m/n/12 DATETIME| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2428--2428
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (7.53691pt too wide) in paragraph at lines 2430--2430
+[]|\OT1/cmr/m/n/12 DATETIME| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2430--2430
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+[58]
+Overfull \hbox (6.33942pt too wide) in paragraph at lines 2439--2439
+[]|\OT1/cmr/m/n/12 ARVTreatmentID| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2439--2439
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2441--2441
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2443--2443
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (29.23946pt too wide) in paragraph at lines 2445--2445
+[]|\OT1/cmr/m/n/12 VARCHAR(200)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2445--2445
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (29.23946pt too wide) in paragraph at lines 2447--2447
+[]|\OT1/cmr/m/n/12 VARCHAR(100)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2447--2447
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (23.36452pt too wide) in paragraph at lines 2449--2449
+[]|\OT1/cmr/m/n/12 VARCHAR(50)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2449--2449
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2451--2451
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (23.85619pt too wide) in paragraph at lines 2459--2459
+[]|\OT1/cmr/m/n/12 DECIMAL(5,2)| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2461--2461
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (7.53691pt too wide) in paragraph at lines 2463--2463
+[]|\OT1/cmr/m/n/12 DATETIME| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2463--2463
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+
+Overfull \hbox (7.53691pt too wide) in paragraph at lines 2465--2465
+[]|\OT1/cmr/m/n/12 DATETIME| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2465--2465
+[]|\OT1/cmr/m/n/12 NOT
+ []
+
+[59]
+
+[60]
+Overfull \hbox (22.9924pt too wide) in paragraph at lines 2479--2480
 []\OT1/cmr/bx/n/12 UC-016 (Man-age ARV Treat-ments) \OT1/cmr/m/n/12 in-cludes \
 OT1/cmr/bx/n/12 UC-015 (Ac-cess Pa-tient Records)
  []
 
 
-
-[21]
-Underfull \hbox (badness 10000) in paragraph at lines 972--972
+Underfull \hbox (badness 10000) in paragraph at lines 2509--2509
 []|\OT1/cmr/m/n/12 User Man-age-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 984--984
+Underfull \hbox (badness 7081) in paragraph at lines 2521--2521
+[]|\OT1/cmr/m/n/12 Dashboard Ac-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2527--2527
+[]|\OT1/cmr/m/n/12 Field Re-stric-
+ []
+
+
+Underfull \hbox (badness 2990) in paragraph at lines 2531--2531
+[]|\OT1/cmr/m/n/12 Password Se-cu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2533--2533
+[]|\OT1/cmr/m/n/12 Password His-
+ []
+
+
+Underfull \hbox (badness 6268) in paragraph at lines 2537--2537
+[]|\OT1/cmr/m/n/12 Role-based Ac-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2541--2541
 []|\OT1/cmr/m/n/12 Appointment
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 986--986
+Underfull \hbox (badness 10000) in paragraph at lines 2543--2543
 []|\OT1/cmr/m/n/12 Cancellation
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 988--988
+Underfull \hbox (badness 10000) in paragraph at lines 2545--2545
 []|\OT1/cmr/m/n/12 Appointment
  []
 
 
-Underfull \hbox (badness 1735) in paragraph at lines 990--990
-[]|\OT1/cmr/m/n/12 Medical Au-tho-
+Underfull \hbox (badness 1838) in paragraph at lines 2567--2567
+[]|\OT1/cmr/m/n/12 Medical Li-cens-
  []
 
 
-Underfull \hbox (badness 4303) in paragraph at lines 1004--1004
+Underfull \hbox (badness 10000) in paragraph at lines 2569--2569
+[]|\OT1/cmr/m/n/12 Appointment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2575--2575
+[]|\OT1/cmr/m/n/12 Slot Mod-i-fi-ca-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2577--2577
+[]|\OT1/cmr/m/n/12 Advance
+ []
+
+
+Underfull \hbox (badness 7796) in paragraph at lines 2583--2583
+[]|\OT1/cmr/m/n/12 Doctor As-sign-
+ []
+
+
+Underfull \hbox (badness 4303) in paragraph at lines 2585--2585
 []|\OT1/cmr/m/n/12 Emergency Ac-
  []
 
 
-Underfull \hbox (badness 1325) in paragraph at lines 1004--1005
-[]|\OT1/cmr/m/n/12 Emergency over-ride al-lows au-tho-rized med-i-cal
+Underfull \hbox (badness 10000) in paragraph at lines 2595--2595
+[]|\OT1/cmr/m/n/12 Communication
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1006--1006
+Underfull \hbox (badness 10000) in paragraph at lines 2599--2599
 []|\OT1/cmr/m/n/12 Notification
  []
 
-[22]
 
-[23]
+Underfull \hbox (badness 10000) in paragraph at lines 2601--2601
+[]|\OT1/cmr/m/n/12 Administrative
+ []
 
-[24] (./RDS_Document_HIV_Clinic_Filled.aux)
+
+Underfull \hbox (badness 5302) in paragraph at lines 2603--2603
+[]|\OT1/cmr/m/n/12 Alert Ac-knowl-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2605--2605
+[]|\OT1/cmr/m/n/12 User Man-age-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2607--2607
+[]|\OT1/cmr/m/n/12 Account Dele-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2609--2609
+[]|\OT1/cmr/m/n/12 Doctor Han-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2611--2611
+[]|\OT1/cmr/m/n/12 Appointment
+ []
+
+
+Underfull \hbox (badness 2088) in paragraph at lines 2613--2613
+[]|\OT1/cmr/m/n/12 Privacy Pro-tec-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2615--2615
+[]|\OT1/cmr/m/n/12 Administrative
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2617--2617
+[]|\OT1/cmr/m/n/12 Content Ac-cu-
+ []
+
+
+Underfull \hbox (badness 5288) in paragraph at lines 2619--2619
+[]|\OT1/cmr/m/n/12 Content Track-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2621--2621
+[]|\OT1/cmr/m/n/12 Content Ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2623--2623
+[]|\OT1/cmr/m/n/12 Management
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2625--2625
+[]|\OT1/cmr/m/n/12 Report
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2625--2625
+\OT1/cmr/m/n/12 Anonymiza-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2627--2627
+[]|\OT1/cmr/m/n/12 Financial An-a-
+ []
+
+
+Underfull \hbox (badness 4303) in paragraph at lines 2629--2629
+[]|\OT1/cmr/m/n/12 Record Change
+ []
+
+
+Underfull \hbox (badness 7256) in paragraph at lines 2631--2631
+[]|\OT1/cmr/m/n/12 Archive Re-ten-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2637--2637
+[]|\OT1/cmr/m/n/12 Deactivation
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2639--2639
+[]|\OT1/cmr/m/n/12 License Mon-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2641--2641
+[]|\OT1/cmr/m/n/12 Analytics Pri-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2645--2645
+[]|\OT1/cmr/m/n/12 Financial An-a-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2649--2649
+[]|\OT1/cmr/m/n/12 Export
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2649--2649
+\OT1/cmr/m/n/12 Anonymiza-
+ []
+
+
+Underfull \hbox (badness 1147) in paragraph at lines 2651--2651
+[]|\OT1/cmr/m/n/12 Export En-cryp-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2653--2653
+[]|\OT1/cmr/m/n/12 Statistical
+ []
+
+
+Underfull \hbox (badness 7759) in paragraph at lines 2653--2654
+[]|\OT1/cmr/m/n/12 All sta-tis-ti-cal data must main-tain pa-tient
+ []
+
+
+
+[61] [62] [63] [64]
+
+[65]
+
+Package longtable Warning: Table widths have changed. Rerun LaTeX.
+
+
+
+[66] (./RDS_Document_HIV_Clinic_Filled.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
-Package rerunfilecheck Info: File `RDS_Document_HIV_Clinic_Filled.out' has not 
-changed.
-(rerunfilecheck)             Checksum: 49459A34030FFDB7968256530A86F8D9;5294.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `RDS_Document_HIV_Clinic_Filled.out' has c
+hanged.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `RDS_Document_HIV_Clinic_Filled.out'
+:
+(rerunfilecheck)             Before: 49459A34030FFDB7968256530A86F8D9;5294
+(rerunfilecheck)             After:  26E460948D65C7095079A9FC08162B7E;13364.
  ) 
 Here is how much of TeX's memory you used:
- 15029 strings out of 475178
- 238130 string characters out of 5766539
- 860893 words of memory out of 5000000
- 37658 multiletter control sequences out of 15000+600000
+ 15186 strings out of 475178
+ 239005 string characters out of 5766539
+ 903298 words of memory out of 5000000
+ 37640 multiletter control sequences out of 15000+600000
  565373 words of font info for 57 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 75i,12n,79p,346b,1932s stack positions out of 10000i,1000n,20000p,200000b,200000s
- </home/ubuntu/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.60
-0pk> </home/ubuntu/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcti1200.
-600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/s
-hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on RDS_Document_HIV_Clinic_Filled.pdf (24 pages, 122542 bytes).
+ 75i,12n,79p,348b,1332s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+pdfTeX warning (dest): name{subsubsection.4.1.3} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.3.4.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.3.3.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.3.2.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.3.1.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.5} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.4} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.1.3.2} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.1.3.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.1.2.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsubsection.1.1.1} has been referenced but does n
+ot exist, replaced by a fixed one
+
+ </home/ubuntu/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcti1200.600p
+k> </home/ubuntu/.texlive2025/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.60
+0pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/sha
+re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on RDS_Document_HIV_Clinic_Filled.pdf (66 pages, 488305 bytes).
 PDF statistics:
- 500 PDF objects out of 1000 (max. 8388607)
- 458 compressed objects within 5 object streams
- 213 named destinations out of 1000 (max. 500000)
- 257 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 849 PDF objects out of 1000 (max. 8388607)
+ 762 compressed objects within 8 object streams
+ 388 named destinations out of 1000 (max. 500000)
+ 267 words of extra memory for PDF output out of 10000 (max. 10000000)
 
