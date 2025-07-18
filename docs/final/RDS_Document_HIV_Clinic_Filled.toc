@@ -3,42 +3,41 @@
 \contentsline {subsection}{\numberline {1.1}User Requirements}{4}{subsection.1.1}%
 \contentsline {subsubsection}{\numberline {1.1.1}Actors}{4}{subsubsection.1.1.1}%
 \contentsline {subsection}{\numberline {1.2}Actor Description}{4}{subsection.1.2}%
-\contentsline {subsubsection}{\numberline {1.2.1}Use Cases}{6}{subsubsection.1.2.1}%
-\contentsline {paragraph}{a. Diagram(s)}{7}{figure.caption.5}%
-\contentsline {paragraph}{b. Descriptions}{11}{section*.11}%
-\contentsline {subsection}{\numberline {1.3}Overall Functionalities}{17}{subsection.1.3}%
-\contentsline {subsubsection}{\numberline {1.3.1}Screens Flow}{17}{subsubsection.1.3.1}%
-\contentsline {subsubsection}{\numberline {1.3.2}Screen Descriptions}{19}{subsubsection.1.3.2}%
-\contentsline {subsubsection}{\numberline {1.3.3}Screen Authorization}{21}{subsubsection.1.3.3}%
-\contentsline {subsubsection}{\numberline {1.3.4}Non-UI Functions}{23}{subsubsection.1.3.4}%
-\contentsline {subsection}{\numberline {1.4}System High Level Design}{23}{subsection.1.4}%
-\contentsline {subsubsection}{\numberline {1.4.1}Database Design}{23}{subsubsection.1.4.1}%
-\contentsline {paragraph}{a. Database Schema}{23}{section*.15}%
-\contentsline {paragraph}{b. Table Descriptions}{24}{section*.17}%
-\contentsline {subsubsection}{\numberline {1.4.2}Code Packages}{25}{subsubsection.1.4.2}%
-\contentsline {subsubsection}{\numberline {1.4.3}Data Flow Architecture}{26}{subsubsection.1.4.3}%
-\contentsline {section}{\numberline {2}Requirement Specifications}{26}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Common functions}{26}{subsection.2.1}%
-\contentsline {subsubsection}{\numberline {2.1.1}UC-01 – Register Donor Account}{26}{subsubsection.2.1.1}%
-\contentsline {subsubsection}{\numberline {2.1.2}UC-02 – Log In}{28}{subsubsection.2.1.2}%
-\contentsline {subsubsection}{\numberline {2.1.3}UC-03 – View Hospital Information}{29}{subsubsection.2.1.3}%
-\contentsline {subsubsection}{\numberline {2.1.4}UC-04 – Read Blogs}{30}{subsubsection.2.1.4}%
-\contentsline {subsubsection}{\numberline {2.1.5}UC-05 – Manage Personal Profile}{31}{subsubsection.2.1.5}%
-\contentsline {section}{\numberline {3}Design Specifications}{32}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Authentication System}{32}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}User Login}{32}{subsubsection.3.1.1}%
-\contentsline {paragraph}{UI Design}{32}{section*.19}%
-\contentsline {paragraph}{Database Access}{32}{section*.20}%
-\contentsline {subsection}{\numberline {3.2}Appointment Management}{33}{subsection.3.2}%
-\contentsline {subsubsection}{\numberline {3.2.1}Appointment Booking}{33}{subsubsection.3.2.1}%
-\contentsline {paragraph}{UI Design}{33}{section*.22}%
-\contentsline {paragraph}{Database Access}{33}{section*.23}%
-\contentsline {subsection}{\numberline {3.3}Patient Care System}{34}{subsection.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.1}Patient Records Management}{34}{subsubsection.3.3.1}%
-\contentsline {paragraph}{UI Design}{34}{section*.25}%
-\contentsline {paragraph}{Database Access}{35}{section*.26}%
-\contentsline {section}{\numberline {4}Appendix}{36}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Assumptions \& Dependencies}{36}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Limitations \& Exclusions}{36}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Business Rules}{37}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Technical Specifications}{37}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {1.2.1}Use Cases}{4}{subsubsection.1.2.1}%
+\contentsline {paragraph}{a. Diagram(s)}{5}{figure.caption.5}%
+\contentsline {paragraph}{b. Use Case Descriptions}{5}{section*.6}%
+\contentsline {subsection}{\numberline {1.3}Overall Functionalities}{6}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}Screen Flow}{6}{subsubsection.1.3.1}%
+\contentsline {subsubsection}{\numberline {1.3.2}Screen Descriptions}{6}{subsubsection.1.3.2}%
+\contentsline {section}{\numberline {2}Use Case Specifications}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.1}UC-001 – Browse Public Website}{7}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}UC-002 – User Registration}{9}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}UC-003 – User Login}{10}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}UC-008 – Manage Appointments}{11}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}UC-016 – Manage ARV Treatments}{13}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Design Specifications}{15}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Authentication System}{15}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}User Login}{15}{subsubsection.3.1.1}%
+\contentsline {paragraph}{UI Design}{15}{section*.8}%
+\contentsline {paragraph}{Database Access}{16}{section*.9}%
+\contentsline {subsection}{\numberline {3.2}Appointment Management}{16}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Appointment Booking}{16}{subsubsection.3.2.1}%
+\contentsline {paragraph}{UI Design}{16}{section*.11}%
+\contentsline {paragraph}{Database Access}{17}{section*.12}%
+\contentsline {subsection}{\numberline {3.3}ARV Treatment Management}{18}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}ARV Treatment Prescription}{18}{subsubsection.3.3.1}%
+\contentsline {paragraph}{UI Design}{18}{section*.14}%
+\contentsline {paragraph}{Database Access}{19}{section*.15}%
+\contentsline {subsection}{\numberline {3.4}Patient Records Management}{19}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Patient Medical Records}{19}{subsubsection.3.4.1}%
+\contentsline {paragraph}{UI Design}{20}{section*.17}%
+\contentsline {paragraph}{Database Access}{20}{section*.18}%
+\contentsline {section}{\numberline {4}Appendix}{21}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Use Case Relationships}{21}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Include Relationships}{21}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Extend Relationships}{22}{subsubsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.3}Generalization Relationships}{22}{subsubsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.2}Business Rules}{22}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Assumptions \& Dependencies}{23}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Limitations \& Exclusions}{24}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Technical Specifications}{24}{subsection.4.5}%

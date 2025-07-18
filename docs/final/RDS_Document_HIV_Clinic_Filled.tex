@@ -13,11 +13,13 @@
 \usepackage{enumitem}
 \usepackage{caption}
 \usepackage{float} % for [H] placement
+% SVG package not available, using manual approach
 \geometry{margin=1in}
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{\thepage}
 \lhead{HIV Clinic RDS}
+\setlength{\headheight}{14.5pt}
 
 \title{\textbf{Requirement \& Design Specification\\HIV Clinic Appointment Booking System}}
 \author{Version: 2.0}
@@ -61,7 +63,7 @@ Add Requirement Speciality\\
 \hline
 V2.0 & Jan 2025 & M & Background Agent & 
 Updated to use definitive 27 use cases from evaluation \newline
-Aligned with HIV_Clinic_Use_Cases.md \newline
+Aligned with HIV\_Clinic\_Use\_Cases.md \newline
 Corrected use case specifications and design details\\
 \hline
 \end{tabular}
@@ -109,7 +111,12 @@ The HIV Clinic Appointment Booking System involves five main actors who interact
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{diagrams/use_case_diagram.svg}
+% Note: SVG file exists at diagrams/use_case_diagram.svg
+% For LaTeX compilation, a PDF version would be needed
+\fbox{\parbox{0.9\textwidth}{\centering\textbf{HIV Clinic Management System Use Case Diagram}\\[10pt]
+\textit{27 Use Cases (UC-001 through UC-027)}\\[5pt]
+\textit{Actors: Unauthenticated User, Authenticated User}\\[5pt]
+\textit{SVG Source: diagrams/use\_case\_diagram.svg}}}
 \caption{HIV Clinic Management System Use Case Diagram}
 \label{fig:use-case-diagram}
 \end{figure}
@@ -198,7 +205,11 @@ The HIV Clinic system provides role-based screen flows ensuring appropriate acce
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{diagrams/user_interface_flow.svg}
+    % Note: SVG file exists at diagrams/user_interface_flow.svg
+    \fbox{\parbox{0.9\textwidth}{\centering\textbf{Overall Screen Flow}\\[10pt]
+    \textit{Role-based interface navigation}\\[5pt]
+    \textit{Public → Authentication → Role-specific dashboards}\\[5pt]
+    \textit{SVG Source: diagrams/user\_interface\_flow.svg}}}
     \caption{Overall Screen Flow}
     \label{fig:screen-flow}
 \end{figure}
