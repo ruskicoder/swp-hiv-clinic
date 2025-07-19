@@ -7,7 +7,8 @@ import DashboardHeader from '../../components/layout/DashboardHeader';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './AdminDashboard.css';
 
-// --- CreateDoctorForm (Standalone Component) ---
+// --- SOLUTION: Define CreateDoctorForm as a standalone component ---
+// It receives all the data and functions it needs from its parent via props.
 const CreateDoctorForm = ({
   preservedFormData,
   setPreservedFormData,
@@ -18,7 +19,7 @@ const CreateDoctorForm = ({
   setActiveTab
 }) => {
   console.log('🔍 DEBUG: CreateDoctorForm component rendering');
-
+  
   const [formData, setFormData] = useState(() => ({
     username: preservedFormData.username || '',
     email: preservedFormData.email || '',
@@ -36,12 +37,13 @@ const CreateDoctorForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('🔍 DEBUG: Form submission started with data:', formData);
-
+    
     setFormLoading(true);
     setFormError('');
     setFormSuccess('');
 
     try {
+      // Validation
       if (!formData.username || !formData.email || !formData.password ||
           !formData.firstName || !formData.lastName || !formData.specialtyId) {
         setFormError('Please fill in all required fields, including specialty.');
@@ -49,6 +51,7 @@ const CreateDoctorForm = ({
         return;
       }
 
+      // Prepare form data for x-www-form-urlencoded
       const formDataToSend = new URLSearchParams();
       formDataToSend.append('username', formData.username);
       formDataToSend.append('email', formData.email);
@@ -67,11 +70,13 @@ const CreateDoctorForm = ({
 
       if (response.data && (response.data.success || response.data.isSuccess)) {
         setFormSuccess('Doctor created successfully!');
-
+        
+        // Reset form
         const resetData = { username: '', email: '', password: '', firstName: '', lastName: '', phoneNumber: '', specialtyId: '', bio: '' };
         setFormData(resetData);
         setPreservedFormData(resetData);
-
+        
+        // Use props to trigger parent actions
         loadDashboardData();
         setTimeout(() => {
           setActiveTab('doctors');
@@ -95,6 +100,7 @@ const CreateDoctorForm = ({
       [name]: value
     };
     setFormData(updatedData);
+    // Use prop to update parent state
     setPreservedFormData(updatedData);
   };
 
@@ -175,137 +181,6 @@ const CreateDoctorForm = ({
   );
 };
 
-// --- NEW: Define CreateManagerForm as a new standalone component ---
-const CreateManagerForm = ({
-  preservedFormData,
-  setPreservedFormData,
-  loadDashboardData,
-  setActiveTab
-}) => {
-  console.log('🔍 DEBUG: CreateManagerForm component rendering');
-
-  const [formData, setFormData] = useState(() => ({
-    username: preservedFormData.username || '',
-    email: preservedFormData.email || '',
-    password: preservedFormData.password || '',
-    firstName: preservedFormData.firstName || '',
-    lastName: preservedFormData.lastName || '',
-  }));
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [formSuccess, setFormSuccess] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('🔍 DEBUG: Manager form submission started with data:', formData);
-
-    setFormLoading(true);
-    setFormError('');
-    setFormSuccess('');
-
-    try {
-      if (!formData.username || !formData.email || !formData.password ||
-          !formData.firstName || !formData.lastName) {
-        setFormError('Please fill in all required fields.');
-        setFormLoading(false);
-        return;
-      }
-
-      const formDataToSend = new URLSearchParams();
-      formDataToSend.append('username', formData.username);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('password', formData.password);
-      formDataToSend.append('firstName', formData.firstName);
-      formDataToSend.append('lastName', formData.lastName);
-
-      // --- CHANGE: Use the correct API endpoint for creating managers ---
-      const response = await apiClient.post('/admin/managers', formDataToSend, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
-
-      if (response.data && (response.data.success || response.data.isSuccess)) {
-        setFormSuccess('Manager created successfully!');
-
-        const resetData = { username: '', email: '', password: '', firstName: '', lastName: '' };
-        setFormData(resetData);
-        setPreservedFormData(resetData);
-
-        loadDashboardData();
-        setTimeout(() => {
-          setActiveTab('users'); // Redirect to the users tab to see the new manager
-        }, 1500);
-      } else {
-        const errorMsg = response.data?.message || response.data?.msg || 'Failed to create manager';
-        setFormError(errorMsg);
-      }
-    } catch (error) {
-      const errorMsg = error?.response?.data?.message || error?.response?.data?.msg || error?.response?.data?.error || error?.message || 'An unexpected error occurred.';
-      setFormError(errorMsg);
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const updatedData = {
-      ...formData,
-      [name]: value
-    };
-    setFormData(updatedData);
-    setPreservedFormData(updatedData);
-  };
-
-  return (
-    <ErrorBoundary>
-      <div className="create-manager-section">
-        <div className="content-header">
-          <h2>Create Manager Account</h2>
-          <p>Add a new manager to the system</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="create-manager-form">
-          {formError && <div className="error-message">{formError}</div>}
-          {formSuccess && <div className="success-message">{formSuccess}</div>}
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <input type="text" id="username" name="username" value={formData.username} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="firstName">First Name</label>
-              <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label htmlFor="lastName">Last Name</label>
-              <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required />
-            </div>
-          </div>
-
-          <button type="submit" className="submit-btn" disabled={formLoading}>
-            {formLoading ? 'Creating...' : 'Create Manager'}
-          </button>
-        </form>
-      </div>
-    </ErrorBoundary>
-  );
-};
-
 
 const AdminDashboard = () => {
   const { logout } = useAuth();
@@ -314,23 +189,30 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Data states
   const [users, setUsers] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [specialties, setSpecialties] = useState([]);
 
+  // Loading states
   const [specialtiesLoading, setSpecialtiesLoading] = useState(true);
 
+  // Error states
   const [usersError, setUsersError] = useState('');
   const [appointmentsError, setAppointmentsError] = useState('');
   const [specialtiesError, setSpecialtiesError] = useState('');
 
+  // Tab transition state
   const [isTabChanging, setIsTabChanging] = useState(false);
 
+  // Form state preservation
   const [preservedFormData, setPreservedFormData] = useState({});
 
   const loadDashboardData = useCallback(async () => {
+    // Only set main loading on initial load, not for re-fetches
+    // setLoading(true); 
     setError('');
     setUsersError('');
     setAppointmentsError('');
@@ -339,7 +221,7 @@ const AdminDashboard = () => {
 
     try {
       console.log('Loading admin dashboard data...');
-
+      
       const [usersResult, patientsResult, doctorsResult, appointmentsResult, specialtiesResult] = await Promise.allSettled([
         apiClient.get('/admin/users'),
         apiClient.get('/admin/patients'),
@@ -408,15 +290,13 @@ const AdminDashboard = () => {
       setError('Failed to reset password');
     }
   };
-  
-  // --- CHANGE: Add 'Create Manager' to the navigation ---
+
   const navigationItems = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'users', label: 'Manage Users', icon: '👥' },
     { id: 'doctors', label: 'Manage Doctors', icon: '👨‍⚕️' },
     { id: 'appointments', label: 'All Appointments', icon: '📅' },
-    { id: 'create-doctor', label: 'Create Doctor', icon: '➕' },
-    { id: 'create-manager', label: 'Create Manager', icon: '➕' }
+    { id: 'create-doctor', label: 'Create Doctor', icon: '➕' }
   ];
 
   const renderOverview = () => (
@@ -541,11 +421,6 @@ const AdminDashboard = () => {
               className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
               onClick={() => {
                 setIsTabChanging(true);
-                // Clear preserved form data when switching to a different form type
-                if ((item.id === 'create-doctor' && activeTab !== 'create-doctor') || 
-                    (item.id === 'create-manager' && activeTab !== 'create-manager')) {
-                  setPreservedFormData({});
-                }
                 setActiveTab(item.id);
                 setTimeout(() => setIsTabChanging(false), 300);
               }}
@@ -564,21 +439,13 @@ const AdminDashboard = () => {
               {activeTab === 'doctors' && renderDoctors()}
               {activeTab === 'appointments' && renderAppointments()}
               {activeTab === 'create-doctor' && (
+                // --- SOLUTION: Render the standalone component and pass props ---
                 <CreateDoctorForm 
                   preservedFormData={preservedFormData}
                   setPreservedFormData={setPreservedFormData}
                   specialties={specialties}
                   specialtiesLoading={specialtiesLoading}
                   specialtiesError={specialtiesError}
-                  loadDashboardData={loadDashboardData}
-                  setActiveTab={setActiveTab}
-                />
-              )}
-              {/* --- CHANGE: Render the CreateManagerForm when the tab is active --- */}
-              {activeTab === 'create-manager' && (
-                <CreateManagerForm
-                  preservedFormData={preservedFormData}
-                  setPreservedFormData={setPreservedFormData}
                   loadDashboardData={loadDashboardData}
                   setActiveTab={setActiveTab}
                 />
