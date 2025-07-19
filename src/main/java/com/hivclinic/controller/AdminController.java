@@ -1,6 +1,7 @@
 package com.hivclinic.controller;
 
 import com.hivclinic.config.CustomUserDetailsService;
+import com.hivclinic.dto.request.CreateManagerRequest; // <-- THÊM DÒNG IMPORT NÀY
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.model.Appointment;
 import com.hivclinic.model.Specialty;
@@ -27,6 +28,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    // --- CÁC PHƯƠNG THỨC KHÁC GIỮ NGUYÊN ---
+    // (healthCheck, getAllUsers, getAllDoctors, v.v...)
 
     @GetMapping("/health")
     public ResponseEntity<?> healthCheck() {
@@ -96,12 +100,20 @@ public class AdminController {
         }
     }
 
+
+    // ----- THAY ĐỔI QUAN TRỌNG Ở ĐÂY -----
+    // Thay thế nhiều @RequestParam bằng một @RequestBody duy nhất.
     @PostMapping("/managers")
-    public ResponseEntity<?> createManagerAccount(
-            @RequestParam String username, @RequestParam String email, @RequestParam String password,
-            @RequestParam String firstName, @RequestParam String lastName) {
+    public ResponseEntity<?> createManagerAccount(@RequestBody CreateManagerRequest request) {
         try {
-            MessageResponse response = adminService.createManagerAccount(username, email, password, firstName, lastName);
+            // Gọi service với dữ liệu lấy từ object 'request'
+            MessageResponse response = adminService.createManagerAccount(
+                    request.getUsername(),
+                    request.getEmail(),
+                    request.getPassword(),
+                    request.getFirstName(),
+                    request.getLastName()
+            );
             return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
