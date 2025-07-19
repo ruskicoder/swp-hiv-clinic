@@ -17,10 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * REST Controller for admin operations
- * Handles user management, appointment oversight, and system administration
- */
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -32,221 +28,137 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    /**
-     * Health check endpoint
-     */
     @GetMapping("/health")
     public ResponseEntity<?> healthCheck() {
         return ResponseEntity.ok(MessageResponse.success("Admin service is running"));
     }
 
-    /**
-     * Get all users
-     */
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
         try {
-            logger.debug("Admin fetching all users");
             List<User> users = adminService.getAllUsers();
-            logger.info("Retrieved {} users", users.size());
             return ResponseEntity.ok(users);
         } catch (Exception e) {
-            logger.error("Error getting all users: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to get users: " + e.getMessage()));
         }
     }
 
-    /**
-     * Get all patients
-     */
     @GetMapping("/patients")
     public ResponseEntity<?> getAllPatients() {
         try {
-            logger.debug("Admin fetching all patients");
             List<User> patients = adminService.getAllPatients();
-            logger.info("Retrieved {} patients", patients.size());
             return ResponseEntity.ok(patients);
         } catch (Exception e) {
-            logger.error("Error getting all patients: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to get patients: " + e.getMessage()));
         }
     }
 
-    /**
-     * Get all doctors
-     */
     @GetMapping("/doctors")
     public ResponseEntity<?> getAllDoctors() {
         try {
-            logger.debug("Admin fetching all doctors");
             List<User> doctors = adminService.getAllDoctors();
-            logger.info("Retrieved {} doctors", doctors.size());
             return ResponseEntity.ok(doctors);
         } catch (Exception e) {
-            logger.error("Error getting all doctors: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to get doctors: " + e.getMessage()));
         }
     }
+    
+    @GetMapping("/managers")
+    public ResponseEntity<?> getAllManagers() {
+        try {
+            logger.debug("Admin fetching all managers");
+            List<User> managers = adminService.getAllManagers();
+            logger.info("Retrieved {} managers", managers.size());
+            return ResponseEntity.ok(managers);
+        } catch (Exception e) {
+            logger.error("Error getting all managers: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to get managers: " + e.getMessage()));
+        }
+    }
 
-    /**
-     * Create doctor account with improved parameter validation
-     */
     @PostMapping("/doctors")
     public ResponseEntity<?> createDoctor(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String firstName,
-            @RequestParam String lastName,
+            @RequestParam String username, @RequestParam String email, @RequestParam String password,
+            @RequestParam String firstName, @RequestParam String lastName,
             @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) String specialtyId,
-            @RequestParam(required = false) String bio,
-            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+            @RequestParam Integer specialtyId,
+            @RequestParam(required = false) String bio) {
         try {
-            logger.info("Admin {} creating doctor account: {}", userPrincipal.getUsername(), username);
-            
-            // Validate and parse specialtyId
-            Integer parsedSpecialtyId = null;
-            if (specialtyId != null && !specialtyId.trim().isEmpty() && !"NaN".equals(specialtyId) && !"null".equals(specialtyId)) {
-                try {
-                    parsedSpecialtyId = Integer.parseInt(specialtyId.trim());
-                    logger.debug("Parsed specialtyId: {}", parsedSpecialtyId);
-                } catch (NumberFormatException e) {
-                    logger.warn("Invalid specialtyId format: '{}', treating as null", specialtyId);
-                    return ResponseEntity.badRequest()
-                            .body(MessageResponse.error("Invalid specialty ID format. Please select a valid specialty."));
-                }
-            }
-            
-            MessageResponse response = adminService.createDoctorAccount(
-                    username, email, password, firstName, lastName, phoneNumber, parsedSpecialtyId, bio);
-            
-            if (response.isSuccess()) {
-                logger.info("Doctor account created successfully: {}", username);
-                return ResponseEntity.ok(response);
-            } else {
-                logger.warn("Failed to create doctor account: {}", response.getMessage());
-                return ResponseEntity.badRequest().body(response);
-            }
+            MessageResponse response = adminService.createDoctorAccount(username, email, password, firstName, lastName, phoneNumber, specialtyId, bio);
+            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            logger.error("Error creating doctor account: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to create doctor account: " + e.getMessage()));
         }
     }
 
-    /**
-     * Toggle user active status
-     */
-    @PutMapping("/users/{userId}/toggle-status")
-    public ResponseEntity<?> toggleUserStatus(
-            @PathVariable Integer userId,
-            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+    @PostMapping("/managers")
+    public ResponseEntity<?> createManagerAccount(
+            @RequestParam String username, @RequestParam String email, @RequestParam String password,
+            @RequestParam String firstName, @RequestParam String lastName) {
         try {
-            logger.info("Admin {} toggling status for user ID: {}", userPrincipal.getUsername(), userId);
-            
-            MessageResponse response = adminService.toggleUserStatus(userId);
-            
-            if (response.isSuccess()) {
-                logger.info("User status toggled successfully for user ID: {}", userId);
-                return ResponseEntity.ok(response);
-            } else {
-                logger.warn("Failed to toggle user status: {}", response.getMessage());
-                return ResponseEntity.badRequest().body(response);
-            }
+            MessageResponse response = adminService.createManagerAccount(username, email, password, firstName, lastName);
+            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            logger.error("Error toggling user status: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to create manager account: " + e.getMessage()));
+        }
+    }
+    
+    @PutMapping("/users/{userId}/toggle-status")
+    public ResponseEntity<?> toggleUserStatus(@PathVariable Integer userId) {
+        try {
+            MessageResponse response = adminService.toggleUserStatus(userId);
+            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to toggle user status: " + e.getMessage()));
         }
     }
 
-    /**
-     * Reset user password
-     */
     @PutMapping("/users/{userId}/reset-password")
-    public ResponseEntity<?> resetUserPassword(
-            @PathVariable Integer userId,
-            @RequestParam String newPassword,
-            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+    public ResponseEntity<?> resetUserPassword(@PathVariable Integer userId, @RequestParam String newPassword) {
         try {
-            logger.info("Admin {} resetting password for user ID: {}", userPrincipal.getUsername(), userId);
-            
             MessageResponse response = adminService.resetUserPassword(userId, newPassword);
-            
-            if (response.isSuccess()) {
-                logger.info("Password reset successfully for user ID: {}", userId);
-                return ResponseEntity.ok(response);
-            } else {
-                logger.warn("Failed to reset password: {}", response.getMessage());
-                return ResponseEntity.badRequest().body(response);
-            }
+            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            logger.error("Error resetting password: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to reset password: " + e.getMessage()));
         }
     }
 
-    /**
-     * Get all appointments (admin oversight)
-     */
     @GetMapping("/appointments")
     public ResponseEntity<?> getAllAppointments() {
         try {
-            logger.debug("Admin fetching all appointments");
             List<Appointment> appointments = adminService.getAllAppointments();
-            logger.info("Retrieved {} appointments", appointments.size());
             return ResponseEntity.ok(appointments);
         } catch (Exception e) {
-            logger.error("Error getting all appointments: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to get appointments: " + e.getMessage()));
         }
     }
 
-    /**
-     * Get all specialties
-     */
     @GetMapping("/specialties")
     public ResponseEntity<?> getAllSpecialties() {
         try {
-            logger.debug("Admin fetching all specialties");
             List<Specialty> specialties = adminService.getAllSpecialties();
-            logger.info("Retrieved {} specialties", specialties.size());
             return ResponseEntity.ok(specialties);
         } catch (Exception e) {
-            logger.error("Error getting all specialties: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to get specialties: " + e.getMessage()));
         }
     }
 
-    /**
-     * Create specialty
-     */
     @PostMapping("/specialties")
-    public ResponseEntity<?> createSpecialty(
-            @RequestParam String specialtyName,
-            @RequestParam(required = false) String description,
-            @AuthenticationPrincipal CustomUserDetailsService.UserPrincipal userPrincipal) {
+    public ResponseEntity<?> createSpecialty(@RequestParam String specialtyName, @RequestParam(required = false) String description) {
         try {
-            logger.info("Admin {} creating specialty: {}", userPrincipal.getUsername(), specialtyName);
-            
             MessageResponse response = adminService.createSpecialty(specialtyName, description);
-            
-            if (response.isSuccess()) {
-                logger.info("Specialty created successfully: {}", specialtyName);
-                return ResponseEntity.ok(response);
-            } else {
-                logger.warn("Failed to create specialty: {}", response.getMessage());
-                return ResponseEntity.badRequest().body(response);
-            }
+            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            logger.error("Error creating specialty: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to create specialty: " + e.getMessage()));
         }
