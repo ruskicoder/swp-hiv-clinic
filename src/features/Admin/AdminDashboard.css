@@ -647,10 +647,27 @@
     flex-wrap: wrap;
   }
   
-  .sidebar-option {
-    flex: 1;
-    min-width: 200px;
-  }
+ .sidebar-option {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #64748b;
+  position: relative;
+  overflow: hidden;
+  font-size: 1rem;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  /* --- ADD THIS LINE --- */
+  justify-content: space-between; 
+}
   
   .dashboard-main {
     width: 100%;
