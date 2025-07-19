@@ -8061,6 +8061,291 @@ export default Navbar;
 }
 ```
 
+## File: services/apiClient.js
+```js
+import axios from 'axios';
+
+/**
+ * API client configuration with interceptors
+ */
+const apiClient = axios.create({
+  baseURL: 'http://localhost:8080/api',
+  timeout: 0, // Remove timeout restriction
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor to handle common errors
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      // Unauthorized - clear token and redirect to login
+      sessionStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default apiClient;
+```
+
+## File: services/authService.js
+```js
+import apiClient from './apiClient';
+
+/**
+ * Authentication service for handling user login, registration, and profile management
+ */
+const authService = {
+  /**
+   * Login user with credentials
+   */
+  async login(credentials) {
+    try {
+      const response = await apiClient.post('/auth/login', credentials);
+      if (response.data) {
+        // Store token in sessionStorage instead of localStorage
+        sessionStorage.setItem('token', response.data.token);
+        return {
+          success: true,
+          token: response.data.token,
+          id: response.data.id,
+          username: response.data.username,
+          email: response.data.email,
+          role: response.data.role
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Login failed - Invalid response'
+        };
+      }
+    } catch (error) {
+      console.error('Login service error:', error);
+      // Return error message from server or fallback message
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Login failed. Please check your credentials.'
+      };
+    }
+  },
+
+  /**
+   * Register new user
+   */
+  async register(userData) {
+    try {
+      const response = await apiClient.post('/auth/register', userData);
+      return {
+        success: true,
+        message: response.data.message || 'Registration successful'
+      };
+    } catch (error) {
+      console.error('Registration service error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Registration failed'
+      };
+    }
+  },
+
+  /**
+   * Get current user profile with better error handling
+   */
+  async getUserProfile() {
+    try {
+      const response = await apiClient.get('/auth/me');
+      
+      // Transform the response to ensure consistent data structure
+      return {
+        ...response.data,
+        firstName: response.data.firstName || '',
+        lastName: response.data.lastName || '',
+        phoneNumber: response.data.phoneNumber || '',
+        gender: response.data.gender || '',
+        dateOfBirth: response.data.dateOfBirth || '',
+        address: response.data.address || '',
+        profileImageBase64: response.data.profileImageBase64 || '',
+        role: response.data.role || 'Patient' // Default to Patient if not specified
+      };
+    } catch (error) {
+      console.error('Get profile error:', error);
+      throw new Error('Failed to load user profile');
+    }
+  },
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(profileData) {
+    try {
+      const response = await apiClient.put('/auth/profile', profileData);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Update profile error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Profile update failed'
+      };
+    }
+  },
+
+  /**
+   * Update profile image
+   */
+  async updateProfileImage(imageData) {
+    try {
+      const response = await apiClient.post('/auth/profile-image', {
+        imageData: imageData
+      });
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Update profile image error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Profile image update failed'
+      };
+    }
+  },
+
+  /**
+   * Check username availability
+   */
+  async checkUsername(username) {
+    try {
+      const response = await apiClient.get(`/auth/check-username?username=${username}`);
+      return response.data;
+    } catch (error) {
+      console.error('Check username error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to check username'
+      };
+    }
+  },
+
+  /**
+   * Check email availability
+   */
+  async checkEmail(email) {
+    try {
+      const response = await apiClient.get(`/auth/check-email?email=${email}`);
+      return response.data;
+    } catch (error) {
+      console.error('Check email error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to check email'
+      };
+    }
+  },
+
+  /**
+   * Check session status and remaining time
+   */
+  async checkSessionStatus() {
+    try {
+      const response = await apiClient.get('/auth/session/status');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Check session status error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to check session status'
+      };
+    }
+  },
+
+  /**
+   * Extend/refresh current session
+   */
+  async extendSession() {
+    try {
+      const response = await apiClient.post('/auth/session/extend');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Extend session error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to extend session'
+      };
+    }
+  },
+
+  /**
+   * Change user password
+   */
+  async changePassword(passwordData) {
+    try {
+      const response = await apiClient.put('/auth/change-password', passwordData);
+      return {
+        success: true,
+        message: response.data.message || 'Password changed successfully'
+      };
+    } catch (error) {
+      console.error('Change password error:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to change password'
+      };
+    }
+  },
+
+  /**
+   * Logout user (server-side session invalidation + client-side cleanup)
+   */
+  async logout() {
+    try {
+      // Invalidate session on server
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      console.error('Server logout error:', error);
+      // Continue with client-side cleanup even if server call fails
+    }
+    
+    try {
+      // Update to use sessionStorage
+      sessionStorage.removeItem('token');
+    } catch (error) {
+      console.error('Client logout error:', error);
+    }
+  }
+};
+
+// Export as both named and default export for compatibility
+export { authService };
+export default authService;
+```
+
 ## File: features/Website/Home.css
 ```css
 .home-container {
@@ -8265,5 +8550,80 @@ export default Navbar;
   }
 }
 ```
+
+---
+
+# FRONTEND SOURCE CODE AUDIT REPORT
+
+## MISSING FILES ANALYSIS
+
+**CRITICAL ISSUE IDENTIFIED**: This frontend-all-files.txt is **INCOMPLETE** and missing **44 critical frontend source files**.
+
+### Current Status:
+- **Total Frontend Files in Codebase:** 87 files
+- **Files Included in TXT:** 45 files  
+- **Missing Files:** 42 files
+- **Completion Percentage:** 51.7%
+
+### Missing Files by Category:
+
+**🚨 CRITICAL DASHBOARD COMPONENTS (8 files):**
+- features/Admin/AdminDashboard.css
+- features/Admin/AdminDashboard.jsx  
+- features/Customer/CustomerDashboard.css
+- features/Customer/CustomerDashboard.jsx
+- features/Doctor/DoctorDashboard.css
+- features/Doctor/DoctorDashboard.jsx
+- features/Manager/ManagerDashboard.css
+- features/Manager/ManagerDashboard.jsx
+
+**🚨 LAYOUT COMPONENTS (2 files):**
+- components/layout/UserProfileDropdown.css
+- components/layout/UserProfileDropdown.jsx
+
+**📱 NOTIFICATION COMPONENTS (12 files):**
+- components/notifications/NotificationHistoryTable.css
+- components/notifications/NotificationHistoryTable.jsx
+- components/notifications/NotificationIcon.css
+- components/notifications/NotificationItem.css
+- components/notifications/NotificationItem.jsx
+- components/notifications/NotificationSendModal.css
+- components/notifications/NotificationSendModal.jsx
+- components/notifications/NotificationTemplateSelector.css
+- components/notifications/NotificationTemplateSelector.jsx
+- components/notifications/PatientSelector.css
+- components/notifications/PatientSelector.jsx
+
+**📅 SCHEDULE COMPONENTS (12 files):**
+- components/schedule/AvailabilityCalendar.css
+- components/schedule/AvailabilityCalendar.jsx
+- components/schedule/SlotActionModal.css
+- components/schedule/SlotActionModal.jsx
+- components/schedule/SlotManagementModal.css
+- components/schedule/SlotManagementModal.jsx
+- components/schedule/TimeSlotModal.css
+- components/schedule/TimeSlotModal.jsx
+- components/schedule/UnifiedCalendar.css
+- components/schedule/UnifiedCalendar.jsx
+- components/schedule/WeeklySchedule.css
+- components/schedule/WeeklySchedule.jsx
+
+**🎨 UI COMPONENTS (3 files):**
+- components/ui/ProfileLoadingModal.css
+- components/ui/ProfileLoadingModal.jsx
+- components/ui/SessionTimeoutModal.css
+
+**👥 MANAGER COMPONENTS (6 files):**
+- features/Manager/DoctorDetail.css
+- features/Manager/DoctorDetail.jsx
+- features/Manager/PatientDetail.css
+- features/Manager/PatientDetail.jsx
+
+**⚙️ SETTINGS COMPONENTS (2 files):**
+- features/Settings/Settings.css
+- features/Settings/Settings.jsx
+
+### RECOMMENDATION:
+This documentation is **SEVERELY INCOMPLETE** and requires immediate updating to include all 42 missing frontend source files to be considered a complete representation of the frontend codebase.
 
 ---
