@@ -12,7 +12,7 @@ const authService = {
       const response = await apiClient.post('/auth/login', credentials);
       if (response.data) {
         // Store token in sessionStorage instead of localStorage
-        sessionStorage.setItem('token', response.data.token);
+        localStorage.setItem('token', response.data.token);
         return {
           success: true,
           token: response.data.token,
@@ -223,8 +223,8 @@ const authService = {
     }
     
     try {
-      // Update to use sessionStorage
-      sessionStorage.removeItem('token');
+      // Update to use localStorage
+      localStorage.removeItem('token');
     } catch (error) {
       console.error('Client logout error:', error);
     }
