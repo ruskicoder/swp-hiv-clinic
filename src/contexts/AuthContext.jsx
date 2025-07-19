@@ -3,6 +3,7 @@ import authService from '../services/authService';
 import notificationService from '../services/notificationService';
 import useSessionMonitor from './useSessionMonitor';
 import SessionTimeoutModal from '../components/ui/SessionTimeoutModal';
+import ProfileLoadingModal from '../components/ui/ProfileLoadingModal';
 
 /**
  * Authentication Context for managing user authentication state
@@ -14,6 +15,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showProfileLoadingModal, setShowProfileLoadingModal] = useState(false);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   // Check token and load user profile on mount
   useEffect(() => {
@@ -43,6 +46,22 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  // Show profile loading modal after first login
+  useEffect(() => {
+    if (isFirstLogin && user && !showProfileLoadingModal) {
+      // Always show modal on first login to ensure page reload for optimal experience
+      setShowProfileLoadingModal(true);
+      setIsFirstLogin(false);
+    }
+  }, [isFirstLogin, user, showProfileLoadingModal]);
+
+  /**
+   * Handle profile loading modal close
+   */
+  const handleProfileModalClose = () => {
+    setShowProfileLoadingModal(false);
+  };
+
   /**
    * Enhanced logout function that handles both server and client cleanup
    */
@@ -57,12 +76,16 @@ export const AuthProvider = ({ children }) => {
       // Client-side cleanup
       setUser(null);
       setError(null);
+      setShowProfileLoadingModal(false);
+      setIsFirstLogin(false);
     } catch (error) {
       console.error('Logout error:', error);
       // Still perform client-side cleanup even if server call fails
       notificationService.resetPollingState();
       setUser(null);
       setError(null);
+      setShowProfileLoadingModal(false);
+      setIsFirstLogin(false);
     }
   }, []);
 
@@ -131,6 +154,9 @@ export const AuthProvider = ({ children }) => {
           console.error('Failed to initialize notifications:', notificationError);
           // Don't fail login if notification initialization fails
         }
+        
+        // Always set first login flag to show modal for page reload
+        setIsFirstLogin(true);
         
         return { success: true };
       } else {
@@ -227,6 +253,12 @@ export const AuthProvider = ({ children }) => {
         remainingSeconds={sessionStatus.remainingSeconds}
         onExtendSession={handleExtendSession}
         onLogout={logout}
+      />
+      
+      {/* Profile Loading Modal */}
+      <ProfileLoadingModal
+        isOpen={showProfileLoadingModal}
+        onClose={handleProfileModalClose}
       />
     </AuthContext.Provider>
   );

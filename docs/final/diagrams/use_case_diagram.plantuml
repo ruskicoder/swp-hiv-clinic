@@ -25,73 +25,68 @@ actor "Doctor" as Doctor
 actor "Admin" as Admin
 actor "Manager" as Manager
 
+' Actor inheritance - authenticated users inherit from unauthenticated users
+Patient --|> Guest
+Doctor --|> Guest
+Admin --|> Guest
+Manager --|> Guest
+
 package "HIV Clinic Management System" {
 
-    package "Authentication & Profile Management" {
-        usecase "UC_001: User Registration" as UC_001
-        usecase "UC_002: User Login" as UC_002
-        usecase "UC_003: Update Profile" as UC_003
-        usecase "UC_004: Change Password" as UC_004
-        usecase "UC_005: Logout" as UC_005
+    package "Public Access" {
+        usecase "UC-001: Browse Public Website" as UC_001
+        usecase "UC-002: User Registration" as UC_002
+        usecase "UC-003: User Login" as UC_003
+    }
+
+    package "Common Authenticated Features" {
+        usecase "UC-004: User Logout" as UC_004
+        usecase "UC-005: Update Profile" as UC_005
+        usecase "UC-006: Change Password" as UC_006
     }
 
     package "Patient Services" {
-        usecase "UC_006: View Dashboard" as UC_006
-        usecase "UC_007: Book Appointment" as UC_007
-        usecase "UC_008: View Appointments" as UC_008
-        usecase "UC_009: Cancel Appointment" as UC_009
-        usecase "UC_010: View Patient Records" as UC_010
-        usecase "UC_011: Update Patient Records" as UC_011
-        usecase "UC_012: View ARV Treatments" as UC_012
+        usecase "UC-007: View Patient Dashboard" as UC_007
+        usecase "UC-008: Manage Appointments" as UC_008
+        usecase "UC-009: Manage Personal Medical Records" as UC_009
+        usecase "UC-010: View ARV Treatments" as UC_010
+        usecase "UC-011: View Notifications" as UC_011
     }
 
     package "Doctor Services" {
-        usecase "UC_013: View Doctor Dashboard" as UC_013
-        usecase "UC_014: Manage Appointments" as UC_014
-        usecase "UC_015: Update Appointment Status" as UC_015
-        usecase "UC_016: Manage Availability Slots" as UC_016
-        usecase "UC_017: Access Patient Records" as UC_017
-        usecase "UC_018: Manage ARV Treatments" as UC_018
-        usecase "UC_019: Send Notifications" as UC_019
-        usecase "UC_020: View Notification History" as UC_020
-        usecase "UC_021: Manage Notification Templates" as UC_021
+        usecase "UC-012: View Doctor Dashboard" as UC_012
+        usecase "UC-013: Manage Appointments" as UC_013
+        usecase "UC-014: Manage Availability Slots" as UC_014
+        usecase "UC-015: Access Patient Records" as UC_015
+        usecase "UC-016: Manage ARV Treatments" as UC_016
+        usecase "UC-017: Manage Patient Notifications" as UC_017
     }
 
     package "Admin Services" {
-        usecase "UC_022: View Admin Dashboard" as UC_022
-        usecase "UC_023: Manage Users" as UC_023
-        usecase "UC_024: Manage Patients" as UC_024
-        usecase "UC_025: Manage Doctors" as UC_025
-        usecase "UC_026: Create Doctor Accounts" as UC_026
-        usecase "UC_027: Toggle User Status" as UC_027
-        usecase "UC_028: Reset User Passwords" as UC_028
-        usecase "UC_029: Manage Specialties" as UC_029
-        usecase "UC_030: View All Appointments" as UC_030
+        usecase "UC-018: View Admin Dashboard" as UC_018
+        usecase "UC-019: Manage Users" as UC_019
+        usecase "UC-020: View All Appointments" as UC_020
     }
 
     package "Manager Services" {
-        usecase "UC_031: View Manager Dashboard" as UC_031
-        usecase "UC_032: View Statistics" as UC_032
-        usecase "UC_033: Manage Patient Records" as UC_033
-        usecase "UC_034: Manage Doctor Records" as UC_034
-        usecase "UC_035: Manage ARV Treatments" as UC_035
-        usecase "UC_036: Manage Schedules" as UC_036
-        usecase "UC_037: Search Patients" as UC_037
-        usecase "UC_038: Search Doctors" as UC_038
-        usecase "UC_039: Export Data (CSV)" as UC_039
-        usecase "UC_040: View Patient Details" as UC_040
-        usecase "UC_041: View Doctor Details" as UC_041
+        usecase "UC-021: View Manager Dashboard" as UC_021
+        usecase "UC-022: View Statistics" as UC_022
+        usecase "UC-023: Manage Patient Records" as UC_023
+        usecase "UC-024: Manage Doctor Records" as UC_024
+        usecase "UC-025: Manage ARV Treatments" as UC_025
+        usecase "UC-026: Manage Schedules" as UC_026
+        usecase "UC-027: Export Data (CSV)" as UC_027
     }
 }
 
-' ====== RELATIONSHIPS ======
+' ====== ACTOR-USE CASE RELATIONSHIPS ======
 
-' --- Unauthenticated User ---
+' --- Unauthenticated User (direct associations) ---
 Guest --> UC_001
 Guest --> UC_002
+Guest --> UC_003
 
-' --- Patient User ---
-Patient --> UC_003
+' --- Patient User (authenticated features only, inherits public access) ---
 Patient --> UC_004
 Patient --> UC_005
 Patient --> UC_006
@@ -100,63 +95,94 @@ Patient --> UC_008
 Patient --> UC_009
 Patient --> UC_010
 Patient --> UC_011
-Patient --> UC_012
 
-' --- Doctor User ---
-Doctor --> UC_003
+' --- Doctor User (authenticated features only, inherits public access) ---
 Doctor --> UC_004
 Doctor --> UC_005
+Doctor --> UC_006
+Doctor --> UC_012
 Doctor --> UC_013
 Doctor --> UC_014
 Doctor --> UC_015
 Doctor --> UC_016
 Doctor --> UC_017
-Doctor --> UC_018
-Doctor --> UC_019
-Doctor --> UC_020
-Doctor --> UC_021
 
-' --- Admin User ---
-Admin --> UC_003
+' --- Admin User (authenticated features only, inherits public access) ---
 Admin --> UC_004
 Admin --> UC_005
-Admin --> UC_022
-Admin --> UC_023
-Admin --> UC_024
-Admin --> UC_025
-Admin --> UC_026
-Admin --> UC_027
-Admin --> UC_028
-Admin --> UC_029
-Admin --> UC_030
+Admin --> UC_006
+Admin --> UC_018
+Admin --> UC_019
+Admin --> UC_020
 
-' --- Manager User ---
-Manager --> UC_003
+' --- Manager User (authenticated features only, inherits public access) ---
 Manager --> UC_004
 Manager --> UC_005
-Manager --> UC_031
-Manager --> UC_032
-Manager --> UC_033
-Manager --> UC_034
-Manager --> UC_035
-Manager --> UC_036
-Manager --> UC_037
-Manager --> UC_038
-Manager --> UC_039
-Manager --> UC_040
-Manager --> UC_041
+Manager --> UC_006
+Manager --> UC_021
+Manager --> UC_022
+Manager --> UC_023
+Manager --> UC_024
+Manager --> UC_025
+Manager --> UC_026
+Manager --> UC_027
 
-' --- Include Relationships ---
-UC_003 ..> UC_002 : <<include>>
-UC_006 ..> UC_002 : <<include>>
-UC_007 ..> UC_002 : <<include>>
-UC_013 ..> UC_002 : <<include>>
-UC_022 ..> UC_002 : <<include>>
-UC_031 ..> UC_002 : <<include>>
+' ====== USE CASE RELATIONSHIPS ======
 
-' --- Extend Relationships ---
-UC_002 <.. UC_004 : <<extend>>
-UC_008 <.. UC_009 : <<extend>>
-UC_014 <.. UC_015 : <<extend>>
+' Include relationships
+UC_008 ..> UC_014 : <<include>>
+UC_013 ..> UC_015 : <<include>>
+UC_016 ..> UC_015 : <<include>>
+UC_017 ..> UC_015 : <<include>>
+UC_019 ..> UC_020 : <<include>>
+
+' Extend relationships
+UC_009 ..> UC_008 : <<extend>>
+UC_011 ..> UC_007 : <<extend>>
+UC_005 ..> UC_006 : <<extend>>
+
+' Generalization relationships
+UC_023 --|> UC_019
+UC_024 --|> UC_019
+UC_008 --|> UC_013
+UC_009 --|> UC_015
+
+note top of Guest
+  Base actor - can register and login
+  Can browse public HIV information
+  All authenticated users inherit these capabilities
+end note
+
+note top of Patient
+  Authenticated user who receives care
+  Inherits all Guest capabilities plus:
+  - Personal dashboard and appointments
+  - Medical records management
+  - Treatment and notification access
+end note
+
+note top of Doctor
+  Medical professional with clinical access
+  Inherits all Guest capabilities plus:
+  - Professional dashboard
+  - Patient care management
+  - Treatment prescription and monitoring
+end note
+
+note top of Admin
+  System administrator
+  Inherits all Guest capabilities plus:
+  - User and system management
+  - Account creation and maintenance
+  - System oversight capabilities
+end note
+
+note top of Manager
+  Operational oversight role
+  Inherits all Guest capabilities plus:
+  - Analytics and reporting
+  - Data export and search
+  - Comprehensive record management
+end note
 
 @enduml
