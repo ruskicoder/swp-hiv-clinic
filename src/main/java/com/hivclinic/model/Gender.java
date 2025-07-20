@@ -1,7 +1,12 @@
 package com.hivclinic.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.stream.Stream;
+
 /**
- * Enum representing gender options for users
+ * Enum Gender - GIỮ NGUYÊN.
+ * Cung cấp logic chuyển đổi cho cả API (JSON) và cho GenderConverter.
  */
 public enum Gender {
     MALE("Male"),
@@ -13,25 +18,19 @@ public enum Gender {
         this.displayName = displayName;
     }
 
+    @JsonValue
     public String getDisplayName() {
         return displayName;
     }
 
-    /**
-     * Convert from string to enum, case-insensitive
-     */
+    @JsonCreator
     public static Gender fromString(String value) {
         if (value == null) {
             return null;
         }
-        
-        for (Gender gender : Gender.values()) {
-            if (gender.displayName.equalsIgnoreCase(value) || 
-                gender.name().equalsIgnoreCase(value)) {
-                return gender;
-            }
-        }
-        
-        throw new IllegalArgumentException("Invalid gender value: " + value);
+        return Stream.of(Gender.values())
+              .filter(gender -> gender.displayName.equalsIgnoreCase(value) || gender.name().equalsIgnoreCase(value))
+              .findFirst()
+              .orElse(null); // Trả về null nếu không tìm thấy, an toàn hơn là ném lỗi
     }
 }

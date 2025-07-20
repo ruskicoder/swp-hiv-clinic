@@ -1,5 +1,6 @@
 package com.hivclinic.service;
 
+import com.hivclinic.dto.request.AdminCreateUserRequest;
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.model.*;
 import com.hivclinic.repository.*;
@@ -10,243 +11,125 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-/**
- * Service class for administrative operations
- * Handles user management, system administration, and oversight functions
- */
 @Service
 public class AdminService {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private DoctorProfileRepository doctorProfileRepository;
-
-    @Autowired
-    private SpecialtyRepository specialtyRepository;
-
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @Autowired private UserRepository userRepository;
+    @Autowired private RoleRepository roleRepository;
+    @Autowired private DoctorProfileRepository doctorProfileRepository;
+    @Autowired private PatientProfileRepository patientProfileRepository;
+    @Autowired private SpecialtyRepository specialtyRepository;
+    @Autowired private AppointmentRepository appointmentRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     /**
-     * Create a new doctor account
+     * Phương thức thống nhất để tạo bất kỳ loại tài khoản nào từ trang Admin.
+     * Nó sẽ tự động tạo Profile tương ứng dựa trên vai trò được chọn.
      */
     @Transactional
-    public MessageResponse createDoctorAccount(String username, String email, String password, 
-                                             String firstName, String lastName, String phoneNumber, 
-                                             Integer specialtyId, String bio) {
-        try {
-            // Check if username already exists
-            if (userRepository.existsByUsername(username)) {
-                return MessageResponse.error("Username is already taken!");
-            }
-
-            // Check if email already exists
-            if (userRepository.existsByEmail(email)) {
-                return MessageResponse.error("Email is already in use!");
-            }
-
-            // Get Doctor role
-            Optional<Role> doctorRoleOpt = roleRepository.findByRoleName("Doctor");
-            if (doctorRoleOpt.isEmpty()) {
-                logger.error("Doctor role not found in database");
-                return MessageResponse.error("System error: Doctor role not configured");
-            }
-            Role doctorRole = doctorRoleOpt.get();
-
-            // Get specialty if provided
-            Specialty specialty = null;
-            if (specialtyId != null) {
-                Optional<Specialty> specialtyOpt = specialtyRepository.findById(specialtyId);
-                if (specialtyOpt.isEmpty()) {
-                    return MessageResponse.error("Specialty not found");
-                }
-                specialty = specialtyOpt.get();
-            }
-
-            // Create new user
-            User user = new User();
-            user.setUsername(username);
-            user.setEmail(email);
-            user.setPasswordHash(passwordEncoder.encode(password));
-            user.setRole(doctorRole);
-            user.setIsActive(true);
-            // Set firstname, lastname, and specialty in Users table
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            if (specialty != null) {
-                user.setSpecialty(specialty.getSpecialtyName());
-            } else {
-                user.setSpecialty(null);
-            }
-            // Set createdAt and updatedAt
-            user.setCreatedAt(java.time.LocalDateTime.now());
-            user.setUpdatedAt(java.time.LocalDateTime.now());
-
-            // Save user
-            User savedUser = userRepository.save(user);
-
-            // Create doctor profile
-            DoctorProfile doctorProfile = new DoctorProfile();
-            doctorProfile.setUser(savedUser);
-            doctorProfile.setFirstName(firstName);
-            doctorProfile.setLastName(lastName);
-            doctorProfile.setPhoneNumber(phoneNumber);
-            doctorProfile.setSpecialty(specialty);
-            doctorProfile.setBio(bio);
-
-            // Save doctor profile
-            doctorProfileRepository.save(doctorProfile);
-
-            logger.info("Doctor account created successfully: {}", username);
-            return MessageResponse.success("Doctor account created successfully!");
-
-        } catch (Exception e) {
-            logger.error("Error creating doctor account: {}", e.getMessage(), e);
-            return MessageResponse.error("Failed to create doctor account: " + e.getMessage());
+    public MessageResponse createUser(AdminCreateUserRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return MessageResponse.error("Username is already taken!");
         }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return MessageResponse.error("Email is already in use!");
+        }
+
+        Role userRole = roleRepository.findByRoleName(request.getRoleName())
+                .orElseThrow(() -> new RuntimeException("Error: Role '" + request.getRoleName() + "' not found."));
+
+        // 1. Tạo User với thông tin đăng nhập và vai trò
+        User newUser = new User();
+        newUser.setUsername(request.getUsername());
+        newUser.setEmail(request.getEmail());
+        newUser.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        newUser.setRole(userRole);
+        newUser.setIsActive(true);
+        newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setUpdatedAt(LocalDateTime.now());
+        
+        User savedUser = userRepository.save(newUser);
+
+        // 2. Tự động tạo Profile tương ứng với vai trò
+        String roleName = userRole.getRoleName();
+        if ("Patient".equalsIgnoreCase(roleName)) {
+            PatientProfile profile = new PatientProfile();
+            profile.setUser(savedUser);
+            profile.setFirstName(request.getFirstName());
+            profile.setLastName(request.getLastName());
+            profile.setPhoneNumber(request.getPhoneNumber());
+            if (request.getGender() != null && !request.getGender().isEmpty()) {
+                profile.setGender(Gender.fromString(request.getGender()));
+            }
+            patientProfileRepository.save(profile);
+
+        } else if ("Doctor".equalsIgnoreCase(roleName)) {
+            DoctorProfile profile = new DoctorProfile();
+            profile.setUser(savedUser);
+            profile.setFirstName(request.getFirstName());
+            profile.setLastName(request.getLastName());
+            profile.setPhoneNumber(request.getPhoneNumber());
+            if (request.getGender() != null && !request.getGender().isEmpty()) {
+                profile.setGender(Gender.fromString(request.getGender()));
+            }
+            // Bác sĩ có thể tự cập nhật chuyên khoa sau này
+            doctorProfileRepository.save(profile);
+        }
+        // Các vai trò khác như Manager, Admin có thể không cần profile riêng
+
+        return MessageResponse.success("User '" + savedUser.getUsername() + "' created successfully with role: " + roleName);
     }
 
-    /**
-     * Get all users
-     */
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    /**
-     * Get all patients
-     */
-    public List<User> getAllPatients() {
+    // Các phương thức khác giữ nguyên
+    public List<User> getAllUsers() { return userRepository.findAllNonDummyUsers(); }
+    public List<User> getAllPatients() { return userRepository.findAllNonDummyPatients(); }
+    public List<User> getAllDoctors() { return userRepository.findAllNonDummyDoctors(); }
+    public List<User> getAllManagers() {
+        Role managerRole = roleRepository.findByRoleName("Manager").orElse(null);
+        if (managerRole == null) return List.of();
         return userRepository.findAll().stream()
-                .filter(user -> "Patient".equalsIgnoreCase(user.getRole().getRoleName()))
-                .toList();
+                .filter(user -> managerRole.equals(user.getRole()))
+                .collect(Collectors.toList());
     }
+    public List<Appointment> getAllAppointments() { return appointmentRepository.findAll(); }
+    public List<Specialty> getAllSpecialties() { return specialtyRepository.findAll(); }
 
-    /**
-     * Get all doctors
-     */
-    public List<User> getAllDoctors() {
-        List<User> doctors = userRepository.findAll().stream()
-                .filter(user -> "Doctor".equalsIgnoreCase(user.getRole().getRoleName()))
-                .toList();
-        // Attach doctor profile info for each doctor
-        for (User doctor : doctors) {
-            doctorProfileRepository.findByUser(doctor).ifPresent(profile -> {
-                doctor.setFirstName(profile.getFirstName());
-                doctor.setLastName(profile.getLastName());
-                if (profile.getSpecialty() != null) {
-                    doctor.setSpecialty(profile.getSpecialty().getSpecialtyName());
-                }
-            });
-        }
-        return doctors;
-    }
-
-    /**
-     * Get all appointments (admin oversight)
-     */
-    public List<Appointment> getAllAppointments() {
-        try {
-            return appointmentRepository.findAll();
-        } catch (Exception e) {
-            logger.error("Error fetching all appointments: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch appointments: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Activate/Deactivate user account
-     */
     @Transactional
     public MessageResponse toggleUserStatus(Integer userId) {
-        try {
-            Optional<User> userOpt = userRepository.findById(userId);
-            if (userOpt.isEmpty()) {
-                return MessageResponse.error("User not found");
-            }
-
-            User user = userOpt.get();
-            user.setIsActive(!user.getIsActive());
-            userRepository.save(user);
-
-            String status = user.getIsActive() ? "activated" : "deactivated";
-            logger.info("User {} {}", user.getUsername(), status);
-            return MessageResponse.success("User account " + status + " successfully!");
-
-        } catch (Exception e) {
-            logger.error("Error toggling user status: {}", e.getMessage(), e);
-            return MessageResponse.error("Failed to update user status: " + e.getMessage());
-        }
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        user.setIsActive(!user.getIsActive());
+        userRepository.save(user);
+        String status = user.getIsActive() ? "activated" : "deactivated";
+        return MessageResponse.success("User account " + status + " successfully!");
     }
 
-    /**
-     * Reset user password
-     */
     @Transactional
     public MessageResponse resetUserPassword(Integer userId, String newPassword) {
-        try {
-            Optional<User> userOpt = userRepository.findById(userId);
-            if (userOpt.isEmpty()) {
-                return MessageResponse.error("User not found");
-            }
-
-            User user = userOpt.get();
-            user.setPasswordHash(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-
-            logger.info("Password reset for user: {}", user.getUsername());
-            return MessageResponse.success("Password reset successfully!");
-        } catch (Exception e) {
-            logger.error("Error resetting password: {}", e.getMessage(), e);
-            return MessageResponse.error("Failed to reset password: " + e.getMessage());
-        }
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return MessageResponse.success("Password reset successfully!");
     }
-
-    /**
-     * Get all specialties
-     */
-    public List<Specialty> getAllSpecialties() {
-        return specialtyRepository.findAll();
-    }
-
-    /**
-     * Create new specialty
-     */
+    
     @Transactional
     public MessageResponse createSpecialty(String specialtyName, String description) {
-        try {
-            // Check if specialty already exists
-            Optional<Specialty> existingSpecialty = specialtyRepository.findBySpecialtyName(specialtyName);
-            if (existingSpecialty.isPresent()) {
-                return MessageResponse.error("Specialty already exists");
-            }
-
-            Specialty specialty = new Specialty();
-            specialty.setSpecialtyName(specialtyName);
-            specialty.setDescription(description);
-            specialty.setIsActive(true);
-
-            specialtyRepository.save(specialty);
-
-            logger.info("Specialty created: {}", specialtyName);
-            return MessageResponse.success("Specialty created successfully!");
-
-        } catch (Exception e) {
-            logger.error("Error creating specialty: {}", e.getMessage(), e);
-            return MessageResponse.error("Failed to create specialty: " + e.getMessage());
+        if (specialtyRepository.findBySpecialtyName(specialtyName).isPresent()) {
+            return MessageResponse.error("Specialty already exists");
         }
+        Specialty specialty = new Specialty();
+        specialty.setSpecialtyName(specialtyName);
+        specialty.setDescription(description);
+        specialty.setIsActive(true);
+        specialtyRepository.save(specialty);
+        return MessageResponse.success("Specialty created successfully!");
     }
 }

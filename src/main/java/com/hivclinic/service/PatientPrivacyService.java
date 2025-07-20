@@ -21,7 +21,7 @@ public class PatientPrivacyService {
     @Transactional(readOnly = true)
     public boolean getPrivacySettings(Integer userId) {
         return patientProfileRepository.findByUser_UserId(userId)
-            .map(PatientProfile::isPrivate)
+            .map(PatientProfile::getIsPrivate)
             .orElse(false);
     }
     
@@ -33,7 +33,7 @@ public class PatientPrivacyService {
         PatientProfile profile = patientProfileRepository.findByUser_UserId(userId)
             .orElseThrow(() -> new RuntimeException("Patient profile not found"));
         
-        profile.setPrivate(isPrivate);
+        profile.setIsPrivate(isPrivate);
         patientProfileRepository.save(profile);
         
         logger.info("Updated privacy settings for patient {}: isPrivate={}", userId, isPrivate);
