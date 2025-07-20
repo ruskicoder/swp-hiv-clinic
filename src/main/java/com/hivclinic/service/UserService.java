@@ -3,9 +3,6 @@ package com.hivclinic.service;
 import com.hivclinic.model.User;
 import com.hivclinic.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable; // Sửa import cho đúng
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,54 +19,49 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Trả về trực tiếp, không cần biến trung gian
-        return userRepository.findByUsername(username)
+        // Include dummy users for authentication, but not in lists
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        return user;
     }
 
     /**
-     * Lấy tất cả người dùng không phải là dummy (có phân trang)
+     * Get all non-dummy users
      */
-    public List<User> getAllUsers(int pageNO, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNO, pageSize);
-        Page<User> userPage = userRepository.findAllNonDummyUsers(pageable); // Bỏ ép kiểu không cần thiết
-        return userPage.getContent();
+    public List<User> getAllUsers() {
+        return userRepository.findAllNonDummyUsers();
     }
 
     /**
-     * Lấy tất cả bác sĩ không phải là dummy (có phân trang)
+     * Get all non-dummy doctors
      */
-    public List<User> getAllDoctors(int pageNO, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNO, pageSize);
-        Page<User> doctorPage = userRepository.findAllNonDummyDoctors(pageable); // Bỏ ép kiểu không cần thiết
-        return doctorPage.getContent();
+    public List<User> getAllDoctors() {
+        return userRepository.findAllNonDummyDoctors();
     }
 
     /**
-     * Lấy tất cả bệnh nhân không phải là dummy (có phân trang)
+     * Get all non-dummy patients
      */
-    public List<User> getAllPatients(int pageNO, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNO, pageSize);
-        Page<User> patientPage = userRepository.findAllNonDummyPatients(pageable); // Bỏ ép kiểu không cần thiết
-        return patientPage.getContent();
+    public List<User> getAllPatients() {
+        return userRepository.findAllNonDummyPatients();
     }
 
     /**
-     * Lấy người dùng theo ID, bao gồm cả người dùng dummy
+     * Get user by ID, including dummy users for ARV template access
      */
     public Optional<User> getUserById(Integer userId) {
         return userRepository.findById(userId);
     }
 
     /**
-     * Kiểm tra username đã tồn tại hay chưa
+     * Check if username exists (including dummy users)
      */
     public boolean isUsernameAvailable(String username) {
         return !userRepository.existsByUsername(username);
     }
 
     /**
-     * Kiểm tra email đã tồn tại hay chưa
+     * Check if email exists (including dummy users)
      */
     public boolean isEmailAvailable(String email) {
         return !userRepository.existsByEmail(email);

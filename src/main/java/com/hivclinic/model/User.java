@@ -2,7 +2,6 @@ package com.hivclinic.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference; // <-- Thêm import
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,8 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Entity đại diện cho một người dùng trong hệ thống.
- * PHIÊN BẢN ĐÃ ĐƯỢC CẬP NHẬT ĐẦY ĐỦ CÁC MỐI QUAN HỆ.
+ * Entity representing a system user
  */
 @Entity
 @Table(name = "Users")
@@ -60,17 +58,7 @@ public class User implements UserDetails {
     @Column(name = "LastLoginAt")
     private LocalDateTime lastLoginAt;
 
-    // ----- THÊM MỚI CÁC KHAI BÁO QUAN HỆ CÒN THIẾU -----
-    
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference("user-doctorprofile")
-    private DoctorProfile doctorProfile;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference("user-patientprofile")
-    private PatientProfile patientProfile;
-
-    // ----- Getters (Giữ nguyên và thêm mới) -----
+    // Getters
     public Integer getUserId() { return userId; }
     public String getUsername() { return username; }
     public String getPasswordHash() { return passwordHash; }
@@ -83,13 +71,8 @@ public class User implements UserDetails {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public LocalDateTime getLastLoginAt() { return lastLoginAt; }
-    
-    // Getters mới
-    public DoctorProfile getDoctorProfile() { return doctorProfile; }
-    public PatientProfile getPatientProfile() { return patientProfile; }
 
-
-    // ----- Setters (Giữ nguyên và thêm mới) -----
+    // Setters
     public void setUserId(Integer userId) { this.userId = userId; }
     public void setUsername(String username) { this.username = username; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
@@ -102,12 +85,8 @@ public class User implements UserDetails {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public void setLastLoginAt(LocalDateTime lastLoginAt) { this.lastLoginAt = lastLoginAt; }
-    
-    // Setters mới
-    public void setDoctorProfile(DoctorProfile doctorProfile) { this.doctorProfile = doctorProfile; }
-    public void setPatientProfile(PatientProfile patientProfile) { this.patientProfile = patientProfile; }
 
-    // ----- UserDetails implementation (Giữ nguyên) -----
+    // UserDetails implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (role == null) {
