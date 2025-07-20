@@ -1,19 +1,20 @@
 package com.hivclinic.controller;
 
-import com.hivclinic.config.CustomUserDetailsService;
-import com.hivclinic.dto.request.CreateManagerRequest; // <-- THÊM DÒNG IMPORT NÀY
+import com.hivclinic.dto.request.AdminCreateUserRequest; // <-- Import DTO mới
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.model.Appointment;
+import com.hivclinic.model.Role;
 import com.hivclinic.model.Specialty;
 import com.hivclinic.model.User;
+import com.hivclinic.repository.RoleRepository; // <-- Import RoleRepository
 import com.hivclinic.service.AdminService;
+import jakarta.validation.Valid; // <-- Import để validation
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,14 +30,30 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    // --- CÁC PHƯƠNG THỨC KHÁC GIỮ NGUYÊN ---
-    // (healthCheck, getAllUsers, getAllDoctors, v.v...)
+    @Autowired
+    private RoleRepository roleRepository; // Cần thiết để lấy danh sách vai trò
 
-    @GetMapping("/health")
-    public ResponseEntity<?> healthCheck() {
-        return ResponseEntity.ok(MessageResponse.success("Admin service is running"));
+    // ----- ENDPOINT TẠO TÀI KHOẢN MỚI THỐNG NHẤT -----
+    /**
+     * Endpoint duy nhất để Admin tạo một tài khoản người dùng mới với vai trò bất kỳ.
+     * Nó thay thế cho các endpoint /doctors và /managers cũ.
+     * @param request DTO chứa tất cả thông tin người dùng mới.
+     * @return MessageResponse cho biết thành công hay thất bại.
+     */
+    @PostMapping("/users")
+    public ResponseEntity<?> createUserByAdmin(@Valid @RequestBody AdminCreateUserRequest request) {
+        try {
+            MessageResponse response = adminService.createUser(request);
+            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            logger.error("Error creating user by admin: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to create user account: " + e.getMessage()));
+        }
     }
 
+    // ----- CÁC ENDPOINT LẤY DANH SÁCH (GET) -----
+    
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
         try {
@@ -83,43 +100,47 @@ public class AdminController {
                     .body(MessageResponse.error("Failed to get managers: " + e.getMessage()));
         }
     }
-
-    @PostMapping("/doctors")
-    public ResponseEntity<?> createDoctor(
-            @RequestParam String username, @RequestParam String email, @RequestParam String password,
-            @RequestParam String firstName, @RequestParam String lastName,
-            @RequestParam(required = false) String phoneNumber,
-            @RequestParam Integer specialtyId,
-            @RequestParam(required = false) String bio) {
+    
+    @GetMapping("/appointments")
+    public ResponseEntity<?> getAllAppointments() {
         try {
-            MessageResponse response = adminService.createDoctorAccount(username, email, password, firstName, lastName, phoneNumber, specialtyId, bio);
-            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+            List<Appointment> appointments = adminService.getAllAppointments();
+            return ResponseEntity.ok(appointments);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to create doctor account: " + e.getMessage()));
+                    .body(MessageResponse.error("Failed to get appointments: " + e.getMessage()));
         }
     }
 
-
-    // ----- THAY ĐỔI QUAN TRỌNG Ở ĐÂY -----
-    // Thay thế nhiều @RequestParam bằng một @RequestBody duy nhất.
-    @PostMapping("/managers")
-    public ResponseEntity<?> createManagerAccount(@RequestBody CreateManagerRequest request) {
+    @GetMapping("/specialties")
+    public ResponseEntity<?> getAllSpecialties() {
         try {
-            // Gọi service với dữ liệu lấy từ object 'request'
-            MessageResponse response = adminService.createManagerAccount(
-                    request.getUsername(),
-                    request.getEmail(),
-                    request.getPassword(),
-                    request.getFirstName(),
-                    request.getLastName()
-            );
-            return response.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
+            List<Specialty> specialties = adminService.getAllSpecialties();
+            return ResponseEntity.ok(specialties);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to create manager account: " + e.getMessage()));
+                    .body(MessageResponse.error("Failed to get specialties: " + e.getMessage()));
         }
     }
+
+    /**
+     * Endpoint để frontend có thể lấy danh sách tất cả các vai trò
+     * và hiển thị trong ô lựa chọn (dropdown/select).
+     * @return Danh sách các đối tượng Role.
+     */
+    @GetMapping("/roles")
+    public ResponseEntity<?> getAllRoles() {
+        try {
+            List<Role> roles = roleRepository.findAll();
+            return ResponseEntity.ok(roles);
+        } catch (Exception e) {
+            logger.error("Error fetching roles: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(MessageResponse.error("Failed to get roles: " + e.getMessage()));
+        }
+    }
+
+    // ----- CÁC ENDPOINT HÀNH ĐỘNG KHÁC (PUT, POST) -----
     
     @PutMapping("/users/{userId}/toggle-status")
     public ResponseEntity<?> toggleUserStatus(@PathVariable Integer userId) {
@@ -140,28 +161,6 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(MessageResponse.error("Failed to reset password: " + e.getMessage()));
-        }
-    }
-
-    @GetMapping("/appointments")
-    public ResponseEntity<?> getAllAppointments() {
-        try {
-            List<Appointment> appointments = adminService.getAllAppointments();
-            return ResponseEntity.ok(appointments);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to get appointments: " + e.getMessage()));
-        }
-    }
-
-    @GetMapping("/specialties")
-    public ResponseEntity<?> getAllSpecialties() {
-        try {
-            List<Specialty> specialties = adminService.getAllSpecialties();
-            return ResponseEntity.ok(specialties);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(MessageResponse.error("Failed to get specialties: " + e.getMessage()));
         }
     }
 

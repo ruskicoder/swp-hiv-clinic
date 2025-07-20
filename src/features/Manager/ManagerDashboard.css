@@ -419,3 +419,125 @@
 .dashboard-main > * {
   animation: fadeIn 0.6s ease-out;
 }
+/*
+=================================
+Gender Update Notification Banner
+=================================
+*/
+
+.gender-notification-banner {
+  /* Positioning and Layout */
+  width: calc(100% - 4rem); /* Full width minus padding of the container */
+  max-width: 1400px; /* Match the max-width of other elements if any */
+  margin: -1rem auto 2rem auto; /* Pull it up a bit, add space below */
+  padding: 1rem 1.5rem;
+  box-sizing: border-box;
+  
+  /* Styling */
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); /* Light yellow gradient */
+  color: #92400e; /* Dark amber text color */
+  border: 1px solid #fde68a; /* Amber border */
+  border-radius: 16px; /* Match other rounded corners */
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.1); /* Subtle yellow shadow */
+
+  /* Animation */
+  animation: slideDown 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.gender-notification-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.gender-notification-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.gender-notification-text {
+  flex: 1; /* Take up available space */
+  min-width: 250px; /* Prevent text from being too squished */
+  font-weight: 500;
+}
+
+.gender-notification-text strong {
+  font-weight: 700;
+  color: #78350f; /* Slightly darker for emphasis */
+}
+
+.gender-notification-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+
+.gender-btn {
+  /* Base button styling */
+  padding: 0.625rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Primary "Go to Settings" button */
+.gender-btn.primary {
+  background: #166534; /* Dark green, consistent with theme */
+  color: white;
+}
+
+.gender-btn.primary:hover {
+  background: #15803d; /* Lighter green on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(22, 101, 52, 0.2);
+}
+
+/* Secondary "Dismiss" button */
+.gender-btn.secondary {
+  background: transparent;
+  color: #78350f; /* Dark amber text */
+  box-shadow: inset 0 0 0 1px #fcd34d; /* Subtle border */
+}
+
+.gender-btn.secondary:hover {
+  background: rgba(252, 211, 77, 0.2); /* Light yellow background on hover */
+}
+
+
+/* Keyframe animation for the banner appearing */
+@keyframes slideDown {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments for the notification banner */
+@media (max-width: 768px) {
+  .gender-notification-banner {
+    width: calc(100% - 2rem);
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .gender-notification-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .gender-notification-actions {
+    width: 100%;
+    justify-content: flex-end; /* Align buttons to the right on mobile */
+  }
+}

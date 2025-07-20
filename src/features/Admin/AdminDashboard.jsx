@@ -7,194 +7,105 @@ import DashboardHeader from '../../components/layout/DashboardHeader';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './AdminDashboard.css';
 
-// --- CreateDoctorForm (Standalone Component) ---
-const CreateDoctorForm = ({
-  preservedFormData,
-  setPreservedFormData,
-  specialties,
-  specialtiesLoading,
-  specialtiesError,
-  loadDashboardData,
-  setActiveTab
-}) => {
-  const [formData, setFormData] = useState(() => ({
-    username: preservedFormData.username || '',
-    email: preservedFormData.email || '',
-    password: preservedFormData.password || '',
-    firstName: preservedFormData.firstName || '',
-    lastName: preservedFormData.lastName || '',
-    phoneNumber: preservedFormData.phoneNumber || '',
-    specialtyId: preservedFormData.specialtyId || '',
-    bio: preservedFormData.bio || ''
-  }));
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [formSuccess, setFormSuccess] = useState('');
+// ----- COMPONENT MỚI: FORM TẠO USER THỐNG NHẤT -----
+const CreateUserForm = ({ loadDashboardData, setActiveTab }) => {
+  const [formData, setFormData] = useState({
+    username: '', password: '', email: '', 
+    firstName: '', lastName: '', phoneNumber: '', 
+    gender: '', roleName: ''
+  });
+  const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Tải danh sách vai trò khi component được mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await apiClient.get('/admin/roles');
+        // Lọc ra vai trò 'Admin' để tránh việc Admin tự tạo thêm Admin khác
+        setRoles(response.data.filter(role => role.roleName !== 'Admin'));
+      } catch (err) {
+        setError('Failed to load roles list. Please check the API endpoint.');
+      }
+    };
+    fetchRoles();
+  }, []);
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormLoading(true);
-    setFormError('');
-    setFormSuccess('');
-
-    try {
-      if (!formData.username || !formData.email || !formData.password || !formData.firstName || !formData.lastName || !formData.specialtyId) {
-        setFormError('Please fill in all required fields, including specialty.');
-        setFormLoading(false);
-        return;
-      }
-
-      const formDataToSend = new URLSearchParams();
-      Object.keys(formData).forEach(key => formDataToSend.append(key, formData[key] || ''));
-
-      const response = await apiClient.post('/admin/doctors', formDataToSend, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      });
-
-      if (response.data && (response.data.success || response.data.isSuccess)) {
-        setFormSuccess('Doctor created successfully!');
-        const resetData = { username: '', email: '', password: '', firstName: '', lastName: '', phoneNumber: '', specialtyId: '', bio: '' };
-        setFormData(resetData);
-        setPreservedFormData(resetData);
-        loadDashboardData();
-        setTimeout(() => setActiveTab('doctors'), 1500);
-      } else {
-        setFormError(response.data?.message || 'Failed to create doctor');
-      }
-    } catch (error) {
-      setFormError(error?.response?.data?.message || 'An unexpected error occurred.');
-    } finally {
-      setFormLoading(false);
+    if (!formData.roleName) {
+      setError('Please select a role for the new user.');
+      return;
     }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
-    setFormData(updatedData);
-    setPreservedFormData(updatedData);
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      // Gọi đến endpoint thống nhất mới
+      const response = await apiClient.post('/admin/users', formData);
+      if (response.data.success) {
+        setSuccess(response.data.message);
+        setFormData({ username: '', password: '', email: '', firstName: '', lastName: '', phoneNumber: '', gender: '', roleName: '' }); // Reset form
+        loadDashboardData(); // Tải lại dữ liệu cho các bảng
+        
+        // Tự động chuyển đến tab quản lý tương ứng sau 1.5 giây
+        setTimeout(() => {
+          if (formData.roleName === 'Doctor') setActiveTab('doctors');
+          else if (formData.roleName === 'Manager') setActiveTab('managers');
+          else setActiveTab('users');
+        }, 1500);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'An unexpected error occurred during user creation.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <ErrorBoundary>
-      <div className="create-doctor-section">
+      <div className="create-user-section">
         <div className="content-header">
-          <h2>Create Doctor Account</h2>
-          <p>Add a new doctor to the system</p>
+          <h2>Create New User Account</h2>
+          <p>A unified form to create any type of user account.</p>
         </div>
-        {specialtiesLoading && <div className="loading-message"><p>Loading form data...</p></div>}
-        <form onSubmit={handleSubmit} className="create-doctor-form">
-          {formError && <div className="error-message">{formError}</div>}
-          {formSuccess && <div className="success-message">{formSuccess}</div>}
-          <div className="form-row">
-            <div className="form-group"><label htmlFor="username">Username</label><input type="text" id="username" name="username" value={formData.username} onChange={handleChange} required /></div>
-            <div className="form-group"><label htmlFor="email">Email</label><input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required /></div>
-          </div>
-          <div className="form-group"><label htmlFor="password">Password</label><input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required /></div>
-          <div className="form-row">
-            <div className="form-group"><label htmlFor="firstName">First Name</label><input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required /></div>
-            <div className="form-group"><label htmlFor="lastName">Last Name</label><input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required /></div>
-          </div>
-          <div className="form-group"><label htmlFor="phoneNumber">Phone Number</label><input type="tel" id="phoneNumber" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} /></div>
-          <div className="form-group">
-            <label htmlFor="specialtyId">Specialty</label>
-            <select id="specialtyId" name="specialtyId" value={formData.specialtyId} onChange={handleChange} disabled={specialtiesLoading} required>
-              <option value="">{specialtiesLoading ? 'Loading...' : 'Select a specialty...'}</option>
-              {!specialtiesLoading && specialties.map((specialty, index) => (
-                <option key={specialty?.specialtyId || index} value={specialty?.specialtyId}>{safeRender(specialty?.specialtyName)}</option>
-              ))}
+        <form onSubmit={handleSubmit} className="unified-create-form">
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
+          <div className="form-grid">
+            <input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First Name" required />
+            <input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last Name" required />
+            <input name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
+            <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
+            <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
+            <input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} placeholder="Phone Number (Optional)" />
+            <select name="gender" value={formData.gender} onChange={handleChange} required>
+              <option value="">Select Gender...</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
             </select>
-            {specialtiesError && <div className="field-error">{specialtiesError}</div>}
+            <select name="roleName" value={formData.roleName} onChange={handleChange} required>
+              <option value="">Select a Role...</option>
+              {roles.length > 0 ? roles.map(role => (
+                <option key={role.roleId} value={role.roleName}>{role.roleName}</option>
+              )) : <option disabled>Loading roles...</option>}
+            </select>
           </div>
-          <div className="form-group"><label htmlFor="bio">Biography</label><textarea id="bio" name="bio" value={formData.bio} onChange={handleChange} placeholder="Enter doctor's biography..." rows="4" /></div>
-          <button type="submit" className="submit-btn" disabled={formLoading || specialtiesLoading}>{formLoading ? 'Creating...' : 'Create Doctor'}</button>
+          <button type="submit" className="submit-btn" disabled={loading}>{loading ? 'Creating Account...' : 'Create Account'}</button>
         </form>
       </div>
     </ErrorBoundary>
   );
 };
 
-// --- CreateManagerForm ---
-const CreateManagerForm = ({
-  preservedFormData,
-  setPreservedFormData,
-  loadDashboardData,
-  setActiveTab
-}) => {
-  const [formData, setFormData] = useState(() => ({
-    username: preservedFormData.username || '',
-    email: preservedFormData.email || '',
-    password: preservedFormData.password || '',
-    firstName: preservedFormData.firstName || '',
-    lastName: preservedFormData.lastName || '',
-  }));
-  const [formLoading, setFormLoading] = useState(false);
-  const [formError, setFormError] = useState('');
-  const [formSuccess, setFormSuccess] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormLoading(true);
-    setFormError('');
-    setFormSuccess('');
-    try {
-      if (!formData.username || !formData.email || !formData.password || !formData.firstName || !formData.lastName) {
-        setFormError('Please fill in all required fields.');
-        setFormLoading(false);
-        return;
-      }
-      const response = await apiClient.post('/admin/managers', formData);
-      if (response.data && (response.data.success || response.data.isSuccess)) {
-        setFormSuccess('Manager created successfully!');
-        const resetData = { username: '', email: '', password: '', firstName: '', lastName: '' };
-        setFormData(resetData);
-        setPreservedFormData(resetData);
-        loadDashboardData();
-        setTimeout(() => setActiveTab('managers'), 1500);
-      } else {
-        setFormError(response.data?.message || 'Failed to create manager');
-      }
-    } catch (error) {
-      setFormError(error?.response?.data?.message || 'An unexpected error occurred.');
-    } finally {
-      setFormLoading(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
-    setFormData(updatedData);
-    setPreservedFormData(updatedData);
-  };
-
-  return (
-    <ErrorBoundary>
-      <div className="create-manager-section">
-        <div className="content-header">
-          <h2>Create Manager Account</h2>
-          <p>Add a new manager to the system</p>
-        </div>
-        <form onSubmit={handleSubmit} className="create-manager-form">
-          {formError && <div className="error-message">{formError}</div>}
-          {formSuccess && <div className="success-message">{formSuccess}</div>}
-          <div className="form-row">
-            <div className="form-group"><label htmlFor="username">Username</label><input type="text" id="username" name="username" value={formData.username} onChange={handleChange} required /></div>
-            <div className="form-group"><label htmlFor="email">Email</label><input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required /></div>
-          </div>
-          <div className="form-group"><label htmlFor="password">Password</label><input type="password" id="password" name="password" value={formData.password} onChange={handleChange} required /></div>
-          <div className="form-row">
-            <div className="form-group"><label htmlFor="firstName">First Name</label><input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required /></div>
-            <div className="form-group"><label htmlFor="lastName">Last Name</label><input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required /></div>
-          </div>
-          <button type="submit" className="submit-btn" disabled={formLoading}>{formLoading ? 'Creating...' : 'Create Manager'}</button>
-        </form>
-      </div>
-    </ErrorBoundary>
-  );
-};
-
-// ----- Component chính: AdminDashboard -----
+// ----- COMPONENT CHÍNH: AdminDashboard -----
 const AdminDashboard = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -207,27 +118,22 @@ const AdminDashboard = () => {
   const [doctors, setDoctors] = useState([]);
   const [managers, setManagers] = useState([]);
   const [appointments, setAppointments] = useState([]);
-  const [specialties, setSpecialties] = useState([]);
-
-  const [specialtiesLoading, setSpecialtiesLoading] = useState(true);
+  
   const [usersError, setUsersError] = useState('');
-  const [appointmentsError, setAppointmentsError] = useState('');
-  const [specialtiesError, setSpecialtiesError] = useState('');
   const [managersError, setManagersError] = useState('');
+  const [appointmentsError, setAppointmentsError] = useState('');
 
   const [isTabChanging, setIsTabChanging] = useState(false);
-  const [preservedFormData, setPreservedFormData] = useState({});
 
   const loadDashboardData = useCallback(async () => {
-    setError(''); setUsersError(''); setAppointmentsError(''); setSpecialtiesError(''); setManagersError('');
-    setSpecialtiesLoading(true);
+    setError(''); setUsersError(''); setManagersError(''); setAppointmentsError('');
     try {
       const results = await Promise.allSettled([
         apiClient.get('/admin/users'), apiClient.get('/admin/patients'),
         apiClient.get('/admin/doctors'), apiClient.get('/admin/managers'),
-        apiClient.get('/admin/appointments'), apiClient.get('/admin/specialties')
+        apiClient.get('/admin/appointments')
       ]);
-      const [usersResult, patientsResult, doctorsResult, managersResult, appointmentsResult, specialtiesResult] = results;
+      const [usersResult, patientsResult, doctorsResult, managersResult, appointmentsResult] = results;
       
       setUsers(usersResult.status === 'fulfilled' ? usersResult.value.data : []);
       if (usersResult.status === 'rejected') setUsersError('Failed to load users');
@@ -241,14 +147,10 @@ const AdminDashboard = () => {
 
       setAppointments(appointmentsResult.status === 'fulfilled' ? appointmentsResult.value.data : []);
       if (appointmentsResult.status === 'rejected') setAppointmentsError('Failed to load appointments');
-      
-      setSpecialties(specialtiesResult.status === 'fulfilled' ? specialtiesResult.value.data : []);
-      if (specialtiesResult.status === 'rejected') setSpecialtiesError('Failed to load specialties');
     } catch (err) {
       setError('Failed to load dashboard data.');
     } finally {
       setLoading(false);
-      setSpecialtiesLoading(false);
     }
   }, []);
 
@@ -260,23 +162,27 @@ const AdminDashboard = () => {
   };
 
   const handleResetPassword = async (userId) => {
-    const newPassword = prompt('Enter new password:');
+    const newPassword = prompt('Enter new password for the user:');
     if (!newPassword) return;
-    try { await apiClient.put(`/admin/users/${userId}/reset-password`, null, { params: { newPassword } }); alert('Password reset successfully'); }
-    catch (err) { setError('Failed to reset password'); }
+    try { await apiClient.put(`/admin/users/${userId}/reset-password`, null, { params: { newPassword } }); alert('Password has been reset successfully.'); }
+    catch (err) { setError('Failed to reset password.'); }
   };
   
+  // Cập nhật navigationItems
   const navigationItems = [
-    { id: 'overview', label: 'Overview', icon: '📊' }, { id: 'users', label: 'Manage Users', icon: '👥' },
-    { id: 'doctors', label: 'Manage Doctors', icon: '👨‍⚕️' }, { id: 'managers', label: 'Manage Managers', icon: '🧑‍💼' },
-    { id: 'appointments', label: 'All Appointments', icon: '📅' }, { id: 'create-doctor', label: 'Create Doctor', icon: '➕' },
-    { id: 'create-manager', label: 'Create Manager', icon: '➕' }
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'users', label: 'Manage Users', icon: '👥' },
+    { id: 'doctors', label: 'Manage Doctors', icon: '👨‍⚕️' },
+    { id: 'managers', label: 'Manage Managers', icon: '🧑‍💼' },
+    { id: 'appointments', label: 'All Appointments', icon: '📅' },
+    { id: 'create-user', label: 'Create User', icon: '➕' }
   ];
 
+  // --- CÁC HÀM RENDER ---
   const renderOverview = () => (
     <ErrorBoundary>
       <div className="overview-section">
-        <div className="content-header"><h2>Admin Dashboard</h2></div>
+        <div className="content-header"><h2>Dashboard Overview</h2></div>
         <div className="stats-grid">
           <div className="stat-card"><h3>Total Users</h3><p className="stat-number">{users?.length || 0}</p></div>
           <div className="stat-card"><h3>Total Patients</h3><p className="stat-number">{patients?.length || 0}</p></div>
@@ -292,7 +198,7 @@ const AdminDashboard = () => {
   const renderUsers = () => (
     <ErrorBoundary>
       <div className="users-section">
-        <div className="content-header"><h2>Manage Users</h2><p>View and manage all system users</p></div>
+        <div className="content-header"><h2>Manage All Users</h2><p>View and manage all system users</p></div>
         {usersError && <div className="error-message">{usersError}</div>}
         {!users || users.length === 0 ? <div className="no-data"><p>No users found.</p></div> : (
           <div className="users-table-container">
@@ -362,10 +268,6 @@ const AdminDashboard = () => {
             <button key={item.id} className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
               onClick={() => {
                 setIsTabChanging(true);
-                const isSwitchingBetweenForms = (activeTab === 'create-doctor' && item.id === 'create-manager') || (activeTab === 'create-manager' && item.id === 'create-doctor');
-                if (isSwitchingBetweenForms) {
-                  setPreservedFormData({});
-                }
                 setActiveTab(item.id);
                 setTimeout(() => setIsTabChanging(false), 300);
               }}>
@@ -381,8 +283,12 @@ const AdminDashboard = () => {
               {activeTab === 'doctors' && renderDoctors()}
               {activeTab === 'managers' && renderManagers()}
               {activeTab === 'appointments' && renderAppointments()}
-              {activeTab === 'create-doctor' && <CreateDoctorForm {...{ preservedFormData, setPreservedFormData, specialties, specialtiesLoading, specialtiesError, loadDashboardData, setActiveTab }} />}
-              {activeTab === 'create-manager' && <CreateManagerForm {...{ preservedFormData, setPreservedFormData, loadDashboardData, setActiveTab }} />}
+              {activeTab === 'create-user' && (
+                <CreateUserForm
+                  loadDashboardData={loadDashboardData}
+                  setActiveTab={setActiveTab}
+                />
+              )}
             </>
           )}
         </main>

@@ -1,10 +1,11 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
- * Entity PatientProfile - Phiên bản cuối cùng sử dụng AttributeConverter.
+ * Entity representing patient profiles
  */
 @Entity
 @Table(name = "PatientProfiles")
@@ -34,9 +35,7 @@ public class PatientProfile {
     @Column(name = "Address", columnDefinition = "NVARCHAR(MAX)")
     private String address;
 
-    // ----- THAY ĐỔI QUAN TRỌNG NHẤT -----
-    // Xóa bỏ @Enumerated(EnumType.STRING).
-    // Hibernate sẽ tự động sử dụng GenderConverter vì chúng ta đã khai báo @Converter(autoApply = true).
+    @Enumerated(EnumType.STRING)
     @Column(name = "Gender", length = 20)
     private Gender gender;
 
@@ -62,7 +61,7 @@ public class PatientProfile {
     @Column(name = "InsuranceNumber", length = 50)
     private String insuranceNumber;
 
-    // --- Getters và Setters giữ nguyên không đổi ---
+    // Getters
     public Integer getPatientProfileId() { return patientProfileId; }
     public User getUser() { return user; }
     public String getFirstName() { return firstName; }
@@ -72,6 +71,7 @@ public class PatientProfile {
     public String getAddress() { return address; }
     public Gender getGender() { return gender; }
     public String getProfileImageBase64() { return profileImageBase64; }
+    public Boolean isPrivate() { return isPrivate; }
     public Boolean getIsPrivate() { return isPrivate; }
     public String getBloodType() { return bloodType; }
     public String getEmergencyContact() { return emergencyContact; }
@@ -79,6 +79,7 @@ public class PatientProfile {
     public String getInsuranceProvider() { return insuranceProvider; }
     public String getInsuranceNumber() { return insuranceNumber; }
 
+    // Setters
     public void setPatientProfileId(Integer id) { this.patientProfileId = id; }
     public void setUser(User user) { this.user = user; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -87,8 +88,19 @@ public class PatientProfile {
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
     public void setAddress(String address) { this.address = address; }
     public void setGender(Gender gender) { this.gender = gender; }
+    
+    // Helper method for string conversion (for compatibility)
+    public void setGenderFromString(String genderString) {
+        this.gender = Gender.fromString(genderString);
+    }
+    
+    // Helper method for string conversion (for compatibility)
+    public String getGenderAsString() {
+        return gender != null ? gender.getDisplayName() : null;
+    }
     public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
     public void setIsPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }
+    public void setPrivate(Boolean isPrivate) { this.isPrivate = isPrivate; }  // Added method to match service usage
     public void setBloodType(String bloodType) { this.bloodType = bloodType; }
     public void setEmergencyContact(String emergencyContact) { this.emergencyContact = emergencyContact; }
     public void setEmergencyPhone(String emergencyPhone) { this.emergencyPhone = emergencyPhone; }
