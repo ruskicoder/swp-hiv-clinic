@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Repository interface for ARVTreatment entity operations
@@ -55,4 +56,32 @@ public interface ARVTreatmentRepository extends JpaRepository<ARVTreatment, Inte
      */
     @Query("SELECT arv FROM ARVTreatment arv WHERE (arv.notes = 'default template' OR arv.notes = 'template')")
     List<ARVTreatment> findAllTemplates();
+    // Thêm vào file: com/hivclinic/repository/ARVTreatmentRepository.java
+
+// Lấy tất cả phác đồ kèm tên (1 query)
+@Query("SELECT new map(arv.arvTreatmentID as arvTreatmentID, arv.regimen as regimen, arv.startDate as startDate, arv.endDate as endDate, " +
+       "arv.adherence as adherence, arv.sideEffects as sideEffects, arv.notes as notes, arv.isActive as isActive, " +
+       "p.firstName as patientFirstName, p.lastName as patientLastName, " +
+       "d.firstName as doctorFirstName, d.lastName as doctorLastName) " +
+       "FROM ARVTreatment arv " +
+       "LEFT JOIN User p ON arv.patientUserID = p.userId " +
+       "LEFT JOIN User d ON arv.doctorUserID = d.userId")
+List<Map<String, Object>> findAllWithPatientAndDoctorNames();
+
+// Tìm kiếm theo ngày kèm tên (1 query)
+@Query("SELECT new map(arv.arvTreatmentID as arvTreatmentID, arv.regimen as regimen, arv.startDate as startDate, arv.endDate as endDate, " +
+       "p.firstName as patientFirstName, p.lastName as patientLastName, " +
+       "d.firstName as doctorFirstName, d.lastName as doctorLastName) " +
+       "FROM ARVTreatment arv " +
+       "LEFT JOIN User p ON arv.patientUserID = p.userId " +
+       "LEFT JOIN User d ON arv.doctorUserID = d.userId " +
+       "WHERE arv.startDate BETWEEN :from AND :to")
+List<Map<String, Object>> findTreatmentsWithNamesByDateRange(@Param("from") java.time.LocalDate from, @Param("to") java.time.LocalDate to);
+
+// Lấy phác đồ của bác sĩ kèm tên bệnh nhân (1 query)
+@Query("SELECT new map(arv.arvTreatmentID as arvTreatmentID, arv.regimen as regimen, arv.startDate as startDate, arv.endDate as endDate, arv.notes as notes, " +
+       "p.firstName as patientFirstName, p.lastName as patientLastName) " +
+       "FROM ARVTreatment arv LEFT JOIN User p ON arv.patientUserID = p.userId " +
+       "WHERE arv.doctorUserID = :doctorId")
+List<Map<String, Object>> findTreatmentsByDoctorWithPatientName(@Param("doctorId") Integer doctorId);
 }

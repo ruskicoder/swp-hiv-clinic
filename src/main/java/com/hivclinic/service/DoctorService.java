@@ -30,7 +30,7 @@ public class DoctorService {
      */
     public List<User> getAllDoctors() {
         try {
-            List<User> doctors = userRepository.findAllNonDummyDoctors().stream()
+            List<User> doctors = userRepository.findAllNonDummyDoctors(null).stream()
                 .filter(User::getIsActive)
                 .toList();
 

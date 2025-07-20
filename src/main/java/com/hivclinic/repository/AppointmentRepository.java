@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -122,4 +123,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
            "WHERE a.doctorUser = :doctorUser AND a.patientUser = :patientUser " +
            "ORDER BY a.appointmentDateTime DESC")
     List<Appointment> findByDoctorUserAndPatientUser(@Param("doctorUser") User doctorUser, @Param("patientUser") User patientUser);
+// Thêm vào file: com/hivclinic/repository/AppointmentRepository.java
+
+@Query("SELECT new map(a.appointmentId as appointmentId, p.firstName as patientFirstName, p.lastName as patientLastName, " +
+       "a.appointmentDateTime as dateTime, a.status as status, a.appointmentNotes as notes) " +
+       "FROM Appointment a LEFT JOIN a.patientUser p " +
+       "WHERE a.doctorUser.userId = :doctorId")
+List<Map<String, Object>> findAppointmentsByDoctorWithPatientName(@Param("doctorId") Integer doctorId);
 }

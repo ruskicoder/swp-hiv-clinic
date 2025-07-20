@@ -1,6 +1,5 @@
 package com.hivclinic.service;
-
-import com.hivclinic.dto.request.DoctorAvailabilityRequest;
+import com.hivclinic.dto.request.DoctorAvailabilityRequest; 
 import com.hivclinic.dto.response.MessageResponse;
 import com.hivclinic.model.Appointment;
 import com.hivclinic.model.DoctorAvailabilitySlot;

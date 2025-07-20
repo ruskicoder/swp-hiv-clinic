@@ -1,8 +1,6 @@
 package com.hivclinic.service;
 
 import com.hivclinic.model.*;
-import com.hivclinic.model.ARVTreatment;
-import com.hivclinic.model.PatientProfile;
 import com.hivclinic.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,11 +72,11 @@ public class ManagerService {
     }
 
     public long getTotalPatients() {
-        return userRepository.findAllNonDummyPatients().size();
+        return userRepository.findAllNonDummyPatients(null).getSize();
     }
 
     public long getTotalDoctors() {
-        return userRepository.findAllNonDummyDoctors().size();
+        return userRepository.findAllNonDummyDoctors(null).getSize();
     }
 
     public long getTotalAppointments() {
@@ -90,11 +88,11 @@ public class ManagerService {
     }
 
     public List<User> getAllPatients() {
-        return userRepository.findAllNonDummyPatients();
+        return (List<User>) userRepository.findAllNonDummyPatients(null);
     }
 
     public List<User> getAllDoctors() {
-        return userRepository.findAllNonDummyDoctors();
+        return (List<User>) userRepository.findAllNonDummyDoctors(null);
     }
 
     public List<com.hivclinic.model.ARVTreatment> getAllARVTreatments() {
@@ -115,7 +113,7 @@ public class ManagerService {
 
     public List<User> searchPatientsByName(String q) {
         String query = q == null ? "" : q.trim().toLowerCase();
-        return userRepository.findAllNonDummyPatients().stream()
+        return userRepository.findAllNonDummyPatients(null).stream()
             .filter(user -> {
                 String firstName = user.getFirstName() != null ? user.getFirstName().toLowerCase() : "";
                 String lastName = user.getLastName() != null ? user.getLastName().toLowerCase() : "";
@@ -135,7 +133,7 @@ public class ManagerService {
 
     public List<User> searchDoctorsByNameOrSpecialty(String q) {
         String query = q == null ? "" : q.trim().toLowerCase();
-        return userRepository.findAllNonDummyDoctors().stream()
+        return userRepository.findAllNonDummyDoctors(null).stream()
             .filter(user -> {
                 String firstName = user.getFirstName() != null ? user.getFirstName().toLowerCase() : "";
                 String lastName = user.getLastName() != null ? user.getLastName().toLowerCase() : "";
