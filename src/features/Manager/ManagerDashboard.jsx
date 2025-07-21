@@ -6,16 +6,36 @@ import './ManagerDashboard.css';
 import PaginatedTable from '../../features/components/PaginatedTable';
 
 const SIDEBAR_OPTIONS = [
-  { key: 'overview', label: 'Dashboard Overview', icon: '📊' },
-  { key: 'patients', label: 'Patient Management', icon: '👥' },
-  { key: 'doctors', label: 'Doctor Management', icon: '👨‍⚕️' },
-  { key: 'arv', label: 'ARV Regimen Management', icon: '💊' },
-  { key: 'schedules', label: 'Schedule Management', icon: '📅' },
+  { 
+    key: 'overview', 
+    label: 'Dashboard Overview',
+    icon: '📊'
+  },
+  { 
+    key: 'patients', 
+    label: 'Patient Management',
+    icon: '👥'
+  },
+  { 
+    key: 'doctors', 
+    label: 'Doctor Management',
+    icon: '👨‍⚕️'
+  },
+  { 
+    key: 'arv', 
+    label: 'ARV Regimen Management',
+    icon: '💊'
+  },
+  { 
+    key: 'schedules', 
+    label: 'Schedule Management',
+    icon: '📅'
+  },
 ];
 
 const ManagerDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [stats, setStats] =useState({});
+  const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [patients, setPatients] = useState([]);
@@ -38,87 +58,47 @@ const ManagerDashboard = () => {
   const [doctorSearch, setDoctorSearch] = useState("");
   const navigate = useNavigate();
 
-  // --- THÊM MỚI: State cho chức năng thông báo gender ---
-  const [userProfile, setUserProfile] = useState(null);
-  const [showGenderNotification, setShowGenderNotification] = useState(false);
-
-
-  // --- THÊM MỚI: Hàm tải hồ sơ người dùng để kiểm tra gender ---
-  const loadUserProfile = async () => {
-    try {
-      const response = await apiClient.get('/auth/profile');
-      setUserProfile(response.data);
-      
-      // Kiểm tra nếu gender là null hoặc rỗng và hiển thị thông báo
-      if (!response.data?.gender) {
-        setShowGenderNotification(true);
-      }
-    } catch (err) {
-      console.error('Error loading user profile:', err);
-      // Không cần hiển thị lỗi này cho người dùng, chỉ log ra console
-    }
-  };
-
-  // --- THÊM MỚI: Các hàm xử lý hành động trên banner thông báo ---
-  const handleGoToSettings = () => {
-    navigate('/settings'); // Điều hướng đến trang cài đặt
-  };
-
-  const dismissGenderNotification = () => {
-    setShowGenderNotification(false); // Ẩn thông báo
-  };
-
-
   // Handle CSV exports
   const handleExportCSV = async (endpoint) => {
-    // ... code giữ nguyên ...
-  };
-   const patientColumns = [
-    { header: 'Patient Name', cell: p => `${p.lastName} ${p.firstName}` },
-    { header: 'Gender', cell: p => p.gender || 'N/A' },
-    { header: 'Date of Birth', cell: p => new Date(p.dateOfBirth).toLocaleDateString() },
-    { header: 'Phone', cell: p => p.phoneNumber || 'N/A' },
-    { header: 'Actions', cell: p => (
-      <button className="view-btn" onClick={() => navigate(`/manager/patients/${p.patientId}`)}>
-        View Details
-      </button>
-    )}
-  ];
-
-  const doctorColumns = [
-    { header: 'Doctor Name', cell: d => `Dr. ${d.lastName} ${d.firstName}` },
-    { header: 'Specialization', cell: d => d.specialization || 'N/A' },
-    { header: 'Email', cell: d => d.email },
-    { header: 'Phone', cell: d => d.phoneNumber || 'N/A' },
-     { header: 'Actions', cell: d => (
-      <button className="view-btn" onClick={() => navigate(`/manager/doctors/${d.doctorId}`)}>
-        View Schedule
-      </button>
-    )}
-  ];
-
-  const arvColumns = [
-    { header: 'Regimen Code', cell: a => a.regimenCode },
-    { header: 'Line', cell: a => a.line },
-    { header: 'Description', cell: a => a.description }
-  ];
-
-  const scheduleColumns = [
-    { header: 'Doctor', cell: s => `Dr. ${s.doctor.lastName} ${s.doctor.firstName}` },
-    { header: 'Date', cell: s => new Date(s.workDate).toLocaleDateString() },
-    { header: 'Start Time', cell: s => s.startTime.substring(0, 5) },
-    { header: 'End Time', cell: s => s.endTime.substring(0, 5) }
-  ];
-
-  // --- THÊM MỚI: useEffect để tải hồ sơ người dùng khi component được mount ---
-  useEffect(() => {
-    loadUserProfile();
-  }, []); // Mảng dependency rỗng đảm bảo nó chỉ chạy một lần
+    try {
+        const response = await apiClient.get(`/export/${endpoint}`, {
+            responseType: 'blob'
+        });
+        
+        // Create a URL for the blob
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${endpoint}.csv`);
+        
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        
+        // Clean up the URL
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error(`Error downloading ${endpoint} CSV:`, error);
+        alert(`Failed to download ${endpoint} CSV. Please try again later.`);
+    }
+};
 
   useEffect(() => {
     if (activeTab === 'overview') {
       const fetchStats = async () => {
-        // ... code giữ nguyên ...
+        setLoading(true);
+        setError('');
+        try {
+          const res = await apiClient.get('/manager/stats');
+          setStats(res.data);
+        } catch (err) {
+          setError(`Failed to load statistics: ${err.message}`);
+        } finally {
+          setLoading(false);
+        }
       };
       fetchStats();
     }
@@ -127,7 +107,16 @@ const ManagerDashboard = () => {
   useEffect(() => {
     if (activeTab === 'patients') {
       const fetchPatients = async () => {
-        // ... code giữ nguyên ...
+        setPatientsLoading(true);
+        setPatientsError('');
+        try {
+          const res = await apiClient.get('/manager/patients');
+          setPatients(res.data);
+        } catch (err) {
+          setPatientsError(`Failed to load patient list: ${err.message}`);
+        } finally {
+          setPatientsLoading(false);
+        }
       };
       fetchPatients();
     }
@@ -136,149 +125,578 @@ const ManagerDashboard = () => {
   useEffect(() => {
     if (activeTab === 'doctors') {
       const fetchDoctors = async () => {
-        // ... code giữ nguyên ...
+        setDoctorsLoading(true);
+        setDoctorsError('');
+        try {
+          const res = await apiClient.get('/manager/doctors');
+          setDoctors(res.data);
+        } catch (err) {
+          setDoctorsError(`Failed to load doctor list: ${err.message}`);
+        } finally {
+          setDoctorsLoading(false);
+        }
       };
       fetchDoctors();
     }
   }, [activeTab]);
 
-  // Các useEffect và hàm xử lý khác giữ nguyên
-  // ... (fetchARVTreatments, fetchSchedules, handle search, etc.)
+  useEffect(() => {
+    if (activeTab === 'arv') {
+      fetchARVTreatments();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
 
-  const renderOverview = () => { /* ... code giữ nguyên ... */ };
+  const fetchARVTreatments = async () => {
+    setArvLoading(true);
+    setArvError("");
+    try {
+      let res;
+      if (arvFrom && arvTo) {
+        res = await apiClient.get(`/manager/arv-treatments/search?from=${encodeURIComponent(arvFrom)}&to=${encodeURIComponent(arvTo)}`);
+      } else {
+        res = await apiClient.get('/manager/arv-treatments');
+      }
+      setArvTreatments(res.data);
+    } catch {
+      setArvError('Failed to load ARV regimens.');
+    } finally {
+      setArvLoading(false);
+    }
+  };
+
+  const handleARVFromChange = (e) => setArvFrom(e.target.value);
+  const handleARVToChange = (e) => setArvTo(e.target.value);
+  const handleARVSearch = (e) => {
+    e.preventDefault();
+    fetchARVTreatments();
+  };
+
+  useEffect(() => {
+    if (activeTab === 'schedules') {
+      fetchSchedules();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
+
+  const fetchSchedules = async () => {
+    setSchedulesLoading(true);
+    setSchedulesError('');
+    try {
+      let res;
+      if (scheduleFrom && scheduleTo) {
+        res = await apiClient.get(`/manager/schedules/search?from=${encodeURIComponent(scheduleFrom)}&to=${encodeURIComponent(scheduleTo)}`);
+      } else {
+        res = await apiClient.get('/manager/schedules');
+      }
+      setSchedules(res.data);
+    } catch {
+      setSchedulesError('Failed to load schedules.');
+    } finally {
+      setSchedulesLoading(false);
+    }
+  };
+
+  const handleScheduleFromChange = (e) => setScheduleFrom(e.target.value);
+  const handleScheduleToChange = (e) => setScheduleTo(e.target.value);
+  const handleScheduleSearch = (e) => {
+    e.preventDefault();
+    fetchSchedules();
+  };
+
+  // Search patients
+  // Only update state on change
+  const handlePatientSearchChange = (e) => {
+    setPatientSearch(e.target.value);
+  };
+
+  const handlePatientSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setPatientsLoading(true);
+        setPatientsError("");
+        try {
+          const res = await apiClient.get('/manager/patients');
+          setPatients(res.data);
+        } catch {
+          setPatientsError('Failed to load patient list.');
+        } finally {
+          setPatientsLoading(false);
+        }
+        return;
+      }
+      setPatientsLoading(true);
+      setPatientsError("");
+      try {
+        const res = await apiClient.get(`/manager/patients/search?q=${encodeURIComponent(value)}`);
+        setPatients(res.data);
+      } catch {
+        setPatientsError('Failed to search patients.');
+      } finally {
+        setPatientsLoading(false);
+      }
+    }
+  };
+
+  // Search doctors
+  const handleDoctorSearchChange = (e) => {
+    setDoctorSearch(e.target.value);
+  };
+
+  const handleDoctorSearchKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      const value = e.target.value;
+      if (value.trim() === "") {
+        setDoctorsLoading(true);
+        setDoctorsError("");
+        try {
+          const res = await apiClient.get('/manager/doctors');
+          setDoctors(res.data);
+        } catch {
+          setDoctorsError('Failed to load doctor list.');
+        } finally {
+          setDoctorsLoading(false);
+        }
+        return;
+      }
+      setDoctorsLoading(true);
+      setDoctorsError("");
+      try {
+        const res = await apiClient.get(`/manager/doctors/search?q=${encodeURIComponent(value)}`);
+        setDoctors(res.data);
+      } catch {
+        setDoctorsError('Failed to search doctors.');
+      } finally {
+        setDoctorsLoading(false);
+      }
+    }
+  };
+
+  const renderOverview = () => (
+    <div>
+      <div className="section-header">
+        <h2>System Overview</h2>
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('patient-profiles')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Patient Profiles
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('doctor-slots')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Doctor Slots
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('arv-treatments')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export ARV Treatments
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('appointments')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem',
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Appointments
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => handleExportCSV('doctor-profiles')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontWeight: 600,
+              borderRadius: 8,
+              padding: '0.5rem 1.25rem', 
+              fontSize: '0.875rem',
+              background: '#22c55e',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <span>⬇️</span> Export Doctor Profiles
+          </button>
+        </div>
+      </div>
+      
+      {loading ? (
+        <div className="loading-state">
+          <div>📊 Loading dashboard statistics...</div>
+        </div>
+      ) : error ? (
+        <div className="error-state">{error}</div>
+      ) : (
+        <div className="stats-grid">
+          <div className="stat-card">
+            <h3>Total Patients</h3>
+            <div className="stat-number">{stats.totalPatients || 0}</div>
+          </div>
+          <div className="stat-card">
+            <h3>Active Doctors</h3>
+            <div className="stat-number">{stats.totalDoctors || 0}</div>
+          </div>
+          <div className="stat-card">
+            <h3>Total Appointments</h3>
+            <div className="stat-number">{stats.totalAppointments || 0}</div>
+          </div>
+          <div className="stat-card">
+            <h3>ARV Treatments</h3>
+            <div className="stat-number">{stats.totalARVTreatments || 0}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const renderPatients = () => (
-    <div className="tab-content">
-      <div className="content-header">
+    <div>
+      <div className="section-header">
         <h2>Patient Management</h2>
-        <button onClick={() => handleExportCSV('patients')} className="export-btn">Export Patients CSV</button>
       </div>
-      <div className="filters">
+      
+      <div className="search-container">
         <input
           type="text"
-          placeholder="Search by patient name..."
+          placeholder="Search patients by name"
           value={patientSearch}
-          onChange={e => setPatientSearch(e.target.value)}
+          onChange={handlePatientSearchChange}
+          onKeyDown={handlePatientSearchKeyDown}
+          className="search-input"
         />
       </div>
-      {patientsLoading ? <div className="loading-spinner">Loading...</div> :
-       patientsError ? <div className="error-message">{patientsError}</div> :
-        (
-          <PaginatedTable
-            data={patients.filter(p => `${p.firstName} ${p.lastName}`.toLowerCase().includes(patientSearch.toLowerCase()))}
-            columns={patientColumns}
-            itemsPerPage={10}
-            emptyMessage="No patients found."
-          />
-        )
-      }
+
+      {patientsLoading ? (
+        <div className="loading-state">Loading patient data...</div>
+      ) : patientsError ? (
+        <div className="error-state">{patientsError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Patient Info</th>
+                <th>Contact</th>
+                <th>Specialty</th>
+                <th>Status</th>
+                <th>Registered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patients.map((p, idx) => (
+                <tr key={p.userId || idx}>
+                  <td>
+                    <div>
+                      <div style={{ fontWeight: '600', color: '#1e293b' }}>
+                        {p.firstName} {p.lastName}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        @{p.username}
+                      </div>
+                    </div>
+                  </td>
+                  <td>{p.email}</td>
+                  <td>{p.specialty || 'General'}</td>
+                  <td>
+                    <span className={`status-badge ${p.isActive ? 'active' : 'inactive'}`}>
+                      {p.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '-'}</td>
+                  <td>
+                    <button
+                      className="action-link"
+                      onClick={() => navigate(`/manager/patients/${p.userId}`)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
+
   const renderDoctors = () => (
-    <div className="tab-content">
-      <div className="content-header">
+    <div>
+      <div className="section-header">
         <h2>Doctor Management</h2>
-        <button onClick={() => handleExportCSV('doctors')} className="export-btn">Export Doctors CSV</button>
       </div>
-      <div className="filters">
+      
+      <div className="search-container">
         <input
           type="text"
-          placeholder="Search by doctor name..."
+          placeholder="Search doctors by name"
           value={doctorSearch}
-          onChange={e => setDoctorSearch(e.target.value)}
+          onChange={handleDoctorSearchChange}
+          onKeyDown={handleDoctorSearchKeyDown}
+          className="search-input"
         />
       </div>
-      {doctorsLoading ? <div className="loading-spinner">Loading...</div> :
-       doctorsError ? <div className="error-message">{doctorsError}</div> :
-        (
-          <PaginatedTable
-            data={doctors.filter(d => `${d.firstName} ${d.lastName}`.toLowerCase().includes(doctorSearch.toLowerCase()))}
-            columns={doctorColumns}
-            itemsPerPage={3}
-            emptyMessage="No doctors found."
-          />
-        )
-      }
+
+      {doctorsLoading ? (
+        <div className="loading-state">Loading doctor data...</div>
+      ) : doctorsError ? (
+        <div className="error-state">{doctorsError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Doctor Info</th>
+                <th>Contact</th>
+                <th>Specialty</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {doctors.map((d, idx) => (
+                <tr key={d.userId || idx}>
+                  <td>
+                    <div>
+                      <div style={{ fontWeight: '600', color: '#1e293b' }}>
+                        Dr. {d.firstName} {d.lastName}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                        @{d.username}
+                      </div>
+                    </div>
+                  </td>
+                  <td>{d.email}</td>
+                  <td>{d.specialty || 'General Medicine'}</td>
+                  <td>
+                    <span className={`status-badge ${d.isActive ? 'active' : 'inactive'}`}>
+                      {d.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td>{d.createdAt ? new Date(d.createdAt).toLocaleDateString() : '-'}</td>
+                  <td>
+                    <button
+                      className="action-link"
+                      onClick={() => navigate(`/manager/doctors/${d.userId}`)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      View Profile
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
+
   const renderARV = () => (
-    <div className="tab-content">
-      <div className="content-header">
-        <h2>ARV Regimen Management</h2>
-        {/* Thêm nút export nếu cần */}
+    <div>
+      <div className="section-header">
+        <h2>ARV Treatment Management</h2>
       </div>
-      {arvLoading ? <div className="loading-spinner">Loading...</div> :
-       arvError ? <div className="error-message">{arvError}</div> :
-        (
-          <PaginatedTable
-            data={arvTreatments}
-            columns={arvColumns}
-            itemsPerPage={15}
-            emptyMessage="No ARV regimens found."
-          />
-        )
-      }
+      <form className="arv-search-form" onSubmit={handleARVSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <label>
+          From:
+          <input type="date" value={arvFrom} onChange={handleARVFromChange} />
+        </label>
+        <label>
+          To:
+          <input type="date" value={arvTo} onChange={handleARVToChange} />
+        </label>
+        <button type="submit" className="search-btn">Search</button>
+        <button type="button" className="reset-btn" onClick={() => { setArvFrom(""); setArvTo(""); fetchARVTreatments(); }}>Reset</button>
+      </form>
+      {arvLoading ? (
+        <div className="loading-state">Loading ARV treatment data...</div>
+      ) : arvError ? (
+        <div className="error-state">{arvError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Treatment ID</th>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Regimen</th>
+                <th>Duration</th>
+                <th>Adherence</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {arvTreatments.map((arv, idx) => (
+                <tr key={arv.arvTreatmentID || idx}>
+                  <td>#{arv.arvTreatmentID}</td>
+                  <td>{arv.patientName || 'N/A'}</td>
+                  <td>{arv.doctorName || 'N/A'}</td>
+                  <td style={{ fontWeight: '600' }}>{arv.regimen}</td>
+                  <td>
+                    <div style={{ fontSize: '0.75rem' }}>
+                      <div>Start: {arv.startDate}</div>
+                      {arv.endDate && <div>End: {arv.endDate}</div>}
+                    </div>
+                  </td>
+                  <td>{arv.adherence || 'Not recorded'}</td>
+                  <td>
+                    <span className={`status-badge ${arv.isActive ? 'active' : 'inactive'}`}>
+                      {arv.isActive ? 'Active' : 'Completed'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
+
   const renderSchedules = () => (
-    <div className="tab-content">
-      <div className="content-header">
+    <div>
+      <div className="section-header">
         <h2>Schedule Management</h2>
-        <button onClick={() => handleExportCSV('schedules')} className="export-btn">Export Schedules CSV</button>
       </div>
-      {/* Giữ lại các filter nếu bạn cần */}
-      {schedulesLoading ? <div className="loading-spinner">Loading...</div> :
-       schedulesError ? <div className="error-message">{schedulesError}</div> :
-        (
-          <PaginatedTable
-            data={schedules}
-            columns={scheduleColumns}
-            itemsPerPage={15}
-            emptyMessage="No schedules found."
-          />
-        )
-      }
+      <form className="schedule-search-form" onSubmit={handleScheduleSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <label>
+          From:
+          <input type="date" value={scheduleFrom} onChange={handleScheduleFromChange} />
+        </label>
+        <label>
+          To:
+          <input type="date" value={scheduleTo} onChange={handleScheduleToChange} />
+        </label>
+        <button type="submit" className="search-btn">Search</button>
+        <button type="button" className="reset-btn" onClick={() => { setScheduleFrom(""); setScheduleTo(""); fetchSchedules(); }}>Reset</button>
+      </form>
+      {schedulesLoading ? (
+        <div className="loading-state">Loading schedule data...</div>
+      ) : schedulesError ? (
+        <div className="error-state">{schedulesError}</div>
+      ) : (
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Slot ID</th>
+                <th>Doctor</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Availability</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedules.map((s, idx) => (
+                <tr key={s.availabilitySlotId || idx}>
+                  <td>#{s.availabilitySlotId}</td>
+                  <td>
+                    {s.doctorUser && s.doctorUser.userId ? 
+                      `Doctor ID: ${s.doctorUser.userId}` : 'N/A'}
+                  </td>
+                  <td style={{ fontWeight: '600' }}>{s.slotDate}</td>
+                  <td>
+                    <div style={{ fontSize: '0.875rem' }}>
+                      {s.startTime} - {s.endTime}
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${s.isBooked ? 'booked' : 'available'}`}>
+                      {s.isBooked ? 'Booked' : 'Available'}
+                    </span>
+                  </td>
+                  <td>{s.notes || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
+
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview': return renderOverview();
-      case 'patients': return renderPatients();
-      case 'doctors': return renderDoctors();
-      case 'arv': return renderARV();
-      case 'schedules': return renderSchedules();
-      default: return renderOverview();
+      case 'overview':
+        return renderOverview();
+      case 'patients':
+        return renderPatients();
+      case 'doctors':
+        return renderDoctors();
+      case 'arv':
+        return renderARV();
+      case 'schedules':
+        return renderSchedules();
+      default:
+        return renderOverview();
     }
   };
 
   return (
     <div className="manager-dashboard">
       <DashboardHeader title="Manager Dashboard" />
-      
-      {/* --- THÊM MỚI: Banner thông báo cập nhật Gender --- */}
-      {showGenderNotification && (
-        <div className="gender-notification-banner">
-          <div className="gender-notification-content">
-            <span className="gender-notification-icon">⚠️</span>
-            <div className="gender-notification-text">
-              <strong>Profile Incomplete:</strong> Please update your gender in Settings to complete your profile.
-            </div>
-            <div className="gender-notification-actions">
-              <button
-                onClick={handleGoToSettings}
-                className="gender-btn primary"
-              >
-                Go to Settings
-              </button>
-              <button
-                onClick={dismissGenderNotification}
-                className="gender-btn secondary"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       
       <div className="dashboard-container">
         <div className="dashboard-layout">
