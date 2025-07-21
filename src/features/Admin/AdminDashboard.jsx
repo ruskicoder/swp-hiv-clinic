@@ -6,6 +6,7 @@ import ErrorBoundary from '../../components/ErrorBoundary';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './AdminDashboard.css';
+import PaginatedTable from '../../features/components/PaginatedTable'; // Import component PaginatedTable.jsx
 
 // ----- COMPONENT MỚI: FORM TẠO USER THỐNG NHẤT -----
 const CreateUserForm = ({ loadDashboardData, setActiveTab }) => {
@@ -124,6 +125,7 @@ const AdminDashboard = () => {
   const [appointmentsError, setAppointmentsError] = useState('');
 
   const [isTabChanging, setIsTabChanging] = useState(false);
+  const [doctorsError, setDoctorsError] = useState('');
 
   const loadDashboardData = useCallback(async () => {
     setError(''); setUsersError(''); setManagersError(''); setAppointmentsError('');
@@ -141,7 +143,7 @@ const AdminDashboard = () => {
       setPatients(patientsResult.status === 'fulfilled' ? patientsResult.value.data : []);
 
       setDoctors(doctorsResult.status === 'fulfilled' ? doctorsResult.value.data : []);
-
+      
       setManagers(managersResult.status === 'fulfilled' ? managersResult.value.data : []);
       if (managersResult.status === 'rejected') setManagersError('Failed to load managers');
 
@@ -177,7 +179,85 @@ const AdminDashboard = () => {
     { id: 'appointments', label: 'All Appointments', icon: '📅' },
     { id: 'create-user', label: 'Create User', icon: '➕' }
   ];
-
+  // Bắt buộc phải có đoạn khai báo này
+const appointmentColumns = [
+    { header: 'Patient', cell: appt => safeRender(appt.patientUser?.username) },
+    { header: 'Doctor', cell: appt => `Dr. ${safeRender(appt.doctorUser?.username)}` },
+    { header: 'Date & Time', cell: appt => safeDateTime(appt.appointmentDateTime) },
+    { header: 'Status', cell: appt => (
+      <span className={`status ${safeRender(appt.status).toLowerCase()}`}>
+        {safeRender(appt.status)}
+      </span>
+    )}
+];
+   const ManagerColumns = [
+    { header: 'Username', cell: user => safeRender(user.username) },
+    { header: 'Email', cell: user => safeRender(user.email) },
+    { header: 'Role', cell: user => safeRender(user.role?.roleName) },
+    { header: 'Status', cell: user => (
+      <span className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}>
+        {user.isActive ? 'Active' : 'Inactive'}
+      </span>
+    )},
+    { header: 'Created', cell: user => safeDate(user.createdAt) },
+    { header: 'Actions', cell: user => (
+      <div className="action-buttons">
+        <button className="btn-toggle" onClick={() => handleToggleUserStatus(user.userId)}>
+          {user.isActive ? 'Deactivate' : 'Activate'}
+        </button>
+        <button className="btn-reset" onClick={() => handleResetPassword(user.userId)}>
+          Reset Password
+        </button>
+      </div>
+    )}
+  ];
+  const doctorColumns = [
+  // Sử dụng "doc" và thêm tiền tố "Dr."
+  { header: 'Doctor Name', cell: doc => `Dr. ${safeRender(doc.username)}` }, 
+  { header: 'Specialization', cell: doc => safeRender(doc.specialization) },
+  { header: 'Phone', cell: doc => safeRender(doc.phoneNumber) },
+  { header: 'Email', cell: doc => safeRender(doc.email) },
+  { header: 'Status', cell: doc => (
+    <span className={`status-badge ${doc.isActive ? 'active' : 'inactive'}`}>
+      {doc.isActive ? 'Active' : 'Inactive'}
+    </span>
+  )},
+  { header: 'Created', cell: doc => safeDate(doc.createdAt) },
+  { header: 'Actions', cell: doc => (
+    <div className="action-buttons">
+      <button className="btn-toggle" onClick={() => handleToggleUserStatus(doc.userId)}>
+        {doc.isActive ? 'Deactivate' : 'Activate'}
+      </button>
+      {/* Nút Reset Password vẫn có thể giữ lại nếu bạn muốn */}
+      <button className="btn-reset" onClick={() => handleResetPassword(doc.userId)}>
+        Reset Password
+      </button>
+    </div>
+  )}
+];
+  const userColumns = [
+    { header: 'Username', cell: user => safeRender(user.username) },
+    { header: 'Email', cell: user => safeRender(user.email) },
+    { header: 'Role', cell: user => safeRender(user.role?.roleName) },
+    { header: 'Status', cell: user => (
+      <span className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}>
+        {user.isActive ? 'Active' : 'Inactive'}
+      </span>
+    )},
+    { header: 'Created', cell: user => safeDate(user.createdAt) },
+    { header: 'Actions', cell: user => (
+      <div className="action-buttons">
+        <button className="btn-toggle" onClick={() => handleToggleUserStatus(user.userId)}>
+          {user.isActive ? 'Deactivate' : 'Activate'}
+        </button>
+        <button className="btn-reset" onClick={() => handleResetPassword(user.userId)}>
+          Reset Password
+        </button>
+      </div>
+    )}
+  ];
+  
+ 
   // --- CÁC HÀM RENDER ---
   const renderOverview = () => (
     <ErrorBoundary>
@@ -195,18 +275,17 @@ const AdminDashboard = () => {
     </ErrorBoundary>
   );
 
-  const renderUsers = () => (
+ const renderUsers = () => (
     <ErrorBoundary>
       <div className="users-section">
         <div className="content-header"><h2>Manage All Users</h2><p>View and manage all system users</p></div>
-        {usersError && <div className="error-message">{usersError}</div>}
-        {!users || users.length === 0 ? <div className="no-data"><p>No users found.</p></div> : (
-          <div className="users-table-container">
-            <table className="users-table">
-              <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
-              <tbody>{users.map((user, i) => <tr key={user?.userId || i}><td>{safeRender(user?.username)}</td><td>{safeRender(user?.email)}</td><td>{safeRender(user?.role?.roleName)}</td><td><span className={`status-badge ${user?.isActive ? 'active' : 'inactive'}`}>{user?.isActive ? 'Active' : 'Inactive'}</span></td><td>{safeDate(user?.createdAt)}</td><td><div className="action-buttons"><button className="btn-toggle" onClick={() => handleToggleUserStatus(user?.userId)}>{user?.isActive ? 'Deactivate' : 'Activate'}</button><button className="btn-reset" onClick={() => handleResetPassword(user?.userId)}>Reset Password</button></div></td></tr>)}</tbody>
-            </table>
-          </div>
+        {usersError ? <div className="error-message">{usersError}</div> : (
+          <PaginatedTable
+            data={users}
+            columns={userColumns}
+            itemsPerPage={3} // Bạn có thể tùy chỉnh số lượng
+            emptyMessage="No users found."
+          />
         )}
       </div>
     </ErrorBoundary>
@@ -214,27 +293,34 @@ const AdminDashboard = () => {
   
   const renderManagers = () => (
     <ErrorBoundary>
-      <div className="managers-section">
-        <div className="content-header"><h2>Manage Managers</h2><p>View and manage manager accounts</p></div>
-        {managersError && <div className="error-message">{managersError}</div>}
-        {!managers || managers.length === 0 ? <div className="no-data"><p>No managers found.</p></div> : (
-          <div className="users-table-container">
-            <table className="users-table">
-              <thead><tr><th>Username</th><th>Email</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
-              <tbody>{managers.map((manager, i) => <tr key={manager?.userId || i}><td>{safeRender(manager?.username)}</td><td>{safeRender(manager?.email)}</td><td><span className={`status-badge ${manager?.isActive ? 'active' : 'inactive'}`}>{manager?.isActive ? 'Active' : 'Inactive'}</span></td><td>{safeDate(manager?.createdAt)}</td><td><div className="action-buttons"><button className="btn-toggle" onClick={() => handleToggleUserStatus(manager?.userId)}>{manager?.isActive ? 'Deactivate' : 'Activate'}</button><button className="btn-reset" onClick={() => handleResetPassword(manager?.userId)}>Reset Password</button></div></td></tr>)}</tbody>
-            </table>
-          </div>
+      <div className="users-section">
+        <div className="content-header"><h2>Manage All Managers</h2><p>View and manage all system managers</p></div>
+        {managersError ? <div className="error-message">{managersError}</div> : (
+          <PaginatedTable
+            data={managers}
+            columns={ManagerColumns} // Sử dụng cột của Manager
+            itemsPerPage={3} // Bạn có thể tùy chỉnh số lượng
+            emptyMessage="No users found."
+          />
         )}
       </div>
     </ErrorBoundary>
   );
-
-  const renderDoctors = () => (
+   const renderDoctors = () => (
     <ErrorBoundary>
-      <div className="doctors-section">
+      {/* Sửa lại className cho đúng */}
+      <div className="doctors-section"> 
         <div className="content-header"><h2>Manage Doctors</h2><p>View and manage doctor accounts</p></div>
-        {!doctors || doctors.length === 0 ? <div className="no-data"><p>No doctors found.</p></div> : (
-          <div className="doctors-grid">{doctors.map((doctor, i) => <ErrorBoundary key={doctor?.userId || i}><div className="doctor-card"><h4>Dr. {safeRender(doctor?.username)}</h4><p><strong>Email:</strong> {safeRender(doctor?.email)}</p><p><strong>Status:</strong><span className={`status-badge ${doctor?.isActive ? 'active' : 'inactive'}`}>{doctor?.isActive ? 'Active' : 'Inactive'}</span></p><p><strong>Created:</strong> {safeDate(doctor?.createdAt)}</p><div className="doctor-actions"><button className="btn-toggle" onClick={() => handleToggleUserStatus(doctor?.userId)}>{doctor?.isActive ? 'Deactivate' : 'Activate'}</button></div></div></ErrorBoundary>)}</div>
+
+        {doctorsError && <div className="error-message">{doctorsError}</div>} 
+
+        {!doctorsError && (
+          <PaginatedTable
+            data={doctors}
+            columns={doctorColumns} // <-- SỬ DỤNG CỘT CỦA DOCTOR
+            itemsPerPage={5}        // Bạn có thể hiển thị 5 bác sĩ mỗi trang
+            emptyMessage="No doctors found."
+          />
         )}
       </div>
     </ErrorBoundary>
@@ -242,16 +328,15 @@ const AdminDashboard = () => {
 
   const renderAppointments = () => (
     <ErrorBoundary>
-      <div className="appointments-section">
-        <div className="content-header"><h2>All Appointments</h2><p>View all system appointments</p></div>
-        {appointmentsError && <div className="error-message">{appointmentsError}</div>}
-        {!appointments || appointments.length === 0 ? <div className="no-data"><p>No appointments found.</p></div> : (
-          <div className="appointments-table-container">
-            <table className="appointments-table">
-              <thead><tr><th>Patient</th><th>Doctor</th><th>Date & Time</th><th>Status</th></tr></thead>
-              <tbody>{appointments.map((appt, i) => <tr key={appt?.appointmentId || i}><td>{safeRender(appt?.patientUser?.username)}</td><td>Dr. {safeRender(appt?.doctorUser?.username)}</td><td>{safeDateTime(appt?.appointmentDateTime)}</td><td><span className={`status ${safeRender(appt?.status).toLowerCase()}`}>{safeRender(appt?.status)}</span></td></tr>)}</tbody>
-            </table>
-          </div>
+      <div className="users-section">
+        <div className="content-header"><h2>Manage All Appointments</h2><p>View and manage all system appointments</p></div>
+        {appointmentsError ? <div className="error-message">{appointmentsError}</div> : (
+          <PaginatedTable
+            data={appointments}
+            columns={appointmentColumns} // Sử dụng cột của appointments
+            itemsPerPage={3} // Bạn có thể tùy chỉnh số lượng
+            emptyMessage="No users found."
+          />
         )}
       </div>
     </ErrorBoundary>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import './ManagerDashboard.css';
+import PaginatedTable from '../../features/components/PaginatedTable';
 
 const SIDEBAR_OPTIONS = [
   { key: 'overview', label: 'Dashboard Overview', icon: '📊' },
@@ -72,6 +73,42 @@ const ManagerDashboard = () => {
   const handleExportCSV = async (endpoint) => {
     // ... code giữ nguyên ...
   };
+   const patientColumns = [
+    { header: 'Patient Name', cell: p => `${p.lastName} ${p.firstName}` },
+    { header: 'Gender', cell: p => p.gender || 'N/A' },
+    { header: 'Date of Birth', cell: p => new Date(p.dateOfBirth).toLocaleDateString() },
+    { header: 'Phone', cell: p => p.phoneNumber || 'N/A' },
+    { header: 'Actions', cell: p => (
+      <button className="view-btn" onClick={() => navigate(`/manager/patients/${p.patientId}`)}>
+        View Details
+      </button>
+    )}
+  ];
+
+  const doctorColumns = [
+    { header: 'Doctor Name', cell: d => `Dr. ${d.lastName} ${d.firstName}` },
+    { header: 'Specialization', cell: d => d.specialization || 'N/A' },
+    { header: 'Email', cell: d => d.email },
+    { header: 'Phone', cell: d => d.phoneNumber || 'N/A' },
+     { header: 'Actions', cell: d => (
+      <button className="view-btn" onClick={() => navigate(`/manager/doctors/${d.doctorId}`)}>
+        View Schedule
+      </button>
+    )}
+  ];
+
+  const arvColumns = [
+    { header: 'Regimen Code', cell: a => a.regimenCode },
+    { header: 'Line', cell: a => a.line },
+    { header: 'Description', cell: a => a.description }
+  ];
+
+  const scheduleColumns = [
+    { header: 'Doctor', cell: s => `Dr. ${s.doctor.lastName} ${s.doctor.firstName}` },
+    { header: 'Date', cell: s => new Date(s.workDate).toLocaleDateString() },
+    { header: 'Start Time', cell: s => s.startTime.substring(0, 5) },
+    { header: 'End Time', cell: s => s.endTime.substring(0, 5) }
+  ];
 
   // --- THÊM MỚI: useEffect để tải hồ sơ người dùng khi component được mount ---
   useEffect(() => {
@@ -109,11 +146,99 @@ const ManagerDashboard = () => {
   // ... (fetchARVTreatments, fetchSchedules, handle search, etc.)
 
   const renderOverview = () => { /* ... code giữ nguyên ... */ };
-  const renderPatients = () => { /* ... code giữ nguyên ... */ };
-  const renderDoctors = () => { /* ... code giữ nguyên ... */ };
-  const renderARV = () => { /* ... code giữ nguyên ... */ };
-  const renderSchedules = () => { /* ... code giữ nguyên ... */ };
-
+  const renderPatients = () => (
+    <div className="tab-content">
+      <div className="content-header">
+        <h2>Patient Management</h2>
+        <button onClick={() => handleExportCSV('patients')} className="export-btn">Export Patients CSV</button>
+      </div>
+      <div className="filters">
+        <input
+          type="text"
+          placeholder="Search by patient name..."
+          value={patientSearch}
+          onChange={e => setPatientSearch(e.target.value)}
+        />
+      </div>
+      {patientsLoading ? <div className="loading-spinner">Loading...</div> :
+       patientsError ? <div className="error-message">{patientsError}</div> :
+        (
+          <PaginatedTable
+            data={patients.filter(p => `${p.firstName} ${p.lastName}`.toLowerCase().includes(patientSearch.toLowerCase()))}
+            columns={patientColumns}
+            itemsPerPage={10}
+            emptyMessage="No patients found."
+          />
+        )
+      }
+    </div>
+  );
+  const renderDoctors = () => (
+    <div className="tab-content">
+      <div className="content-header">
+        <h2>Doctor Management</h2>
+        <button onClick={() => handleExportCSV('doctors')} className="export-btn">Export Doctors CSV</button>
+      </div>
+      <div className="filters">
+        <input
+          type="text"
+          placeholder="Search by doctor name..."
+          value={doctorSearch}
+          onChange={e => setDoctorSearch(e.target.value)}
+        />
+      </div>
+      {doctorsLoading ? <div className="loading-spinner">Loading...</div> :
+       doctorsError ? <div className="error-message">{doctorsError}</div> :
+        (
+          <PaginatedTable
+            data={doctors.filter(d => `${d.firstName} ${d.lastName}`.toLowerCase().includes(doctorSearch.toLowerCase()))}
+            columns={doctorColumns}
+            itemsPerPage={3}
+            emptyMessage="No doctors found."
+          />
+        )
+      }
+    </div>
+  );
+  const renderARV = () => (
+    <div className="tab-content">
+      <div className="content-header">
+        <h2>ARV Regimen Management</h2>
+        {/* Thêm nút export nếu cần */}
+      </div>
+      {arvLoading ? <div className="loading-spinner">Loading...</div> :
+       arvError ? <div className="error-message">{arvError}</div> :
+        (
+          <PaginatedTable
+            data={arvTreatments}
+            columns={arvColumns}
+            itemsPerPage={15}
+            emptyMessage="No ARV regimens found."
+          />
+        )
+      }
+    </div>
+  );
+  const renderSchedules = () => (
+    <div className="tab-content">
+      <div className="content-header">
+        <h2>Schedule Management</h2>
+        <button onClick={() => handleExportCSV('schedules')} className="export-btn">Export Schedules CSV</button>
+      </div>
+      {/* Giữ lại các filter nếu bạn cần */}
+      {schedulesLoading ? <div className="loading-spinner">Loading...</div> :
+       schedulesError ? <div className="error-message">{schedulesError}</div> :
+        (
+          <PaginatedTable
+            data={schedules}
+            columns={scheduleColumns}
+            itemsPerPage={15}
+            emptyMessage="No schedules found."
+          />
+        )
+      }
+    </div>
+  );
   const renderContent = () => {
     switch (activeTab) {
       case 'overview': return renderOverview();
