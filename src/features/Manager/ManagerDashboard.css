@@ -283,7 +283,7 @@
 
 /* Action Links */
 .action-link {
-  color: #22c55e;
+  color: #070707;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.2s ease;
@@ -291,7 +291,7 @@
 }
 
 .action-link:hover {
-  color: #16a34a;
+  color: #e8ece9;
   text-decoration: underline;
 }
 

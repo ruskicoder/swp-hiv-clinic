@@ -9,6 +9,7 @@ import ErrorBoundary from '../../components/ErrorBoundary';
 import { createBookingData, validateBookingData } from '../../utils/dateUtils';
 import { safeRender, safeDate, safeTime } from '../../utils/renderUtils';
 import './CustomerDashboard.css';
+import PaginatedTable from '../../features/components/PaginatedTable'; // Import PaginatedTable component
 
 const CustomerDashboard = () => {
   const { user, logout } = useAuth();
@@ -26,7 +27,49 @@ const CustomerDashboard = () => {
   const [doctorSlots, setDoctorSlots] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
   const [showGenderNotification, setShowGenderNotification] = useState(false);
+const appointmentColumns = [
+    { header: 'Doctor', cell: apt => `Dr. ${safeRender(apt.doctorUser?.firstName)} ${safeRender(apt.doctorUser?.lastName)}` },
+    { header: 'Date', cell: apt => safeDate(apt.appointmentDateTime) },
+    { header: 'Time', cell: apt => safeTime(apt.appointmentDateTime) },
+    { header: 'Status', cell: apt => (
+        <span className={`status ${apt.status?.toLowerCase()}`}>
+          {safeRender(apt.status)}
+        </span>
+      )
+    },
+    { header: 'Actions', cell: apt => (
+      apt.status === 'Scheduled' && new Date(apt.appointmentDateTime) > new Date() && (
+        <button
+          onClick={() => {
+            const reason = prompt('Please provide a reason for cancellation (optional):');
+            if (reason !== null) {
+              handleCancelBooking(apt.appointmentId, reason);
+            }
+          }}
+          className="cancel-btn"
+          disabled={loading}
+        >
+          Cancel
+        </button>
+      )
+    )}
+  ];
 
+  const doctorColumns = [
+    { header: 'Doctor Name', cell: doc => `Dr. ${safeRender(doc.firstName)} ${safeRender(doc.lastName)}` },
+    { header: 'Specialty', cell: doc => safeRender(doc.specialty) },
+    { header: 'Email', cell: doc => safeRender(doc.email) },
+    { header: 'Actions', cell: doc => (
+        <button 
+          onClick={() => handleBookDoctor(doc)}
+          className="book-btn"
+          disabled={loading}
+        >
+          Book Appointment
+        </button>
+      )
+    }
+  ];
   // Load dashboard data
   const loadDashboardData = async () => {
     try {
@@ -311,8 +354,7 @@ const CustomerDashboard = () => {
     </ErrorBoundary>
   );
 
-  // Render appointments section
-  const renderAppointments = () => (
+   const renderAppointments = () => (
     <ErrorBoundary>
       <div className="appointments-content">
         <div className="content-header">
@@ -320,66 +362,27 @@ const CustomerDashboard = () => {
           <p>View and manage your appointments</p>
         </div>
 
-        {error && (
-          <div className="error-message">
-            {error}
-            <button onClick={loadDashboardData} className="refresh-btn">
-              Retry
+        {error && <div className="error-message">{error}</div>}
+
+        {appointments?.length === 0 && !loading ? (
+          <div className="no-data">
+            <p>No appointments found.</p>
+            <button onClick={() => setActiveTab('doctors')} className="book-btn">
+              Book Your First Appointment
             </button>
           </div>
+        ) : (
+          <PaginatedTable
+            data={appointments}
+            columns={appointmentColumns}
+            itemsPerPage={5}
+            emptyMessage="No appointments found."
+          />
         )}
-
-        <div className="appointments-list">
-          {appointments?.length === 0 ? (
-            <div className="no-data">
-              <p>No appointments found.</p>
-              <button onClick={() => setActiveTab('doctors')} className="book-btn">
-                Book Your First Appointment
-              </button>
-            </div>
-          ) : (
-            appointments.map(appointment => (
-              <div key={appointment.appointmentId} className="appointment-card">
-                <div className="appointment-header">
-                  <h4>Dr. {safeRender(appointment.doctorUser?.firstName)} {safeRender(appointment.doctorUser?.lastName)}</h4>
-                  <span className={`status ${appointment.status?.toLowerCase()}`}>
-                    {safeRender(appointment.status)}
-                  </span>
-                </div>
-                <div className="appointment-details">
-                  <p><strong>Date:</strong> {safeDate(appointment.appointmentDateTime)}</p>
-                  <p><strong>Time:</strong> {safeTime(appointment.appointmentDateTime)}</p>
-                  <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
-                  <p><strong>Specialty:</strong> {safeRender(appointment.doctorUser?.specialty)}</p>
-                  {appointment.appointmentNotes && (
-                    <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
-                  )}
-                </div>
-                <div className="appointment-actions">
-                  {appointment.status === 'Scheduled' && new Date(appointment.appointmentDateTime) > new Date() && (
-                    <button 
-                      onClick={() => {
-                        const reason = prompt('Please provide a reason for cancellation (optional):');
-                        if (reason !== null) {
-                          handleCancelBooking(appointment.appointmentId, reason);
-                        }
-                      }}
-                      className="cancel-btn"
-                      disabled={loading}
-                    >
-                      Cancel Appointment
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
       </div>
     </ErrorBoundary>
   );
 
-  // Render doctors section
   const renderDoctors = () => (
     <ErrorBoundary>
       <div className="doctors-content">
@@ -388,44 +391,23 @@ const CustomerDashboard = () => {
           <p>Choose a doctor to book an appointment</p>
         </div>
 
-        {error && (
-          <div className="error-message">
-            {error}
-            <button onClick={loadDashboardData} className="refresh-btn">
-              Retry
-            </button>
-          </div>
-        )}
+        {error && <div className="error-message">{error}</div>}
 
-        <div className="doctors-grid">
-          {doctors?.length === 0 ? (
-            <div className="no-data">
-              <p>No doctors available at the moment.</p>
-              <button onClick={loadDashboardData} className="refresh-btn">
-                Refresh
-              </button>
-            </div>
-          ) : (
-            doctors.map(doctor => (
-              <div key={doctor.userId} className="doctor-card">
-                <h4>Dr. {safeRender(doctor.firstName)} {safeRender(doctor.lastName)}</h4>
-                <p><strong>Specialty:</strong> {safeRender(doctor.specialty)}</p>
-                <p><strong>Email:</strong> {safeRender(doctor.email)}</p>
-                <button 
-                  onClick={() => handleBookDoctor(doctor)}
-                  className="book-btn"
-                  disabled={loading}
-                >
-                  Book Appointment
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+        {doctors?.length === 0 && !loading ? (
+          <div className="no-data">
+            <p>No doctors available at the moment.</p>
+          </div>
+        ) : (
+          <PaginatedTable
+            data={doctors}
+            columns={doctorColumns}
+            itemsPerPage={6}
+            emptyMessage="No doctors available."
+          />
+        )}
       </div>
     </ErrorBoundary>
   );
-
   // Render booking section
   const renderBookAppointment = () => (
     <ErrorBoundary>
