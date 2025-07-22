@@ -9,8 +9,7 @@ import NotificationManagerTab from '../../components/notifications/NotificationM
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
-import Pagination from '../components/PaginatedTable';
-/**
+import PaginatedTable from '../../features/components/PaginatedTable';/**
  * Doctor Dashboard component for managing appointments, availability, and patient records
  */
 const DoctorDashboard = () => {
