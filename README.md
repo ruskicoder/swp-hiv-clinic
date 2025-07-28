@@ -282,6 +282,16 @@ http://localhost:8080/api
 - `POST /notifications/read-all` - Mark all notifications as read
 - `POST /notifications/doctor/send` - Send notification to patient
 
+### Manager Endpoints
+
+- `GET /api/manager/patients` - Get patient informations
+- `GET /api/manager/patients/search?q=abc` - Search patients
+- `GET /api/manager/patients/{id}/profile` - View patient profile
+- `GET /api/manager/doctors` - Get doctor informations
+- `GET /api/manager/doctors/search?q=xyz` - Search doctors
+- `GET /api/manager/schedules` - Get schedule informations
+- `GET /api/manager/schedules/search?from=yyyy-mm-dd&to=yyyy-mm-dd` - Search schedule by dates 
+
 ### Admin Endpoints
 
 - `GET /admin/users` - Get all users
