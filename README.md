@@ -238,8 +238,8 @@ http://localhost:8080/api
 
 ### Authentication Endpoints
 
-- `POST /auth/login` - User login
-- `POST /auth/register` - User registration
+- `POST /auth/login` - User login (Do Dang Khoa)
+- `POST /auth/register` - User registration (Do Dang Khoa)
 - `GET /auth/me` - Get current user
 - `PUT /auth/profile` - Update user profile
 - `GET /auth/check-username` - Check username availability
@@ -247,15 +247,15 @@ http://localhost:8080/api
 
 ### Patient Endpoints
 
-- `GET /patients` - List all patients (Admin only)
-- `GET /patient-record/my-record` - Get patient's own record
+- `GET /patients` - List all patients (Admin only) (Nguyen Thanh Dat)
+- `GET /patient-record/my-record` - Get patient's own record 
 - `PUT /patient-record/my-record` - Update patient record
 - `POST /patient-record/upload-image` - Upload patient image
 
 ### Doctor Endpoints
 
-- `GET /doctors` - List all doctors
-- `GET /doctors/{id}` - Get doctor details
+- `GET /doctors` - List all doctors (Do Dang Khoa)
+- `GET /doctors/{id}` - Get doctor details (Do Dang Khoa)
 - `POST /doctors/availability` - Set doctor availability
 - `GET /doctors/availability/my-slots` - Get doctor's availability
 - `PUT /doctors/availability/{slotId}` - Update availability slot
@@ -284,21 +284,21 @@ http://localhost:8080/api
 
 ### Manager Endpoints
 
-- `GET /api/manager/patients` - Get patient informations
-- `GET /api/manager/patients/search?q=abc` - Search patients
-- `GET /api/manager/patients/{id}/profile` - View patient profile
-- `GET /api/manager/doctors` - Get doctor informations
-- `GET /api/manager/doctors/search?q=xyz` - Search doctors
-- `GET /api/manager/schedules` - Get schedule informations
-- `GET /api/manager/schedules/search?from=yyyy-mm-dd&to=yyyy-mm-dd` - Search schedule by dates 
+- `GET /api/manager/patients` - Get patient informations (Tao Minh Tuan)
+- `GET /api/manager/patients/search?q=abc` - Search patients (Tao Minh Tuan)
+- `GET /api/manager/patients/{id}/profile` - View patient profile (Tao Minh Tuan)
+- `GET /api/manager/doctors` - Get doctor informations (Tao Minh Tuan)
+- `GET /api/manager/doctors/search?q=xyz` - Search doctors (Tao Minh Tuan)
+- `GET /api/manager/schedules` - Get schedule informations (Tao Minh Tuan)
+- `GET /api/manager/schedules/search?from=yyyy-mm-dd&to=yyyy-mm-dd` - Search schedule by dates (Tao Minh Tuan)
 
 ### Admin Endpoints
 
-- `GET /admin/users` - Get all users
-- `GET /admin/patients` - Get all patients
-- `GET /admin/doctors` - Get all doctors
-- `POST /admin/doctors` - Create new doctor
-- `PUT /admin/users/{id}/toggle-status` - Toggle user status
+- `GET /admin/users` - Get all users (Nguyen Thanh Dat)
+- `GET /admin/patients` - Get all patients (Nguyen Thanh Dat)
+- `GET /admin/doctors` - Get all doctors (Nguyen Thanh Dat)
+- `POST /admin/doctors` - Create new doctor (Nguyen Thanh Dat)
+- `PUT /admin/users/{id}/toggle-status` - Toggle user status (Nguyen Thanh Dat)
 
 ## 🧪 Testing
 
