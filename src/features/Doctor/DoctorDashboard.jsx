@@ -491,7 +491,7 @@ const renderAppointments = () => {
           <PaginatedTable
             data={safeAppointments}
             columns={appointmentColumns}
-            itemsPerPage={5} // Hiển thị 10 cuộc hẹn mỗi trang
+            itemsPerPage={9} // Hiển thị 10 cuộc hẹn mỗi trang
             emptyMessage="No appointments scheduled."
           />
         ) : (
