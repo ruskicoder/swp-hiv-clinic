@@ -1,4 +1,6 @@
-# HIV Clinic Management System RELEASE
+# HIV Clinic Management System
+
+
 
 A comprehensive web-based application for managing HIV clinic operations, patient care, and treatment management. The system provides role-based access control for Guest, Patient, Doctor, and Admin users with a focus on appointment scheduling, ARV treatment tracking, and patient record management.
 
@@ -15,6 +17,7 @@ The HIV Clinic Management System is designed to streamline clinic operations, en
 - **Notification System**: Real-time notifications and messaging
 - **Privacy Controls**: Patient privacy settings and data protection
 - **Admin Dashboard**: System administration and user management
+- **Manager Dashboard**:  View and export reports
 - **Doctor Dashboard**: Patient management and treatment oversight
 - **Patient Dashboard**: Personal health information and appointment management
 
@@ -189,6 +192,16 @@ npm run dev
 - Send notifications to patients
 - Manage availability schedules
 
+### Manager User
+
+- Get patient informations
+- Search patients 
+- View patient profile 
+- Get doctor informations 
+- Search doctors 
+- Get schedule informations 
+- Search schedule by dates 
+
 ### Admin User
 
 - Manage all users (patients, doctors)
@@ -240,17 +253,17 @@ http://localhost:8080/api
 
 - `POST /auth/login` - User login (Do Dang Khoa)
 - `POST /auth/register` - User registration (Do Dang Khoa)
-- `GET /auth/me` - Get current user
-- `PUT /auth/profile` - Update user profile
-- `GET /auth/check-username` - Check username availability (Nguyen Thanh An)
-- `GET /auth/check-email` - Check email availability (Nguyen Thanh An)
+- `GET /auth/me` - Get current user (Do Dang Khoa)
+- `PUT /auth/profile` - Update user profile (Do Dang Khoa)
+- `GET /auth/check-username` - Check username availability (Pham Phuoc An)
+- `GET /auth/check-email` - Check email availability (Pham Phuoc An)
 
 ### Patient Endpoints
 
 - `GET /patients` - List all patients (Admin only) (Nguyen Thanh Dat)
-- `GET /patient-record/my-record` - Get patient's own record (Nguyen Thanh An) 
-- `PUT /patient-record/my-record` - Update patient record (Nguyen Thanh An + Tao Minh Tuan) 
-- `POST /patient-record/upload-image` - Upload patient image (Nguyen Thanh An)
+- `GET /patient-record/my-record` - Get patient's own record (Pham Phuoc An) 
+- `PUT /patient-record/my-record` - Update patient record (Pham Phuoc An + Tao Minh Tuan) 
+- `POST /patient-record/upload-image` - Upload patient image (Pham Phuoc An + Tao Minh Tuan)
 
 ### Doctor Endpoints
 
@@ -262,25 +275,25 @@ http://localhost:8080/api
 
 ### Appointment Endpoints
 
-- `POST /appointments/book` - Book new appointment 
-- `GET /appointments/patient/my-appointments` - Get patient appointments
-- `GET /appointments/doctor/my-appointments` - Get doctor appointments
-- `PUT /appointments/{id}/cancel` - Cancel appointment
-- `PUT /appointments/{id}/status` - Update appointment status
+- `POST /appointments/book` - Book new appointment (Do Dang Khoa)
+- `GET /appointments/patient/my-appointments` - Get patient appointments (Do Dang Khoa)  
+- `GET /appointments/doctor/my-appointments` - Get doctor appointments (Do Dang Khoa)
+- `PUT /appointments/{id}/cancel` - Cancel appointment (Nguyen Thanh Dat)
+- `PUT /appointments/{id}/status` - Update appointment status (Nguyen Thanh Dat)
 
 ### ARV Treatment Endpoints
 
-- `GET /arv-treatments/my-treatments` - Get patient's treatments 
-- `POST /arv-treatments/add` - Add new treatment
-- `PUT /arv-treatments/{id}` - Update treatment
-- `PUT /arv-treatments/{id}/deactivate` - Deactivate treatment
+- `GET /arv-treatments/my-treatments` - Get patient's treatments (Nguyen Thanh Dat)
+- `POST /arv-treatments/add` - Add new treatment (Do Dang Khoa)
+- `PUT /arv-treatments/{id}` - Update treatment (Do Dang Khoa)
+- `PUT /arv-treatments/{id}/deactivate` - Deactivate treatment (Do Dang Khoa)
 
 ### Notification Endpoints
 
-- `GET /notifications` - Get user notifications (Do Dang Khoa)
-- `POST /notifications/{id}/read` - Mark notification as read (Do Dang Khoa)
-- `POST /notifications/read-all` - Mark all notifications as read (Do Dang Khoa)
-- `POST /notifications/doctor/send` - Send notification to patient (Do Dang Khoa)
+- `GET /notifications` - Get user notifications (Nguyen Thanh Dat)
+- `POST /notifications/{id}/read` - Mark notification as read (Nguyen Thanh Dat)
+- `POST /notifications/read-all` - Mark all notifications as read (Nguyen Thanh Dat)
+- `POST /notifications/doctor/send` - Send notification to patient (Nguyen Thanh Dat)
 
 ### Manager Endpoints
 

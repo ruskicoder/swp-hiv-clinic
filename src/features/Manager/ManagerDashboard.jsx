@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import './ManagerDashboard.css';
+import PaginatedTable from '../../features/components/PaginatedTable';
 
 const SIDEBAR_OPTIONS = [
   { 
@@ -56,6 +57,72 @@ const ManagerDashboard = () => {
   const [patientSearch, setPatientSearch] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
   const navigate = useNavigate();
+const patientColumns = [
+    { header: 'Patient Info', cell: p => (
+      <div>
+        <div style={{ fontWeight: '600' }}>{p.firstName} {p.lastName}</div>
+        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>@{p.username}</div>
+      </div>
+    )},
+    { header: 'Contact', cell: p => p.email },
+    { header: 'Status', cell: p => (
+      <span className={`status-badge ${p.isActive ? 'active' : 'inactive'}`}>
+        {p.isActive ? 'Active' : 'Inactive'}
+      </span>
+    )},
+    { header: 'Registered', cell: p => p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '-' },
+    { header: 'Actions', cell: p => (
+      <button className="action-link" onClick={() => navigate(`/manager/patients/${p.userId}`)}>
+        View Details
+      </button>
+    )}
+  ];
+
+  const doctorColumns = [
+    { header: 'Doctor Info', cell: d => (
+      <div>
+        <div style={{ fontWeight: '600' }}>Dr. {d.firstName} {d.lastName}</div>
+        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>@{d.username}</div>
+      </div>
+    )},
+    { header: 'Contact', cell: d => d.email },
+    { header: 'Specialty', cell: d => d.specialty || 'General' },
+    { header: 'Status', cell: d => (
+      <span className={`status-badge ${d.isActive ? 'active' : 'inactive'}`}>
+        {d.isActive ? 'Active' : 'Inactive'}
+      </span>
+    )},
+    { header: 'Joined', cell: d => d.createdAt ? new Date(d.createdAt).toLocaleDateString() : '-' },
+    { header: 'Actions', cell: d => (
+      <button className="action-link" onClick={() => navigate(`/manager/doctors/${d.userId}`)}>
+        View Profile
+      </button>
+    )}
+  ];
+
+  const arvColumns = [
+    { header: 'Treatment ID', cell: arv => `#${arv.arvTreatmentID}` },
+    { header: 'Patient', cell: arv => arv.patientName || 'N/A' },
+    { header: 'Regimen', cell: arv => <strong style={{ fontWeight: '600' }}>{arv.regimen}</strong> },
+    { header: 'Start Date', cell: arv => arv.startDate },
+    { header: 'Status', cell: arv => (
+      <span className={`status-badge ${arv.isActive ? 'active' : 'inactive'}`}>
+        {arv.isActive ? 'Active' : 'Completed'}
+      </span>
+    )}
+  ];
+
+  const scheduleColumns = [
+    { header: 'Slot ID', cell: s => `#${s.availabilitySlotId}` },
+    { header: 'Doctor', cell: s => s.doctorUser ? `Dr. ${s.doctorUser.username}` : 'N/A' },
+    { header: 'Date', cell: s => <strong style={{ fontWeight: '600' }}>{s.slotDate}</strong> },
+    { header: 'Time', cell: s => `${s.startTime} - ${s.endTime}` },
+    { header: 'Availability', cell: s => (
+      <span className={`status-badge ${s.isBooked ? 'booked' : 'available'}`}>
+        {s.isBooked ? 'Booked' : 'Available'}
+      </span>
+    )}
+  ];
 
   // Handle CSV exports
   const handleExportCSV = async (endpoint) => {
@@ -426,57 +493,17 @@ const ManagerDashboard = () => {
       ) : patientsError ? (
         <div className="error-state">{patientsError}</div>
       ) : (
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Patient Info</th>
-                <th>Contact</th>
-                <th>Specialty</th>
-                <th>Status</th>
-                <th>Registered</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {patients.map((p, idx) => (
-                <tr key={p.userId || idx}>
-                  <td>
-                    <div>
-                      <div style={{ fontWeight: '600', color: '#1e293b' }}>
-                        {p.firstName} {p.lastName}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                        @{p.username}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{p.email}</td>
-                  <td>{p.specialty || 'General'}</td>
-                  <td>
-                    <span className={`status-badge ${p.isActive ? 'active' : 'inactive'}`}>
-                      {p.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '-'}</td>
-                  <td>
-                    <button
-                      className="action-link"
-                      onClick={() => navigate(`/manager/patients/${p.userId}`)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                    >
-                      View Details
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <PaginatedTable
+          data={patients}
+          columns={patientColumns}
+          itemsPerPage={9}
+          emptyMessage="No patients found."
+        />
       )}
     </div>
   );
 
+    // Thay thế toàn bộ hàm renderDoctors cũ bằng hàm này
   const renderDoctors = () => (
     <div>
       <div className="section-header">
@@ -499,62 +526,24 @@ const ManagerDashboard = () => {
       ) : doctorsError ? (
         <div className="error-state">{doctorsError}</div>
       ) : (
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Doctor Info</th>
-                <th>Contact</th>
-                <th>Specialty</th>
-                <th>Status</th>
-                <th>Joined</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {doctors.map((d, idx) => (
-                <tr key={d.userId || idx}>
-                  <td>
-                    <div>
-                      <div style={{ fontWeight: '600', color: '#1e293b' }}>
-                        Dr. {d.firstName} {d.lastName}
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                        @{d.username}
-                      </div>
-                    </div>
-                  </td>
-                  <td>{d.email}</td>
-                  <td>{d.specialty || 'General Medicine'}</td>
-                  <td>
-                    <span className={`status-badge ${d.isActive ? 'active' : 'inactive'}`}>
-                      {d.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>{d.createdAt ? new Date(d.createdAt).toLocaleDateString() : '-'}</td>
-                  <td>
-                    <button
-                      className="action-link"
-                      onClick={() => navigate(`/manager/doctors/${d.userId}`)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                    >
-                      View Profile
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        // Bảng thủ công đã được thay thế bằng PaginatedTable
+        <PaginatedTable
+          data={doctors}
+          columns={doctorColumns}
+          itemsPerPage={9} // Hiển thị 5 bác sĩ mỗi trang
+          emptyMessage="No doctors found."
+        />
       )}
     </div>
   );
 
+    // Thay thế toàn bộ hàm renderARV cũ bằng hàm này
   const renderARV = () => (
     <div>
       <div className="section-header">
         <h2>ARV Treatment Management</h2>
       </div>
+
       <form className="arv-search-form" onSubmit={handleARVSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
         <label>
           From:
@@ -567,57 +556,29 @@ const ManagerDashboard = () => {
         <button type="submit" className="search-btn">Search</button>
         <button type="button" className="reset-btn" onClick={() => { setArvFrom(""); setArvTo(""); fetchARVTreatments(); }}>Reset</button>
       </form>
+
       {arvLoading ? (
         <div className="loading-state">Loading ARV treatment data...</div>
       ) : arvError ? (
         <div className="error-state">{arvError}</div>
       ) : (
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Treatment ID</th>
-                <th>Patient</th>
-                <th>Doctor</th>
-                <th>Regimen</th>
-                <th>Duration</th>
-                <th>Adherence</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {arvTreatments.map((arv, idx) => (
-                <tr key={arv.arvTreatmentID || idx}>
-                  <td>#{arv.arvTreatmentID}</td>
-                  <td>{arv.patientName || 'N/A'}</td>
-                  <td>{arv.doctorName || 'N/A'}</td>
-                  <td style={{ fontWeight: '600' }}>{arv.regimen}</td>
-                  <td>
-                    <div style={{ fontSize: '0.75rem' }}>
-                      <div>Start: {arv.startDate}</div>
-                      {arv.endDate && <div>End: {arv.endDate}</div>}
-                    </div>
-                  </td>
-                  <td>{arv.adherence || 'Not recorded'}</td>
-                  <td>
-                    <span className={`status-badge ${arv.isActive ? 'active' : 'inactive'}`}>
-                      {arv.isActive ? 'Active' : 'Completed'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        // Bảng thủ công đã được thay thế bằng PaginatedTable
+        <PaginatedTable
+          data={arvTreatments}
+          columns={arvColumns}
+          itemsPerPage={9} // Hiển thị 15 mục mỗi trang
+          emptyMessage="No ARV treatments found."
+        />
       )}
     </div>
   );
-
+    // Thay thế toàn bộ hàm renderSchedules cũ bằng hàm này
   const renderSchedules = () => (
     <div>
       <div className="section-header">
         <h2>Schedule Management</h2>
       </div>
+      
       <form className="schedule-search-form" onSubmit={handleScheduleSearch} style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
         <label>
           From:
@@ -630,52 +591,22 @@ const ManagerDashboard = () => {
         <button type="submit" className="search-btn">Search</button>
         <button type="button" className="reset-btn" onClick={() => { setScheduleFrom(""); setScheduleTo(""); fetchSchedules(); }}>Reset</button>
       </form>
+      
       {schedulesLoading ? (
         <div className="loading-state">Loading schedule data...</div>
       ) : schedulesError ? (
         <div className="error-state">{schedulesError}</div>
       ) : (
-        <div className="table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Slot ID</th>
-                <th>Doctor</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Availability</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {schedules.map((s, idx) => (
-                <tr key={s.availabilitySlotId || idx}>
-                  <td>#{s.availabilitySlotId}</td>
-                  <td>
-                    {s.doctorUser && s.doctorUser.userId ? 
-                      `Doctor ID: ${s.doctorUser.userId}` : 'N/A'}
-                  </td>
-                  <td style={{ fontWeight: '600' }}>{s.slotDate}</td>
-                  <td>
-                    <div style={{ fontSize: '0.875rem' }}>
-                      {s.startTime} - {s.endTime}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${s.isBooked ? 'booked' : 'available'}`}>
-                      {s.isBooked ? 'Booked' : 'Available'}
-                    </span>
-                  </td>
-                  <td>{s.notes || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        // Bảng thủ công đã được thay thế bằng PaginatedTable
+        <PaginatedTable
+          data={schedules}
+          columns={scheduleColumns}
+          itemsPerPage={9} // Hiển thị 15 lịch mỗi trang
+          emptyMessage="No schedules found."
+        />
       )}
     </div>
   );
-
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':

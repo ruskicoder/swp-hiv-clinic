@@ -195,6 +195,8 @@ INPUT ./images/patient_login.png
 INPUT ./images/patient_login.png
 INPUT ./images/patient_login.png
 INPUT ./images/patient_login.png
+INPUT ./images/patient_login.png
+INPUT ./images/patient_register.png
 INPUT ./images/patient_register.png
 INPUT ./images/patient_register.png
 INPUT ./images/patient_register.png
@@ -203,6 +205,8 @@ INPUT ./images/patient_booking.png
 INPUT ./images/patient_booking.png
 INPUT ./images/patient_booking.png
 INPUT ./images/patient_booking.png
+INPUT ./images/patient_booking.png
+INPUT ./images/patient_dashboard.png
 INPUT ./images/patient_dashboard.png
 INPUT ./images/patient_dashboard.png
 INPUT ./images/patient_dashboard.png
@@ -211,6 +215,8 @@ INPUT ./images/patient_records.png
 INPUT ./images/patient_records.png
 INPUT ./images/patient_records.png
 INPUT ./images/patient_records.png
+INPUT ./images/patient_records.png
+INPUT ./images/doctor_login.png
 INPUT ./images/doctor_login.png
 INPUT ./images/doctor_login.png
 INPUT ./images/doctor_login.png
@@ -219,6 +225,8 @@ INPUT ./images/doctor_availability.png
 INPUT ./images/doctor_availability.png
 INPUT ./images/doctor_availability.png
 INPUT ./images/doctor_availability.png
+INPUT ./images/doctor_availability.png
+INPUT ./images/doctor_dashboard.png
 INPUT ./images/doctor_dashboard.png
 INPUT ./images/doctor_dashboard.png
 INPUT ./images/doctor_dashboard.png
@@ -227,6 +235,8 @@ INPUT ./images/doctor_patientview.png
 INPUT ./images/doctor_patientview.png
 INPUT ./images/doctor_patientview.png
 INPUT ./images/doctor_patientview.png
+INPUT ./images/doctor_patientview.png
+INPUT ./images/doctor_treatment.png
 INPUT ./images/doctor_treatment.png
 INPUT ./images/doctor_treatment.png
 INPUT ./images/doctor_treatment.png

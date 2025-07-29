@@ -6,7 +6,107 @@ import ErrorBoundary from '../../components/ErrorBoundary';
 import DashboardHeader from '../../components/layout/DashboardHeader';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './AdminDashboard.css';
+import PaginatedTable from '../../features/components/PaginatedTable'; // Import component PaginatedTable.jsx
 
+// ----- COMPONENT MỚI: FORM TẠO USER THỐNG NHẤT -----
+const CreateUserForm = ({ loadDashboardData, setActiveTab }) => {
+  const [formData, setFormData] = useState({
+    username: '', password: '', email: '', 
+    firstName: '', lastName: '', phoneNumber: '', 
+    gender: '', roleName: ''
+  });
+  const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Tải danh sách vai trò khi component được mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await apiClient.get('/admin/roles');
+        // Lọc ra vai trò 'Admin' và 'Manager' để tránh việc Admin tự tạo thêm Admin hoặc Manager khác
+        setRoles(response.data.filter(role => role.roleName !== 'Admin' && role.roleName !== 'Manager'));
+      } catch (err) {
+        setError('Failed to load roles list. Please check the API endpoint.');
+      }
+    };
+    fetchRoles();
+  }, []);
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.roleName) {
+      setError('Please select a role for the new user.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      // Gọi đến endpoint thống nhất mới
+      const response = await apiClient.post('/admin/users', formData);
+      if (response.data.success) {
+        setSuccess(response.data.message);
+        setFormData({ username: '', password: '', email: '', firstName: '', lastName: '', phoneNumber: '', gender: '', roleName: '' }); // Reset form
+        loadDashboardData(); // Tải lại dữ liệu cho các bảng
+        
+        // Tự động chuyển đến tab quản lý tương ứng sau 1.5 giây
+        setTimeout(() => {
+          if (formData.roleName === 'Doctor') setActiveTab('doctors');
+          else if (formData.roleName === 'Manager') setActiveTab('managers');
+          else setActiveTab('users');
+        }, 1500);
+      } else {
+        setError(response.data.message);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'An unexpected error occurred during user creation.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ErrorBoundary>
+      <div className="create-user-section">
+        <div className="content-header">
+          <h2>Create New User Account</h2>
+          <p>A unified form to create any type of user account.</p>
+        </div>
+        <form onSubmit={handleSubmit} className="unified-create-form">
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
+          <div className="form-grid">
+            <input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First Name" required />
+            <input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last Name" required />
+            <input name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
+            <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
+            <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
+            <input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} placeholder="Phone Number (Optional)" />
+            <select name="gender" value={formData.gender} onChange={handleChange} required>
+              <option value="">Select Gender...</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            <select name="roleName" value={formData.roleName} onChange={handleChange} required>
+              <option value="">Select a Role...</option>
+              {roles.length > 0 ? roles.map(role => (
+                <option key={role.roleId} value={role.roleName}>{role.roleName}</option>
+              )) : <option disabled>Loading roles...</option>}
+            </select>
+          </div>
+          <button type="submit" className="submit-btn" disabled={loading}>{loading ? 'Creating Account...' : 'Create Account'}</button>
+        </form>
+      </div>
+    </ErrorBoundary>
+  );
+};
+
+
+// ----- COMPONENT CHÍNH: AdminDashboard -----
 const AdminDashboard = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -14,277 +114,213 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Data states
   const [users, setUsers] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const [managers, setManagers] = useState([]);
   const [appointments, setAppointments] = useState([]);
-  const [specialties, setSpecialties] = useState([]);
-
-  // Loading states
-  const [specialtiesLoading, setSpecialtiesLoading] = useState(true);
-  const [specialtiesError, setSpecialtiesError] = useState('');
-
-  // Error states
+  
   const [usersError, setUsersError] = useState('');
+  const [managersError, setManagersError] = useState('');
   const [appointmentsError, setAppointmentsError] = useState('');
 
-  // Tab transition state
   const [isTabChanging, setIsTabChanging] = useState(false);
-
-  // Form state preservation
-  const [preservedFormData, setPreservedFormData] = useState({});
+  const [doctorsError, setDoctorsError] = useState('');
 
   const loadDashboardData = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    setUsersError('');
-    setAppointmentsError('');
-    setSpecialtiesLoading(true);
-    setSpecialtiesError('');
-
+    setError(''); setUsersError(''); setManagersError(''); setAppointmentsError('');
     try {
-      console.log('Loading admin dashboard data...');
-      
-      // Load all data concurrently
-      const [usersResult, patientsResult, doctorsResult, appointmentsResult, specialtiesResult] = await Promise.allSettled([
-        apiClient.get('/admin/users'),
-        apiClient.get('/admin/patients'),
-        apiClient.get('/admin/doctors'),
-        apiClient.get('/admin/appointments'),
-        apiClient.get('/admin/specialties')
+      const results = await Promise.allSettled([
+        apiClient.get('/admin/users'), apiClient.get('/admin/patients'),
+        apiClient.get('/admin/doctors'), apiClient.get('/admin/managers'),
+        apiClient.get('/admin/appointments')
       ]);
+      const [usersResult, patientsResult, doctorsResult, managersResult, appointmentsResult] = results;
+      
+      setUsers(usersResult.status === 'fulfilled' ? usersResult.value.data : []);
+      if (usersResult.status === 'rejected') setUsersError('Failed to load users');
 
-      // Handle results
-      if (usersResult.status === 'fulfilled' && usersResult.value?.data) {
-        setUsers(Array.isArray(usersResult.value.data) ? usersResult.value.data : []);
-      } else {
-        setUsersError('Failed to load users');
-      }
+      setPatients(patientsResult.status === 'fulfilled' ? patientsResult.value.data : []);
 
-      if (patientsResult.status === 'fulfilled' && patientsResult.value?.data) {
-        setPatients(Array.isArray(patientsResult.value.data) ? patientsResult.value.data : []);
-      }
+      setDoctors(doctorsResult.status === 'fulfilled' ? doctorsResult.value.data : []);
+      
+      setManagers(managersResult.status === 'fulfilled' ? managersResult.value.data : []);
+      if (managersResult.status === 'rejected') setManagersError('Failed to load managers');
 
-      if (doctorsResult.status === 'fulfilled' && doctorsResult.value?.data) {
-        setDoctors(Array.isArray(doctorsResult.value.data) ? doctorsResult.value.data : []);
-      }
-
-      if (appointmentsResult.status === 'fulfilled' && appointmentsResult.value?.data) {
-        setAppointments(Array.isArray(appointmentsResult.value.data) ? appointmentsResult.value.data : []);
-      } else {
-        setAppointmentsError('Failed to load appointments');
-      }
-
-      if (specialtiesResult.status === 'fulfilled' && specialtiesResult.value?.data) {
-        setSpecialties(Array.isArray(specialtiesResult.value.data) ? specialtiesResult.value.data : []);
-        setSpecialtiesLoading(false);
-      } else {
-        setSpecialtiesError('Failed to load specialties');
-        setSpecialtiesLoading(false);
-      }
-
-    } catch (error) {
-      console.error('Dashboard error:', error);
-      setError('Failed to load dashboard data. Please try again.');
-      setSpecialtiesLoading(false);
+      setAppointments(appointmentsResult.status === 'fulfilled' ? appointmentsResult.value.data : []);
+      if (appointmentsResult.status === 'rejected') setAppointmentsError('Failed to load appointments');
+    } catch (err) {
+      setError('Failed to load dashboard data.');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
-
-  const _handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  useEffect(() => { loadDashboardData(); }, [loadDashboardData]);
 
   const handleToggleUserStatus = async (userId) => {
-      try {
-      await apiClient.put(`/admin/users/${userId}/toggle-status`);
-          loadDashboardData();
-      } catch (error) {
-      console.error('Toggle user status error:', error);
-      setError('Failed to toggle user status');
-      }
-    };
+    try { await apiClient.put(`/admin/users/${userId}/toggle-status`); loadDashboardData(); }
+    catch (err) { setError('Failed to toggle user status'); }
+  };
 
   const handleResetPassword = async (userId) => {
-    const newPassword = prompt('Enter new password:');
+    const newPassword = prompt('Enter new password for the user:');
     if (!newPassword) return;
-
-    try {
-      await apiClient.put(`/admin/users/${userId}/reset-password`, null, {
-        params: { newPassword }
-      });
-      alert('Password reset successfully');
-    } catch (error) {
-      console.error('Reset password error:', error);
-      setError('Failed to reset password');
-    }
-    };
-
+    try { await apiClient.put(`/admin/users/${userId}/reset-password`, null, { params: { newPassword } }); alert('Password has been reset successfully.'); }
+    catch (err) { setError('Failed to reset password.'); }
+  };
+  
+  // Cập nhật navigationItems
   const navigationItems = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'users', label: 'Manage Users', icon: '👥' },
     { id: 'doctors', label: 'Manage Doctors', icon: '👨‍⚕️' },
+    { id: 'managers', label: 'Manage Managers', icon: '🧑‍💼' },
     { id: 'appointments', label: 'All Appointments', icon: '📅' },
-    { id: 'create-doctor', label: 'Create Doctor', icon: '➕' }
+    { id: 'create-user', label: 'Create User', icon: '➕' }
   ];
-
-  const renderOverview = () => (
-      <ErrorBoundary>
-      <div className="overview-section">
-          <div className="content-header">
-          <h2>Admin Dashboard</h2>
-          </div>
-
-        <div className="stats-grid">
-          <div className="stat-card">
-            <h3>Total Users</h3>
-            <p className="stat-number">{users?.length || 0}</p>
-              </div>
-          <div className="stat-card">
-            <h3>Total Patients</h3>
-            <p className="stat-number">{patients?.length || 0}</p>
-              </div>
-          <div className="stat-card">
-            <h3>Total Doctors</h3>
-            <p className="stat-number">{doctors?.length || 0}</p>
-              </div>
-          <div className="stat-card">
-            <h3>Total Appointments</h3>
-            <p className="stat-number">{appointments?.length || 0}</p>
-            </div>
-              </div>
-
-        {error && (
-          <div className="error-message">
-            {error}
-            <button onClick={loadDashboardData} className="retry-btn">
-              Retry
-            </button>
-          </div>
-        )}
+  // Bắt buộc phải có đoạn khai báo này
+const appointmentColumns = [
+    { header: 'Patient', cell: appt => safeRender(appt.patientUser?.username) },
+    { header: 'Doctor', cell: appt => `Dr. ${safeRender(appt.doctorUser?.username)}` },
+    { header: 'Date & Time', cell: appt => safeDateTime(appt.appointmentDateTime) },
+    { header: 'Status', cell: appt => (
+      <span className={`status ${safeRender(appt.status).toLowerCase()}`}>
+        {safeRender(appt.status)}
+      </span>
+    )}
+];
+   const ManagerColumns = [
+    { header: 'Username', cell: user => safeRender(user.username) },
+    { header: 'Email', cell: user => safeRender(user.email) },
+    { header: 'Role', cell: user => safeRender(user.role?.roleName) },
+    { header: 'Status', cell: user => (
+      <span className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}>
+        {user.isActive ? 'Active' : 'Inactive'}
+      </span>
+    )},
+    { header: 'Created', cell: user => safeDate(user.createdAt) },
+    { header: 'Actions', cell: user => (
+      <div className="action-buttons">
+        <button className="btn-toggle" onClick={() => handleToggleUserStatus(user.userId)}>
+          {user.isActive ? 'Deactivate' : 'Activate'}
+        </button>
+        <button className="btn-reset" onClick={() => handleResetPassword(user.userId)}>
+          Reset Password
+        </button>
       </div>
-    </ErrorBoundary>
-    );
-
-  const renderUsers = () => (
+    )}
+  ];
+  const doctorColumns = [
+  // Sử dụng "doc" và thêm tiền tố "Dr."
+  { header: 'Doctor Name', cell: doc => `Dr. ${safeRender(doc.username)}` }, 
+  { header: 'Specialization', cell: doc => safeRender(doc.specialization) },
+  { header: 'Phone', cell: doc => safeRender(doc.phoneNumber) },
+  { header: 'Email', cell: doc => safeRender(doc.email) },
+  { header: 'Status', cell: doc => (
+    <span className={`status-badge ${doc.isActive ? 'active' : 'inactive'}`}>
+      {doc.isActive ? 'Active' : 'Inactive'}
+    </span>
+  )},
+  { header: 'Created', cell: doc => safeDate(doc.createdAt) },
+  { header: 'Actions', cell: doc => (
+    <div className="action-buttons">
+      <button className="btn-toggle" onClick={() => handleToggleUserStatus(doc.userId)}>
+        {doc.isActive ? 'Deactivate' : 'Activate'}
+      </button>
+      {/* Nút Reset Password vẫn có thể giữ lại nếu bạn muốn */}
+      <button className="btn-reset" onClick={() => handleResetPassword(doc.userId)}>
+        Reset Password
+      </button>
+    </div>
+  )}
+];
+  const userColumns = [
+    { header: 'Username', cell: user => safeRender(user.username) },
+    { header: 'Email', cell: user => safeRender(user.email) },
+    { header: 'Role', cell: user => safeRender(user.role?.roleName) },
+    { header: 'Status', cell: user => (
+      <span className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}>
+        {user.isActive ? 'Active' : 'Inactive'}
+      </span>
+    )},
+    { header: 'Created', cell: user => safeDate(user.createdAt) },
+    { header: 'Actions', cell: user => (
+      <div className="action-buttons">
+        <button className="btn-toggle" onClick={() => handleToggleUserStatus(user.userId)}>
+          {user.isActive ? 'Deactivate' : 'Activate'}
+        </button>
+        <button className="btn-reset" onClick={() => handleResetPassword(user.userId)}>
+          Reset Password
+        </button>
+      </div>
+    )}
+  ];
+  
+ 
+  // --- CÁC HÀM RENDER ---
+  const renderOverview = () => (
     <ErrorBoundary>
-      <div className="users-section">
-        <div className="content-header">
-          <h2>Manage Users</h2>
-          <p>View and manage all system users</p>
-          </div>
-          
-        {usersError && (
-          <div className="error-message">
-            {usersError}
-              </div>
-        )}
-            
-        {!users || users.length === 0 ? (
-          <div className="no-data">
-            <p>No users found.</p>
-            <button className="refresh-btn" onClick={loadDashboardData}>
-              Refresh
-              </button>
-            </div>
-        ) : (
-          <div className="users-table-container">
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((userItem, index) => (
-                  <tr key={userItem?.userId || index}>
-                    <td>{safeRender(userItem?.username)}</td>
-                    <td>{safeRender(userItem?.email)}</td>
-                    <td>{safeRender(userItem?.role?.roleName || userItem?.role)}</td>
-                    <td>
-                      <span className={`status-badge ${userItem?.isActive ? 'active' : 'inactive'}`}>
-                        {userItem?.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td>{safeDate(userItem?.createdAt)}</td>
-                    <td>
-                      <div className="action-buttons">
-                        <button 
-                          className="btn-toggle"
-                          onClick={() => handleToggleUserStatus(userItem?.userId)}
-                        >
-                          {userItem?.isActive ? 'Deactivate' : 'Activate'}
-                        </button>
-                        <button 
-                          className="btn-reset"
-                          onClick={() => handleResetPassword(userItem?.userId)}
-                        >
-                          Reset Password
-                        </button>
+      <div className="overview-section">
+        <div className="content-header"><h2>Dashboard Overview</h2></div>
+        <div className="stats-grid">
+          <div className="stat-card"><h3>Total Users</h3><p className="stat-number">{users?.length || 0}</p></div>
+          <div className="stat-card"><h3>Total Patients</h3><p className="stat-number">{patients?.length || 0}</p></div>
+          <div className="stat-card"><h3>Total Doctors</h3><p className="stat-number">{doctors?.length || 0}</p></div>
+          <div className="stat-card"><h3>Total Managers</h3><p className="stat-number">{managers?.length || 0}</p></div>
+          <div className="stat-card"><h3>Total Appointments</h3><p className="stat-number">{appointments?.length || 0}</p></div>
         </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {error && <div className="error-message">{error}<button onClick={loadDashboardData} className="retry-btn">Retry</button></div>}
       </div>
     </ErrorBoundary>
   );
 
-  const renderDoctors = () => (
+ const renderUsers = () => (
     <ErrorBoundary>
-      <div className="doctors-section">
-        <div className="content-header">
-          <h2>Manage Doctors</h2>
-          <p>View and manage doctor accounts</p>
-        </div>
+      <div className="users-section">
+        <div className="content-header"><h2>Manage All Users</h2><p>View and manage all system users</p></div>
+        {usersError ? <div className="error-message">{usersError}</div> : (
+          <PaginatedTable
+            data={users}
+            columns={userColumns}
+            itemsPerPage={9} // Bạn có thể tùy chỉnh số lượng
+            emptyMessage="No users found."
+          />
+        )}
+      </div>
+    </ErrorBoundary>
+  );
+  
+  const renderManagers = () => (
+    <ErrorBoundary>
+      <div className="users-section">
+        <div className="content-header"><h2>Manage All Managers</h2><p>View and manage all system managers</p></div>
+        {managersError ? <div className="error-message">{managersError}</div> : (
+          <PaginatedTable
+            data={managers}
+            columns={ManagerColumns} // Sử dụng cột của Manager
+            itemsPerPage={9} // Bạn có thể tùy chỉnh số lượng
+            emptyMessage="No users found."
+          />
+        )}
+      </div>
+    </ErrorBoundary>
+  );
+   const renderDoctors = () => (
+    <ErrorBoundary>
+      {/* Sửa lại className cho đúng */}
+      <div className="doctors-section"> 
+        <div className="content-header"><h2>Manage Doctors</h2><p>View and manage doctor accounts</p></div>
 
-        {!doctors || doctors.length === 0 ? (
-          <div className="no-data">
-            <p>No doctors found.</p>
-            <button className="refresh-btn" onClick={loadDashboardData}>
-              Refresh
-            </button>
-          </div>
-        ) : (
-          <div className="doctors-grid">
-            {doctors.map((doctor, index) => (
-              <ErrorBoundary key={doctor?.userId || index}>
-                <div className="doctor-card">
-                  <h4>Dr. {safeRender(doctor?.username)}</h4>
-                  <p><strong>Email:</strong> {safeRender(doctor?.email)}</p>
-                  <p><strong>Status:</strong> 
-                    <span className={`status-badge ${doctor?.isActive ? 'active' : 'inactive'}`}>
-                      {doctor?.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </p>
-                  <p><strong>Created:</strong> {safeDate(doctor?.createdAt)}</p>
-                  <div className="doctor-actions">
-                    <button 
-                      className="btn-toggle"
-                      onClick={() => handleToggleUserStatus(doctor?.userId)}
-                    >
-                      {doctor?.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                  </div>
-                </div>
-              </ErrorBoundary>
-            ))}
-          </div>
+        {doctorsError && <div className="error-message">{doctorsError}</div>} 
+
+        {!doctorsError && (
+          <PaginatedTable
+            data={doctors}
+            columns={doctorColumns} // <-- SỬ DỤNG CỘT CỦA DOCTOR
+            itemsPerPage={9}        // Bạn có thể hiển thị 5 bác sĩ mỗi trang
+            emptyMessage="No doctors found."
+          />
         )}
       </div>
     </ErrorBoundary>
@@ -292,371 +328,51 @@ const AdminDashboard = () => {
 
   const renderAppointments = () => (
     <ErrorBoundary>
-      <div className="appointments-section">
-        <div className="content-header">
-          <h2>All Appointments</h2>
-          <p>View all system appointments</p>
-        </div>
-
-        {appointmentsError && (
-          <div className="error-message">
-            {appointmentsError}
-          </div>
-        )}
-
-        {!appointments || appointments.length === 0 ? (
-          <div className="no-data">
-            <p>No appointments found.</p>
-            <button className="refresh-btn" onClick={loadDashboardData}>
-              Refresh
-            </button>
-          </div>
-        ) : (
-          <div className="appointments-table-container">
-            <table className="appointments-table">
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Doctor</th>
-                  <th>Date & Time</th>
-                  <th>Duration</th>
-                  <th>Status</th>
-                  <th>Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.map((appointment, index) => (
-                  <tr key={appointment?.appointmentId || index}>
-                    <td>{safeRender(appointment?.patientUser?.username, 'Unknown Patient')}</td>
-                    <td>Dr. {safeRender(appointment?.doctorUser?.username, 'Unknown Doctor')}</td>
-                    <td>{safeDateTime(appointment?.appointmentDateTime)}</td>
-                    <td>{safeRender(appointment?.durationMinutes, '30')} min</td>
-                    <td>
-                      <span className={`status ${safeRender(appointment?.status, 'unknown').toLowerCase()}`}>
-                        {safeRender(appointment?.status, 'Unknown')}
-                      </span>
-                    </td>
-                    <td>{safeRender(appointment?.appointmentNotes)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      <div className="users-section">
+        <div className="content-header"><h2>Manage All Appointments</h2><p>View and manage all system appointments</p></div>
+        {appointmentsError ? <div className="error-message">{appointmentsError}</div> : (
+          <PaginatedTable
+            data={appointments}
+            columns={appointmentColumns} // Sử dụng cột của appointments
+            itemsPerPage={9} // Bạn có thể tùy chỉnh số lượng
+            emptyMessage="No users found."
+          />
         )}
       </div>
     </ErrorBoundary>
   );
 
-  const CreateDoctorForm = () => {
-    console.log('🔍 DEBUG: CreateDoctorForm component rendering');
-    console.log('🔍 DEBUG: Available specialties:', specialties);
-    console.log('🔍 DEBUG: Specialties length:', specialties?.length);
-    console.log('🔍 DEBUG: Specialties loading:', specialtiesLoading);
-    
-    const [formData, setFormData] = useState(() => ({
-      username: preservedFormData.username || '',
-      email: preservedFormData.email || '',
-      password: preservedFormData.password || '',
-      firstName: preservedFormData.firstName || '',
-      lastName: preservedFormData.lastName || '',
-      phoneNumber: preservedFormData.phoneNumber || '',
-      specialtyId: preservedFormData.specialtyId || '',
-      bio: preservedFormData.bio || ''
-    }));
-    const [formLoading, setFormLoading] = useState(false);
-    const [formError, setFormError] = useState('');
-    const [formSuccess, setFormSuccess] = useState('');
+  if (loading) { return <div className="loading">Loading dashboard data...</div>; }
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      console.log('🔍 DEBUG: Form submission started');
-      console.log('🔍 DEBUG: Current form data:', formData);
-      console.log('🔍 DEBUG: Available specialties for validation:', specialties);
-      
-      setFormLoading(true);
-      setFormError('');
-      setFormSuccess('');
-
-      try {
-        // Validation
-        if (!formData.username || !formData.email || !formData.password ||
-            !formData.firstName || !formData.lastName) {
-          setFormError('Please fill in all required fields');
-          setFormLoading(false);
-          return;
-        }
-
-        // Prepare form data for x-www-form-urlencoded
-        const formDataToSend = new URLSearchParams();
-        formDataToSend.append('username', formData.username);
-        formDataToSend.append('email', formData.email);
-        formDataToSend.append('password', formData.password);
-        formDataToSend.append('firstName', formData.firstName);
-        formDataToSend.append('lastName', formData.lastName);
-        formDataToSend.append('phoneNumber', formData.phoneNumber || '');
-        formDataToSend.append('specialtyId', formData.specialtyId || '');
-        formDataToSend.append('bio', formData.bio || '');
-
-        console.log('🔍 DEBUG: Form data being sent:', Array.from(formDataToSend.entries()));
-
-        const response = await apiClient.post('/admin/doctors', formDataToSend, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        });
-        
-        console.log('🔍 DEBUG: API response received:', response.data);
-
-        if (response.data && (response.data.success || response.data.isSuccess)) {
-          console.log('🔍 DEBUG: Doctor created successfully, response:', response.data);
-          setFormSuccess('Doctor created successfully!');
-          
-          // Reset form
-          const resetData = {
-            username: '',
-            email: '',
-            password: '',
-            firstName: '',
-            lastName: '',
-            phoneNumber: '',
-            specialtyId: '',
-            bio: ''
-          };
-          setFormData(resetData);
-          setPreservedFormData(resetData);
-          
-          // Reload data and switch to doctors tab
-          loadDashboardData();
-          setTimeout(() => {
-            setActiveTab('doctors');
-          }, 1500);
-        } else {
-          console.log('🔍 DEBUG: Doctor creation failed, response:', response.data);
-          const errorMsg = response.data?.message || response.data?.msg || 'Failed to create doctor';
-          console.log('🔍 DEBUG: Setting form error:', errorMsg);
-          setFormError(errorMsg);
-        }
-      } catch (error) {
-        console.log('🔍 DEBUG: Exception during doctor creation:', error);
-        console.log('🔍 DEBUG: Error response:', error?.response?.data);
-        const errorMsg = error?.response?.data?.message ||
-          error?.response?.data?.msg ||
-          error?.response?.data?.error ||
-          error?.message ||
-          'Failed to create doctor';
-        console.log('🔍 DEBUG: Setting form error from exception:', errorMsg);
-        setFormError(errorMsg);
-      } finally {
-        console.log('🔍 DEBUG: Form submission completed, loading:', false);
-        setFormLoading(false);
-      }
-    };
-
-    const handleChange = (e) => {
-      console.log('🔍 DEBUG: Form field changed:', e.target.name, '=', e.target.value);
-      const updatedData = {
-        ...formData,
-        [e.target.name]: e.target.value
-      };
-      setFormData(updatedData);
-      setPreservedFormData(updatedData);
-    };
-
-    return (
-      <ErrorBoundary>
-        <div className="create-doctor-section">
-          <div className="content-header">
-            <h2>Create Doctor Account</h2>
-            <p>Add a new doctor to the system</p>
-          </div>
-
-          {specialtiesLoading && (
-            <div className="loading-message">
-              <p>Loading form data...</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="create-doctor-form">
-            {formError && (
-              <div className="error-message">
-                {formError}
-              </div>
-            )}
-
-            {formSuccess && (
-              <div className="success-message">
-                {formSuccess}
-              </div>
-            )}
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="username">Username</label>
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="firstName">First Name</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="lastName">Last Name</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="phoneNumber">Phone Number</label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="specialtyId">Specialty</label>
-              <select
-                id="specialtyId"
-                name="specialtyId"
-                value={formData.specialtyId}
-                onChange={handleChange}
-                disabled={specialtiesLoading}
-              >
-                <option value="">
-                  {specialtiesLoading ? 'Loading specialties...' : 'Select a specialty...'}
-                </option>
-                {!specialtiesLoading && specialties.map((specialty, index) => (
-                  <option key={specialty?.specialtyId || index} value={specialty?.specialtyId}>
-                    {safeRender(specialty?.specialtyName)}
-                  </option>
-                ))}
-              </select>
-              {specialtiesError && (
-                <div className="field-error">
-                  {specialtiesError}
-                </div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="bio">Biography</label>
-              <textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                placeholder="Enter doctor's biography..."
-                rows="4"
-              />
-            </div>
-
-            <button type="submit" className="submit-btn" disabled={formLoading || specialtiesLoading}>
-              {formLoading ? 'Creating...' : 'Create Doctor'}
-            </button>
-          </form>
-        </div>
-      </ErrorBoundary>
-    );
-  };
-
-
-  if (loading) {
-    return (
-      <div className="admin-dashboard">
-        <div className="loading">Loading dashboard data...</div>
-      </div>
-    );
-  }
-
-  // Use the same sidebar style as ManagerDashboard
   return (
     <div className="admin-dashboard">
       <DashboardHeader title="Admin Dashboard" subtitle="System overview and management" />
       <div className="dashboard-layout">
         <aside className="manager-sidebar">
           {navigationItems.map(item => (
-            <button
-              key={item.id}
-              className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
+            <button key={item.id} className={`sidebar-option${activeTab === item.id ? ' active' : ''}`}
               onClick={() => {
-                console.log('🔍 DEBUG: Tab switching from', activeTab, 'to', item.id);
                 setIsTabChanging(true);
                 setActiveTab(item.id);
                 setTimeout(() => setIsTabChanging(false), 300);
-              }}
-            >
+              }}>
               {item.icon} {item.label}
             </button>
           ))}
         </aside>
         <main className="dashboard-main">
-          {isTabChanging && (
-            <div className="tab-transition-loading">
-              <p>Loading...</p>
-            </div>
-          )}
-          {!isTabChanging && (
+          {isTabChanging ? <div className="tab-transition-loading"><p>Loading...</p></div> : (
             <>
               {activeTab === 'overview' && renderOverview()}
               {activeTab === 'users' && renderUsers()}
               {activeTab === 'doctors' && renderDoctors()}
+              {activeTab === 'managers' && renderManagers()}
               {activeTab === 'appointments' && renderAppointments()}
-              {activeTab === 'create-doctor' && (
-                <div>
-                  {console.log('🔍 DEBUG: Rendering CreateDoctorForm component')}
-                  <CreateDoctorForm />
-                </div>
+              {activeTab === 'create-user' && (
+                <CreateUserForm
+                  loadDashboardData={loadDashboardData}
+                  setActiveTab={setActiveTab}
+                />
               )}
             </>
           )}

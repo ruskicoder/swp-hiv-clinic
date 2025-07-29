@@ -9,8 +9,7 @@ import NotificationManagerTab from '../../components/notifications/NotificationM
 import ErrorBoundary from '../../components/ErrorBoundary';
 import { safeRender, safeDate, safeDateTime } from '../../utils/renderUtils';
 import './DoctorDashboard.css';
-
-/**
+import PaginatedTable from '../../features/components/PaginatedTable';/**
  * Doctor Dashboard component for managing appointments, availability, and patient records
  */
 const DoctorDashboard = () => {
@@ -49,6 +48,41 @@ const DoctorDashboard = () => {
     recheckDateTime: '',
     durationMinutes: 30
   });
+  const appointmentColumns = [
+  { 
+    header: 'Patient', 
+    cell: apt => safeRender(apt.patientUser?.username) 
+  },
+  { 
+    header: 'Date & Time', 
+    cell: apt => safeDateTime(apt.appointmentDateTime) 
+  },
+  { 
+    header: 'Duration', 
+    cell: apt => `${apt.durationMinutes || 30} min` 
+  },
+  { 
+    header: 'Status', 
+    cell: apt => (
+      <span className={`status ${apt.status?.toLowerCase()}`}>
+        {safeRender(apt.status)}
+      </span>
+    )
+  },
+  { 
+    header: 'Actions', 
+    cell: apt => (
+      apt.status !== 'Completed' && (
+        <button 
+          className="btn-primary"
+          onClick={() => loadPatientRecord(apt)}
+        >
+          View Record
+        </button>
+      )
+    )
+  }
+];
 
   // Load dashboard data
   useEffect(() => {
@@ -439,57 +473,36 @@ const DoctorDashboard = () => {
   };
 
   // Render appointments section
-  const renderAppointments = () => {
-    const safeAppointments = Array.isArray(appointments) ? appointments : [];
+  // THAY THẾ TOÀN BỘ HÀM renderAppointments CŨ BẰNG HÀM NÀY:
 
-    return (
-      <ErrorBoundary>
-        <div className="appointments-content">
-          <div className="content-header">
-            <h2>My Appointments</h2>
-            <p>Manage your scheduled appointments</p>
-          </div>
+const renderAppointments = () => {
+  const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
-          {safeAppointments.length > 0 ? (
-            <div className="appointments-list">
-              {safeAppointments.map(appointment => (
-                <div key={appointment.appointmentId} className="appointment-card">
-                  <div className="appointment-header">
-                    <h4>Patient: {safeRender(appointment.patientUser?.username)}</h4>
-                    <span className={`status ${appointment.status?.toLowerCase()}`}>
-                      {safeRender(appointment.status)}
-                    </span>
-                  </div>
-                  <div className="appointment-details">
-                    <p><strong>Date & Time:</strong> {safeDateTime(appointment.appointmentDateTime)}</p>
-                    <p><strong>Duration:</strong> {appointment.durationMinutes || 30} minutes</p>
-                    <p><strong>Patient Email:</strong> {safeRender(appointment.patientUser?.email)}</p>
-                    {appointment.appointmentNotes && (
-                      <p><strong>Notes:</strong> {safeRender(appointment.appointmentNotes)}</p>
-                    )}
-                  </div>
-                  <div className="appointment-actions">
-                    {appointment.status !== 'Completed' && (
-                      <button 
-                        className="btn-primary"
-                        onClick={() => loadPatientRecord(appointment)}
-                      >
-                        View Patient Record
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="no-data">
-              <p>No appointments scheduled.</p>
-            </div>
-          )}
+  return (
+    <ErrorBoundary>
+      <div className="appointments-content">
+        <div className="content-header">
+          <h2>My Appointments</h2>
+          <p>Manage your scheduled appointments</p>
         </div>
-      </ErrorBoundary>
-    );
-  };
+
+        {safeAppointments.length > 0 ? (
+          // Giao diện thẻ đã được thay bằng PaginatedTable
+          <PaginatedTable
+            data={safeAppointments}
+            columns={appointmentColumns}
+            itemsPerPage={9} // Hiển thị 10 cuộc hẹn mỗi trang
+            emptyMessage="No appointments scheduled."
+          />
+        ) : (
+          <div className="no-data">
+            <p>No appointments scheduled.</p>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
+  );
+};
 
   // Render patient record
   const renderPatientRecord = () => (

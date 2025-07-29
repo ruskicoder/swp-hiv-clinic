@@ -20,19 +20,17 @@
 \contentsline {subsubsection}{\numberline {3.3.2}Appointment Booking}{8}{subsubsection.3.3.2}%
 \contentsline {subsection}{\numberline {3.4}Doctor Workflow}{11}{subsection.3.4}%
 \contentsline {subsubsection}{\numberline {3.4.1}Availability Management}{11}{subsubsection.3.4.1}%
-\contentsline {subsubsection}{\numberline {3.4.2}Patient Care Management}{12}{subsubsection.3.4.2}%
-\contentsline {subsubsection}{\numberline {3.4.3}ARV Treatment Management}{13}{subsubsection.3.4.3}%
 \contentsline {subsection}{\numberline {3.5}Administrative Functions}{14}{subsection.3.5}%
-\contentsline {subsection}{\numberline {3.6}Notification System}{15}{subsection.3.6}%
-\contentsline {subsubsection}{\numberline {3.6.1}Appointment Reminders}{15}{subsubsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6}Notification System}{14}{subsection.3.6}%
+\contentsline {subsubsection}{\numberline {3.6.1}Appointment Reminders}{14}{subsubsection.3.6.1}%
 \contentsline {subsubsection}{\numberline {3.6.2}Medication Reminders}{15}{subsubsection.3.6.2}%
 \contentsline {subsection}{\numberline {3.7}Security Features}{15}{subsection.3.7}%
 \contentsline {subsubsection}{\numberline {3.7.1}Data Protection}{15}{subsubsection.3.7.1}%
-\contentsline {subsubsection}{\numberline {3.7.2}Privacy Controls}{16}{subsubsection.3.7.2}%
-\contentsline {section}{\numberline {4}Troubleshooting}{16}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Common Issues}{16}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {3.7.2}Privacy Controls}{15}{subsubsection.3.7.2}%
+\contentsline {section}{\numberline {4}Troubleshooting}{15}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Common Issues}{15}{subsection.4.1}%
 \contentsline {subsection}{\numberline {4.2}Support Information}{16}{subsection.4.2}%
 \contentsline {section}{\numberline {5}System Specifications}{16}{section.5}%
 \contentsline {subsection}{\numberline {5.1}Technical Requirements}{16}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Performance Metrics}{17}{subsection.5.2}%
-\contentsline {section}{\numberline {6}Conclusion}{17}{section.6}%
+\contentsline {subsection}{\numberline {5.2}Performance Metrics}{16}{subsection.5.2}%
+\contentsline {section}{\numberline {6}Conclusion}{16}{section.6}%

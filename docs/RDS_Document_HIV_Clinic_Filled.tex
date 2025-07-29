@@ -35,13 +35,7 @@
 \hline
 \textbf{Version} & \textbf{Date} & \textbf{A*M, D} & \textbf{In charge} & \textbf{Change Description} \\
 \hline
-V1.0 & 07/01/2025 & A & KhoaDDSE196260 & Initial RDS document creation and overview \\
-\hline
-V1.0 & 07/01/2025 & A & TuanTMSE192397 & Added authentication and user management sections \\
-\hline
-V1.0 & 07/01/2025 & A & DatNTSE194083 & Added use case diagrams and descriptions \\
-\hline
-V1.0 & 07/01/2025 & A & AnPPSE196260 & Added screen flows and interface specifications \\
+V1.0 & 07/01/2025 & A & Development Team & Initial HIV Clinic System RDS document based on implemented codebase \\
 \hline
 \end{longtable}
 
@@ -78,27 +72,6 @@ The HIV Clinic Appointment Booking System involves four main actors who interact
 \subsubsection{Use Cases}
 
 \paragraph{a. Diagram(s)}
-
-\begin{figure}
-\centering
-\fbox{
-\begin{minipage}{0.9\textwidth}
-\centering
-\vspace{3cm}
-\textbf{HIV Clinic Management System - Use Case Diagram}\\
-\vspace{0.5cm}
-\textit{Comprehensive use case diagram showing all actors (Patient, Doctor, Admin, Manager, Guest, System) and their interactions with 35 distinct use cases across authentication, appointment management, patient records, ARV treatment, notifications, and administrative functions}\\
-\vspace{0.5cm}
-\textit{Dimensions: 16" x 12"}\\
-\vspace{0.5cm}
-\textit{Generated from: use\_case\_diagram.mermaid}\\
-\vspace{3cm}
-\end{minipage}
-}
-\caption{HIV Clinic Management System Use Case Diagram}
-\label{fig:use-case-diagram}
-\end{figure}
-
 The system provides comprehensive use cases covering patient care, appointment management, and administrative functions for an HIV clinic environment.
 
 \paragraph{b. Descriptions}
@@ -145,26 +118,6 @@ The HIV Clinic system provides role-based screen flows ensuring appropriate acce
     \item \textbf{Admin Flow}: Login → Admin Dashboard → User Management → System Settings → Reports
     \item \textbf{Manager Flow}: Login → Manager Dashboard → Clinic Operations → Staff Management → Analytics
 \end{itemize}
-
-\begin{figure}
-\centering
-\fbox{
-\begin{minipage}{0.9\textwidth}
-\centering
-\vspace{3cm}
-\textbf{HIV Clinic Management System - User Interface Flow Diagram}\\
-\vspace{0.5cm}
-\textit{Comprehensive UI navigation flow showing screen transitions, user journeys for different roles (Patient, Doctor, Admin, Manager), authentication flow, error handling, and common page interactions with proper role-based access control}\\
-\vspace{0.5cm}
-\textit{Dimensions: 18" x 14"}\\
-\vspace{0.5cm}
-\textit{Generated from: user\_interface\_flow.mermaid}\\
-\vspace{3cm}
-\end{minipage}
-}
-\caption{User Interface Flow Diagram}
-\label{fig:ui-flow-diagram}
-\end{figure}
 
 \subsubsection{Screen Descriptions}
 
@@ -363,28 +316,6 @@ The HIV Clinic system follows a layered Spring Boot architecture:
 08 & com.hivclinic.validation & Input validation and sanitization utilities \\
 \hline
 \end{longtable}
-
-\subsubsection{Data Flow Architecture}
-
-\begin{figure}
-\centering
-\fbox{
-\begin{minipage}{0.9\textwidth}
-\centering
-\vspace{3cm}
-\textbf{HIV Clinic Management System - Data Flow Diagram}\\
-\vspace{0.5cm}
-\textit{Comprehensive data flow diagram showing how information moves through the system from external entities (Patient, Doctor, Admin, Manager) through various processes (Authentication, Appointment Management, Patient Records, ARV Treatment, Notifications, Administration) to data stores (User Database, Appointments, Medical Records, Treatment Data, Notifications, System Logs) with proper security and audit controls}\\
-\vspace{0.5cm}
-\textit{Dimensions: 20" x 16"}\\
-\vspace{0.5cm}
-\textit{Generated from: data\_flow\_diagram.mermaid}\\
-\vspace{3cm}
-\end{minipage}
-}
-\caption{System Data Flow Diagram}
-\label{fig:data-flow-diagram}
-\end{figure}
 
 \section{Requirement Specifications}
 

@@ -1,7 +1,6 @@
 package com.hivclinic.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**

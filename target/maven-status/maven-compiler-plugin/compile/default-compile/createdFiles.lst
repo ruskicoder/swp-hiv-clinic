@@ -19,7 +19,6 @@ com\hivclinic\model\User.class
 com\hivclinic\service\LoginActivityService.class
 com\hivclinic\config\JwtAuthenticationFilter.class
 com\hivclinic\model\NotificationTemplate$NotificationType.class
-com\hivclinic\service\SessionStatusInfo.class
 com\hivclinic\repository\UserSessionRepository.class
 com\hivclinic\service\AppointmentService.class
 com\hivclinic\dto\request\DoctorAvailabilityRequest.class
@@ -49,6 +48,7 @@ com\hivclinic\repository\AppointmentStatusHistoryRepository.class
 com\hivclinic\dto\LoginRequest.class
 com\hivclinic\service\UserService.class
 com\hivclinic\service\PatientPrivacyService.class
+com\hivclinic\service\UserSessionService$SessionStatusInfo.class
 com\hivclinic\config\DataInitializer.class
 com\hivclinic\controller\AdminController.class
 com\hivclinic\repository\SpecialtyRepository.class
@@ -57,7 +57,6 @@ com\hivclinic\controller\PatientPrivacyController.class
 com\hivclinic\controller\LoginActivityController.class
 com\hivclinic\repository\PatientRecordRepository.class
 com\hivclinic\dto\response\MessageResponse$MessageResponseBuilder.class
-com\hivclinic\validation\ValidGenderValidator.class
 com\hivclinic\service\NotificationSchedulingService.class
 com\hivclinic\repository\PasswordResetTokenRepository.class
 com\hivclinic\dto\response\AuthResponse.class
@@ -76,14 +75,12 @@ com\hivclinic\controller\MedicationRoutineController.class
 com\hivclinic\repository\NotificationTemplateRepository.class
 com\hivclinic\model\UserSession.class
 com\hivclinic\config\CustomLocalDateTimeDeserializer.class
-com\hivclinic\validation\ValidGender.class
 com\hivclinic\model\NotificationTemplate.class
 com\hivclinic\model\Notification.class
 com\hivclinic\service\NotificationTemplateService.class
 com\hivclinic\dto\request\LoginRequest.class
 com\hivclinic\controller\PatientRecordController.class
 com\hivclinic\model\Appointment.class
-com\hivclinic\model\Gender.class
 com\hivclinic\repository\DoctorAvailabilitySlotRepositoryCustom.class
 com\hivclinic\service\DoctorAvailabilityService.class
 com\hivclinic\HivClinicBackendApplication.class

@@ -10,19 +10,29 @@ const authService = {
   async login(credentials) {
     try {
       const response = await apiClient.post('/auth/login', credentials);
-      return {
-        success: true,
-        token: response.data.token,
-        id: response.data.id,
-        username: response.data.username,
-        email: response.data.email,
-        role: response.data.role
-      };
+      if (response.data) {
+        // Store token in sessionStorage instead of localStorage
+        localStorage.setItem('token', response.data.token);
+        return {
+          success: true,
+          token: response.data.token,
+          id: response.data.id,
+          username: response.data.username,
+          email: response.data.email,
+          role: response.data.role
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Login failed - Invalid response'
+        };
+      }
     } catch (error) {
       console.error('Login service error:', error);
+      // Return error message from server or fallback message
       return {
         success: false,
-        message: error.response?.data?.message || 'Login failed'
+        message: error.response?.data?.message || 'Login failed. Please check your credentials.'
       };
     }
   },
@@ -213,7 +223,7 @@ const authService = {
     }
     
     try {
-      // Client-side cleanup
+      // Update to use localStorage
       localStorage.removeItem('token');
     } catch (error) {
       console.error('Client logout error:', error);

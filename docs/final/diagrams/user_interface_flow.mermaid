@@ -1,186 +1,218 @@
 graph TD
     %% Landing and Authentication
     START([Application Start])
-    LANDING[Landing Page]
+    LANDING[Landing Page - Browse Public Website]
     LOGIN[Login Page]
     REGISTER[Registration Page]
-    FORGOT[Forgot Password]
-    RESET[Reset Password]
     
-    %% Common Components
+    %% Common Authenticated Components
     LOGOUT[Logout Confirmation]
-    PROFILE[Profile Management]
-    SETTINGS[User Settings]
+    PROFILE[Update Profile & Settings]
+    CHANGE_PASSWORD[Change Password]
     NOTIF_CENTER[Notification Center]
     
     %% Patient Flow
     PAT_DASH[Patient Dashboard]
-    PAT_APPT[My Appointments]
+    MANAGE_APPT[Manage Appointments]
     BOOK_APPT[Book Appointment]
-    PAT_RECORDS[Medical Records]
-    PAT_TREATMENT[Treatment History]
-    PAT_MEDICATION[Medication Schedule]
-    PAT_PRIVACY[Privacy Settings]
+    VIEW_APPT[View Appointments]
+    CANCEL_APPT[Cancel Appointment]
+    MANAGE_RECORDS[Manage Personal Medical Records]
+    VIEW_RECORDS[View Medical Records]
+    UPDATE_RECORDS[Update Medical Records]
+    VIEW_ARV[View ARV Treatments]
+    VIEW_NOTIF[View Notifications]
     
     %% Doctor Flow
     DOC_DASH[Doctor Dashboard]
-    DOC_PATIENTS[Patient List]
-    PAT_DETAIL[Patient Details]
-    UPDATE_RECORDS[Update Medical Records]
-    ARV_MANAGEMENT[ARV Treatment Management]
-    DOC_SCHEDULE[Doctor Schedule]
-    AVAILABILITY[Manage Availability]
+    DOC_MANAGE_APPT[Manage Appointments]
+    DOC_VIEW_APPT[View Patient Appointments]
+    UPDATE_APPT_STATUS[Update Appointment Status]
+    MANAGE_AVAILABILITY[Manage Availability Slots]
+    ACCESS_PAT_RECORDS[Access Patient Records]
+    MANAGE_ARV[Manage ARV Treatments]
+    MANAGE_NOTIFICATIONS[Manage Patient Notifications]
     SEND_NOTIF[Send Notifications]
     NOTIF_TEMPLATES[Notification Templates]
+    NOTIF_HISTORY[View Notification History]
     
     %% Admin Flow
     ADMIN_DASH[Admin Dashboard]
-    USER_MGMT[User Management]
-    SYSTEM_CONFIG[System Configuration]
-    ADMIN_REPORTS[System Reports]
-    CLINIC_INFO[Clinic Information]
+    MANAGE_USERS[Manage Users]
+    MANAGE_PATIENTS[Manage Patients]
+    MANAGE_DOCTORS[Manage Doctors]
+    CREATE_ACCOUNTS[Create User Accounts]
+    TOGGLE_STATUS[Toggle User Status]
+    RESET_PASSWORDS[Reset User Passwords]
+    MANAGE_SPECIALTIES[Manage Specialties]
+    VIEW_ALL_APPT[View All Appointments]
     
     %% Manager Flow
     MGR_DASH[Manager Dashboard]
-    CLINIC_ANALYTICS[Clinic Analytics]
-    STAFF_MGMT[Staff Management]
-    OPERATIONAL_REPORTS[Operational Reports]
+    VIEW_STATISTICS[View Statistics]
+    MGR_PAT_RECORDS[Manage Patient Records]
+    SEARCH_PATIENTS[Search Patients]
+    VIEW_PAT_DETAILS[View Patient Details]
+    MGR_DOC_RECORDS[Manage Doctor Records]
+    SEARCH_DOCTORS[Search Doctors]
+    VIEW_DOC_DETAILS[View Doctor Details]
+    MGR_ARV[Manage ARV Treatments]
+    MANAGE_SCHEDULES[Manage Schedules]
+    EXPORT_DATA[Export Data CSV]
     
     %% Error and Loading States
     ERROR_404[404 - Page Not Found]
-    ERROR_403[403 - Access Denied]
-    LOADING[Loading...]
+    LOADING[Loading State]
+    ERROR_AUTH[Authentication Error]
     
-    %% Navigation Flow
+    %% Application Flow
     START --> LANDING
     LANDING --> LOGIN
     LANDING --> REGISTER
-    LOGIN --> FORGOT
-    FORGOT --> RESET
-    RESET --> LOGIN
     
-    %% Authentication Success Routes
-    LOGIN -->|Patient Login| PAT_DASH
-    LOGIN -->|Doctor Login| DOC_DASH
-    LOGIN -->|Admin Login| ADMIN_DASH
-    LOGIN -->|Manager Login| MGR_DASH
+    %% Authentication Flows
+    LOGIN --> PAT_DASH
+    LOGIN --> DOC_DASH
+    LOGIN --> ADMIN_DASH
+    LOGIN --> MGR_DASH
+    LOGIN --> ERROR_AUTH
     
-    %% Patient Navigation
-    PAT_DASH --> PAT_APPT
-    PAT_DASH --> BOOK_APPT
-    PAT_DASH --> PAT_RECORDS
-    PAT_DASH --> PAT_TREATMENT
-    PAT_DASH --> PAT_MEDICATION
+    REGISTER --> LOGIN
+    
+    %% Common Authenticated User Flows
     PAT_DASH --> PROFILE
-    PAT_DASH --> SETTINGS
-    PAT_DASH --> NOTIF_CENTER
-    PAT_DASH --> PAT_PRIVACY
-    
-    PAT_APPT --> BOOK_APPT
-    BOOK_APPT --> PAT_APPT
-    PAT_RECORDS --> PAT_TREATMENT
-    PAT_TREATMENT --> PAT_MEDICATION
-    
-    %% Doctor Navigation
-    DOC_DASH --> DOC_PATIENTS
-    DOC_DASH --> DOC_SCHEDULE
-    DOC_DASH --> AVAILABILITY
-    DOC_DASH --> SEND_NOTIF
     DOC_DASH --> PROFILE
-    DOC_DASH --> SETTINGS
-    DOC_DASH --> NOTIF_CENTER
-    
-    DOC_PATIENTS --> PAT_DETAIL
-    PAT_DETAIL --> UPDATE_RECORDS
-    PAT_DETAIL --> ARV_MANAGEMENT
-    DOC_SCHEDULE --> AVAILABILITY
-    SEND_NOTIF --> NOTIF_TEMPLATES
-    
-    %% Admin Navigation
-    ADMIN_DASH --> USER_MGMT
-    ADMIN_DASH --> SYSTEM_CONFIG
-    ADMIN_DASH --> ADMIN_REPORTS
-    ADMIN_DASH --> CLINIC_INFO
     ADMIN_DASH --> PROFILE
-    ADMIN_DASH --> SETTINGS
-    ADMIN_DASH --> NOTIF_CENTER
-    
-    %% Manager Navigation
-    MGR_DASH --> CLINIC_ANALYTICS
-    MGR_DASH --> STAFF_MGMT
-    MGR_DASH --> OPERATIONAL_REPORTS
     MGR_DASH --> PROFILE
-    MGR_DASH --> SETTINGS
-    MGR_DASH --> NOTIF_CENTER
     
-    %% Common Return Paths
-    PROFILE --> PAT_DASH
-    PROFILE --> DOC_DASH
-    PROFILE --> ADMIN_DASH
-    PROFILE --> MGR_DASH
+    PROFILE --> CHANGE_PASSWORD
     
-    SETTINGS --> PAT_DASH
-    SETTINGS --> DOC_DASH
-    SETTINGS --> ADMIN_DASH
-    SETTINGS --> MGR_DASH
-    
-    NOTIF_CENTER --> PAT_DASH
-    NOTIF_CENTER --> DOC_DASH
-    NOTIF_CENTER --> ADMIN_DASH
-    NOTIF_CENTER --> MGR_DASH
-    
-    %% Logout Flow
     PAT_DASH --> LOGOUT
     DOC_DASH --> LOGOUT
     ADMIN_DASH --> LOGOUT
     MGR_DASH --> LOGOUT
     LOGOUT --> LANDING
     
-    %% Error Handling
-    PAT_DASH -->|Invalid Route| ERROR_404
-    DOC_DASH -->|Invalid Route| ERROR_404
-    ADMIN_DASH -->|Invalid Route| ERROR_404
-    MGR_DASH -->|Invalid Route| ERROR_404
+    %% Patient Specific Flows
+    PAT_DASH --> MANAGE_APPT
+    MANAGE_APPT --> BOOK_APPT
+    MANAGE_APPT --> VIEW_APPT
+    MANAGE_APPT --> CANCEL_APPT
+    BOOK_APPT --> PAT_DASH
+    VIEW_APPT --> PAT_DASH
+    CANCEL_APPT --> PAT_DASH
     
-    LOGIN -->|Access Denied| ERROR_403
-    ERROR_403 --> LOGIN
-    ERROR_404 --> LANDING
+    PAT_DASH --> MANAGE_RECORDS
+    MANAGE_RECORDS --> VIEW_RECORDS
+    MANAGE_RECORDS --> UPDATE_RECORDS
+    VIEW_RECORDS --> PAT_DASH
+    UPDATE_RECORDS --> PAT_DASH
+    
+    PAT_DASH --> VIEW_ARV
+    PAT_DASH --> VIEW_NOTIF
+    PAT_DASH --> NOTIF_CENTER
+    VIEW_ARV --> PAT_DASH
+    VIEW_NOTIF --> PAT_DASH
+    NOTIF_CENTER --> PAT_DASH
+    
+    %% Doctor Specific Flows
+    DOC_DASH --> DOC_MANAGE_APPT
+    DOC_MANAGE_APPT --> DOC_VIEW_APPT
+    DOC_MANAGE_APPT --> UPDATE_APPT_STATUS
+    DOC_VIEW_APPT --> DOC_DASH
+    UPDATE_APPT_STATUS --> DOC_DASH
+    
+    DOC_DASH --> MANAGE_AVAILABILITY
+    MANAGE_AVAILABILITY --> DOC_DASH
+    
+    DOC_DASH --> ACCESS_PAT_RECORDS
+    ACCESS_PAT_RECORDS --> DOC_DASH
+    
+    DOC_DASH --> MANAGE_ARV
+    MANAGE_ARV --> DOC_DASH
+    
+    DOC_DASH --> MANAGE_NOTIFICATIONS
+    MANAGE_NOTIFICATIONS --> SEND_NOTIF
+    MANAGE_NOTIFICATIONS --> NOTIF_TEMPLATES
+    MANAGE_NOTIFICATIONS --> NOTIF_HISTORY
+    SEND_NOTIF --> DOC_DASH
+    NOTIF_TEMPLATES --> DOC_DASH
+    NOTIF_HISTORY --> DOC_DASH
+    
+    %% Admin Specific Flows
+    ADMIN_DASH --> MANAGE_USERS
+    MANAGE_USERS --> MANAGE_PATIENTS
+    MANAGE_USERS --> MANAGE_DOCTORS
+    MANAGE_USERS --> CREATE_ACCOUNTS
+    MANAGE_USERS --> TOGGLE_STATUS
+    MANAGE_USERS --> RESET_PASSWORDS
+    MANAGE_USERS --> MANAGE_SPECIALTIES
+    MANAGE_PATIENTS --> ADMIN_DASH
+    MANAGE_DOCTORS --> ADMIN_DASH
+    CREATE_ACCOUNTS --> ADMIN_DASH
+    TOGGLE_STATUS --> ADMIN_DASH
+    RESET_PASSWORDS --> ADMIN_DASH
+    MANAGE_SPECIALTIES --> ADMIN_DASH
+    
+    ADMIN_DASH --> VIEW_ALL_APPT
+    VIEW_ALL_APPT --> ADMIN_DASH
+    
+    %% Manager Specific Flows
+    MGR_DASH --> VIEW_STATISTICS
+    VIEW_STATISTICS --> MGR_DASH
+    
+    MGR_DASH --> MGR_PAT_RECORDS
+    MGR_PAT_RECORDS --> SEARCH_PATIENTS
+    MGR_PAT_RECORDS --> VIEW_PAT_DETAILS
+    SEARCH_PATIENTS --> VIEW_PAT_DETAILS
+    VIEW_PAT_DETAILS --> MGR_DASH
+    SEARCH_PATIENTS --> MGR_DASH
+    
+    MGR_DASH --> MGR_DOC_RECORDS
+    MGR_DOC_RECORDS --> SEARCH_DOCTORS
+    MGR_DOC_RECORDS --> VIEW_DOC_DETAILS
+    SEARCH_DOCTORS --> VIEW_DOC_DETAILS
+    VIEW_DOC_DETAILS --> MGR_DASH
+    SEARCH_DOCTORS --> MGR_DASH
+    
+    MGR_DASH --> MGR_ARV
+    MGR_ARV --> MGR_DASH
+    
+    MGR_DASH --> MANAGE_SCHEDULES
+    MANAGE_SCHEDULES --> MGR_DASH
+    
+    MGR_DASH --> EXPORT_DATA
+    EXPORT_DATA --> MGR_DASH
+    
+    %% Error Flows
+    LANDING --> ERROR_404
+    PAT_DASH --> ERROR_404
+    DOC_DASH --> ERROR_404
+    ADMIN_DASH --> ERROR_404
+    MGR_DASH --> ERROR_404
     
     %% Loading States
     LOGIN --> LOADING
+    REGISTER --> LOADING
     LOADING --> PAT_DASH
     LOADING --> DOC_DASH
     LOADING --> ADMIN_DASH
     LOADING --> MGR_DASH
-    LOADING -->|Error| LOGIN
+    LOADING --> ERROR_AUTH
     
     %% Styling
-    classDef landing fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    classDef auth fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
-    classDef patient fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef doctor fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef admin fill:#ffebee,stroke:#c62828,stroke-width:2px
-    classDef manager fill:#e0f2f1,stroke:#00695c,stroke-width:2px
-    classDef common fill:#f5f5f5,stroke:#616161,stroke-width:2px
-    classDef error fill:#ffcdd2,stroke:#d32f2f,stroke-width:2px
+    classDef landingStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef authStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef patientStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef doctorStyle fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    classDef adminStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef managerStyle fill:#f1f8e9,stroke:#689f38,stroke-width:2px
+    classDef errorStyle fill:#ffebee,stroke:#d32f2f,stroke-width:2px
     
-    class START,LANDING landing
-    class LOGIN,REGISTER,FORGOT,RESET,LOGOUT auth
-    class PAT_DASH,PAT_APPT,BOOK_APPT,PAT_RECORDS,PAT_TREATMENT,PAT_MEDICATION,PAT_PRIVACY patient
-    class DOC_DASH,DOC_PATIENTS,PAT_DETAIL,UPDATE_RECORDS,ARV_MANAGEMENT,DOC_SCHEDULE,AVAILABILITY,SEND_NOTIF,NOTIF_TEMPLATES doctor
-    class ADMIN_DASH,USER_MGMT,SYSTEM_CONFIG,ADMIN_REPORTS,CLINIC_INFO admin
-    class MGR_DASH,CLINIC_ANALYTICS,STAFF_MGMT,OPERATIONAL_REPORTS manager
-    class PROFILE,SETTINGS,NOTIF_CENTER,LOADING common
-    class ERROR_404,ERROR_403 error
-    
-    %% Navigation Notes
-    subgraph "Legend"
-        L1[Landing/Start]:::landing
-        L2[Authentication]:::auth
-        L3[Patient Pages]:::patient
-        L4[Doctor Pages]:::doctor
-        L5[Admin Pages]:::admin
-        L6[Manager Pages]:::manager
-        L7[Common Pages]:::common
-        L8[Error Pages]:::error
-    end
+    class START,LANDING landingStyle
+    class LOGIN,REGISTER,LOGOUT,PROFILE,CHANGE_PASSWORD authStyle
+    class PAT_DASH,MANAGE_APPT,BOOK_APPT,VIEW_APPT,CANCEL_APPT,MANAGE_RECORDS,VIEW_RECORDS,UPDATE_RECORDS,VIEW_ARV,VIEW_NOTIF patientStyle
+    class DOC_DASH,DOC_MANAGE_APPT,DOC_VIEW_APPT,UPDATE_APPT_STATUS,MANAGE_AVAILABILITY,ACCESS_PAT_RECORDS,MANAGE_ARV,MANAGE_NOTIFICATIONS,SEND_NOTIF,NOTIF_TEMPLATES,NOTIF_HISTORY doctorStyle
+    class ADMIN_DASH,MANAGE_USERS,MANAGE_PATIENTS,MANAGE_DOCTORS,CREATE_ACCOUNTS,TOGGLE_STATUS,RESET_PASSWORDS,MANAGE_SPECIALTIES,VIEW_ALL_APPT adminStyle
+    class MGR_DASH,VIEW_STATISTICS,MGR_PAT_RECORDS,SEARCH_PATIENTS,VIEW_PAT_DETAILS,MGR_DOC_RECORDS,SEARCH_DOCTORS,VIEW_DOC_DETAILS,MGR_ARV,MANAGE_SCHEDULES,EXPORT_DATA managerStyle
+    class ERROR_404,ERROR_AUTH,LOADING errorStyle
