@@ -496,7 +496,7 @@ const patientColumns = [
         <PaginatedTable
           data={patients}
           columns={patientColumns}
-          itemsPerPage={5}
+          itemsPerPage={9}
           emptyMessage="No patients found."
         />
       )}
@@ -530,7 +530,7 @@ const patientColumns = [
         <PaginatedTable
           data={doctors}
           columns={doctorColumns}
-          itemsPerPage={5} // Hiển thị 5 bác sĩ mỗi trang
+          itemsPerPage={9} // Hiển thị 5 bác sĩ mỗi trang
           emptyMessage="No doctors found."
         />
       )}
@@ -566,7 +566,7 @@ const patientColumns = [
         <PaginatedTable
           data={arvTreatments}
           columns={arvColumns}
-          itemsPerPage={5} // Hiển thị 15 mục mỗi trang
+          itemsPerPage={9} // Hiển thị 15 mục mỗi trang
           emptyMessage="No ARV treatments found."
         />
       )}
@@ -601,7 +601,7 @@ const patientColumns = [
         <PaginatedTable
           data={schedules}
           columns={scheduleColumns}
-          itemsPerPage={5} // Hiển thị 15 lịch mỗi trang
+          itemsPerPage={9} // Hiển thị 15 lịch mỗi trang
           emptyMessage="No schedules found."
         />
       )}

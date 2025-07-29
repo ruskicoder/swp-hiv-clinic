@@ -375,7 +375,7 @@ const appointmentColumns = [
           <PaginatedTable
             data={appointments}
             columns={appointmentColumns}
-            itemsPerPage={5}
+            itemsPerPage={9}
             emptyMessage="No appointments found."
           />
         )}
@@ -401,7 +401,7 @@ const appointmentColumns = [
           <PaginatedTable
             data={doctors}
             columns={doctorColumns}
-            itemsPerPage={6}
+            itemsPerPage={9}
             emptyMessage="No doctors available."
           />
         )}

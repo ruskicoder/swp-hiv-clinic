@@ -283,7 +283,7 @@ const appointmentColumns = [
           <PaginatedTable
             data={users}
             columns={userColumns}
-            itemsPerPage={3} // Bạn có thể tùy chỉnh số lượng
+            itemsPerPage={9} // Bạn có thể tùy chỉnh số lượng
             emptyMessage="No users found."
           />
         )}
@@ -299,7 +299,7 @@ const appointmentColumns = [
           <PaginatedTable
             data={managers}
             columns={ManagerColumns} // Sử dụng cột của Manager
-            itemsPerPage={3} // Bạn có thể tùy chỉnh số lượng
+            itemsPerPage={9} // Bạn có thể tùy chỉnh số lượng
             emptyMessage="No users found."
           />
         )}
@@ -318,7 +318,7 @@ const appointmentColumns = [
           <PaginatedTable
             data={doctors}
             columns={doctorColumns} // <-- SỬ DỤNG CỘT CỦA DOCTOR
-            itemsPerPage={5}        // Bạn có thể hiển thị 5 bác sĩ mỗi trang
+            itemsPerPage={9}        // Bạn có thể hiển thị 5 bác sĩ mỗi trang
             emptyMessage="No doctors found."
           />
         )}
@@ -334,7 +334,7 @@ const appointmentColumns = [
           <PaginatedTable
             data={appointments}
             columns={appointmentColumns} // Sử dụng cột của appointments
-            itemsPerPage={3} // Bạn có thể tùy chỉnh số lượng
+            itemsPerPage={9} // Bạn có thể tùy chỉnh số lượng
             emptyMessage="No users found."
           />
         )}
