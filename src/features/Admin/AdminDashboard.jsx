@@ -25,8 +25,8 @@ const CreateUserForm = ({ loadDashboardData, setActiveTab }) => {
     const fetchRoles = async () => {
       try {
         const response = await apiClient.get('/admin/roles');
-        // Lọc ra vai trò 'Admin' để tránh việc Admin tự tạo thêm Admin khác
-        setRoles(response.data.filter(role => role.roleName !== 'Admin'));
+        // Lọc ra vai trò 'Admin' và 'Manager' để tránh việc Admin tự tạo thêm Admin hoặc Manager khác
+        setRoles(response.data.filter(role => role.roleName !== 'Admin' && role.roleName !== 'Manager'));
       } catch (err) {
         setError('Failed to load roles list. Please check the API endpoint.');
       }
