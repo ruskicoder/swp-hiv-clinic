@@ -1,0 +1,25 @@
+erDiagram
+    Users ||--|| Roles : "has"
+    Users ||--o{ LoginActivity : "generates"
+    Users ||--o{ SystemSettings : "updates"
+    Users ||--o{ PasswordResetTokens : "requests"
+    
+    Users ||--o| DoctorProfiles : "has doctor profile"
+    Users ||--o| PatientProfiles : "has patient profile"
+    DoctorProfiles ||--|| Specialties : "specializes in"
+
+    Users ||--o{ DoctorAvailabilitySlots : "creates slots"
+    DoctorAvailabilitySlots ||--o| Appointments : "booked for"
+
+    Users ||--o{ Appointments : "books as patient"
+    Users ||--o{ Appointments : "accepts as doctor"
+    Appointments ||--o{ AppointmentStatusHistory : "tracks"
+    Appointments ||--o{ AppointmentReminders : "generates"
+
+    Users ||--o{ PatientRecords : "has medical record"
+    PatientRecords ||--o{ ARVTreatments : "receives"
+    ARVTreatments ||--o{ MedicationRoutines : "prescribes"
+    MedicationRoutines ||--o{ MedicationReminders : "generates"
+
+    Users ||--o{ Notifications : "receives"
+    Notifications ||--o| NotificationTemplates : "uses"
