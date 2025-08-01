@@ -2321,4 +2321,629 @@ This completes the comprehensive documentation of the HIV Clinic Management Syst
 11. **Deployment Considerations**: Production configuration and optimization
 12. **Maintenance and Monitoring**: Logging, performance monitoring, and metrics
 
-This documentation serves as a complete reference for understanding, maintaining, and extending the HIV Clinic Management System.
+---
+
+## 13. Role-Based Dashboard Analysis
+
+### 13.1. Doctor Dashboard - Medical Professional Interface
+
+The `DoctorDashboard` provides comprehensive tools for healthcare providers to manage their practice:
+
+#### **Core Features for Doctors**
+```jsx
+const DoctorDashboard = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [appointments, setAppointments] = useState([]);
+  const [availabilitySlots, setAvailabilitySlots] = useState([]);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [patientRecord, setPatientRecord] = useState(null);
+  const [arvTreatments, setArvTreatments] = useState([]);
+};
+```
+
+**Doctor Dashboard Capabilities:**
+1. **Appointment Management**: View upcoming appointments with patient details
+2. **Availability Control**: Set and manage available time slots for patient bookings
+3. **Patient Records**: Access and update patient medical records
+4. **ARV Treatment Management**: Prescribe and monitor HIV treatment regimens
+5. **Notification System**: Send appointment reminders and medication alerts
+
+#### **Patient Record Management**
+```jsx
+const loadPatientRecord = async (appointment) => {
+  try {
+    setSelectedAppointment(appointment);
+    
+    // Load patient's medical history
+    const recordResponse = await apiClient.get(`/patient-records/${appointment.patientUser.userId}`);
+    setPatientRecord(recordResponse.data);
+    
+    // Load ARV treatment history
+    const arvResponse = await apiClient.get(`/arv-treatments/patient/${appointment.patientUser.userId}`);
+    setArvTreatments(arvResponse.data || []);
+    
+    setActiveTab('patient-record');
+  } catch (error) {
+    console.error('Error loading patient record:', error);
+    setError('Failed to load patient record');
+  }
+};
+```
+
+**What This Does:**
+- Loads complete patient medical history when doctor selects an appointment
+- Retrieves ARV treatment records for HIV-specific care
+- Provides context for informed medical decisions
+- Maintains patient privacy through role-based access
+
+#### **ARV Treatment Prescription**
+```jsx
+const handleSaveARVTreatment = async () => {
+  try {
+    const treatmentData = {
+      patientUserID: selectedAppointment.patientUser.userId,
+      regimen: arvFormData.regimen,
+      startDate: arvFormData.startDate,
+      adherence: arvFormData.adherence,
+      sideEffects: arvFormData.sideEffects,
+      notes: arvFormData.notes
+    };
+    
+    await apiClient.post('/arv-treatments', treatmentData);
+    alert('ARV treatment saved successfully!');
+    loadPatientRecord(selectedAppointment);
+  } catch (error) {
+    console.error('Error saving ARV treatment:', error);
+    alert('Failed to save ARV treatment');
+  }
+};
+```
+
+### 13.2. Manager Dashboard - Clinic Operations Interface
+
+The `ManagerDashboard` provides oversight tools for clinic administration:
+
+#### **Management Capabilities**
+```jsx
+const SIDEBAR_OPTIONS = [
+  { key: 'overview', label: 'Dashboard Overview', icon: '📊' },
+  { key: 'patients', label: 'Patient Management', icon: '👥' },
+  { key: 'doctors', label: 'Doctor Management', icon: '👨‍⚕️' },
+  { key: 'arv', label: 'ARV Regimen Management', icon: '💊' },
+  { key: 'schedules', label: 'Schedule Management', icon: '📅' }
+];
+```
+
+**Manager Features:**
+1. **Patient Management**: Overview of all registered patients
+2. **Doctor Management**: Monitor doctor schedules and performance
+3. **ARV Oversight**: Review treatment regimens across the clinic
+4. **Schedule Coordination**: Manage clinic-wide appointment scheduling
+5. **Reporting**: Generate operational reports and statistics
+
+#### **Patient Management Table**
+```jsx
+const patientColumns = [
+  { header: 'Patient Info', cell: p => (
+    <div>
+      <div style={{ fontWeight: '600' }}>{p.firstName} {p.lastName}</div>
+      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>@{p.username}</div>
+    </div>
+  )},
+  { header: 'Contact', cell: p => p.email },
+  { header: 'Status', cell: p => (
+    <span className={`status-badge ${p.isActive ? 'active' : 'inactive'}`}>
+      {p.isActive ? 'Active' : 'Inactive'}
+    </span>
+  )},
+  { header: 'Actions', cell: p => (
+    <button onClick={() => navigate(`/manager/patients/${p.userId}`)}>
+      View Details
+    </button>
+  )}
+];
+```
+
+### 13.3. Admin Dashboard - System Administration Interface
+
+The `AdminDashboard` provides complete system control:
+
+#### **Unified User Creation**
+```jsx
+const CreateUserForm = ({ loadDashboardData, setActiveTab }) => {
+  const [formData, setFormData] = useState({
+    username: '', password: '', email: '',
+    firstName: '', lastName: '', phoneNumber: '',
+    gender: '', roleName: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await apiClient.post('/admin/users', formData);
+      if (response.data.success) {
+        // Automatically navigate to relevant management tab
+        setTimeout(() => {
+          if (formData.roleName === 'Doctor') setActiveTab('doctors');
+          else if (formData.roleName === 'Manager') setActiveTab('managers');
+          else setActiveTab('users');
+        }, 1500);
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || 'User creation failed');
+    }
+  };
+};
+```
+
+**Admin Capabilities:**
+1. **User Management**: Create and manage all user accounts
+2. **Role Assignment**: Assign roles (Patient, Doctor, Manager)
+3. **System Configuration**: Manage system settings and templates
+4. **Security Oversight**: Monitor login activities and security events
+5. **Data Management**: Backup and maintenance operations
+
+---
+
+## 14. Advanced Medical System Features
+
+### 14.1. ARV Treatment Management System
+
+HIV clinics require specialized treatment tracking. The ARVTreatment entity manages this:
+
+#### **ARV Treatment Entity Structure**
+```java
+@Entity
+@Table(name = "ARVTreatments")
+public class ARVTreatment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ARVTreatmentID")
+    private Integer arvTreatmentID;
+
+    @Column(name = "PatientUserID", nullable = false)
+    private Integer patientUserID;
+
+    @Column(name = "DoctorUserID", nullable = false)
+    private Integer doctorUserID;
+
+    @Column(name = "Regimen", length = 200)
+    private String regimen;  // e.g., "TDF/FTC/EFV", "ABC/3TC/DTG"
+
+    @Column(name = "Adherence")
+    private String adherence;  // Patient compliance tracking
+
+    @Column(name = "SideEffects", columnDefinition = "NVARCHAR(MAX)")
+    private String sideEffects;  // Monitor treatment side effects
+}
+```
+
+**ARV Treatment Features:**
+- **Regimen Tracking**: Different drug combinations for HIV treatment
+- **Adherence Monitoring**: Track how well patients follow their treatment
+- **Side Effect Management**: Record and monitor adverse reactions
+- **Treatment History**: Complete timeline of patient's ARV treatments
+- **Doctor Assignment**: Track which doctor prescribed each treatment
+
+#### **Common ARV Regimens**
+The system supports various HIV treatment combinations:
+1. **First-line treatments**: TDF/FTC/EFV, ABC/3TC/DTG
+2. **Second-line treatments**: AZT/3TC/LPV/r, TDF/FTC/ATV/r
+3. **Specialized regimens**: For drug resistance or special populations
+
+### 14.2. Patient Medical Records System
+
+#### **PatientRecord Entity - Comprehensive Medical History**
+```java
+@Entity
+@Table(name = "PatientRecords")
+public class PatientRecord {
+    @Column(name = "MedicalHistory", columnDefinition = "NVARCHAR(MAX)")
+    private String medicalHistory;
+
+    @Column(name = "Allergies", columnDefinition = "NVARCHAR(MAX)")
+    private String allergies;
+
+    @Column(name = "CurrentMedications", columnDefinition = "NVARCHAR(MAX)")
+    private String currentMedications;
+
+    @Column(name = "BloodType", length = 10)
+    private String bloodType;
+
+    @Column(name = "EmergencyContact")
+    private String emergencyContact;
+
+    @Column(name = "ProfileImageBase64", columnDefinition = "NVARCHAR(MAX)")
+    private String profileImageBase64;  // Medical photos, X-rays, etc.
+}
+```
+
+**Medical Record Features:**
+- **Comprehensive History**: Complete medical background
+- **Allergy Tracking**: Critical for safe medication prescribing
+- **Current Medications**: Avoid drug interactions
+- **Emergency Information**: Quick access during emergencies
+- **Medical Imaging**: Store and display medical photos
+- **Privacy Controls**: Patient can control record visibility
+
+### 14.3. Notification System for Healthcare
+
+#### **Healthcare-Specific Notifications**
+```java
+public enum NotificationType {
+    APPOINTMENT_REMINDER("APPOINTMENT_REMINDER"),     // "Your appointment is tomorrow at 2 PM"
+    MEDICATION_REMINDER("MEDICATION_REMINDER"),       // "Time to take your ARV medication"
+    GENERAL("GENERAL"),                               // "Clinic holiday notice"
+    SYSTEM_NOTIFICATION("SYSTEM_NOTIFICATION");       // "Your test results are ready"
+}
+
+public enum Priority {
+    LOW("LOW"),        // General information
+    MEDIUM("MEDIUM"),  // Standard reminders
+    HIGH("HIGH"),      // Important health updates
+    URGENT("URGENT");  // Emergency alerts
+}
+```
+
+**Notification Features:**
+- **Appointment Reminders**: Automated reminders before appointments
+- **Medication Alerts**: ARV adherence reminders at prescribed times
+- **Lab Results**: Notify when test results are available
+- **Emergency Alerts**: Critical health information
+- **Bulk Messaging**: Clinic-wide announcements
+
+---
+
+## 15. Calendar and Scheduling System
+
+### 15.1. UnifiedCalendar Component
+
+The scheduling system handles complex healthcare scheduling requirements:
+
+#### **Multi-Role Calendar Functionality**
+```jsx
+const UnifiedCalendar = ({
+  slots = [],
+  userRole = 'doctor',  // 'doctor', 'patient', 'manager'
+  currentUserId,
+  doctorInfo = null,
+  onAddSlot,      // Doctor creates availability
+  onDeleteSlot,   // Doctor removes availability
+  onBookSlot,     // Patient books appointment
+  onCancelBooking // Cancel existing booking
+}) => {
+  // Smart date processing to handle timezone issues
+  const processSlotDate = (dateValue) => {
+    if (typeof dateValue === 'string' && dateValue.includes('T')) {
+      return new Date(dateValue);
+    }
+    // Handle date-only strings - create at noon to avoid timezone issues
+    const [year, month, day] = dateValue.split('-').map(Number);
+    return new Date(year, month - 1, day, 12, 0, 0);
+  };
+};
+```
+
+**Calendar Features by Role:**
+
+**For Doctors:**
+- **Set Availability**: Create time slots when available for appointments
+- **Manage Schedule**: View upcoming appointments and patient details
+- **Block Time**: Reserve slots for procedures or breaks
+- **Emergency Slots**: Create urgent appointment availability
+
+**For Patients:**
+- **View Availability**: See open appointment slots
+- **Book Appointments**: Select and confirm appointment times
+- **Reschedule**: Move appointments to different times
+- **Cancel Bookings**: Cancel appointments with reason
+
+**For Managers:**
+- **Clinic Overview**: See all doctor schedules and appointments
+- **Resource Planning**: Optimize clinic capacity and utilization
+- **Conflict Resolution**: Handle scheduling conflicts
+- **Reporting**: Generate schedule-related reports
+
+### 15.2. Advanced Scheduling Logic
+
+#### **Time Slot Management**
+```jsx
+const processedSlots = useMemo(() => {
+  return slots.filter(slot => {
+    const slotDate = processSlotDate(slot.slotDate);
+    if (!slotDate || isNaN(slotDate.getTime())) {
+      return false; // Filter out invalid dates
+    }
+    return true;
+  }).map(slot => ({
+    ...slot,
+    availabilitySlotId: slot.availabilitySlotId || slot.slotId,
+    startTime: slot.startTime || '00:00',
+    endTime: slot.endTime || '00:30',
+    isBooked: Boolean(slot.isBooked),
+    appointment: slot.appointment || null
+  }));
+}, [slots]);
+```
+
+**Scheduling Business Rules:**
+1. **No Double Booking**: System prevents multiple appointments at same time
+2. **Buffer Time**: Automatic gaps between appointments for doctor preparation
+3. **Working Hours**: Enforce clinic operating hours
+4. **Doctor Availability**: Only show slots when doctor is available
+5. **Emergency Slots**: High-priority booking for urgent cases
+
+---
+
+## 16. Security and Authentication Deep Dive
+
+### 16.1. JWT Token Security Implementation
+
+#### **JWT Utility Functions**
+```java
+@Component
+public class JwtUtils {
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;  // Secret key for signing tokens
+
+    @Value("${app.jwt.expiration-ms}")
+    private int jwtExpirationMs;  // 24 hours default
+
+    public String generateJwtToken(String username, Integer userId, String role) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("userId", userId)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+}
+```
+
+**JWT Security Features:**
+- **HMAC SHA-256 Signing**: Cryptographic signature prevents tampering
+- **Expiration**: Tokens automatically expire for security
+- **Role-Based Claims**: User role embedded in token for authorization
+- **User Identification**: User ID included for database lookups
+- **Stateless**: No server-side session storage required
+
+#### **Role Hierarchy System**
+```java
+@Bean
+public RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+    hierarchy.setHierarchy(
+        "ROLE_ADMIN > ROLE_MANAGER\n" +
+        "ROLE_MANAGER > ROLE_DOCTOR\n" +
+        "ROLE_DOCTOR > ROLE_PATIENT"
+    );
+    return hierarchy;
+}
+```
+
+**Permission Hierarchy:**
+1. **Admin**: Can access everything (user management, system settings)
+2. **Manager**: Can access clinic operations (patient lists, doctor schedules)
+3. **Doctor**: Can access medical functions (patient records, treatments)
+4. **Patient**: Can access personal data (own appointments, own records)
+
+### 16.2. API Security Configuration
+
+#### **Endpoint Protection**
+```java
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(auth -> auth
+        .requestMatchers("/api/auth/**").permitAll()           // Public registration/login
+        .requestMatchers("/api/health/**").permitAll()         // Health checks
+        .requestMatchers("/api/admin/**").hasRole("ADMIN")     // Admin only
+        .requestMatchers("/api/manager/**").hasRole("MANAGER") // Manager and above
+        .requestMatchers("/api/arv-treatments/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN")
+        .anyRequest().authenticated()                          // Everything else requires login
+    );
+}
+```
+
+**Security Layers:**
+1. **CORS Protection**: Configured for specific frontend domains
+2. **CSRF Disabled**: For stateless JWT-based authentication
+3. **Role-Based Access**: Different endpoints for different user types
+4. **JWT Filter**: Validates tokens on every protected request
+5. **Password Encryption**: BCrypt hashing with salt
+
+---
+
+## 17. Database Schema and Relationships
+
+### 17.1. Complete Entity Relationship Diagram
+
+```
+┌─────────────────┐       ┌─────────────────┐
+│     Users       │◄─────►│     Roles       │
+│                 │       │                 │
+│ • UserID (PK)   │       │ • RoleID (PK)   │
+│ • Username      │       │ • RoleName      │
+│ • PasswordHash  │       │                 │
+│ • Email         │       └─────────────────┘
+│ • RoleID (FK)   │
+│ • IsActive      │
+└─────────────────┘
+         │
+         ├─────────────────────────────────────────┐
+         │                                         │
+         ▼                                         ▼
+┌─────────────────┐                    ┌─────────────────┐
+│ PatientProfiles │                    │ DoctorProfiles  │
+│                 │                    │                 │
+│ • ProfileID(PK) │                    │ • ProfileID(PK) │
+│ • UserID (FK)   │                    │ • UserID (FK)   │
+│ • BloodType     │                    │ • Specialty     │
+│ • IsPrivate     │                    │ • LicenseNum    │
+└─────────────────┘                    └─────────────────┘
+         │                                         │
+         ▼                                         ▼
+┌─────────────────┐                    ┌─────────────────┐
+│ PatientRecords  │                    │DoctorAvailSlots │
+│                 │                    │                 │
+│ • RecordID (PK) │                    │ • SlotID (PK)   │
+│ • PatientID(FK) │                    │ • DoctorID (FK) │
+│ • MedicalHist   │                    │ • SlotDate      │
+│ • Allergies     │                    │ • StartTime     │
+│ • Emergency     │                    │ • IsBooked      │
+└─────────────────┘                    └─────────────────┘
+         │                                         │
+         ▼                                         │
+┌─────────────────┐                                │
+│  ARVTreatments  │                                │
+│                 │                                │
+│ • TreatmentID   │                                │
+│ • PatientID(FK) │                                │
+│ • DoctorID (FK) │                                │
+│ • Regimen       │                                │
+│ • StartDate     │                                │
+│ • Adherence     │                                │
+└─────────────────┘                                │
+                                                   │
+         ┌─────────────────────────────────────────┘
+         ▼
+┌─────────────────┐       ┌─────────────────┐
+│  Appointments   │◄─────►│ AppointStatusHx │
+│                 │       │                 │
+│ • AppointID(PK) │       │ • HistoryID(PK) │
+│ • PatientID(FK) │       │ • AppointID(FK) │
+│ • DoctorID (FK) │       │ • OldStatus     │
+│ • SlotID   (FK) │       │ • NewStatus     │
+│ • DateTime      │       │ • ChangedAt     │
+│ • Status        │       │ • Reason        │
+│ • Duration      │       └─────────────────┘
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Notifications   │
+│                 │
+│ • NotifyID (PK) │
+│ • UserID   (FK) │
+│ • Type          │
+│ • Title         │
+│ • Message       │
+│ • IsRead        │
+│ • Priority      │
+│ • ScheduledFor  │
+└─────────────────┘
+```
+
+### 17.2. Database Relationships Explained
+
+#### **One-to-One Relationships**
+- **User ↔ PatientProfile**: Each user can have one patient profile
+- **User ↔ DoctorProfile**: Each user can have one doctor profile
+- **PatientProfile ↔ PatientRecord**: Each patient has one medical record
+
+#### **One-to-Many Relationships**
+- **Role → Users**: One role can be assigned to many users
+- **Doctor → Appointments**: One doctor can have many appointments
+- **Patient → Appointments**: One patient can have many appointments
+- **Doctor → ARVTreatments**: One doctor can prescribe many treatments
+- **Patient → ARVTreatments**: One patient can have many treatments
+- **User → Notifications**: One user can receive many notifications
+
+#### **Many-to-Many Relationships**
+- **Appointments ↔ Availability Slots**: Appointments link to doctor availability
+- **Users ↔ Login Activities**: Track multiple login sessions per user
+
+---
+
+## 18. Error Handling and Resilience
+
+### 18.1. Frontend Error Boundaries
+
+#### **React Error Boundary Implementation**
+```jsx
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('React Error Boundary caught an error:', error, errorInfo);
+    
+    // Log to monitoring service
+    if (window.analytics) {
+      window.analytics.track('Frontend Error', {
+        error: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="error-boundary">
+          <h2>Something went wrong</h2>
+          <p>We're sorry, but something unexpected happened.</p>
+          <button onClick={() => window.location.reload()}>
+            Refresh Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+### 18.2. Backend Exception Handling
+
+#### **Global Exception Handler**
+```java
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDatabaseError(DataAccessException ex) {
+        logger.error("Database error occurred", ex);
+        
+        ErrorResponse error = new ErrorResponse(
+            "DATABASE_ERROR",
+            "A database error occurred. Please try again later.",
+            HttpStatus.INTERNAL_SERVER_ERROR.value()
+        );
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationError(MethodArgumentNotValidException ex) {
+        List<String> validationErrors = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.toList());
+        
+        ErrorResponse error = new ErrorResponse(
+            "VALIDATION_ERROR",
+            "Validation failed: " + String.join(", ", validationErrors),
+            HttpStatus.BAD_REQUEST.value()
+        );
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+}
+```
+
+---
+
+This documentation serves as a complete reference for understanding, maintaining, and extending the HIV Clinic Management System. It covers every aspect from high-level architecture to implementation details, security considerations, and operational procedures.
