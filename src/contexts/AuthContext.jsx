@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       try {
         setLoading(true);
-        const token = sessionStorage.getItem('token');
+        const token = localStorage.getItem('token');
         
         if (token) {
           try {
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userProfile);
           } catch (error) {
             console.error('Token validation failed:', error);
-            sessionStorage.removeItem('token');
+            localStorage.removeItem('token');
             setUser(null);
           }
         }
