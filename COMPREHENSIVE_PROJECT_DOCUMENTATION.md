@@ -2946,4 +2946,627 @@ public class GlobalExceptionHandler {
 
 ---
 
-This documentation serves as a complete reference for understanding, maintaining, and extending the HIV Clinic Management System. It covers every aspect from high-level architecture to implementation details, security considerations, and operational procedures.
+---
+
+## 19. Advanced Healthcare Notification System
+
+### 19.1. Notification Service Architecture
+
+The notification system provides sophisticated healthcare-specific messaging capabilities:
+
+#### **Notification Business Logic**
+```java
+@Service
+public class NotificationService {
+    
+    public List<NotificationDto> getNotificationsByUserId(Integer userId) {
+        // Filter out cancelled notifications from patient view
+        List<Notification> visibleNotifications = 
+            notificationRepository.findByUserIdExcludingCancelledOrderByCreatedAtDesc(userId);
+        
+        // Log filtering for debugging
+        System.out.println("DEBUG: Filtered out cancelled notifications for patient visibility");
+        
+        return visibleNotifications.stream()
+                .map(NotificationDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+    
+    @Transactional
+    public NotificationDto markAsRead(Integer notificationId, Integer userId) {
+        return notificationRepository.findById(notificationId)
+                .map(notification -> {
+                    // Verify user owns this notification
+                    if (!notification.getUserId().equals(userId)) {
+                        throw new SecurityException("User cannot access this notification");
+                    }
+                    
+                    notification.setIsRead(true);
+                    notificationRepository.save(notification);
+                    return NotificationDto.fromEntity(notification);
+                })
+                .orElse(null);
+    }
+}
+```
+
+**Key Features:**
+- **Privacy Protection**: Cancelled notifications are hidden from patients
+- **Security Validation**: Users can only mark their own notifications as read
+- **Audit Logging**: All notification actions are logged for debugging
+- **Bulk Operations**: Mark all notifications as read functionality
+- **Status Filtering**: Support for read/unread filtering
+
+#### **Healthcare Notification Types**
+```java
+public enum NotificationType {
+    APPOINTMENT_REMINDER("APPOINTMENT_REMINDER"),     // "Your HIV consultation is tomorrow at 2 PM"
+    MEDICATION_REMINDER("MEDICATION_REMINDER"),       // "Time to take your ARV medication"
+    GENERAL("GENERAL"),                               // "Clinic holiday schedule"
+    SYSTEM_NOTIFICATION("SYSTEM_NOTIFICATION");       // "Your lab results are available"
+}
+```
+
+**Notification Priorities for Medical Context:**
+- **URGENT**: Emergency alerts, critical lab results
+- **HIGH**: Missed appointments, medication adherence issues  
+- **MEDIUM**: Standard appointment reminders
+- **LOW**: General clinic announcements
+
+### 19.2. ARV Treatment Management Business Logic
+
+HIV treatment requires specialized tracking and monitoring:
+
+#### **ARV Treatment Service Features**
+```java
+@Service
+public class ARVTreatmentService {
+    
+    public List<Map<String, Object>> getPatientTreatments(Integer patientUserId) {
+        // Verify patient exists and has correct role
+        if (!checkPatientExists(patientUserId)) {
+            return List.of(); // Return empty list for security
+        }
+        
+        List<ARVTreatment> treatments = 
+            arvTreatmentRepository.findByPatientUserIDOrderByCreatedAtDesc(patientUserId);
+        
+        return treatments.stream()
+                .map(this::mapTreatmentToResponse)
+                .collect(Collectors.toList());
+    }
+    
+    @Transactional
+    public MessageResponse addTreatment(Map<String, Object> treatmentData, Integer doctorUserId) {
+        // Validate doctor permissions
+        if (!isDoctorAuthorized(doctorUserId)) {
+            return MessageResponse.error("Unauthorized to prescribe ARV treatments");
+        }
+        
+        // Create treatment record
+        ARVTreatment treatment = new ARVTreatment();
+        treatment.setPatientUserID((Integer) treatmentData.get("patientUserID"));
+        treatment.setDoctorUserID(doctorUserId);
+        treatment.setRegimen((String) treatmentData.get("regimen"));
+        treatment.setStartDate(LocalDate.parse((String) treatmentData.get("startDate")));
+        
+        // Save and log
+        arvTreatmentRepository.save(treatment);
+        logger.info("ARV treatment added for patient {} by doctor {}", 
+                   treatment.getPatientUserID(), doctorUserId);
+        
+        return MessageResponse.success("ARV treatment added successfully");
+    }
+}
+```
+
+**ARV Treatment Features:**
+- **Role-Based Access**: Only doctors can prescribe treatments
+- **Patient Verification**: Ensures patient exists and has correct role
+- **Treatment History**: Complete timeline of all ARV treatments
+- **Adherence Tracking**: Monitor patient compliance with medication
+- **Side Effect Monitoring**: Record and track adverse reactions
+- **Template System**: Pre-defined treatment regimens for consistency
+
+#### **Common ARV Regimen Templates**
+The system supports standard HIV treatment protocols:
+
+```java
+// First-line ARV combinations
+"TDF/FTC/EFV"     // Tenofovir/Emtricitabine/Efavirenz
+"ABC/3TC/DTG"     // Abacavir/Lamivudine/Dolutegravir
+
+// Second-line treatments  
+"AZT/3TC/LPV/r"   // Zidovudine/Lamivudine/Lopinavir/ritonavir
+"TDF/FTC/ATV/r"   // Tenofovir/Emtricitabine/Atazanavir/ritonavir
+
+// Specialized regimens for resistance
+"DRV/r + RAL + ETR"  // Darunavir/ritonavir + Raltegravir + Etravirine
+```
+
+---
+
+## 20. Session Management and Security
+
+### 20.1. Client-Side Session Monitoring
+
+The system implements sophisticated client-side session management:
+
+#### **Session Timeout Hook**
+```javascript
+const useSessionMonitor = (isAuthenticated, onLogout) => {
+  const [sessionStatus, setSessionStatus] = useState({
+    isActive: false,
+    remainingSeconds: 0,
+    expiresAt: null
+  });
+  
+  // Session timeout duration (30 minutes)
+  const SESSION_TIMEOUT_DURATION = 30 * 60 * 1000;
+  
+  // Warning threshold (1 minute before expiry)
+  const WARNING_THRESHOLD_SECONDS = 60;
+  
+  const calculateRemainingTime = useCallback(() => {
+    const now = Date.now();
+    const timeSinceActivity = now - lastActivity;
+    const remaining = SESSION_TIMEOUT_DURATION - timeSinceActivity;
+    return Math.max(0, Math.floor(remaining / 1000));
+  }, [lastActivity]);
+};
+```
+
+**Session Management Features:**
+- **Activity Detection**: Monitors mouse movement, clicks, keystrokes
+- **Automatic Warnings**: Shows modal 1 minute before timeout
+- **Graceful Logout**: Server-side session invalidation
+- **Activity Reset**: User activity extends session automatically
+- **Security Focus**: Protects sensitive medical data
+
+#### **Session Timeout Modal**
+```jsx
+const SessionTimeoutModal = ({ isOpen, remainingSeconds, onExtendSession, onLogout }) => {
+  const [countdown, setCountdown] = useState(remainingSeconds || 0);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const timer = setInterval(() => {
+      setCountdown(prevCount => {
+        if (prevCount <= 1) {
+          clearInterval(timer);
+          onLogout(); // Auto-logout when countdown reaches 0
+          return 0;
+        }
+        return prevCount - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isOpen, onLogout]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="session-timeout-modal">
+      <h3>⚠️ Session Expiring</h3>
+      <p>Your session will expire in: {formatTime(countdown)}</p>
+      <button onClick={onExtendSession}>Yes, Extend Session</button>
+      <button onClick={onLogout}>No, Logout Now</button>
+    </div>
+  );
+};
+```
+
+**Security Benefits:**
+- **Medical Data Protection**: Prevents unauthorized access to patient records
+- **Compliance**: Meets healthcare data security requirements
+- **User Experience**: Non-intrusive warnings with clear options
+- **Automatic Cleanup**: Forces logout to prevent data exposure
+
+---
+
+## 21. Data Presentation and UI Components
+
+### 21.1. Reusable Table Components
+
+The system uses sophisticated table components for data presentation:
+
+#### **PaginatedTable Component**
+```jsx
+const PaginatedTable = ({ data, columns, itemsPerPage = 10, emptyMessage = "No data found." }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
+  return (
+    <div className="paginated-table-wrapper">
+      <table className="users-table">
+        <thead>
+          <tr>
+            {columns.map(column => <th key={column.header}>{column.header}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {currentItems.map((item, index) => (
+            <tr key={item.userId || item.appointmentId || index}>
+              {columns.map(column => (
+                <td key={column.accessor || column.header}>
+                  {/* Custom cell renderer function */}
+                  {column.cell ? column.cell(item) : item[column.accessor]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      
+      <Pagination
+        itemsPerPage={itemsPerPage}
+        totalItems={data.length}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
+    </div>
+  );
+};
+```
+
+**Table Features:**
+- **Dynamic Columns**: Configurable column definitions
+- **Custom Renderers**: `column.cell` functions for complex display logic
+- **Pagination**: Built-in pagination for large datasets
+- **Flexible Data**: Works with any data structure
+- **Responsive Design**: Adapts to different screen sizes
+
+#### **Pagination Component**
+```jsx
+const Pagination = ({ itemsPerPage, totalItems, currentPage, onPageChange }) => {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  if (totalPages <= 1) {
+    return null; // Don't show pagination for single page
+  }
+
+  return (
+    <nav className="pagination-container">
+      <ul className="pagination-list">
+        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+          <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+            «
+          </button>
+        </li>
+        
+        {/* Page numbers */}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+          <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+            <button onClick={() => onPageChange(number)}>
+              {number}
+            </button>
+          </li>
+        ))}
+        
+        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+          <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+            »
+          </button>
+        </li>
+      </ul>
+    </nav>
+  );
+};
+```
+
+### 21.2. Safe Rendering Utilities
+
+The system includes comprehensive utilities for safe data rendering:
+
+#### **Safe Rendering Functions**
+```javascript
+// Safely renders any value, handling null/undefined cases
+export const safeRender = (value) => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  
+  if (typeof value === 'object') {
+    // Handle Date objects
+    if (value instanceof Date) {
+      return value.toLocaleDateString();
+    }
+    
+    // Handle arrays
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
+    
+    // For other objects, try to extract meaningful data
+    try {
+      return JSON.stringify(value);
+    } catch (error) {
+      return '[Complex Object]';
+    }
+  }
+  
+  return String(value);
+};
+
+// Medical-specific date formatting
+export const safeDate = (dateValue) => {
+  if (!dateValue) return '';
+  
+  try {
+    const date = new Date(dateValue);
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+    return date.toLocaleDateString();
+  } catch (error) {
+    return safeRender(dateValue);
+  }
+};
+
+// Healthcare time formatting with 12-hour format
+export const safeTime = (timeValue) => {
+  if (!timeValue) return '';
+  
+  try {
+    if (typeof timeValue === 'string') {
+      const timeParts = timeValue.split(':');
+      if (timeParts.length >= 2) {
+        const hours = parseInt(timeParts[0]);
+        const minutes = parseInt(timeParts[1]);
+        
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true // 12-hour format for user-friendly display
+        });
+      }
+    }
+    return 'Invalid Time';
+  } catch (error) {
+    return safeRender(timeValue);
+  }
+};
+```
+
+**Safe Rendering Benefits:**
+- **Error Prevention**: No crashes from null/undefined data
+- **Medical Context**: Proper formatting for healthcare data
+- **User-Friendly**: 12-hour time format, readable dates
+- **Debugging Support**: Logs errors while providing fallbacks
+- **Consistent Display**: Uniform formatting across the application
+
+---
+
+## 22. Data Validation and Processing
+
+### 22.1. Date and Time Handling
+
+Healthcare applications require precise date/time handling:
+
+#### **Advanced Date Utilities**
+```javascript
+// Format date and time for API requests with strict validation
+export const formatDateTimeForAPI = (date, time) => {
+  try {
+    if (!date) throw new Error('Date is required');
+
+    let dateStr, timeStr;
+
+    // Handle multiple date formats
+    if (date instanceof Date) {
+      dateStr = date.toISOString().split('T')[0];
+    } else if (typeof date === 'string') {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        dateStr = date; // Already in YYYY-MM-DD format
+      } else {
+        const parsedDate = new Date(date);
+        if (isNaN(parsedDate.getTime())) {
+          throw new Error('Invalid date format');
+        }
+        dateStr = parsedDate.toISOString().split('T')[0];
+      }
+    }
+
+    // Handle multiple time formats - ENSURE SECONDS ARE ALWAYS INCLUDED
+    if (!time) {
+      timeStr = '00:00:00';
+    } else if (typeof time === 'string') {
+      if (/^\d{2}:\d{2}:\d{2}$/.test(time)) {
+        timeStr = time; // Already HH:mm:ss
+      } else if (/^\d{2}:\d{2}$/.test(time)) {
+        timeStr = time + ':00'; // Add seconds
+      } else if (/^\d{1,2}:\d{2}$/.test(time)) {
+        const [hours, minutes] = time.split(':');
+        timeStr = hours.padStart(2, '0') + ':' + minutes + ':00';
+      } else {
+        throw new Error('Invalid time format');
+      }
+    }
+
+    // Final format validation
+    const result = `${dateStr}T${timeStr}`;
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(result)) {
+      throw new Error(`Invalid final format: ${result}`);
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error formatting date/time for API:', error);
+    throw new Error(`Failed to format date/time: ${error.message}`);
+  }
+};
+```
+
+**Date Handling Features:**
+- **Multiple Format Support**: Handles various input formats
+- **Strict Validation**: Ensures API receives consistent format
+- **Timezone Awareness**: Handles timezone issues in medical scheduling
+- **Error Recovery**: Provides detailed error messages for debugging
+- **Medical Precision**: Ensures accurate appointment scheduling
+
+### 22.2. System Initialization and Setup
+
+The system includes automated setup for development and production:
+
+#### **Data Initializer Service**
+```java
+@Component
+public class DataInitializer implements CommandLineRunner {
+    
+    @Override
+    public void run(String... args) throws Exception {
+        logger.info("Starting data initialization...");
+        
+        // Check if data already exists
+        if (roleRepository.count() > 0) {
+            logger.info("Data already initialized, skipping...");
+            return;
+        }
+
+        initializeRoles();
+        initializeSpecialties();
+        initializeSystemSettings();
+        initializeDefaultAdmin();
+        initializeTestPatient();
+        initializeTestDoctor();
+        
+        logger.info("Data initialization completed successfully!");
+    }
+
+    private void initializeRoles() {
+        Role patientRole = new Role();
+        patientRole.setRoleName("Patient");
+        roleRepository.save(patientRole);
+
+        Role doctorRole = new Role();
+        doctorRole.setRoleName("Doctor");
+        roleRepository.save(doctorRole);
+
+        Role adminRole = new Role();
+        adminRole.setRoleName("Admin");
+        roleRepository.save(adminRole);
+        
+        logger.info("Roles initialized successfully");
+    }
+
+    private void initializeSpecialties() {
+        Specialty hivSpecialty = new Specialty();
+        hivSpecialty.setSpecialtyName("HIV/AIDS Specialist");
+        hivSpecialty.setDescription("Specialist in HIV/AIDS treatment and care");
+        hivSpecialty.setIsActive(true);
+        specialtyRepository.save(hivSpecialty);
+
+        Specialty infectiousDisease = new Specialty();
+        infectiousDisease.setSpecialtyName("Infectious Disease");
+        infectiousDisease.setDescription("Specialist in infectious diseases");
+        infectiousDisease.setIsActive(true);
+        specialtyRepository.save(infectiousDisease);
+        
+        logger.info("Medical specialties initialized");
+    }
+}
+```
+
+**Initialization Features:**
+- **Development Setup**: Automatic creation of test data
+- **Production Safety**: Checks for existing data before initialization
+- **Medical Specialties**: HIV/AIDS and infectious disease specialties
+- **Default Admin**: Creates system administrator account
+- **Role Hierarchy**: Establishes proper user role structure
+- **System Settings**: Configures clinic-specific parameters
+
+---
+
+## 23. Complete System Integration
+
+### 23.1. Comprehensive Feature Summary
+
+The HIV Clinic Management System integrates multiple healthcare-specific components:
+
+#### **Core Medical Features**
+1. **Patient Management**
+   - Complete medical records with privacy controls
+   - ARV treatment tracking and adherence monitoring
+   - Appointment scheduling with doctor availability
+   - Medical imaging and document storage
+
+2. **Doctor Tools**
+   - Patient record access with role-based permissions
+   - ARV prescription and monitoring capabilities
+   - Schedule management and availability setting
+   - Treatment history and outcome tracking
+
+3. **Manager Oversight**
+   - Clinic-wide patient and doctor management
+   - Operational reporting and analytics
+   - Schedule coordination and resource planning
+   - ARV regimen oversight across patients
+
+4. **Administrative Control**
+   - Complete user and role management
+   - System configuration and security settings
+   - Data backup and maintenance procedures
+   - Audit logging and compliance monitoring
+
+#### **Technical Excellence Features**
+1. **Security and Compliance**
+   - JWT-based authentication with role hierarchy
+   - Session management with automatic timeout
+   - Data encryption and privacy protection
+   - HIPAA-ready security measures
+
+2. **User Experience**
+   - Role-based dashboards with relevant tools
+   - Responsive design for various devices
+   - Real-time notifications and alerts
+   - Intuitive navigation and workflows
+
+3. **Data Management**
+   - Comprehensive entity relationships
+   - Automated data validation and formatting
+   - Robust error handling and recovery
+   - Scalable pagination and filtering
+
+4. **Development and Maintenance**
+   - Comprehensive testing strategies
+   - Detailed logging and monitoring
+   - Automated deployment procedures
+   - Complete documentation and guides
+
+### 23.2. System Benefits for HIV Care
+
+This system specifically addresses HIV care challenges:
+
+#### **Medical Benefits**
+- **Treatment Adherence**: ARV medication tracking helps ensure patient compliance
+- **Care Coordination**: Centralized records improve doctor-patient communication
+- **Outcome Monitoring**: Complete treatment history enables outcome analysis
+- **Privacy Protection**: Role-based access protects sensitive HIV status information
+
+#### **Operational Benefits**
+- **Efficiency**: Automated scheduling reduces administrative overhead
+- **Compliance**: Built-in audit logging meets healthcare regulations
+- **Scalability**: Architecture supports clinic growth and expansion
+- **Cost-Effective**: Reduces paper-based processes and manual work
+
+#### **Technical Benefits**
+- **Reliability**: Robust error handling ensures system stability
+- **Security**: Advanced authentication protects patient data
+- **Maintainability**: Clean code structure enables easy updates
+- **Integration**: API-based design allows future system integration
+
+---
+
+This documentation serves as a complete reference for understanding, maintaining, and extending the HIV Clinic Management System. It covers every aspect from high-level architecture to implementation details, security considerations, and operational procedures. The system provides a comprehensive solution for HIV healthcare management with modern technology stack, robust security, and user-friendly interfaces for all stakeholders in the healthcare process.
