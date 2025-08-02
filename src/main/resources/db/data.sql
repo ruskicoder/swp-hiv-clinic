@@ -75,7 +75,7 @@ VALUES ('doctor1', '$2a$10$v.dQO4SQPJjqXLis7VgdceEaMbTb7ImtzDlVeIGMmDCB69RO9LhXK
 SELECT @DoctorUserId = SCOPE_IDENTITY();
 
 INSERT INTO DoctorProfiles (UserID, FirstName, LastName, SpecialtyID, PhoneNumber, Bio)
-VALUES (@DoctorUserId, 'John', 'Smith', @SpecialtyId, '+1234567890', 'Experienced HIV/AIDS specialist with 10+ years of practice.');
+VALUES (@DoctorUserId, 'Dr. John', 'Smith', @SpecialtyId, '+1234567890', 'Experienced HIV/AIDS specialist with 10+ years of practice.');
 END
 
 -- Insert default manager user (password: 123456)
