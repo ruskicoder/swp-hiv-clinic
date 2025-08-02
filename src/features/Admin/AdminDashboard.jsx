@@ -289,7 +289,7 @@ const AdminDashboard = () => {
     { id: "overview", label: "Overview", icon: "📊" },
     { id: "users", label: "Manage Users", icon: "👥" },
     { id: "doctors", label: "Manage Doctors", icon: "👨‍⚕️" },
-    { id: "managers", label: "Manage Managers", icon: "🧑‍💼" },
+    { id: "patients", label: "Manage Patients", icon: "🏥" },
     { id: "appointments", label: "All Appointments", icon: "📅" },
     { id: "create-user", label: "Create User", icon: "➕" },
   ];
@@ -316,34 +316,40 @@ const AdminDashboard = () => {
       ),
     },
   ];
-  const ManagerColumns = [
-    { header: "Username", cell: (user) => safeRender(user.username) },
-    { header: "Email", cell: (user) => safeRender(user.email) },
-    { header: "Role", cell: (user) => safeRender(user.role?.roleName) },
+  const patientColumns = [
+    { 
+      header: "Patient Info", 
+      cell: (patient) => (
+        <div>
+          <div style={{ fontWeight: '600' }}>{safeRender(patient.firstName)} {safeRender(patient.lastName)}</div>
+          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>@{safeRender(patient.username)}</div>
+        </div>
+      )
+    },
+    { header: "Email", cell: (patient) => safeRender(patient.email) },
+    { header: "Phone", cell: (patient) => safeRender(patient.phoneNumber) },
     {
       header: "Status",
-      cell: (user) => (
-        <span
-          className={`status-badge ${user.isActive ? "active" : "inactive"}`}
-        >
-          {user.isActive ? "Active" : "Inactive"}
+      cell: (patient) => (
+        <span className={`status-badge ${patient.isActive ? "active" : "inactive"}`}>
+          {patient.isActive ? "Active" : "Inactive"}
         </span>
       ),
     },
-    { header: "Created", cell: (user) => safeDate(user.createdAt) },
+    { header: "Registered", cell: (patient) => safeDate(patient.createdAt) },
     {
       header: "Actions",
-      cell: (user) => (
+      cell: (patient) => (
         <div className="action-buttons">
           <button
             className="btn-toggle"
-            onClick={() => handleToggleUserStatus(user.userId)}
+            onClick={() => handleToggleUserStatus(patient.userId)}
           >
-            {user.isActive ? "Deactivate" : "Activate"}
+            {patient.isActive ? "Deactivate" : "Activate"}
           </button>
           <button
             className="btn-reset"
-            onClick={() => handleResetPassword(user.userId)}
+            onClick={() => handleResetPassword(patient.userId)}
           >
             Reset Password
           </button>
@@ -487,21 +493,21 @@ const AdminDashboard = () => {
     </ErrorBoundary>
   );
 
-  const renderManagers = () => (
+  const renderPatients = () => (
     <ErrorBoundary>
       <div className="users-section">
         <div className="content-header">
-          <h2>Manage All Managers</h2>
-          <p>View and manage all system managers</p>
+          <h2>Manage Patients</h2>
+          <p>View and manage all patient accounts</p>
         </div>
-        {managersError ? (
-          <div className="error-message">{managersError}</div>
+        {error ? (
+          <div className="error-message">{error}</div>
         ) : (
           <PaginatedTable
-            data={managers}
-            columns={ManagerColumns} // Sử dụng cột của Manager
-            itemsPerPage={9} // Bạn có thể tùy chỉnh số lượng
-            emptyMessage="No users found."
+            data={patients}
+            columns={patientColumns}
+            itemsPerPage={9}
+            emptyMessage="No patients found."
           />
         )}
       </div>
@@ -589,7 +595,7 @@ const AdminDashboard = () => {
               {activeTab === "overview" && renderOverview()}
               {activeTab === "users" && renderUsers()}
               {activeTab === "doctors" && renderDoctors()}
-              {activeTab === "managers" && renderManagers()}
+              {activeTab === "patients" && renderPatients()}
               {activeTab === "appointments" && renderAppointments()}
               {activeTab === "create-user" && (
                 <CreateUserForm
