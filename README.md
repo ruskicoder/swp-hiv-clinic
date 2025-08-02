@@ -1,6 +1,6 @@
 # HIV Clinic Management System
 
-[![Node.js CI](https://github.com/ruskicoder/swp-hiv-clinic/actions/workflows/node.js.yml/badge.svg)](https://github.com/ruskicoder/swp-hiv-clinic/actions/workflows/node.js.yml)
+
 
 A comprehensive web-based application for managing HIV clinic operations, patient care, and treatment management. The system provides role-based access control for Guest, Patient, Doctor, and Admin users with a focus on appointment scheduling, ARV treatment tracking, and patient record management.
 
