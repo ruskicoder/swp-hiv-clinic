@@ -878,8 +878,8 @@ GET & /api/manager/stats & Manager & Get system statistics \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{diagrams/network_architecture.svg}
-\caption{Network Architectureand Security Zones}
-\label{fig:component-diagram}
+\caption{Network Architecture and Security Zones}
+\label{fig:network-architecture}
 \end{figure}
 
 \section{Deployment Architecture}
@@ -918,5 +918,140 @@ Key architectural strengths include:
 \end{itemize}
 
 The system is designed to be maintainable, extensible, and capable of handling future enhancements while maintaining data integrity and security standards required for healthcare applications.
+
+\section{Implementation Tracking}
+
+\subsection{Code-to-Design Mapping}
+
+This section provides traceability between the design specifications and actual implementation files in the codebase.
+
+\subsubsection{Entity Models Implementation}
+
+\begin{longtable}{|l|l|p{6cm}|}
+\hline
+\textbf{Design Entity} & \textbf{Implementation File} & \textbf{Key Features} \\
+\hline
+User Entity & \texttt{src/main/java/com/hivclinic/model/User.java} & UserDetails implementation, JWT integration, role-based access \\
+\hline
+Appointment Entity & \texttt{src/main/java/com/hivclinic/model/Appointment.java} & Status tracking, cancellation reasons, audit timestamps \\
+\hline
+DoctorAvailabilitySlot & \texttt{src/main/java/com/hivclinic/model/DoctorAvailabilitySlot.java} & Time slot management, booking status, notes \\
+\hline
+ARVTreatment Entity & \texttt{src/main/java/com/hivclinic/model/ARVTreatment.java} & Treatment regimen, adherence tracking, side effects \\
+\hline
+Notification Entity & \texttt{src/main/java/com/hivclinic/model/Notification.java} & Type enumeration, priority levels, scheduling \\
+\hline
+PatientProfile Entity & \texttt{src/main/java/com/hivclinic/model/PatientProfile.java} & Personal info, medical details, privacy settings \\
+\hline
+DoctorProfile Entity & \texttt{src/main/java/com/hivclinic/model/DoctorProfile.java} & Professional info, specialty, contact details \\
+\hline
+MedicationRoutine Entity & \texttt{src/main/java/com/hivclinic/model/MedicationRoutine.java} & Dosage schedules, reminder settings, adherence \\
+\hline
+\end{longtable}
+
+\subsubsection{Security Implementation}
+
+\begin{longtable}{|l|l|p{6cm}|}
+\hline
+\textbf{Security Component} & \textbf{Implementation File} & \textbf{Key Features} \\
+\hline
+Security Configuration & \texttt{src/main/java/com/hivclinic/config/SecurityConfig.java} & JWT filter chain, CORS, role hierarchy \\
+\hline
+JWT Utilities & \texttt{src/main/java/com/hivclinic/util/JwtUtils.java} & Token generation, validation, claims extraction \\
+\hline
+Authentication Filter & \texttt{src/main/java/com/hivclinic/security/JwtAuthenticationFilter.java} & Request interception, token validation \\
+\hline
+User Details Service & \texttt{src/main/java/com/hivclinic/service/CustomUserDetailsService.java} & User loading, authority mapping \\
+\hline
+\end{longtable}
+
+\subsubsection{API Controller Implementation}
+
+\begin{longtable}{|l|l|p{6cm}|}
+\hline
+\textbf{API Controller} & \textbf{Implementation File} & \textbf{Endpoints Implemented} \\
+\hline
+Authentication Controller & \texttt{src/main/java/com/hivclinic/controller/AuthController.java} & Login, registration, profile management \\
+\hline
+Appointment Controller & \texttt{src/main/java/com/hivclinic/controller/AppointmentController.java} & Booking, cancellation, status updates \\
+\hline
+Doctor Controller & \texttt{src/main/java/com/hivclinic/controller/DoctorController.java} & Availability, appointments, patient records \\
+\hline
+Notification Controller & \texttt{src/main/java/com/hivclinic/controller/NotificationController.java} & Message delivery, template management \\
+\hline
+ARV Treatment Controller & \texttt{src/main/java/com/hivclinic/controller/ARVTreatmentController.java} & Treatment management, adherence tracking \\
+\hline
+Admin Controller & \texttt{src/main/java/com/hivclinic/controller/AdminController.java} & User management, system administration \\
+\hline
+\end{longtable}
+
+\subsubsection{Frontend Component Implementation}
+
+\begin{longtable}{|l|l|p{6cm}|}
+\hline
+\textbf{React Component} & \textbf{Implementation Path} & \textbf{Functionality} \\
+\hline
+Dashboard Components & \texttt{src/components/Dashboard/} & Role-based dashboards, activity feeds \\
+\hline
+Authentication Components & \texttt{src/features/auth/} & Login, registration, profile forms \\
+\hline
+Appointment Components & \texttt{src/features/appointments/} & Booking forms, calendar views, management \\
+\hline
+Notification Components & \texttt{src/features/notifications/} & Message display, status updates \\
+\hline
+ARV Treatment Components & \texttt{src/features/arv-treatments/} & Treatment forms, tracking displays \\
+\hline
+Admin Components & \texttt{src/features/admin/} & User management, system controls \\
+\hline
+\end{longtable}
+
+\subsection{Test Coverage Implementation}
+
+\begin{longtable}{|l|l|p{6cm}|}
+\hline
+\textbf{Test Category} & \textbf{Implementation Files} & \textbf{Coverage Areas} \\
+\hline
+Unit Tests & \texttt{src/test/java/com/hivclinic/service/} & Service layer business logic testing \\
+\hline
+Repository Tests & \texttt{src/test/java/com/hivclinic/repository/} & Data access layer testing \\
+\hline
+Controller Tests & \texttt{src/test/java/com/hivclinic/controller/} & API endpoint testing \\
+\hline
+Security Tests & \texttt{src/test/java/com/hivclinic/security/} & Authentication and authorization \\
+\hline
+Integration Tests & \texttt{src/test/java/com/hivclinic/integration/} & End-to-end workflow testing \\
+\hline
+Frontend Tests & \texttt{src/test/} & React component and utility testing \\
+\hline
+\end{longtable}
+
+\subsection{Configuration and Infrastructure}
+
+\begin{longtable}{|l|l|p{6cm}|}
+\hline
+\textbf{Configuration File} & \textbf{Purpose} & \textbf{Key Settings} \\
+\hline
+\texttt{application.properties} & Spring Boot configuration & Database connection, JWT settings, CORS \\
+\hline
+\texttt{pom.xml} & Maven dependencies & Spring Boot starters, security, database drivers \\
+\hline
+\texttt{package.json} & Frontend dependencies & React, routing, state management, testing \\
+\hline
+\texttt{vite.config.js} & Build configuration & Development server, proxy settings \\
+\hline
+\texttt{eslint.config.js} & Code quality & Linting rules, formatting standards \\
+\hline
+\end{longtable}
+
+\section{Version Information}
+
+\begin{itemize}
+\item \textbf{Document Version:} 2.1
+\item \textbf{Last Updated:} January 2025
+\item \textbf{Codebase Version:} Current implementation matches specification v2.1
+\item \textbf{Implementation Status:} All specified components implemented and tested
+\item \textbf{Database Schema Version:} Fully normalized, matches entity model specifications
+\item \textbf{API Version:} RESTful API v1.0 with comprehensive endpoint coverage
+\end{itemize}
 
 \end{document}

@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant P as Patient
+    participant CD as CustomerDashboard.jsx
+    participant API as apiClient.js
+    participant ATC as ARVTreatmentController.java
+    participant ATS as ARVTreatmentService.java
+    participant ATVR as ARVTreatmentRepository
+    participant MRR as MedicationRoutineRepository
+    participant DB as Database
+
+    P->>CD: View ARV treatments section
+    CD->>API: GET /api/arv-treatments/my-treatments
+    API->>ATC: getMyTreatments(patientId)
+    ATC->>ATS: getPatientTreatments(patientId)
+    
+    ATS->>ATVR: findByPatientUserOrderByStartDateDesc(patient)
+    ATVR->>DB: SELECT treatments WHERE patientId = ?
+    DB-->>ATVR: Treatment records
+    ATVR-->>ATS: List<ARVTreatment>
+    
+    ATS->>MRR: findByTreatmentId(treatmentIds)
+    MRR->>DB: SELECT routines WHERE treatmentId IN (?)
+    DB-->>MRR: Medication routines
+    MRR-->>ATS: List<MedicationRoutine>
+    
+    ATS->>ATS: calculate adherence statistics
+    ATS->>ATS: prepare treatment summary
+    ATS-->>ATC: Treatment data with adherence info
+    ATC-->>API: ResponseEntity.ok(treatments)
+    API-->>CD: treatment data
+    CD->>CD: display adherence charts and medication schedules

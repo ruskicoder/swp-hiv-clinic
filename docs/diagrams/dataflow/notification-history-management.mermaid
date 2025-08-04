@@ -1,0 +1,45 @@
+sequenceDiagram
+    participant D as Doctor
+    participant NMD as NotificationManagementDashboard.jsx
+    participant NHT as NotificationHistoryTable.jsx
+    participant API as apiClient.js
+    participant NC as NotificationController.java
+    participant DNS as DoctorNotificationService.java
+    participant NR as NotificationRepository
+    participant DB as Database
+
+    D->>NMD: View notification history
+    NMD->>API: GET /v1/notifications/doctor/history?doctorId={id}
+    API->>NC: getNotificationHistoryForDoctor(doctorId)
+    NC->>DNS: getNotificationHistoryForDoctor(doctorId)
+    
+    DNS->>NR: findAll()
+    NR->>DB: SELECT all notifications
+    DB-->>NR: All notifications
+    NR-->>DNS: List<Notification>
+    
+    DNS->>DNS: filter for doctor's patients only
+    DNS->>DNS: build notification history with patient info
+    DNS-->>NC: List<Map<String, Object>>
+    NC-->>API: ResponseEntity.ok(history)
+    API-->>NMD: notification history
+    
+    NMD->>NHT: render history table
+    NHT->>NHT: display notifications with patient name, title, status, send time, actions
+    
+    alt Doctor cancels notification
+        D->>NHT: Click cancel on pending notification
+        NHT->>API: POST /v1/notifications/doctor/{id}/unsend
+        API->>NC: unsendNotification(notificationId, doctorId)
+        NC->>DNS: unsendNotification(notificationId, doctorId)
+        
+        DNS->>NR: findById(notificationId)
+        DNS->>DNS: validate notification not yet sent
+        DNS->>NR: update(notification) [set status = 'CANCELLED']
+        NR->>DB: UPDATE notifications SET status = 'CANCELLED'
+        
+        DNS-->>NC: Success response
+        NC-->>API: ResponseEntity.ok()
+        API-->>NHT: cancel success
+        NHT->>NMD: refresh history
+    end

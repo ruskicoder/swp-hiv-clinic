@@ -1,0 +1,46 @@
+sequenceDiagram
+    participant U as User
+    participant L as Login.jsx
+    participant AC as AuthContext.jsx
+    participant AS as authService.js
+    participant API as apiClient.js
+    participant AuthC as AuthController.java
+    participant AuthS as AuthService.java
+    participant AM as AuthenticationManager
+    participant UR as UserRepository
+    participant JWT as JwtUtils.java
+    participant USS as UserSessionService.java
+    participant LAS as LoginActivityService.java
+    participant DB as Database
+
+    U->>L: Nhập credentials
+    L->>AC: login(formData)
+    AC->>AS: authService.login(credentials)
+    AS->>API: POST /api/auth/login
+    API->>AuthC: authenticateUser()
+    AuthC->>AuthS: authenticateUser(request, ip, userAgent)
+    AuthS->>AM: authenticate(UsernamePasswordAuthenticationToken)
+    AM->>UR: loadUserByUsername()
+    UR->>DB: SELECT user WHERE username = ?
+    DB-->>UR: User data
+    UR-->>AM: UserPrincipal
+    AM-->>AuthS: Authentication object
+    
+    AuthS->>JWT: generateJwtToken(userPrincipal)
+    JWT-->>AuthS: JWT token
+    
+    AuthS->>LAS: logLoginAttempt(username, true, ip, userAgent)
+    LAS->>DB: INSERT INTO LoginActivity
+    
+    AuthS->>USS: createSession(user, jwt, ip, userAgent)
+    USS->>DB: INSERT INTO UserSession
+    
+    AuthS-->>AuthC: AuthResponse(success, token, userDTO)
+    AuthC-->>API: ResponseEntity.ok(response)
+    API-->>AS: HTTP 200 + response.data
+    AS-->>AC: {success: true, token, userData}
+    
+    AC->>AC: sessionStorage.setItem('token')
+    AC->>AC: setUser(userData)
+    AC-->>L: success response
+    L->>L: navigate to dashboard

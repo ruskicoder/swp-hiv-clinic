@@ -1,0 +1,37 @@
+sequenceDiagram
+    participant P as Patient
+    participant PRS as PatientRecordSection.jsx
+    participant API as apiClient.js
+    participant PRC as PatientRecordController.java
+    participant PRCS as PatientRecordService.java
+    participant PRR as PatientRecordRepository
+    participant DB as Database
+
+    P->>PRS: Edit record fields (medical history, allergies, etc.)
+    PRS->>PRS: validate input data
+    PRS->>API: PUT /api/patient-records/my-record
+    API->>PRC: updateMyRecord(@RequestBody Map<String, Object>)
+    PRC->>PRCS: updatePatientRecordWithResponse(userId, recordData)
+    
+    PRCS->>PRR: findByPatientUserID(userId)
+    PRR->>DB: SELECT record WHERE patientUserId = ?
+    
+    alt Record exists
+        DB-->>PRR: Existing record
+        PRR-->>PRCS: PatientRecord
+        PRCS->>PRCS: update record fields
+    else No record exists
+        PRCS->>PRCS: create new PatientRecord
+    end
+    
+    PRCS->>PRCS: setMedicalHistory(), setAllergies(), etc.
+    PRCS->>PRR: save(updatedRecord)
+    PRR->>DB: UPDATE PatientRecords SET ... WHERE id = ?
+    DB-->>PRR: Update confirmation
+    PRR-->>PRCS: Saved record
+    
+    PRCS-->>PRC: MessageResponse.success()
+    PRC-->>API: ResponseEntity.ok()
+    API-->>PRS: update success
+    PRS->>PRS: show success message
+    PRS->>PRS: refresh display

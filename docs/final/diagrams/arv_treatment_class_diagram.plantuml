@@ -80,9 +80,9 @@ package "Service Layer" {
 package "Entity Layer" {
     class ARVTreatment {
         -arvTreatmentId: Integer
-        -patient: User
-        -doctor: User
-        -appointment: Appointment
+        -patientUserID: Integer
+        -doctorUserID: Integer
+        -appointmentID: Integer
         -regimen: String
         -startDate: LocalDate
         -endDate: LocalDate

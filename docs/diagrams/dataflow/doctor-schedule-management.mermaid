@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant D as Doctor
+    participant DD as DoctorDashboard.jsx
+    participant WS as WeeklySchedule.jsx
+    participant API as apiClient.js
+    participant DC as DoctorController.java
+    participant DAS as DoctorAvailabilityService.java
+    participant ASR as AvailabilitySlotRepository
+    participant DB as Database
+
+    D->>DD: Navigate to schedule management
+    DD->>API: GET /api/doctors/my-availability
+    API->>DC: getMyAvailability()
+    DC->>DAS: getDoctorAvailability(doctorId)
+    DAS->>ASR: findByDoctorUserOrderBySlotDateAsc()
+    ASR->>DB: SELECT slots WHERE doctorId = ?
+    DB-->>ASR: Current schedule
+    ASR-->>DAS: List<DoctorAvailabilitySlot>
+    DAS-->>DC: Schedule data
+    DC-->>API: ResponseEntity.ok(schedule)
+    API-->>DD: current availability
+    
+    DD->>WS: display weekly schedule
+    D->>WS: modify time slots (add/edit/delete)
+    WS->>DD: schedule changes
+    DD->>API: POST /api/doctors/availability/bulk-update
+    API->>DC: bulkUpdateAvailability()
+    DC->>DAS: updateDoctorAvailability(doctorId, slots)
+    
+    DAS->>DAS: validate business hours (8AM-6PM)
+    DAS->>DAS: check for overlapping slots
+    DAS->>DAS: ensure minimum duration (15 min)
+    
+    DAS->>ASR: save/update availability slots
+    ASR->>DB: INSERT/UPDATE availability slots
+    
+    DAS-->>DC: MessageResponse.success()
+    DC-->>API: ResponseEntity.ok()
+    API-->>DD: update success
+    DD->>DD: refresh schedule display

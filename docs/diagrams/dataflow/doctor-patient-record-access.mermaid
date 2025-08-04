@@ -1,0 +1,38 @@
+sequenceDiagram
+    participant D as Doctor
+    participant DD as DoctorDashboard.jsx
+    participant API as apiClient.js
+    participant PRC as PatientRecordController.java
+    participant PRCS as PatientRecordService.java
+    participant AR as AppointmentRepository
+    participant PPS as PatientPrivacyService.java
+    participant DB as Database
+
+    D->>DD: Select patient appointment
+    DD->>API: GET /api/patient-records/appointment/{appointmentId}
+    API->>PRC: getPatientRecordByAppointment(appointmentId, doctorId)
+    PRC->>PRCS: getPatientRecordForAppointment(appointmentId, doctorId)
+    
+    PRCS->>AR: findByIdWithPatient(appointmentId)
+    AR->>DB: SELECT appointment WITH patient details
+    DB-->>AR: Appointment + Patient data
+    AR-->>PRCS: Appointment object
+    
+    PRCS->>PRCS: validate doctor has access to appointment
+    PRCS->>PPS: getPrivacySettings(patientId)
+    PPS->>DB: SELECT privacy settings
+    DB-->>PPS: Privacy status
+    PPS-->>PRCS: isPrivate boolean
+    
+    alt Patient privacy enabled
+        PRCS->>PRCS: mask sensitive information
+        PRCS-->>PRC: Limited record data
+    else Full access allowed
+        PRCS->>PRCS: return complete record
+        PRCS-->>PRC: Complete record data
+    end
+    
+    PRC-->>API: ResponseEntity.ok(recordData)
+    API-->>DD: patient record
+    DD->>DD: display patient information
+    DD->>DD: enable record editing (if permitted)

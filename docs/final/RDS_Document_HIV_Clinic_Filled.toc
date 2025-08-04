@@ -1,88 +1,88 @@
 \babel@toc {english}{}\relax 
-\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Purpose}{3}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Scope}{3}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}Document Structure}{3}{subsection.1.3}%
-\contentsline {subsection}{\numberline {1.4}Stakeholders}{3}{subsection.1.4}%
-\contentsline {section}{\numberline {2}Requirements Specifications}{4}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Functional Requirements Overview}{4}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Use Case Diagram}{5}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}User Interface Flow}{6}{subsection.2.3}%
-\contentsline {section}{\numberline {3}Use Case Specifications}{7}{section.3}%
-\contentsline {subsection}{\numberline {3.1}UC-001 – Browse Public Website}{7}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}UC-002 – User Registration}{8}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}UC-003 – User Login}{9}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}UC-004 – View Patient Dashboard}{10}{subsection.3.4}%
-\contentsline {subsection}{\numberline {3.5}UC-005 – Update Profile}{12}{subsection.3.5}%
-\contentsline {subsection}{\numberline {3.6}UC-006 – Change Password}{13}{subsection.3.6}%
-\contentsline {subsection}{\numberline {3.7}UC-007 – View Dashboard}{14}{subsection.3.7}%
-\contentsline {subsection}{\numberline {3.8}UC-008 – Manage Appointments}{16}{subsection.3.8}%
-\contentsline {subsection}{\numberline {3.9}UC-009 – Manage Personal Medical Records}{18}{subsection.3.9}%
-\contentsline {subsection}{\numberline {3.10}UC-010 – View Notifications}{19}{subsection.3.10}%
-\contentsline {subsection}{\numberline {3.11}UC-011 – Logout}{21}{subsection.3.11}%
-\contentsline {subsection}{\numberline {3.12}UC-012 – View Doctor Dashboard}{22}{subsection.3.12}%
-\contentsline {subsection}{\numberline {3.13}UC-013 – Manage Doctor Appointments}{24}{subsection.3.13}%
-\contentsline {subsection}{\numberline {3.14}UC-014 – Manage Availability Slots}{25}{subsection.3.14}%
-\contentsline {subsection}{\numberline {3.15}UC-015 – Access Patient Records}{27}{subsection.3.15}%
-\contentsline {subsection}{\numberline {3.16}UC-016 – Manage ARV Treatments}{28}{subsection.3.16}%
-\contentsline {subsection}{\numberline {3.17}UC-017 – Send Patient Notifications}{30}{subsection.3.17}%
-\contentsline {subsection}{\numberline {3.18}UC-018 – View Admin Dashboard}{32}{subsection.3.18}%
-\contentsline {subsection}{\numberline {3.19}UC-019 – Manage Users}{33}{subsection.3.19}%
-\contentsline {subsection}{\numberline {3.20}UC-020 – View All Appointments}{35}{subsection.3.20}%
-\contentsline {subsection}{\numberline {3.21}UC-021 – Manage Blog Content}{36}{subsection.3.21}%
-\contentsline {subsection}{\numberline {3.22}UC-022 – View Manager Dashboard}{38}{subsection.3.22}%
-\contentsline {subsection}{\numberline {3.23}UC-023 – Manage Patient Records (Admin)}{40}{subsection.3.23}%
-\contentsline {subsection}{\numberline {3.24}UC-024 – Manage Doctor Records (Admin)}{41}{subsection.3.24}%
-\contentsline {subsection}{\numberline {3.25}UC-025 – View System Analytics}{43}{subsection.3.25}%
-\contentsline {subsection}{\numberline {3.26}UC-026 – Export Data}{45}{subsection.3.26}%
-\contentsline {subsection}{\numberline {3.27}UC-027 – View Clinic Statistics}{46}{subsection.3.27}%
-\contentsline {section}{\numberline {4}Design Specifications}{49}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Authentication System}{49}{subsection.4.1}%
-\contentsline {subsubsection}{\numberline {4.1.1}User Login (UC-003)}{49}{subsubsection.4.1.1}%
-\contentsline {paragraph}{UI Design}{49}{section*.4}%
-\contentsline {paragraph}{Database Access}{49}{section*.5}%
-\contentsline {subsubsection}{\numberline {4.1.2}User Registration (UC-002)}{50}{subsubsection.4.1.2}%
-\contentsline {paragraph}{UI Design}{50}{section*.7}%
-\contentsline {paragraph}{Database Access}{50}{section*.8}%
-\contentsline {subsection}{\numberline {4.2}Appointment Management}{50}{subsection.4.2}%
-\contentsline {subsubsection}{\numberline {4.2.1}Appointment Booking (UC-008)}{50}{subsubsection.4.2.1}%
-\contentsline {paragraph}{UI Design}{50}{section*.9}%
-\contentsline {paragraph}{Database Access}{51}{section*.10}%
-\contentsline {subsubsection}{\numberline {4.2.2}Doctor Appointment Management (UC-013)}{51}{subsubsection.4.2.2}%
-\contentsline {paragraph}{UI Design}{51}{section*.11}%
-\contentsline {subsection}{\numberline {4.3}Medical Records Management}{52}{subsection.4.3}%
-\contentsline {subsubsection}{\numberline {4.3.1}Patient Medical Records (UC-009, UC-015)}{52}{subsubsection.4.3.1}%
-\contentsline {paragraph}{UI Design}{52}{section*.12}%
-\contentsline {paragraph}{Database Access}{52}{section*.13}%
-\contentsline {subsection}{\numberline {4.4}ARV Treatment Management}{53}{subsection.4.4}%
-\contentsline {subsubsection}{\numberline {4.4.1}ARV Treatment Prescription (UC-016)}{53}{subsubsection.4.4.1}%
-\contentsline {paragraph}{UI Design}{53}{section*.14}%
-\contentsline {paragraph}{Database Access}{53}{section*.15}%
-\contentsline {subsection}{\numberline {4.5}Dashboard Interfaces}{54}{subsection.4.5}%
-\contentsline {subsubsection}{\numberline {4.5.1}Patient Dashboard (UC-004)}{54}{subsubsection.4.5.1}%
-\contentsline {paragraph}{UI Design}{54}{section*.16}%
-\contentsline {subsubsection}{\numberline {4.5.2}Doctor Dashboard (UC-012)}{54}{subsubsection.4.5.2}%
-\contentsline {paragraph}{UI Design}{54}{section*.17}%
-\contentsline {subsection}{\numberline {4.6}Administrative Interfaces}{55}{subsection.4.6}%
-\contentsline {subsubsection}{\numberline {4.6.1}Admin Dashboard (UC-018)}{55}{subsubsection.4.6.1}%
-\contentsline {paragraph}{UI Design}{55}{section*.18}%
-\contentsline {subsubsection}{\numberline {4.6.2}Manager Dashboard (UC-022)}{55}{subsubsection.4.6.2}%
-\contentsline {paragraph}{UI Design}{55}{section*.19}%
-\contentsline {subsection}{\numberline {4.7}Notification System}{56}{subsection.4.7}%
-\contentsline {subsubsection}{\numberline {4.7.1}Notification Center (UC-010, UC-017)}{56}{subsubsection.4.7.1}%
-\contentsline {paragraph}{UI Design}{56}{section*.20}%
-\contentsline {paragraph}{Database Access}{56}{section*.21}%
-\contentsline {section}{\numberline {5}Database Schema}{58}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Core Tables}{58}{subsection.5.1}%
-\contentsline {subsubsection}{\numberline {5.1.1}Users Table}{58}{subsubsection.5.1.1}%
-\contentsline {subsubsection}{\numberline {5.1.2}Appointments Table}{58}{subsubsection.5.1.2}%
-\contentsline {subsubsection}{\numberline {5.1.3}ARVTreatments Table}{59}{subsubsection.5.1.3}%
-\contentsline {section}{\numberline {6}Appendix}{61}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Use Case Relationships}{61}{subsection.6.1}%
-\contentsline {subsubsection}{\numberline {6.1.1}Include Relationships}{61}{subsubsection.6.1.1}%
-\contentsline {subsubsection}{\numberline {6.1.2}Extend Relationships}{61}{subsubsection.6.1.2}%
-\contentsline {subsubsection}{\numberline {6.1.3}Generalization Relationships}{61}{subsubsection.6.1.3}%
-\contentsline {subsection}{\numberline {6.2}Business Rules}{61}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Assumptions \& Dependencies}{66}{subsection.6.3}%
-\contentsline {subsection}{\numberline {6.4}Limitations \& Exclusions}{66}{subsection.6.4}%
-\contentsline {subsection}{\numberline {6.5}Technical Specifications}{66}{subsection.6.5}%
+\contentsline {section}{\numberline {1}Introduction}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Purpose}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Scope}{4}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Document Structure}{4}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Stakeholders}{4}{subsection.1.4}%
+\contentsline {section}{\numberline {2}Requirements Specifications}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Functional Requirements Overview}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Use Case Diagram}{6}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}User Interface Flow}{7}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Use Case Specifications}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}UC-001 – Browse Public Website}{8}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}UC-002 – User Registration}{9}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}UC-003 – User Login}{10}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}UC-004 – View Patient Dashboard}{11}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}UC-005 – Update Profile}{13}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}UC-006 – Change Password}{14}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}UC-007 – View Dashboard}{15}{subsection.3.7}%
+\contentsline {subsection}{\numberline {3.8}UC-008 – Manage Appointments}{17}{subsection.3.8}%
+\contentsline {subsection}{\numberline {3.9}UC-009 – Manage Personal Medical Records}{19}{subsection.3.9}%
+\contentsline {subsection}{\numberline {3.10}UC-010 – View Notifications}{21}{subsection.3.10}%
+\contentsline {subsection}{\numberline {3.11}UC-011 – Logout}{22}{subsection.3.11}%
+\contentsline {subsection}{\numberline {3.12}UC-012 – View Doctor Dashboard}{24}{subsection.3.12}%
+\contentsline {subsection}{\numberline {3.13}UC-013 – Manage Doctor Appointments}{25}{subsection.3.13}%
+\contentsline {subsection}{\numberline {3.14}UC-014 – Manage Availability Slots}{27}{subsection.3.14}%
+\contentsline {subsection}{\numberline {3.15}UC-015 – Access Patient Records}{28}{subsection.3.15}%
+\contentsline {subsection}{\numberline {3.16}UC-016 – Manage ARV Treatments}{30}{subsection.3.16}%
+\contentsline {subsection}{\numberline {3.17}UC-017 – Send Patient Notifications}{32}{subsection.3.17}%
+\contentsline {subsection}{\numberline {3.18}UC-018 – View Admin Dashboard}{33}{subsection.3.18}%
+\contentsline {subsection}{\numberline {3.19}UC-019 – Manage Users}{35}{subsection.3.19}%
+\contentsline {subsection}{\numberline {3.20}UC-020 – View All Appointments}{36}{subsection.3.20}%
+\contentsline {subsection}{\numberline {3.21}UC-021 – Manage Blog Content}{38}{subsection.3.21}%
+\contentsline {subsection}{\numberline {3.22}UC-022 – View Manager Dashboard}{39}{subsection.3.22}%
+\contentsline {subsection}{\numberline {3.23}UC-023 – Manage Patient Records (Admin)}{41}{subsection.3.23}%
+\contentsline {subsection}{\numberline {3.24}UC-024 – Manage Doctor Records (Admin)}{43}{subsection.3.24}%
+\contentsline {subsection}{\numberline {3.25}UC-025 – View System Analytics}{44}{subsection.3.25}%
+\contentsline {subsection}{\numberline {3.26}UC-026 – Export Data}{46}{subsection.3.26}%
+\contentsline {subsection}{\numberline {3.27}UC-027 – View Clinic Statistics}{47}{subsection.3.27}%
+\contentsline {section}{\numberline {4}Design Specifications}{50}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Authentication System}{50}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}User Login (UC-003)}{50}{subsubsection.4.1.1}%
+\contentsline {paragraph}{UI Design}{50}{section*.4}%
+\contentsline {paragraph}{Database Access}{50}{section*.5}%
+\contentsline {subsubsection}{\numberline {4.1.2}User Registration (UC-002)}{51}{subsubsection.4.1.2}%
+\contentsline {paragraph}{UI Design}{51}{section*.7}%
+\contentsline {paragraph}{Database Access}{51}{section*.8}%
+\contentsline {subsection}{\numberline {4.2}Appointment Management}{51}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Appointment Booking (UC-008)}{51}{subsubsection.4.2.1}%
+\contentsline {paragraph}{UI Design}{51}{section*.9}%
+\contentsline {paragraph}{Database Access}{52}{section*.10}%
+\contentsline {subsubsection}{\numberline {4.2.2}Doctor Appointment Management (UC-013)}{52}{subsubsection.4.2.2}%
+\contentsline {paragraph}{UI Design}{52}{section*.11}%
+\contentsline {subsection}{\numberline {4.3}Medical Records Management}{53}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Patient Medical Records (UC-009, UC-015)}{53}{subsubsection.4.3.1}%
+\contentsline {paragraph}{UI Design}{53}{section*.12}%
+\contentsline {paragraph}{Database Access}{53}{section*.13}%
+\contentsline {subsection}{\numberline {4.4}ARV Treatment Management}{54}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}ARV Treatment Prescription (UC-016)}{54}{subsubsection.4.4.1}%
+\contentsline {paragraph}{UI Design}{54}{section*.14}%
+\contentsline {paragraph}{Database Access}{54}{section*.15}%
+\contentsline {subsection}{\numberline {4.5}Dashboard Interfaces}{55}{subsection.4.5}%
+\contentsline {subsubsection}{\numberline {4.5.1}Patient Dashboard (UC-004)}{55}{subsubsection.4.5.1}%
+\contentsline {paragraph}{UI Design}{55}{section*.16}%
+\contentsline {subsubsection}{\numberline {4.5.2}Doctor Dashboard (UC-012)}{55}{subsubsection.4.5.2}%
+\contentsline {paragraph}{UI Design}{55}{section*.17}%
+\contentsline {subsection}{\numberline {4.6}Administrative Interfaces}{56}{subsection.4.6}%
+\contentsline {subsubsection}{\numberline {4.6.1}Admin Dashboard (UC-018)}{56}{subsubsection.4.6.1}%
+\contentsline {paragraph}{UI Design}{56}{section*.18}%
+\contentsline {subsubsection}{\numberline {4.6.2}Manager Dashboard (UC-022)}{56}{subsubsection.4.6.2}%
+\contentsline {paragraph}{UI Design}{56}{section*.19}%
+\contentsline {subsection}{\numberline {4.7}Notification System}{57}{subsection.4.7}%
+\contentsline {subsubsection}{\numberline {4.7.1}Notification Center (UC-010, UC-017)}{57}{subsubsection.4.7.1}%
+\contentsline {paragraph}{UI Design}{57}{section*.20}%
+\contentsline {paragraph}{Database Access}{57}{section*.21}%
+\contentsline {section}{\numberline {5}Database Schema}{59}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Core Tables}{59}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}Users Table}{59}{subsubsection.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.1.2}Appointments Table}{59}{subsubsection.5.1.2}%
+\contentsline {subsubsection}{\numberline {5.1.3}ARVTreatments Table}{60}{subsubsection.5.1.3}%
+\contentsline {section}{\numberline {6}Appendix}{62}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Use Case Relationships}{62}{subsection.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.1}Include Relationships}{62}{subsubsection.6.1.1}%
+\contentsline {subsubsection}{\numberline {6.1.2}Extend Relationships}{62}{subsubsection.6.1.2}%
+\contentsline {subsubsection}{\numberline {6.1.3}Generalization Relationships}{62}{subsubsection.6.1.3}%
+\contentsline {subsection}{\numberline {6.2}Business Rules}{62}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Assumptions \& Dependencies}{67}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Limitations \& Exclusions}{67}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Technical Specifications}{67}{subsection.6.5}%

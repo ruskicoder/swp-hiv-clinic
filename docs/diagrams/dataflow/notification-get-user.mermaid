@@ -1,0 +1,50 @@
+sequenceDiagram
+    participant U as User
+    participant NI as NotificationIcon.jsx
+    participant NS as notificationService.js
+    participant API as apiClient.js
+    participant NC as NotificationController.java
+    participant NSS as NotificationService.java
+    participant NR as NotificationRepository
+    participant DB as Database
+
+    U->>NI: Component mounts
+    NI->>NS: startPolling()
+    NS->>NS: _startPolling() [every 30 seconds]
+    
+    loop Polling cycle
+        NS->>API: GET /v1/notifications?status=unread
+        API->>NC: getNotifications(status="unread")
+        NC->>NSS: getUnreadNotificationsByUserId(userId)
+        
+        NSS->>NR: findByUserIdAndIsReadExcludingCancelled(userId, false)
+        NR->>DB: SELECT notifications WHERE userId = ? AND isRead = false AND status != 'CANCELLED'
+        DB-->>NR: Unread notifications
+        NR-->>NSS: List<Notification>
+        
+        NSS->>NSS: filter out cancelled notifications
+        NSS->>NSS: convert to DTOs
+        NSS-->>NC: List<NotificationDto>
+        NC-->>API: ResponseEntity.ok(notifications)
+        API-->>NS: notification data
+        
+        NS->>NS: _filterNewNotifications()
+        alt New notifications found
+            NS->>NS: update internal state
+            NS->>NI: callback with new notifications
+            NI->>NI: update notification badge count
+            NI->>NI: show notification indicators
+        end
+    end
+    
+    U->>NI: Click notification
+    NI->>API: POST /v1/notifications/{id}/read
+    API->>NC: markAsRead(notificationId)
+    NC->>NSS: markAsRead(notificationId, userId)
+    NSS->>NR: update notification set isRead = true
+    NR->>DB: UPDATE notifications SET isRead = true WHERE id = ?
+    DB-->>NR: Update confirmation
+    NR-->>NSS: Updated notification
+    NSS-->>NC: NotificationDto
+    NC-->>API: ResponseEntity.ok()
+    API-->>NI: mark read success

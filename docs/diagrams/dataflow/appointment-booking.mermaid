@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant P as Patient
+    participant CD as CustomerDashboard.jsx
+    participant UC as UnifiedCalendar.jsx
+    participant API as apiClient.js
+    participant AC as AppointmentController.java
+    participant AS as AppointmentService.java
+    participant UR as UserRepository
+    participant ASR as AvailabilitySlotRepository
+    participant AR as AppointmentRepository
+    participant NS as NotificationService.java
+    participant DB as Database
+
+    P->>CD: Select doctor
+    CD->>API: GET /api/doctors/available-slots
+    API-->>CD: available slots
+    CD->>UC: display calendar with slots
+    P->>UC: select date/time
+    UC->>CD: booking request
+    CD->>API: POST /api/appointments/book
+    API->>AC: bookAppointment()
+    AC->>AS: bookAppointment(request, patientId)
+    AS->>UR: validate patient/doctor exists
+    AS->>ASR: validate slot availability
+    AS->>ASR: UPDATE slot SET isBooked = true
+    AS->>AR: INSERT appointment
+    AS->>AS: createStatusHistory(appointment, "Scheduled")
+    AS->>NS: scheduleAppointmentReminders(appointment)
+    NS->>DB: INSERT reminder notifications
+    AS-->>AC: MessageResponse
+    AC-->>API: ResponseEntity
+    API-->>CD: booking result
+    CD->>CD: refresh appointments list
+    CD->>CD: show success message

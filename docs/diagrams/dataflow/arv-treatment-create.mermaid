@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant D as Doctor
+    participant DD as DoctorDashboard.jsx
+    participant ATM as ARVTreatmentModal.jsx
+    participant API as apiClient.js
+    participant ATC as ARVTreatmentController.java
+    participant ATS as ARVTreatmentService.java
+    participant ATVR as ARVTreatmentRepository
+    participant MRR as MedicationRoutineRepository
+    participant NSS as NotificationSchedulingService.java
+    participant DB as Database
+
+    D->>DD: Select patient for ARV treatment
+    DD->>ATM: open treatment modal
+    D->>ATM: fill treatment form (regimen, dosage, schedule)
+    ATM->>API: POST /api/arv-treatments/add
+    API->>ATC: addTreatment(@RequestBody treatmentData, doctorId)
+    ATC->>ATS: createARVTreatment(request, doctorId)
+    
+    ATS->>ATS: validate doctor-patient relationship
+    ATS->>ATS: validate treatment data
+    
+    ATS->>ATVR: save(new ARVTreatment)
+    ATVR->>DB: INSERT ARV treatment record
+    DB-->>ATVR: Created treatment
+    ATVR-->>ATS: ARVTreatment object
+    
+    ATS->>MRR: save(new MedicationRoutine)
+    MRR->>DB: INSERT medication routines
+    DB-->>MRR: Created routines
+    MRR-->>ATS: MedicationRoutine objects
+    
+    ATS->>NSS: scheduleRecurringMedicationReminders(routines)
+    NSS->>DB: INSERT scheduled notifications
+    
+    ATS-->>ATC: MessageResponse.success()
+    ATC-->>API: ResponseEntity.ok()
+    API-->>ATM: creation success
+    ATM->>ATM: close modal
+    DD->>DD: refresh treatment list
