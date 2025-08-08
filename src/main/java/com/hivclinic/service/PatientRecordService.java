@@ -36,6 +36,9 @@ public class PatientRecordService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
+    @Autowired
+    private PatientPrivacyService patientPrivacyService;
+
     /**
      * Get patient record by ID with enhanced validation
      */
@@ -331,6 +334,15 @@ public class PatientRecordService {
                 }
             } catch (Exception e) {
                 logger.warn("Failed to load user details for patient {}: {}", record.getPatientUserID(), e.getMessage());
+            }
+            
+            // Add privacy setting
+            try {
+                boolean isPrivate = patientPrivacyService.getPrivacySettings(record.getPatientUserID());
+                response.put("isPrivate", isPrivate);
+            } catch (Exception e) {
+                logger.warn("Failed to load privacy settings for patient {}: {}", record.getPatientUserID(), e.getMessage());
+                response.put("isPrivate", false); // Default to non-private if we can't determine
             }
         }
 

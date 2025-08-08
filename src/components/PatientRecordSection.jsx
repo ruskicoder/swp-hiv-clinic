@@ -72,8 +72,9 @@ const PatientRecordSection = ({
         currentMedications: record.currentMedications || '',
         notes: record.notes || '',
         bloodType: record.bloodType || '',
-        emergencyContact: record.emergencyContact || '',
-        emergencyPhone: record.emergencyPhone || ''
+        // For private records, don't load emergency contact info to prevent validation issues
+        emergencyContact: record.isPrivate ? '' : (record.emergencyContact || ''),
+        emergencyPhone: record.isPrivate ? '' : (record.emergencyPhone || '')
       });
       setError('');
       console.debug('Form data updated successfully');
@@ -123,20 +124,27 @@ const PatientRecordSection = ({
     setError('');
     setSaveSuccess('');
 
-    // Basic validation
+    // Basic validation - skip emergency contact validation for private records
     const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
-    if (formData.emergencyPhone && !phoneRegex.test(formData.emergencyPhone.replace(/[\s\-()]/g, ''))) {
+    if (!record?.isPrivate && formData.emergencyPhone && !phoneRegex.test(formData.emergencyPhone.replace(/[\s\-()]/g, ''))) {
       setError('Please enter a valid emergency phone number');
       return;
     }
 
-    if (formData.emergencyContact && !formData.emergencyPhone) {
+    if (!record?.isPrivate && formData.emergencyContact && !formData.emergencyPhone) {
       setError('Please provide an emergency phone number when adding an emergency contact');
       return;
     }
 
+    // Prepare data for submission - exclude emergency fields for private records
+    const dataToSave = { ...formData };
+    if (record?.isPrivate) {
+      delete dataToSave.emergencyContact;
+      delete dataToSave.emergencyPhone;
+    }
+
     try {
-      await onSave(formData);
+      await onSave(dataToSave);
       setSaveSuccess('Patient record saved successfully!');
       setTimeout(() => setSaveSuccess(''), 3000);
     } catch (error) {
