@@ -670,6 +670,29 @@ The interface flow demonstrates role-based navigation from public access through
 \end{enumerate} \\
 \hline
 \textbf{Alternative Flows:} &
+\textbf{AF-1:} Emergency appointment booking with priority scheduling \\
+\textbf{AF-2:} Group appointment booking for family consultations \\
+\hline
+\textbf{Exceptions:} &
+\begin{itemize}
+  \item EX-1: Time slot no longer available → System refreshes available slots
+  \item EX-2: Doctor unavailable → System suggests alternative doctors
+  \item EX-3: Appointment limit reached → System enforces maximum appointment policy
+\end{itemize} \\
+\hline
+\textbf{Business Rules:} &
+\begin{itemize}
+  \item BR-019: Patients cannot book overlapping appointments
+  \item BR-020: Appointment cancellations within 24 hours may incur penalties
+  \item BR-021: Maximum 3 future appointments allowed per patient
+\end{itemize} \\
+\hline
+\textbf{Priority:} & High \\
+\hline
+\textbf{Frequency of Use:} & High \\
+\hline
+\hline
+\textbf{Alternative Flows:} &
 \textbf{AF-1:} No available slots → System suggests alternative dates \\
 \textbf{AF-2:} Appointment within 24 hours → Requires confirmation \\
 \hline

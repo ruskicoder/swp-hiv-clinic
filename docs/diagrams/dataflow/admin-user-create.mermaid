@@ -1,0 +1,52 @@
+sequenceDiagram
+    participant A as Admin
+    participant AD as AdminDashboard.jsx
+    participant CUF as CreateUserForm.jsx
+    participant API as apiClient.js
+    participant AC as AdminController.java
+    participant AS as AdminService.java
+    participant UR as UserRepository
+    participant RR as RoleRepository
+    participant PE as PasswordEncoder
+    participant DB as Database
+
+    A->>AD: Navigate to user management
+    AD->>CUF: render create user form
+    CUF->>API: GET /api/admin/roles
+    API->>AC: getAllRoles()
+    AC->>RR: findAll()
+    RR->>DB: SELECT roles
+    DB-->>RR: Available roles
+    RR-->>AC: List<Role>
+    AC-->>API: ResponseEntity.ok(roles)
+    API-->>CUF: role options
+    
+    A->>CUF: fill user form (username, email, role, etc.)
+    CUF->>API: POST /api/admin/users
+    API->>AC: createUserByAdmin(@RequestBody AdminCreateUserRequest)
+    AC->>AS: createUserAccount(request)
+    
+    AS->>UR: existsByUsername(username)
+    AS->>UR: existsByEmail(email)
+    AS->>AS: validate unique constraints
+    
+    AS->>PE: encode(password)
+    PE-->>AS: Encoded password hash
+    
+    AS->>UR: save(new User)
+    UR->>DB: INSERT user record
+    DB-->>UR: Created user
+    UR-->>AS: User object
+    
+    alt Role is DOCTOR
+        AS->>AS: createDoctorProfile(user)
+        AS->>DB: INSERT doctor profile
+    else Role is PATIENT  
+        AS->>AS: createPatientProfile(user)
+        AS->>DB: INSERT patient profile
+    end
+    
+    AS-->>AC: MessageResponse.success()
+    AC-->>API: ResponseEntity.ok()
+    API-->>CUF: creation success
+    CUF->>AD: refresh user list

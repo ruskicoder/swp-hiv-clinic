@@ -1,0 +1,50 @@
+sequenceDiagram
+    participant D as Doctor
+    participant NMD as NotificationManagementDashboard.jsx
+    participant NSM as NotificationSendModal.jsx
+    participant API as apiClient.js
+    participant NC as NotificationController.java
+    participant DNS as DoctorNotificationService.java
+    participant NTS as NotificationTemplateService.java
+    participant NR as NotificationRepository
+    participant DB as Database
+
+    D->>NMD: Click send notification
+    NMD->>NSM: open send modal
+    NSM->>API: GET /v1/notifications/templates
+    API->>NC: getAllTemplates()
+    NC->>NTS: getAllActiveTemplates()
+    NTS->>DB: SELECT templates WHERE isActive = true
+    DB-->>NTS: Template list
+    NTS-->>NC: Templates
+    NC-->>API: ResponseEntity.ok(templates)
+    API-->>NSM: template options
+    
+    NSM->>API: GET /v1/notifications/doctor/patients-with-appointments
+    API->>NC: getPatientsWithAppointments(doctorId)
+    NC->>DNS: getPatientsWithAppointments(doctorId)
+    DNS->>DB: SELECT patients WITH appointments
+    DB-->>DNS: Patient list
+    DNS-->>NC: Patients data
+    NC-->>API: ResponseEntity.ok(patients)
+    API-->>NSM: patient options
+    
+    D->>NSM: select patients + template + custom message
+    NSM->>API: POST /v1/notifications/doctor/send
+    API->>NC: sendNotificationToPatient()
+    NC->>DNS: sendNotificationToPatient(doctorId, patientId, templateId, variables)
+    
+    DNS->>DNS: validate doctor-patient relationship
+    DNS->>NTS: getTemplateById(templateId)
+    DNS->>DNS: processTemplate(template, variables)
+    
+    DNS->>NR: save(notification)
+    NR->>DB: INSERT notification
+    DB-->>NR: Created notification
+    NR-->>DNS: Notification object
+    
+    DNS-->>NC: Success response
+    NC-->>API: ResponseEntity.ok()
+    API-->>NSM: send success
+    NSM->>NSM: close modal
+    NMD->>NMD: refresh notification history

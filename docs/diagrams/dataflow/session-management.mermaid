@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant U as User
+    participant USM as useSessionMonitor.js
+    participant AC as AuthContext.jsx
+    participant API as apiClient.js
+    participant AuthC as AuthController.java
+    participant USS as UserSessionService.java
+    participant DB as Database
+
+    U->>USM: User activity detected
+    USM->>API: GET /api/auth/session/status
+    API->>AuthC: checkSessionStatus()
+    AuthC->>USS: isSessionValid(token)
+    USS->>DB: SELECT session WHERE token = ?
+    DB-->>USS: Session data
+    USS-->>AuthC: session status
+    AuthC-->>API: ResponseEntity
+    API-->>USM: session status
+    
+    alt Session near expiry
+        USM->>USM: show timeout modal
+        U->>USM: extend session
+        USM->>API: POST /api/auth/session/extend
+        API->>AuthC: extendSession()
+        AuthC->>USS: extendUserSession(token)
+        USS->>DB: UPDATE UserSession SET expiryTime = ?
+        USS-->>AuthC: extended session
+    else Session expired
+        USM->>AC: logout()
+        AC->>API: POST /api/auth/logout
+        API->>AuthC: logout()
+        AuthC->>USS: invalidateUserSessions()
+        USS->>DB: UPDATE UserSession SET isActive = false
+    end

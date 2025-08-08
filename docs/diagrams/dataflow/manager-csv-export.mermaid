@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant M as Manager
+    participant MD as ManagerDashboard.jsx
+    participant API as apiClient.js
+    participant EC as ExportController.java
+    participant MS as ManagerService.java
+    participant Repos as Various Repositories
+    participant DB as Database
+
+    M->>MD: Click export button (patients/doctors/appointments)
+    MD->>API: GET /api/export/{entityType}
+    API->>EC: export{EntityType}()
+    EC->>MS: generate{EntityType}CSV()
+    
+    MS->>Repos: findAll{EntityType}WithDetails()
+    Repos->>DB: SELECT entity data WITH related info
+    DB-->>Repos: Complete entity records
+    Repos-->>MS: List<Entity>
+    
+    MS->>MS: buildCSVHeader()
+    MS->>MS: convertToCSVRows(entities)
+    MS->>MS: formatCSVContent()
+    MS-->>EC: CSV string content
+    
+    EC->>EC: createCSVResponse(csv, filename)
+    EC-->>API: ResponseEntity with CSV file
+    API-->>MD: File download response
+    MD->>MD: trigger browser download

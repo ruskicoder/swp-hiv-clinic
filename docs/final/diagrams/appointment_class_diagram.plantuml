@@ -124,14 +124,24 @@ package "Entity Layer" {
     class User {
         -userId: Integer
         -username: String
+        -passwordHash: String
         -email: String
         -firstName: String
         -lastName: String
+        -specialty: String
         -role: Role
         -isActive: Boolean
+        -createdAt: LocalDateTime
+        -updatedAt: LocalDateTime
+        -lastLoginAt: LocalDateTime
         +getFullName(): String
         +isDoctor(): boolean
         +isPatient(): boolean
+        +getAuthorities(): Collection<GrantedAuthority>
+        +isAccountNonExpired(): boolean
+        +isAccountNonLocked(): boolean
+        +isCredentialsNonExpired(): boolean
+        +isEnabled(): boolean
     }
     
     class AppointmentReminder {

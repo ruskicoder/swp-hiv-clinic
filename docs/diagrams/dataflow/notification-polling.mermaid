@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant U as User
+    participant NI as NotificationIcon.jsx
+    participant NS_JS as notificationService.js
+    participant API as apiClient.js
+    participant NC as NotificationController.java
+    participant NS as NotificationService.java
+    participant DB as Database
+
+    U->>NI: Component mount
+    NI->>NS_JS: startPolling()
+    NS_JS->>API: GET /api/notifications/unread
+    API->>NC: getUnreadNotifications()
+    NC->>NS: getUnreadNotificationsForUser(userId)
+    NS->>DB: query unread notifications
+    DB-->>NS: notification list
+    NS-->>NC: List<Notification>
+    NC-->>API: ResponseEntity
+    API-->>NS_JS: notifications data
+    NS_JS->>NI: update notification count
+    NI->>NI: display notification badge

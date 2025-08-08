@@ -12,6 +12,7 @@ erDiagram
         bit IsActive
         datetime2 CreatedAt
         datetime2 UpdatedAt
+        datetime2 LastLoginAt
     }
     
     Roles {
@@ -27,6 +28,7 @@ erDiagram
         int SpecialtyID FK
         string PhoneNumber
         string Bio
+        string Gender
         string ProfileImageBase64
     }
     
@@ -38,8 +40,14 @@ erDiagram
         date DateOfBirth
         string PhoneNumber
         string Address
+        string Gender
         string ProfileImageBase64
         bit IsPrivate
+        string BloodType
+        string EmergencyContact
+        string EmergencyPhone
+        string InsuranceProvider
+        string InsuranceNumber
     }
     
     Specialties {
@@ -91,6 +99,7 @@ erDiagram
     PatientRecords {
         int RecordID PK
         int PatientUserID FK
+        int AppointmentId FK
         string MedicalHistory
         string Allergies
         string CurrentMedications
@@ -238,6 +247,7 @@ erDiagram
     Users ||--o{ AppointmentStatusHistory : "changed by"
     
     Users ||--o{ PatientRecords : "has"
+    Appointments ||--o{ PatientRecords : "records for"
     Users ||--o{ ARVTreatments : "patient"
     Users ||--o{ ARVTreatments : "doctor"
     Appointments ||--o{ ARVTreatments : "prescribed in"

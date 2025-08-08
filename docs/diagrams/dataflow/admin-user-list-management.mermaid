@@ -1,0 +1,41 @@
+sequenceDiagram
+    participant A as Admin
+    participant AD as AdminDashboard.jsx
+    participant PT as PaginatedTable.jsx
+    participant API as apiClient.js
+    participant AC as AdminController.java
+    participant AS as AdminService.java
+    participant UR as UserRepository
+    participant DB as Database
+
+    A->>AD: View users section
+    AD->>API: GET /api/admin/users
+    API->>AC: getAllUsers()
+    AC->>AS: getAllUsersWithProfiles()
+    
+    AS->>UR: findAllWithRoles()
+    UR->>DB: SELECT users WITH roles
+    DB-->>UR: User data with roles
+    UR-->>AS: List<User>
+    
+    AS->>AS: attachProfileData(users)
+    AS->>DB: JOIN with PatientProfiles, DoctorProfiles
+    DB-->>AS: Enhanced user data
+    
+    AS-->>AC: List<UserDTO>
+    AC-->>API: ResponseEntity.ok(users)
+    API-->>AD: user list data
+    
+    AD->>PT: render paginated table
+    PT->>PT: display users with username, email, full name, role, status, actions
+    
+    A->>PT: Search/filter users
+    PT->>AD: filter criteria
+    AD->>API: GET /api/admin/users?search={term}&role={role}
+    API->>AC: searchUsers(criteria)
+    AC->>AS: searchUsersWithCriteria(criteria)
+    AS->>DB: SELECT users WHERE conditions
+    DB-->>AS: Filtered results
+    AS-->>AC: Filtered user list
+    AC-->>API: ResponseEntity.ok()
+    API-->>PT: updated user list

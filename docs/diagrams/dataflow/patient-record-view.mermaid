@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant P as Patient
+    participant CD as CustomerDashboard.jsx
+    participant PRS as PatientRecordSection.jsx
+    participant API as apiClient.js
+    participant PRC as PatientRecordController.java
+    participant PRCS as PatientRecordService.java
+    participant PRR as PatientRecordRepository
+    participant UR as UserRepository
+    participant DB as Database
+
+    P->>CD: Click medical record tab
+    CD->>PRS: render patient record section
+    PRS->>API: GET /api/patient-records/my-record
+    API->>PRC: getMyRecord(@AuthenticationPrincipal UserPrincipal)
+    PRC->>PRCS: getPatientRecordAsMap(userId)
+    
+    PRCS->>PRR: findByPatientUserID(userId)
+    PRR->>DB: SELECT record WHERE patientUserId = ?
+    
+    alt Record exists
+        DB-->>PRR: Patient record data
+        PRR-->>PRCS: PatientRecord
+        PRCS->>PRCS: mapRecordToResponse(record)
+        PRCS->>UR: findById(userId) [for patient details]
+        UR->>DB: SELECT user WHERE id = ?
+        DB-->>UR: User data
+        UR-->>PRCS: User details
+    else No record exists
+        PRCS->>PRR: save(new PatientRecord)
+        PRR->>DB: INSERT new empty record
+        DB-->>PRR: Created record
+        PRR-->>PRCS: New PatientRecord
+    end
+    
+    PRCS-->>PRC: Map<String, Object> record data
+    PRC-->>API: ResponseEntity.ok(record)
+    API-->>PRS: record data
+    PRS->>PRS: populate form fields
+    PRS->>PRS: display medical information

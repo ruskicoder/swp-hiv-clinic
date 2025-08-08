@@ -1,0 +1,33 @@
+sequenceDiagram
+    participant P as Patient/Doctor
+    participant CD as Dashboard
+    participant API as apiClient.js
+    participant AC as AppointmentController.java
+    participant AS as AppointmentService.java
+    participant AR as AppointmentRepository
+    participant ASR as AvailabilitySlotRepository
+    participant AHS as AppointmentStatusHistory
+    participant NS as NotificationService.java
+    participant DB as Database
+
+    P->>CD: Click cancel appointment
+    CD->>CD: prompt for cancellation reason
+    P->>CD: provide reason
+    CD->>API: PUT /api/appointments/{id}/cancel?reason={reason}
+    API->>AC: cancelAppointment(appointmentId, reason, userId)
+    AC->>AS: cancelAppointment(appointmentId, userId, reason)
+    
+    AS->>AR: findById(appointmentId)
+    AS->>AS: validate user permission
+    AS->>AS: validate cancellation rules
+    
+    AS->>AR: UPDATE appointment SET status = 'Cancelled'
+    AS->>AHS: INSERT status change history
+    AS->>ASR: UPDATE slot SET isBooked = false
+    AS->>NS: sendCancellationNotification()
+    
+    AS-->>AC: MessageResponse.success()
+    AC-->>API: ResponseEntity.ok()
+    API-->>CD: cancellation success
+    CD->>CD: refresh appointments
+    CD->>CD: show confirmation message

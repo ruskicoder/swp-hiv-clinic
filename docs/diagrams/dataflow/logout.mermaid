@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant U as User
+    participant Comp as Component
+    participant AC as AuthContext.jsx
+    participant AS as authService.js
+    participant API as apiClient.js
+    participant AuthC as AuthController.java
+    participant USS as UserSessionService.java
+    participant DB as Database
+
+    U->>Comp: Click logout
+    Comp->>AC: logout()
+    AC->>AS: authService.logout()
+    AS->>API: POST /api/auth/logout
+    API->>AuthC: logout()
+    AuthC->>USS: invalidateUserSessions()
+    USS->>DB: UPDATE session status
+    USS-->>AuthC: success
+    AuthC-->>API: ResponseEntity.ok()
+    API-->>AS: success
+    AS-->>AC: success
+    AC->>AC: sessionStorage.clear()
+    AC->>AC: setUser(null)
+    AC->>AC: navigate to login
