@@ -75,7 +75,7 @@ const CreateUserForm = ({ loadDashboardData, setActiveTab }) => {
         // Tự động chuyển đến tab quản lý tương ứng sau 1.5 giây
         setTimeout(() => {
           if (formData.roleName === "Doctor") setActiveTab("doctors");
-          else if (formData.roleName === "Manager") setActiveTab("managers");
+          else if (formData.roleName === "Patient") setActiveTab("patients");
           else setActiveTab("users");
         }, 1500);
       } else {
@@ -145,6 +145,7 @@ const CreateUserForm = ({ loadDashboardData, setActiveTab }) => {
               onChange={handleChange}
               placeholder="Phone Number (Optional)"
             />
+  
             <select
               name="gender"
               value={formData.gender}
@@ -327,7 +328,6 @@ const AdminDashboard = () => {
       )
     },
     { header: "Email", cell: (patient) => safeRender(patient.email) },
-    { header: "Phone", cell: (patient) => safeRender(patient.phoneNumber) },
     {
       header: "Status",
       cell: (patient) => (
@@ -360,8 +360,7 @@ const AdminDashboard = () => {
   const doctorColumns = [
     // Sử dụng "doc" và thêm tiền tố "Dr."
     { header: "Doctor Name", cell: (doc) => `Dr. ${safeRender(doc.username)}` },
-    { header: "Specialization", cell: (doc) => safeRender(doc.specialization) },
-    { header: "Phone", cell: (doc) => safeRender(doc.phoneNumber) },
+    { header: "Specialization", cell: (doc) => safeRender(doc.specialty) },
     { header: "Email", cell: (doc) => safeRender(doc.email) },
     {
       header: "Status",

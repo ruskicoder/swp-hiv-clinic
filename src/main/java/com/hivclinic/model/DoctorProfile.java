@@ -73,4 +73,8 @@ public class DoctorProfile {
         return gender != null ? gender.getDisplayName() : null;
     }
     public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
+    public void setSpecialty(Object specialty2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setSpecialty'");
+    }
 }
