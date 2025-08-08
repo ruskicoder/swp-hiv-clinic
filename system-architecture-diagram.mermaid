@@ -1,0 +1,61 @@
+graph TB
+    %% Client Layer
+    subgraph "Client Layer"
+        Browser[Web Browser / Mobile]
+    end
+
+    %% Frontend Layer
+    subgraph "Frontend Technology Stack"
+        React[React 18]
+        Vite[Vite Build Tool]
+        HttpClient[Axios HTTP Client]
+    end
+
+    %% Backend Layer
+    subgraph "Backend Technology Stack"
+        SpringBoot[Spring Boot 3.2]
+        Tomcat[Embedded Tomcat Server]
+        SpringSecurity[Spring Security]
+        JWT[JWT Authentication]
+        RestAPI[REST API Controllers]
+        BusinessLogic[Service Layer]
+        DataAccess[Repository Layer - JPA/Hibernate]
+    end
+
+    %% Database Layer
+    subgraph "Database Technology"
+        SQLServer[Microsoft SQL Server]
+    end
+
+    %% Technology Flow Connections
+    Browser --> React
+    React -.->|Build Process| Vite
+    React -.->|API Calls| HttpClient
+    
+    HttpClient -.->|HTTPS/REST| RestAPI
+    
+    %% Spring Boot Framework Connections
+    SpringBoot -.->|Web Server| Tomcat
+    SpringBoot -.->|Security Framework| SpringSecurity
+    SpringBoot -.->|Dependency Injection| RestAPI
+    SpringBoot -.->|Dependency Injection| BusinessLogic
+    SpringBoot -.->|Dependency Injection| DataAccess
+    
+    %% Backend Layer Interactions
+    RestAPI -.->|Authentication| SpringSecurity
+    SpringSecurity -.->|Token Validation| JWT
+    RestAPI --> BusinessLogic
+    BusinessLogic --> DataAccess
+    DataAccess -.->|SQL Queries| SQLServer
+
+    %% Styling
+    classDef frontend fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef backend fill:#f3e5f5,stroke:#4a148c,stroke-width:3px
+    classDef database fill:#e8f5e8,stroke:#1b5e20,stroke-width:3px
+    classDef external fill:#fff3e0,stroke:#e65100,stroke-width:3px
+    classDef client fill:#fce4ec,stroke:#880e4f,stroke-width:3px
+
+    class Browser client
+    class React,Vite,HttpClient frontend
+    class SpringBoot,Tomcat,SpringSecurity,JWT,RestAPI,BusinessLogic,DataAccess backend
+    class SQLServer database
